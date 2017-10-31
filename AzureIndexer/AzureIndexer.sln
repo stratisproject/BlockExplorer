@@ -7,6 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.Az
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.IndexerD", "Stratis.IndexerD\Stratis.IndexerD.csproj", "{8E1DCC85-5E80-43AD-8A78-2F9DF8F2B995}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBitcoin", "NStratis\NBitcoin\NBitcoin.csproj", "{02B026C8-97CF-4DEF-96B0-129EA45D0AB3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{557F83DC-ABB5-4B2B-8BB8-4D827608C698}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HashLib", "NStratis\Hashing\HashLib\HashLib.csproj", "{735F817D-E898-46BF-84B8-B2DB7C575792}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +27,21 @@ Global
 		{8E1DCC85-5E80-43AD-8A78-2F9DF8F2B995}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E1DCC85-5E80-43AD-8A78-2F9DF8F2B995}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E1DCC85-5E80-43AD-8A78-2F9DF8F2B995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02B026C8-97CF-4DEF-96B0-129EA45D0AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02B026C8-97CF-4DEF-96B0-129EA45D0AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02B026C8-97CF-4DEF-96B0-129EA45D0AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02B026C8-97CF-4DEF-96B0-129EA45D0AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{735F817D-E898-46BF-84B8-B2DB7C575792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{735F817D-E898-46BF-84B8-B2DB7C575792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{735F817D-E898-46BF-84B8-B2DB7C575792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{735F817D-E898-46BF-84B8-B2DB7C575792}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02B026C8-97CF-4DEF-96B0-129EA45D0AB3} = {557F83DC-ABB5-4B2B-8BB8-4D827608C698}
+		{735F817D-E898-46BF-84B8-B2DB7C575792} = {557F83DC-ABB5-4B2B-8BB8-4D827608C698}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A1C9D456-D421-464C-9B8B-1ADFB22C5A9D}

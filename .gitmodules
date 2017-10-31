@@ -1,0 +1,3 @@
+[submodule "AzureIndexer/NStratis"]
+	path = AzureIndexer/NStratis
+	url = https://github.com/stratisproject/NStratis.git
