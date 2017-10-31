@@ -54,6 +54,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
         }
 
+        /// <summary>
+        /// Initializes an instance of the object.
+        /// </summary>
+        /// <param name="callback">A callback for modifying the settings during startup.</param>
         public AzureIndexerSettings(Action<AzureIndexerSettings> callback)
             : this()
         {
@@ -100,6 +104,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.callback?.Invoke(this);
         }
 
+        /// <summary>
+        /// Prints command line help.
+        /// </summary>
+        /// <param name="mainNet">Used for network-specific help (if any).</param>
         public static void PrintHelp(Network mainNet)
         {
             var defaults = NodeSettings.Default();
