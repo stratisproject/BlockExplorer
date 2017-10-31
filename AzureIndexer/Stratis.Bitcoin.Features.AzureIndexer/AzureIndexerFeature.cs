@@ -1,38 +1,45 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Stratis.Bitcoin.Builder;
 using Stratis.Bitcoin.Builder.Feature;
 using Stratis.Bitcoin.Configuration;
 using Stratis.Bitcoin.Configuration.Logging;
-using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.Interfaces;
-using Stratis.Bitcoin.Utilities;
+using System;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 [assembly: InternalsVisibleTo("Stratis.Bitcoin.Features.AzureIndexer.Tests")]
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    /// <summary>
+    /// The AzureIndexerFeature provides the ".UseAzureIndexer" extension.
+    /// </summary>
     public class AzureIndexerFeature: FullNodeFeature, INodeStats
     {
+        /// <summary>The loop responsible for indexing blocks to azure.</summary>
         protected readonly AzureIndexerLoop indexerLoop;
-        protected readonly NodeSettings nodeSettings;
+
+        /// <summary>The Azure Indexer settings.</summary>
         protected readonly AzureIndexerSettings indexerSettings;
-        protected readonly INodeLifetime nodeLifetime;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
 
-        /// <summary>Factory for creating loggers.</summary>
-        protected readonly ILoggerFactory loggerFactory;
-
+        /// <summary>The name of this feature.</summary>
         protected readonly string name;
 
+        /// <summary>
+        /// Constructs the Azure Indexer feature.
+        /// </summary>
+        /// <param name="azureIndexerLoop">The loop responsible for indexing blocks to azure.</param>
+        /// <param name="nodeSettings">The settings of the full node.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="indexerSettings">The Azure Indexer settings.</param>
+        /// <param name="name">The name of this feature.</param>
         public AzureIndexerFeature(
             AzureIndexerLoop azureIndexerLoop,
-            INodeLifetime nodeLifetime,
             NodeSettings nodeSettings,
             ILoggerFactory loggerFactory,
             AzureIndexerSettings indexerSettings,
@@ -40,14 +47,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.name = name;
             this.indexerLoop = azureIndexerLoop;
-            this.nodeLifetime = nodeLifetime;
-            this.nodeSettings = nodeSettings;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            this.loggerFactory = loggerFactory;
             indexerSettings.Load(nodeSettings);
             this.indexerSettings = indexerSettings;
         }
 
+        /// <summary>
+        /// Displays statistics in the console.
+        /// </summary>
+        /// <param name="benchLogs">The sring builder to add the statistics to.</param>
         public void AddNodeStats(StringBuilder benchLogs)
         {
             var highestBlock = this.indexerLoop.StoreTip;
@@ -59,6 +67,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     highestBlock.HashBlock);
         }
 
+        /// <summary>
+        /// Starts the Azure Indexer feature.
+        /// </summary>
         public override void Start()
         {
             this.logger.LogInformation("Starting {0}...", this.name);
@@ -66,6 +77,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.logger.LogTrace("(-)");
         }
 
+        /// <summary>
+        /// Stops the Azure Indexer feature.
+        /// </summary>
         public override void Stop()
         {
             this.logger.LogInformation("Stopping {0}...", this.name);
@@ -89,8 +103,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 .AddFeature<AzureIndexerFeature>()
                 .FeatureServices(services =>
                 {
-                    services.AddSingleton<BlockStore.IBlockRepository, BlockStore.BlockRepository>();
-                    services.AddSingleton<ConnectionManager>();
                     services.AddSingleton<AzureIndexerLoop>();
                     services.AddSingleton<AzureIndexerSettings>(new AzureIndexerSettings(setup));
                 });
