@@ -35,12 +35,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The last block to index.</summary>
         public int To { get; set; }
 
-        /// <summary>The checkpoint to delete.</summary>
-        public string DeleteCheckpoint { get; set; }
-
-        /// <summary>The checkpoint to add.</summary>
-        public string AddCheckpoint { get; set; }
-
         /// <summary>The storage namespace to use.</summary>
         public string StorageNamespace { get; set; }
 
