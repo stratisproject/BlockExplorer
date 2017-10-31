@@ -76,7 +76,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             indexerConfig.StorageCredentials = new StorageCredentials(
                 this.indexerSettings.AzureAccountName, this.indexerSettings.AzureKey);
-            indexerConfig.StorageNamespace = "";
+            indexerConfig.StorageNamespace = this.indexerSettings.StorageNamespace;
             indexerConfig.Network = this.FullNode.Network;
             indexerConfig.CheckpointSetName = this.indexerSettings.CheckpointsetName;
             indexerConfig.AzureStorageEmulatorUsed = this.indexerSettings.AzureEmulatorUsed;

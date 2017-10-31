@@ -41,6 +41,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The checkpoint to add.</summary>
         public string AddCheckpoint { get; set; }
 
+        /// <summary>The storage namespace to use.</summary>
+        public string StorageNamespace { get; set; }
+
         /// <summary>The callback used to modify settings on startup.</summary>
         private Action<AzureIndexerSettings> callback = null;
 
@@ -80,6 +83,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.From = int.Parse(config.GetOrDefault<string>("indexfrom", "0"));
             this.To = int.Parse(config.GetOrDefault<string>("indexto", int.MaxValue.ToString()));
             this.CheckpointsetName = config.GetOrDefault<string>("chkptset", "default");
+            this.StorageNamespace = config.GetOrDefault<string>("indexprefix", "");
         }
 
         /// <summary>
@@ -109,6 +113,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             builder.AppendLine($"-indexfrom=<int (0 to N)> Block height to start indexing from.");
             builder.AppendLine($"-indexto=<int (0 to N)>   Maximum block height to index.");
             builder.AppendLine($"-chkptset=<string>        Checkpointset name. Default is 'default'.");
+            builder.AppendLine($"-indexprefix=<string>     Name prefix for index tables and blob container.");
 
             defaults.Logger.LogInformation(builder.ToString());
         }
