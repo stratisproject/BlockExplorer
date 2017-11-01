@@ -1,17 +1,12 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin.BitcoinCore;
+using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.OpenAsset;
-using NBitcoin.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,7 +16,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
@@ -31,7 +25,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public void CanSerializeOrderedBalanceToEntity()
         {
             uint256 txId = new uint256(RandomUtils.GetBytes(32));
-            Script script = CreateScript(512);
+            Script script = this.CreateScript(512);
             OrderedBalanceChange balance = new OrderedBalanceChange(txId, script, null, null, 0);
             Assert.Equal(script, balance.ScriptPubKey);
             var entity = balance.ToEntity();
@@ -39,7 +33,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             balance = new OrderedBalanceChange(entity);
             Assert.Equal(script, balance.ScriptPubKey);
 
-            script = CreateScript(513);
+            script = this.CreateScript(513);
             balance = new OrderedBalanceChange(txId, script, null, null, 0);
             Assert.Equal(script, balance.ScriptPubKey);
             entity = balance.ToEntity();
@@ -78,7 +72,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanIndexBlocks()
         {
-            using (var tester = CreateTester())
+            using (var tester = this.CreateTester())
             {
                 var node = tester.CreateLocalNode();
                 node.ChainBuilder.Load("../../../Data/blocks");
@@ -148,7 +142,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanIndexTransactions()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 tester.CreateLocalNode().ChainBuilder.Load("../../../Data/blocks");
                 Assert.Equal(138, tester.Indexer.IndexTransactions());
@@ -159,7 +153,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanManageCheckpoints()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var repo = tester.Indexer.GetCheckpointRepository();
                 var checkpoint = repo.GetCheckpoint("toto");
@@ -207,7 +201,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         //[Fact]
         //public void CanGetOrderedBalance2()
         //{
@@ -226,7 +219,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             BitcoinSecret goldGuy = new BitcoinSecret("KyuzoVnpsqW529yzozkzP629wUDBsPmm4QEkh9iKnvw3Dy5JJiNg");
             BitcoinSecret silverGuy = new BitcoinSecret("L4KvjpqDtdGEn7Lw6HdDQjbg74MwWRrFZMQTgJozeHAKJw5rQ2Kn");
 
-            using (var tester = CreateTester())
+            using (var tester = this.CreateTester())
             {
                 var chainBuilder = tester.CreateChainBuilder();
                 tester.Client.ColoredBalance = true;
@@ -347,9 +340,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                        HashPrevBlock = prev.GetHash()
                    },
                    Transactions =
-					{
-						tx
-					}
+                    {
+                        tx
+                    }
                };
             store.Append(b);
             return b;
@@ -358,7 +351,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanImportMainChain()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var node = tester.CreateLocalNode();
                 var chain = new ConcurrentChain(tester.Client.Configuration.Network);
@@ -416,21 +409,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         //[Fact]
         //public void CanGetMultipleEntries()
         //{
-        //	var client = new IndexerClient(new IndexerConfiguration()
-        //	{
-        //		Network = Network.Main,
+        //  var client = new IndexerClient(new IndexerConfiguration()
+        //  {
+        //     Network = Network.Main,
+        //  });
 
-        //	});
-
-        //	Stopwatch watch = new Stopwatch();
-        //	watch.Start();
-        //	for(int i = 0 ; i < 10 ; i++)
-        //	{
-        //		var r = client.GetAllEntries(JsonConvert.DeserializeObject<string[]>(File.ReadAllText("C:/Addresses.txt")).Select(n => new BitcoinScriptAddress(n, Network.Main)).ToArray());
-        //	}
-        //	watch.Stop();
+        //  Stopwatch watch = new Stopwatch();
+        //  watch.Start();
+        //  for(int i = 0 ; i < 10 ; i++)
+        //  {
+        //      var r = client.GetAllEntries(JsonConvert.DeserializeObject<string[]>(File.ReadAllText("C:/Addresses.txt")).Select(n => new BitcoinScriptAddress(n, Network.Main)).ToArray());
+        //  }
+        //  watch.Stop();
         //}
-
 
         [Fact]
         public void CanGeneratePartitionKey()
@@ -449,15 +440,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             OrderedBalanceChange.ExtractScriptBalances(null, tx, null, null, 0);
         }
 
-
-        TransactionSignature sig = new TransactionSignature(Encoders.Hex.DecodeData("304602210095050cbad0bc3bad2436a651810e83f21afb1cdf75d74a13049114958942067d02210099b591d52665597fd88c4a205fe3ef82715e5a125e0f2ae736bf64dc634fba9f01"));
-
-
-
         [Fact]
         public void CanMergeBalance()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice1 = new Key();
@@ -600,7 +586,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetWalletOrderedBalances()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice1 = new Key();
@@ -644,9 +630,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Equal(2, rules.Length);
                 /////////////////////////////////////////////
 
-
-                tx
-                    = new TransactionBuilder()
+                tx = new TransactionBuilder()
                         .AddKeys(alice1)
                         .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey))
                         .Send(alice2, "2.0")
@@ -659,7 +643,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 chainBuilder.Emit(tx);
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
-
 
                 aliceBalance = tester.Client.GetOrderedBalance("Alice").ToArray();
                 Assert.True(aliceBalance[0].Amount == Money.Parse("-4.0"));
@@ -714,7 +697,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var b3 = chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
 
-
                 aliceBalance = tester.Client.GetOrderedBalance("Alice").ToArray();
                 var entry = aliceBalance[0];
 
@@ -751,7 +733,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                         .SetChange(satoshi)
                         .BuildTransaction(true);
 
-
                 chainBuilder.Emit(tx);
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
@@ -783,7 +764,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanQueryBalanceRange()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 Key bob = new BitcoinSecret("L4JinGSmHxKJJrjbeFx3zxf9Vr3VD6jmq5wXpDm6ywUewcWoXEAy").PrivateKey;
                 var chainBuilder = tester.CreateChainBuilder();
@@ -815,7 +796,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 chainBuilder.SyncIndexer();
 
-
                 var tests = new String[][]
                 {
                      new string[]{"2in", "4in", "tx43,tx42,tx41,tx33,tx32,tx31,tx22,tx21"},
@@ -836,16 +816,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 {
                     var data = test;
                     BalanceQuery query = new BalanceQuery();
-                    query.From = Parse(data[0], all, txs);
-                    query.FromIncluded = ParseIncl(data[0]);
-                    query.To = Parse(data[1], all, txs);
-                    query.ToIncluded = ParseIncl(data[1]);
+                    query.From = this.Parse(data[0], all, txs);
+                    query.FromIncluded = this.ParseIncl(data[0]);
+                    query.To = this.Parse(data[1], all, txs);
+                    query.ToIncluded = this.ParseIncl(data[1]);
 
                     var result = tester.Client.GetOrderedBalance(bob, query).ToArray();
                     var expected = data[2].Split(',').ToArray();
 
                     var expectedResult = String.Join(",", expected);
-                    var actualResult = String.Join(",", result.Select(o => GetName(txs, o)));
+                    var actualResult = String.Join(",", result.Select(o => this.GetName(txs, o)));
                     Assert.Equal(expectedResult, actualResult);
                 }
             }
@@ -881,11 +861,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         [Fact]
         public void CanGetBalanceSheet()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -994,7 +973,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         [Fact]
         public void CustomThreadPoolTaskWorks()
         {
@@ -1027,7 +1005,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanIndexHugeTransaction()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var builder = tester.CreateChainBuilder();
                 Transaction tx = new Transaction();
@@ -1055,7 +1033,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanIndexLongScript()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var tx = Transaction.Parse("010000000127d57276f1026a95b4af3b03b6aba859a001861682342af19825e8a2408ae008010000008c493046022100cd92b992d4bde3b44471677081c5ece6735d6936480ff74659ac1824d8a1958e022100b08839f167532aea10acecc9d5f7044ddd9793ef2989d090127a6e626dc7c9ce014104cac6999d6c3feaba7cdd6c62bce174339190435cffd15af7cb70c33b82027deba06e6d5441eb401c0f8f92d4ffe6038d283d2b2dd59c4384b66b7b8f038a7cf5ffffffff0200093d0000000000434104636d69f81d685f6f58054e17ac34d16db869bba8b3562aabc38c35b065158d360f087ef7bd8b0bcbd1be9a846a8ed339bf0131cdb354074244b0a9736beeb2b9ac40420f0000000000fdba0f76a9144838a081d73cf134e8ff9cfd4015406c73beceb388acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac00000000");
                 tester.Indexer.IndexOrderedBalance(tx);
@@ -1064,11 +1042,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         [Fact]
         public void NonStandardScriptPubKeyDoesNotReturnsWrongBalance()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -1082,8 +1059,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 {
                     ScriptPubKey = bob.ScriptPubKey
                 });
-                NonStandardScriptPubKeyDoesNotReturnsWrongBalanceCore(tester, bob, alice, bobId);
 
+                NonStandardScriptPubKeyDoesNotReturnsWrongBalanceCore(tester, bob, alice, bobId);
 
                 bob = new Key();
                 alice = new Key();
@@ -1100,7 +1077,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 bobCoins.AddRange(chainBuilder.EmitMoney(bob, "5.0").Outputs.AsCoins());
                 bobCoins.AddRange(chainBuilder.EmitMoney(bob, "15.0").Outputs.AsCoins());
 
-
                 var prev = chainBuilder.Emit(new Transaction()
                 {
                     Outputs =
@@ -1112,11 +1088,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 });
 
                 bobCoins.AddRange(prev.Outputs.AsCoins());
-                Shuffle(bobCoins);
+                this.Shuffle(bobCoins);
 
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
-
 
                 var bobBalance = tester.Client.GetOrderedBalance(bobId).ToArray();
                 Assert.True(bobBalance.Length == 3);
@@ -1130,11 +1105,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                         ScriptSig = bob.ScriptPubKey
                     });
                 }
+
                 tx.Outputs.Add(new TxOut(Money.Coins(0.1m), alice));
                 tx.Sign(bob, false);
                 chainBuilder.Emit(tx);
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
+
                 for(int i = 0; i < 2; i++)
                 {
                     bobBalance = tester.Client.GetOrderedBalance(bobId).ToArray();
@@ -1167,7 +1144,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         {
             var chainBuilder = tester.CreateChainBuilder();
             chainBuilder.EmitMoney(bob, "50.0");
-
 
             var prev = chainBuilder.Emit(new Transaction()
             {
@@ -1204,7 +1180,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalancesP2WPKH()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -1226,6 +1202,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     .Send(bob.PubKey.WitHash, "5.0")
                     .SetChange(alice.PubKey.WitHash)
                     .BuildTransaction(true);
+
                 chainBuilder.Emit(tx);
 
                 var block = chainBuilder.SubmitBlock();
@@ -1244,7 +1221,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalancesP2WSH()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -1284,7 +1261,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalances()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -1401,12 +1378,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
-
         [Fact]
         public void CanGetBlock()
         {
-            using(var tester = CreateTester("cached"))
+            using(var tester = this.CreateTester("cached"))
             {
                 tester.Cached = true;
                 tester.ImportCachedBlocks();
@@ -1417,10 +1392,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Null(block);
             }
         }
+
         [Fact]
         public void CanGetTransaction()
         {
-            using(var tester = CreateTester("cached"))
+            using(var tester = this.CreateTester("cached"))
             {
                 tester.Cached = true;
                 tester.ImportCachedBlocks();
@@ -1436,11 +1412,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         [Fact]
         public void CanGetColoredTransaction()
         {
-            using(var tester = CreateTester())
+            using(var tester = this.CreateTester())
             {
                 var node = tester.CreateLocalNode();
                 var ccTester = new ColoredCoinTester("CanColorizeTransferTransaction");
@@ -1465,30 +1440,38 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-
         private IndexerTester CreateTester([CallerMemberName]string folder = null)
         {
             return new IndexerTester(folder);
         }
     }
 
-    class ColoredCoinTester
+    public class ColoredCoinTester
     {
+        private class TestCase
+        {
+            public string test { get; set; }
+            public string testedtx { get; set; }
+            public string[] txs { get; set; }
+        }
+
         public ColoredCoinTester([CallerMemberName]string test = null)
         {
             var testcase = JsonConvert.DeserializeObject<TestCase[]>(File.ReadAllText("../../../Data/openasset-known-tx.json"))
                 .First(t => t.test == test);
+
             NoSqlTransactionRepository repository = new NoSqlTransactionRepository();
+
             foreach(var tx in testcase.txs)
             {
                 var txObj = Transaction.Parse(tx);
-                Transactions.Add(txObj);
+                this.Transactions.Add(txObj);
                 repository.Put(txObj.GetHash(), txObj);
             }
-            TestedTxId = uint256.Parse(testcase.testedtx);
-            Repository = new NoSqlColoredTransactionRepository(repository, new InMemoryNoSqlRepository());
-        }
 
+            this.TestedTxId = uint256.Parse(testcase.testedtx);
+            this.Repository = new NoSqlColoredTransactionRepository(repository, new InMemoryNoSqlRepository());
+        }
 
         public IColoredTransactionRepository Repository
         {
@@ -1520,31 +1503,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     var tx = Transaction.Parse(json["data"]["tx"]["hex"].ToString());
 
                     builder.AppendLine("\"" + json["data"]["tx"]["hex"].ToString() + "\",\r\n");
-                    Repository.Transactions.Put(tx.GetHash(), tx);
+                    this.Repository.Transactions.Put(tx.GetHash(), tx);
                 }
             }
             return builder.ToString();
         }
 
         public List<Transaction> Transactions = new List<Transaction>();
-    }
-
-    class TestCase
-    {
-        public string test
-        {
-            get;
-            set;
-        }
-        public string testedtx
-        {
-            get;
-            set;
-        }
-        public string[] txs
-        {
-            get;
-            set;
-        }
     }
 }
