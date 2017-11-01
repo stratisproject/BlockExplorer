@@ -26,7 +26,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 		public static IndexerConfiguration CreateConfiguration()
 		{
 			var confBuilder = new ConfigurationBuilder();
-			confBuilder.AddUserSecrets(typeof(IndexerTester).Assembly);
 			var config = IndexerConfiguration.FromConfiguration(confBuilder.Build());
 			return config;
 		}
@@ -35,9 +34,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public IndexerTester(string folder)
         {
             TestUtils.EnsureNew(folder);
-			var config = CreateConfiguration();
-            config.Network = Network.TestNet;
-            config.StorageNamespace = folder;
+
+            var config = AzureIndexerLoop.IndexerConfigFromSettings(
+                new AzureIndexerSettings() { StorageNamespace = folder }, Network.TestNet);
+
             _Importer = config.CreateIndexer();
 
 			List<Task> creating = new List<Task>();
