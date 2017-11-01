@@ -214,18 +214,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         //}
 
-        BitcoinSecret alice = new BitcoinSecret("KyJTjvFpPF6DDX4fnT56d2eATPfxjdUPXFFUb85psnCdh34iyXRQ");
-        BitcoinSecret bob = new BitcoinSecret("KysJMPCkFP4SLsEQAED9CzCurJBkeVvAa4jeN1BBtYS7P5LocUBQ");
-        BitcoinSecret nico = new BitcoinSecret("L2uC8xNjmcfwje6eweucYvFsmKASbMDALy4rCJBAg8wofpH6barj");
-        BitcoinSecret satoshi = new BitcoinSecret("L1CpAon5d8zroENbkiMbk3dtd3kcbms6QGF5x475KKTMmXVaJXh3");
-
-        BitcoinSecret goldGuy = new BitcoinSecret("KyuzoVnpsqW529yzozkzP629wUDBsPmm4QEkh9iKnvw3Dy5JJiNg");
-        BitcoinSecret silverGuy = new BitcoinSecret("L4KvjpqDtdGEn7Lw6HdDQjbg74MwWRrFZMQTgJozeHAKJw5rQ2Kn");
-
         [Fact]
         public void CanGetColoredBalance()
         {
-            using(var tester = CreateTester())
+
+            BitcoinSecret alice = new BitcoinSecret("KyJTjvFpPF6DDX4fnT56d2eATPfxjdUPXFFUb85psnCdh34iyXRQ");
+            BitcoinSecret bob = new BitcoinSecret("KysJMPCkFP4SLsEQAED9CzCurJBkeVvAa4jeN1BBtYS7P5LocUBQ");
+            BitcoinSecret nico = new BitcoinSecret("L2uC8xNjmcfwje6eweucYvFsmKASbMDALy4rCJBAg8wofpH6barj");
+            BitcoinSecret satoshi = new BitcoinSecret("L1CpAon5d8zroENbkiMbk3dtd3kcbms6QGF5x475KKTMmXVaJXh3");
+
+            BitcoinSecret goldGuy = new BitcoinSecret("KyuzoVnpsqW529yzozkzP629wUDBsPmm4QEkh9iKnvw3Dy5JJiNg");
+            BitcoinSecret silverGuy = new BitcoinSecret("L4KvjpqDtdGEn7Lw6HdDQjbg74MwWRrFZMQTgJozeHAKJw5rQ2Kn");
+
+            using (var tester = CreateTester())
             {
                 var chainBuilder = tester.CreateChainBuilder();
                 tester.Client.ColoredBalance = true;
@@ -371,12 +372,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Equal(result[0].BlockId, firstTip.GetHash());
                 Assert.Equal(result.Last().BlockId, chain.Tip.HashBlock);
                 Assert.Equal(result.Last().Height, chain.Tip.Height);
-                Assert.Equal(result.Count, 4);
+                Assert.Equal(4, result.Count);
 
                 result = tester.Client.GetChainChangesUntilFork(chain.Tip, false).ToList();
                 Assert.Equal(result[0].BlockId, firstTip.GetHash());
                 Assert.NotEqual(result.Last().BlockId, chain.Tip.HashBlock);
-                Assert.Equal(result.Count, 3);
+                Assert.Equal(3, result.Count);
 
                 Assert.Equal(firstTip.GetHash(), tester.Client.GetBestBlock().BlockId);
 
@@ -591,7 +592,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     + Money.Parse("0.23")
                     );
                 Assert.True(aliceBalance[0].ScriptPubKey == alice1.ScriptPubKey);
-                Assert.True(aliceBalance[0].MatchedRules.Any(m => m.Rule.CustomData == "hello"));
+                Assert.Contains("hello", aliceBalance[0].MatchedRules.Select(m => m.Rule.CustomData));
                 ////
             }
         }
@@ -610,7 +611,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 {
                     CustomData = "hello"
                 });
-                Assert.True(expectedRule.Rule.ToString().Contains("hello"));
+                Assert.Contains("hello", expectedRule.Rule.ToString());
                 var rules = tester.Client.GetWalletRules("Alice");
                 Assert.Equal(1, rules.Length);
                 Assert.Equal(expectedRule.WalletId, rules[0].WalletId);
@@ -988,7 +989,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 bytes = RandomUtils.GetBytes(100);
                 str = FastEncoder.Instance.EncodeData(bytes);
                 actual = FastEncoder.Instance.DecodeData(str);
-                Assert.False(str.Contains('-'));
+                Assert.DoesNotContain("-", str);
                 Assert.True(bytes.SequenceEqual(actual));
             }
         }
