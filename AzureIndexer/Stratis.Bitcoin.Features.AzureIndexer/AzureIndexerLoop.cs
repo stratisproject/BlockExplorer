@@ -66,24 +66,35 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         /// <summary>
+        /// Derives an IndexerConfiguration object from the proviced AzureIndexerSettings object and network.
+        /// </summary>
+        /// <param name="indexerSettings">The AzureIndexerSettings object to use.</param>
+        /// <param name="network">The network to use.</param>
+        /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
+        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network)
+        {
+            IndexerConfiguration indexerConfig = new IndexerConfiguration();
+        
+            indexerConfig.StorageCredentials = new StorageCredentials(
+                indexerSettings.AzureAccountName, indexerSettings.AzureKey);
+            indexerConfig.StorageNamespace = indexerSettings.StorageNamespace;
+            indexerConfig.Network = network;
+            indexerConfig.CheckpointSetName = indexerSettings.CheckpointsetName;
+            indexerConfig.AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed;
+
+            return indexerConfig;
+        }
+
+        /// <summary>
         /// Initializes the Azure Indexer.
         /// </summary>
         public void Initialize()
         {
             this.logger.LogTrace("()");
 
-            IndexerConfiguration indexerConfig = new IndexerConfiguration();
+            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network);
 
-            indexerConfig.StorageCredentials = new StorageCredentials(
-                this.indexerSettings.AzureAccountName, this.indexerSettings.AzureKey);
-            indexerConfig.StorageNamespace = this.indexerSettings.StorageNamespace;
-            indexerConfig.Network = this.FullNode.Network;
-            indexerConfig.CheckpointSetName = this.indexerSettings.CheckpointsetName;
-            indexerConfig.AzureStorageEmulatorUsed = this.indexerSettings.AzureEmulatorUsed;
-
-            this.IndexerConfig = indexerConfig;
-
-            var indexer = indexerConfig.CreateIndexer();
+            var indexer = this.IndexerConfig.CreateIndexer();
             indexer.Configuration.EnsureSetup();
             indexer.TaskScheduler = new CustomThreadPoolTaskScheduler(30, 100);
             indexer.CheckpointInterval = this.indexerSettings.CheckpointInterval;
@@ -94,7 +105,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.AzureIndexer = indexer;
 
             if (this.indexerSettings.IgnoreCheckpoints)
-                this.SetStoreTip(this.Chain.GetBlock(this.indexerSettings.From));
+                this.SetStoreTip(this.Chain.GetBlock(indexer.FromHeight));
             else
             {
                 int minHeight = int.MaxValue;

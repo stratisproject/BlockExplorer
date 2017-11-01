@@ -46,6 +46,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public AzureIndexerSettings()
         {
+            this.AzureAccountName = "devstoreaccount1";
+            this.AzureKey = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+            this.AzureEmulatorUsed = true;
+            this.From = 0;
+            this.To = int.MaxValue;
+            this.StorageNamespace = "";
+            this.CheckpointsetName = "default";
+            this.CheckpointInterval = TimeSpan.Parse("00:15:00");
+            
         }
 
         /// <summary>
@@ -66,12 +75,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             var config = nodeSettings.ConfigReader;
             this.AzureEmulatorUsed = int.Parse(config.GetOrDefault<string>("azemu", "0")) != 0;
-            if (this.AzureEmulatorUsed)
-            {
-                this.AzureAccountName = "devstoreaccount1";
-                this.AzureKey = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
-            }
-            else
+            if (!this.AzureEmulatorUsed)
             {
                 this.AzureAccountName = config.GetOrDefault<string>("azureacc", "");
                 this.AzureKey = config.GetOrDefault<string>("azurekey", "");
