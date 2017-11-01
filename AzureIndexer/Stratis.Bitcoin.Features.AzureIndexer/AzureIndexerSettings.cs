@@ -79,6 +79,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 this.AzureAccountName = config.GetOrDefault<string>("azureacc", "");
                 this.AzureKey = config.GetOrDefault<string>("azurekey", "");
+                // Mime-encoded-data strings should always be a multiple of 4 in length. Provide trailing '='s if omitted..
+                this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
             }
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
             this.IgnoreCheckpoints = int.Parse(config.GetOrDefault<string>("nochkpts", "0")) != 0;
