@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NBitcoin;
 
-namespace NBitcoin.Indexer.Tests
+namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
     public class ChainBuilder
     {
@@ -155,7 +156,7 @@ namespace NBitcoin.Indexer.Tests
 
         public void Load(string blockFolder)
         {
-            var store = new BlockStore(blockFolder, this._Tester.Client.Configuration.Network);
+            var store = new NBitcoin.BitcoinCore.BlockStore(blockFolder, this._Tester.Client.Configuration.Network);
             foreach (var block in store.Enumerate(false))
             {
                 SubmitBlock(block.Item);

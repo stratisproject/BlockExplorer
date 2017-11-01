@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NBitcoin;
 
-namespace NBitcoin.Indexer.Tests
+namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
 	public class MiniNode
 	{
