@@ -226,7 +226,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (this.StoreTip.Height < indexerSettings.To && !cancellationToken.IsCancellationRequested)
             {
                 try
                 {
