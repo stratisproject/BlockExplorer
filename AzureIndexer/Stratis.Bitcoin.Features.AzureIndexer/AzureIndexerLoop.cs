@@ -200,10 +200,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 try
                 {                  
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
-                    }
+                    this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
