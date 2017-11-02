@@ -205,9 +205,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
                     }
                 }
-                catch (Exception)
+                catch (OperationCanceledException)
                 {
-                    // Try again 1 minute later
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // If something goes wrong then try again 1 minute later
+                    IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
             }
@@ -274,6 +279,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                     // Update the StoreTip value from the minHeight
                     this.SetStoreTip(this.Chain.GetBlock(Math.Min(minHeight, this.indexerSettings.To)));
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception ex)
                 {
