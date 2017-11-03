@@ -201,6 +201,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 try
                 {                  
                     this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
