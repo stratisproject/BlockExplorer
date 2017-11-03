@@ -241,10 +241,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public ChainBlockHeader GetBestBlock()
         {
             var table = Configuration.GetChainTable();
-            var part = table.ExecuteQueryAsync(new TableQuery()
+            var part = table.ExecuteQuery(new TableQuery()
             {
                 TakeCount = 1
-            }).GetAwaiter().GetResult().Select(e => new ChainPartEntry(e)).FirstOrDefault();
+            }).Select(e => new ChainPartEntry(e)).FirstOrDefault();
             if(part == null)
                 return null;
 
@@ -265,7 +265,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             foreach(var chainPart in
                 ExecuteBalanceQuery(table, new TableQuery(), new[] { 1, 2, 10 })
             .Concat(
-                    table.ExecuteQueryAsync(new TableQuery()).GetAwaiter().GetResult().Skip(2)
+                    table.ExecuteQuery(new TableQuery()).Skip(2)
                     )
             .Select(e => new ChainPartEntry(e)))
             {
@@ -315,7 +315,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var query = new TableQuery()
                                     .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, searchedEntity.PartitionKey));
             return
-                table.ExecuteQueryAsync(query).GetAwaiter().GetResult()
+                table.ExecuteQuery(query)
                  .Select(e => new WalletRuleEntry(e, this))
                  .ToArray();
         }
@@ -338,7 +338,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return
                 new WalletRuleEntryCollection(
                 Configuration.GetWalletRulesTable()
-                .ExecuteQueryAsync(new TableQuery()).GetAwaiter().GetResult()
+                .ExecuteQuery(new TableQuery())
                 .Select(e => new WalletRuleEntry(e, this)));
         }
 
@@ -574,7 +574,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var table = Configuration.GetBalanceTable();
             List<DynamicTableEntity> unconfirmed = new List<DynamicTableEntity>();
 
-            foreach(var c in table.ExecuteQueryAsync(new BalanceQuery().CreateTableQuery(new BalanceId(scriptPubKey))).GetAwaiter().GetResult())
+            foreach(var c in table.ExecuteQuery(new BalanceQuery().CreateTableQuery(new BalanceId(scriptPubKey))))
             {
                 var change = new OrderedBalanceChange(c);
                 if(change.BlockId != null)
@@ -741,22 +741,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     public static class CloudTableExtensions
     {
         // From: https://stackoverflow.com/questions/24234350/how-to-execute-an-azure-table-storage-query-async-client-version-4-0-1
-        public static async Task<IList<DynamicTableEntity>> ExecuteQueryAsync(this CloudTable table, TableQuery query, CancellationToken ct = default(CancellationToken), Action<IList<DynamicTableEntity>> onProgress = null)
+        public static IEnumerable<DynamicTableEntity> ExecuteQuery(this CloudTable table, TableQuery query, CancellationToken ct = default(CancellationToken))
         {
-
-            var items = new List<DynamicTableEntity>();
             TableContinuationToken token = null;
 
             do
             {
-                var seg = await table.ExecuteQuerySegmentedAsync(query, token);
+                var seg = table.ExecuteQuerySegmentedAsync(query, token).GetAwaiter().GetResult();
                 token = seg.ContinuationToken;
-                items.AddRange(seg);
-                if(onProgress != null) onProgress(items);
-
+                foreach (var tableEntity in seg)
+                    yield return tableEntity;
             } while(token != null && !ct.IsCancellationRequested);
-
-            return items;
         }
     }
 }

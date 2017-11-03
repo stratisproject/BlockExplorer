@@ -64,7 +64,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 foreach (var table in _Importer.Configuration.EnumerateTables())
                 {
 					table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
-                    var entities = table.ExecuteQueryAsync(new TableQuery()).GetAwaiter().GetResult().ToList();
+                    var entities = table.ExecuteQuery(new TableQuery()).ToList();
                     Parallel.ForEach(entities, e =>
                     {
                         table.ExecuteAsync(TableOperation.Delete(e)).GetAwaiter().GetResult();

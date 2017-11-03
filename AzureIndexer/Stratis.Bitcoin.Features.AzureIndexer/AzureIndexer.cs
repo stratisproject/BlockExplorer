@@ -343,7 +343,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         internal const int BlockHeaderPerRow = 6;
-        internal void Index(ChainBase chain, int startHeight)
+        internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<ChainPartEntry> entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
@@ -366,14 +366,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             if(chainPart != null)
                 entries.Add(chainPart);
-            this.Index(entries);
+            this.Index(entries, cancellationToken);
         }
 
-        private void Index(List<ChainPartEntry> chainParts)
+        private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))
         {
             CloudTable table = this.Configuration.GetChainTable();
             TableBatchOperation batch = new TableBatchOperation();
             var last = chainParts[chainParts.Count - 1];
+
             foreach(var entry in chainParts)
             {
                 batch.Add(TableOperation.InsertOrReplace(entry.ToEntity()));
@@ -384,9 +385,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
                 IndexerTrace.RemainingBlockChain(entry.ChainOffset, last.ChainOffset + last.BlockHeaders.Count - 1);
             }
+
             if(batch.Count > 0)
             {
-                table.ExecuteBatchAsync(batch).GetAwaiter().GetResult();
+                table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
             }
         }
 
@@ -443,7 +445,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
 
                 IndexerTrace.IndexingChain(chain.GetBlock(height), chain.Tip);
-                this.Index(chain, height);
+                this.Index(chain, height, cancellationToken);
             }
         }
 

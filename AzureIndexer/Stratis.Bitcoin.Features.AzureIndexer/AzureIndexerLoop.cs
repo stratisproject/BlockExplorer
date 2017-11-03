@@ -47,7 +47,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The highest block that has been indexed.</summary>
         internal ChainedBlock StoreTip { get; private set; }
 
+        /// <summary>The Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
+
+        /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
         
         /// <summary>
@@ -200,14 +203,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 try
                 {                  
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
-                    }
+                    this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
-                catch (Exception)
+                catch (OperationCanceledException)
                 {
-                    // Try again 1 minute later
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // If something goes wrong then try again 1 minute later
+                    IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
             }
@@ -224,7 +230,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (this.StoreTip.Height < indexerSettings.To && !cancellationToken.IsCancellationRequested)
             {
                 try
                 {
@@ -274,6 +280,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                     // Update the StoreTip value from the minHeight
                     this.SetStoreTip(this.Chain.GetBlock(Math.Min(minHeight, this.indexerSettings.To)));
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception ex)
                 {
