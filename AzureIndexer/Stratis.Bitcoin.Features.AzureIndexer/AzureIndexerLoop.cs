@@ -47,7 +47,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The highest block that has been indexed.</summary>
         internal ChainedBlock StoreTip { get; private set; }
 
+        /// <summary>The Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
+
+        /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
         
         /// <summary>
