@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.IndexStore", "Stratis.Bitcoin.Features.IndexStore\Stratis.Bitcoin.Features.IndexStore.csproj", "{C5C08D97-4588-4C87-B1E7-7366BF6F874E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.IndexStore.Tests", "Stratis.Bitcoin.Features.IndexStore.Tests\Stratis.Bitcoin.Features.IndexStore.Tests.csproj", "{C215B5C9-46D0-4B4D-AC99-DBAB20D5D3A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.IndexStoreD", "Stratis.IndexStoreD\Stratis.IndexStoreD.csproj", "{36F86851-1526-4BEA-BE85-2DFA9A319C28}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5C08D97-4588-4C87-B1E7-7366BF6F874E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C08D97-4588-4C87-B1E7-7366BF6F874E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C08D97-4588-4C87-B1E7-7366BF6F874E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C08D97-4588-4C87-B1E7-7366BF6F874E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C215B5C9-46D0-4B4D-AC99-DBAB20D5D3A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C215B5C9-46D0-4B4D-AC99-DBAB20D5D3A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C215B5C9-46D0-4B4D-AC99-DBAB20D5D3A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C215B5C9-46D0-4B4D-AC99-DBAB20D5D3A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F86851-1526-4BEA-BE85-2DFA9A319C28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F86851-1526-4BEA-BE85-2DFA9A319C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F86851-1526-4BEA-BE85-2DFA9A319C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F86851-1526-4BEA-BE85-2DFA9A319C28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1C9D456-D421-464C-9B8B-1ADFB22C5A9D}
+	EndGlobalSection
+EndGlobal
