@@ -2,6 +2,7 @@
 using NBitcoin.Protocol;
 using Stratis.Bitcoin.Builder;
 using Stratis.Bitcoin.Configuration;
+using Stratis.Bitcoin.Features.Consensus;
 using Stratis.Bitcoin.Features.IndexStore;
 using Stratis.Bitcoin.Features.MemoryPool;
 using Stratis.Bitcoin.Utilities;
@@ -26,6 +27,7 @@ namespace Stratis.IndexStoreD
 
             var node = new FullNodeBuilder()
                 .UseNodeSettings(nodeSettings)
+                .UseStratisConsensus()
                 .UseIndexStore()
                 .UseMempool()
                 .Build();
