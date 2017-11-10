@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Web.Http.Dependencies;
 using Autofac.Integration.WebApi;
 using NBitcoin;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using System.IO;
 using System.Threading;
 using Microsoft.WindowsAzure.Storage.Table;

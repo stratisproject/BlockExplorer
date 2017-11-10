@@ -2,7 +2,7 @@
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.Crypto;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using NBitcoin.Protocol;
 using QBitNinja.Models;
 using QBitNinja.Notifications;

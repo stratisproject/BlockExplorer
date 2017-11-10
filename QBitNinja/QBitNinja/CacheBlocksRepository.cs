@@ -1,5 +1,5 @@
 ﻿using NBitcoin;
-using NBitcoin.Indexer.IndexTasks;
+using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

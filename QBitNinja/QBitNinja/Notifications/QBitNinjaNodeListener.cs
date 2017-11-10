@@ -3,8 +3,8 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.Indexer;
-using NBitcoin.Indexer.IndexTasks;
+using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using NBitcoin.Protocol;
 using NBitcoin.Protocol.Behaviors;
 using QBitNinja.Models;
@@ -74,7 +74,7 @@ namespace QBitNinja.Notifications
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
-        private NBitcoin.Indexer.WalletRuleEntryCollection _Wallets;
+        private Stratis.Bitcoin.Features.AzureIndexer.WalletRuleEntryCollection _Wallets;
         ReaderWriterLock _WalletsSlimLock = new ReaderWriterLock();
 
         object _LockBalance = new object();

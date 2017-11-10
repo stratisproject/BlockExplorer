@@ -1,6 +1,6 @@
 ﻿using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using QBitNinja.Models;
 using QBitNinja.Notifications;
 using System;

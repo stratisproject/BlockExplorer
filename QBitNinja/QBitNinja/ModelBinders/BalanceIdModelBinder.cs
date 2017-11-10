@@ -1,6 +1,6 @@
 ﻿using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using System;
 using System.Web.Http.ModelBinding;
 using System.Web.Http.ValueProviders;

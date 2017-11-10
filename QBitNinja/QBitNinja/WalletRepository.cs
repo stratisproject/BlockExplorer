@@ -2,7 +2,7 @@
 using NBitcoin;
 using System.Linq;
 using NBitcoin.Crypto;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using QBitNinja.Models;
 using System;
 using System.Text;

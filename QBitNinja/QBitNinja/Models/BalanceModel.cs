@@ -6,7 +6,7 @@ using NBitcoin.OpenAsset;
 using System;
 
 #if !CLIENT
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 #endif
 #if !CLIENT
 namespace QBitNinja.Models

@@ -1,11 +1,11 @@
-﻿using NBitcoin.Indexer.IndexTasks;
+﻿using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NBitcoin;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using System.Threading;
 
 namespace QBitNinja.Notifications

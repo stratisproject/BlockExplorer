@@ -1,5 +1,5 @@
 ﻿#if !CLIENT
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using NBitcoin.JsonConverters;
 using Newtonsoft.Json;
 using System;

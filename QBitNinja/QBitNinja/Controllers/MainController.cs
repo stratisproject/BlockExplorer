@@ -1,7 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QBitNinja.ModelBinders;

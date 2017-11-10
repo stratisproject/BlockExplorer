@@ -2,8 +2,8 @@
 using Microsoft.WindowsAzure.Storage.Blob;
 using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.Indexer;
-using NBitcoin.Indexer.IndexTasks;
+using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using QBitNinja.Notifications;
 using System;
 using System.Collections.Generic;

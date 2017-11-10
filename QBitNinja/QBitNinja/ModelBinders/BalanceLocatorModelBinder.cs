@@ -1,4 +1,4 @@
-﻿using NBitcoin.Indexer;
+﻿using Stratis.Bitcoin.Features.AzureIndexer;
 using System.Web.Http.ModelBinding;
 using System.Web.Http.ValueProviders;
 

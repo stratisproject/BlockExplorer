@@ -1,5 +1,5 @@
-﻿using NBitcoin.Indexer;
-using NBitcoin.Indexer.IndexTasks;
+﻿using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using QBitNinja.Models;
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace QBitNinja.Notifications
             }
         }
 
-        protected override void ProcessBlock(NBitcoin.Indexer.BlockInfo block, BulkImport<Notify> bulk)
+        protected override void ProcessBlock(Stratis.Bitcoin.Features.AzureIndexer.BlockInfo block, BulkImport<Notify> bulk)
         {
             var notif = new NewBlockNotificationData()
                     {
