@@ -1,23 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Http;
-using System.Web.Mvc;
-using System.Web.Optimization;
 using System.Web.Routing;
 
-namespace Api
+namespace QBitNinja
 {
-    public class WebApiApplication : System.Web.HttpApplication
+    public class WebApiApplication : HttpApplication
     {
+        UpdateChainListener _Listener;
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            _Listener = new UpdateChainListener();
+            _Listener.Listen(GlobalConfiguration.Configuration);
         }
+        protected void Application_End()
+        {
+            if (_Listener != null)
+                _Listener.Dispose();
+        }
+
+       
     }
 }
