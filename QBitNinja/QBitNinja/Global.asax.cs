@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Web;
+﻿using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
+using NBitcoin;
 
 namespace QBitNinja
 {
@@ -11,6 +10,10 @@ namespace QBitNinja
         UpdateChainListener _Listener;
         protected void Application_Start()
         {
+            // load the stratis networks
+            var stratis = Network.StratisMain;
+            var stratisTest = Network.StratisTest;
+
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             _Listener = new UpdateChainListener();

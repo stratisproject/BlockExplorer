@@ -305,9 +305,6 @@
     <Reference Include="Stratis.Bitcoin, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Stratis.Bitcoin.1.0.4-alpha\lib\netstandard2.0\Stratis.Bitcoin.dll</HintPath>
     </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.AzureIndexer, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.Features.AzureIndexer.1.0.2-alpha\lib\netstandard2.0\Stratis.Bitcoin.Features.AzureIndexer.dll</HintPath>
-    </Reference>
     <Reference Include="Stratis.Bitcoin.Features.BlockStore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Stratis.Bitcoin.Features.BlockStore.1.0.4-alpha\lib\netstandard2.0\Stratis.Bitcoin.Features.BlockStore.dll</HintPath>
     </Reference>
@@ -646,6 +643,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj">
+      <Project>{ba1c60ea-42c7-4b63-8dc0-6155c0603700}</Project>
+      <Name>Stratis.Bitcoin.Features.AzureIndexer</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>

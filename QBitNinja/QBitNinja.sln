@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Listener.Console"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QBitNinja.Client.NETCore", "QBitNinja.Client.NETCore\QBitNinja.Client.NETCore.csproj", "{30AEC09B-8D39-417F-85C3-A33F8AFB2193}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{DE989093-1B6D-48E6-BB13-93A799F9CF49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer", "..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj", "{BA1C60EA-42C7-4B63-8DC0-6155C0603700}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,14 +90,14 @@ Global
 		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
 		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA|Any CPU.Build.0 = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
