@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9FC402
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja", "QBitNinja\QBitNinja.csproj", "{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Tests", "QBitNinja.Tests\QBitNinja.Tests.csproj", "{5CB38069-834E-4586-B101-036BDBCA7B92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Client", "QBitNinja.Client\QBitNinja.Client.csproj", "{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}"
@@ -36,14 +34,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.QA|Any CPU.ActiveCfg = QA|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.QA|Any CPU.Build.0 = QA|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.QA-Testnet|Any CPU.ActiveCfg = QA-Testnet|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.QA-Testnet|Any CPU.Build.0 = QA-Testnet|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{39B56DA4-7986-4EA4-8F00-F1E28EFA0101}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CB38069-834E-4586-B101-036BDBCA7B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CB38069-834E-4586-B101-036BDBCA7B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CB38069-834E-4586-B101-036BDBCA7B92}.QA|Any CPU.ActiveCfg = QA|Any CPU
