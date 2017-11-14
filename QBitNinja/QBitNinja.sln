@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QBitNinja.Client.NETCore", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer", "..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj", "{BA1C60EA-42C7-4B63-8DC0-6155C0603700}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{DE989093-1B6D-48E6-BB13-93A799F9CF49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,14 @@ Global
 		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
 		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.ActiveCfg = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.Build.0 = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.ActiveCfg = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.Build.0 = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -306,18 +306,6 @@
     <Reference Include="NLog.Extensions.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.Extensions.Logging.1.0.0-rtm-beta5\lib\net451\NLog.Extensions.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Stratis.Bitcoin, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.1.0.4-alpha\lib\netstandard2.0\Stratis.Bitcoin.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.AzureIndexer, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.Features.AzureIndexer.1.0.2-alpha\lib\netstandard2.0\Stratis.Bitcoin.Features.AzureIndexer.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.BlockStore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.Features.BlockStore.1.0.4-alpha\lib\netstandard2.0\Stratis.Bitcoin.Features.BlockStore.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.Consensus, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.Features.Consensus.1.0.4-alpha\lib\netstandard2.0\Stratis.Bitcoin.Features.Consensus.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext">
       <HintPath>..\packages\System.AppContext.4.3.0\lib\net463\System.AppContext.dll</HintPath>
@@ -648,6 +636,12 @@
     <Content Include="QBitNinja.Tokenized.nuspec">
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj">
+      <Project>{ba1c60ea-42c7-4b63-8dc0-6155c0603700}</Project>
+      <Name>Stratis.Bitcoin.Features.AzureIndexer</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
