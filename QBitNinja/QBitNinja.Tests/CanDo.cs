@@ -1,9 +1,5 @@
-﻿using Microsoft.ServiceBus.Messaging;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
+﻿using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.Indexer;
 using NBitcoin.OpenAsset;
 using NBitcoin.Policy;
 using NBitcoin.Protocol;
@@ -12,6 +8,7 @@ using QBitNinja.Client;
 using QBitNinja.Controllers;
 using QBitNinja.Models;
 using QBitNinja.Notifications;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using System;
 using System.Configuration;
 using System.IO;

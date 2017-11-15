@@ -1,5 +1,5 @@
 ﻿using NBitcoin;
-using NBitcoin.Indexer;
+using Stratis.Bitcoin.Features.AzureIndexer;
 using NBitcoin.Protocol;
 using QBitNinja.Notifications;
 using System;

@@ -155,7 +155,7 @@ namespace QBitNinja
 			}
 		}
 
-		internal Task EnsureSetupAsync()
+		public Task EnsureSetupAsync()
 		{
 			return Task.WhenAll(All.Select(a => a.EnsureExistsAsync()).ToArray());
 		}
