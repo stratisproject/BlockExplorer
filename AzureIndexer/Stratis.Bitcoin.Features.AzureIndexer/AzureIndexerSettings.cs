@@ -74,7 +74,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private void LoadSettingsFromConfig(NodeSettings nodeSettings)
         {
             var config = nodeSettings.ConfigReader;
-            this.AzureEmulatorUsed = int.Parse(config.GetOrDefault<string>("azemu", "0")) != 0;
+            this.AzureEmulatorUsed = config.GetOrDefault<bool>("azemu", false);
             if (!this.AzureEmulatorUsed)
             {
                 this.AzureAccountName = config.GetOrDefault<string>("azureacc", "");
@@ -83,7 +83,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
             }
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
-            this.IgnoreCheckpoints = int.Parse(config.GetOrDefault<string>("nochkpts", "0")) != 0;
+            this.IgnoreCheckpoints = config.GetOrDefault<bool>("nochkpts", false);
             this.From = int.Parse(config.GetOrDefault<string>("indexfrom", "0"));
             this.To = int.Parse(config.GetOrDefault<string>("indexto", int.MaxValue.ToString()));
             this.CheckpointsetName = config.GetOrDefault<string>("chkptset", "default");
