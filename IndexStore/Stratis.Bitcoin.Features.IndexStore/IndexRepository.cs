@@ -27,7 +27,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
         Task<byte[]> LookupAsync(string indexName, byte[] key);
         Task<List<byte[]>> LookupManyAsync(string indexName, byte[] key);
         Task<List<byte[]>> LookupAsync(string indexName, List<byte[]> keys);
-        void DeleteTable(string name);
+        void DeleteIndexTable(string name);
         List<string> GetIndexTables();
     }
 
@@ -79,7 +79,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 // Remove any index tables that are not being used (not transactional).
                 foreach (string indexTable in this.GetIndexTables())
                     if (!transaction.Select<string, string>("Common", indexTable).Exists)
-                        this.DeleteTable(indexTable);
+                        this.DeleteIndexTable(indexTable);
             }
         }
 
@@ -325,8 +325,16 @@ namespace Stratis.Bitcoin.Features.IndexStore
             return this.DBreeze.Scheme.GetUserTableNamesStartingWith(IndexTablePrefix);
         }
 
-        public void DeleteTable(string name)
+        public void DeleteIndexTable(string name)
         {
+            Guard.NotEmpty(name, nameof(name));
+
+            if (!name.StartsWith(IndexRepository.IndexTablePrefix))
+            {
+                throw new InvalidOperationException($"Table name {name} does not start with {IndexRepository.IndexTablePrefix}.");
+            }
+
+
             this.DBreeze.Scheme.DeleteTable(name);
         }
     }

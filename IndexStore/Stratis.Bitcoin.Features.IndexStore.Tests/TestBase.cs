@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Stratis.Bitcoin.Tests
 {
@@ -38,6 +39,14 @@ namespace Stratis.Bitcoin.Tests
             Directory.CreateDirectory(dir);
 
             return dir;
+        }
+
+        public static string AssureEmptyDirWithMethodName(string dir, [CallerMemberName] string methodName = null)
+        {
+            dir = dir.TrimEnd('/');
+            dir = string.Format($"{dir}/{methodName}");
+
+            return AssureEmptyDir(dir);
         }
 
         public void AppendBlocksToChain(ConcurrentChain chain, IEnumerable<Block> blocks)

@@ -6,6 +6,8 @@ using Stratis.Bitcoin.Base;
 using Stratis.Bitcoin.Tests;
 using Xunit;
 using Stratis.Bitcoin.Utilities;
+using System.Threading.Tasks;
+using System;
 
 namespace Stratis.Bitcoin.Features.IndexStore.Tests
 {
@@ -556,6 +558,106 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 Assert.Equal(new uint256(45), blockHashKeyRow.Value);
                 Assert.Empty(blockDict);
                 Assert.Empty(transDict);
+            }
+        }
+
+        [Fact]
+        public void GetIndexTables_NoIndexTablesExist_ReturnsEmptyList()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var engine = repository.GetDbreezeEngine();
+                var transaction = engine.GetTransaction();
+                transaction.InsertTable("Blocks", "", 235);
+                transaction.Commit();
+
+                List<string> result = repository.GetIndexTables();
+
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public void GetIndexTables_IndexTablesExist_ReturnsIndexTables()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var engine = repository.GetDbreezeEngine();
+                var transaction = engine.GetTransaction();
+                transaction.InsertTable("Blocks", "", 235);
+                transaction.InsertTable(IndexRepository.IndexTablePrefix + "Transaction", "", 236);
+                transaction.Commit();
+
+                List<string> result = repository.GetIndexTables();
+
+                Assert.Single(result);
+                Assert.Equal(IndexRepository.IndexTablePrefix + "Transaction", result[0]);
+            }
+        }
+
+        [Fact]
+        public void DeleteTable_TableNameDoesNotStartWithPrefix_ThrowsInvalidOperationException()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+                using (var repository = SetupRepository(Network.Main, dir))
+                {
+                    repository.DeleteIndexTable("Test");
+                }
+            });
+        }
+
+        [Fact]
+        public void DeleteIndexTable_GivenIndexTableExists_RemovesTable()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var engine = repository.GetDbreezeEngine();
+                var transaction = engine.GetTransaction();
+                transaction.InsertTable("Blocks", "", 235);
+                transaction.InsertTable(IndexRepository.IndexTablePrefix + "Transaction", "", 236);
+                transaction.Commit();
+
+                List<string> result = repository.GetIndexTables();
+                Assert.Single(result);
+
+                repository.DeleteIndexTable(IndexRepository.IndexTablePrefix + "Transaction");
+
+                result = repository.GetIndexTables();
+
+                Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public void DeleteIndexTable_GivenIndexTableDoesNotExist_Continues()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var engine = repository.GetDbreezeEngine();
+                var transaction = engine.GetTransaction();
+                transaction.InsertTable("Blocks", "", 235);
+                transaction.InsertTable(IndexRepository.IndexTablePrefix + "Transaction", "", 236);
+
+                transaction.Commit();
+                List<string> result = repository.GetIndexTables();
+                Assert.Single(result);
+
+                repository.DeleteIndexTable(IndexRepository.IndexTablePrefix + "Tree");
+
+                result = repository.GetIndexTables();
+
+                Assert.Single(result);
             }
         }
 
