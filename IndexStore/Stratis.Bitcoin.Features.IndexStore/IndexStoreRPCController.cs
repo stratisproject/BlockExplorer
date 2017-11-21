@@ -5,11 +5,56 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Stratis.Bitcoin.Features.IndexStore;
 using Stratis.Bitcoin.Features.MemoryPool;
-//using Stratis.Bitcoin.Features.RPC.Models;
+using Stratis.Bitcoin.Features.RPC.Models;
+using System;
 
 namespace Stratis.Bitcoin.Features.RPC.Controllers
 {
-    public class IndexStoreRPCController : FeatureController
+    /// <summary>
+    /// An interface for an index store controller.
+    /// </summary>
+    public interface IIndexStoreRPCController
+    {
+        /// <summary>
+        /// Creates a new index.
+        /// </summary>
+        /// <param name="name">The name of the index.</param>
+        /// <param name="multiValue">Indicates whether the index should be multi-value.</param>
+        /// <param name="builder">The index builder.</param>
+        /// <param name="dependencies">A list of index dependencies needed to compile the index.</param>
+        /// <returns>An indication whether the index was successfully created.</returns>
+        Task<bool> CreateIndexAsync(string name, bool multiValue, string builder, string[] dependencies = null);
+
+        /// <summary>
+        /// Describes a given index.
+        /// </summary>
+        /// <param name="name">The name of the index to describe.</param>
+        /// <returns>The index description or null if not found.</returns>
+        string[] DescribeIndex(string name);
+
+        /// <summary>
+        /// Drops the given index when found.
+        /// </summary>
+        /// <param name="name">The name of the index to drop.</param>
+        /// <returns>An indication whether the index was successfully dropped.</returns>
+        Task<bool> DropIndexAsync(string name);
+
+        /// <summary>
+        /// Gets the raw transaction based on the transaction id.
+        /// </summary>
+        /// <param name="txid">The transaction id.</param>
+        /// <param name="verbose">Return a <see cref="TransactionVerboseModel"/> or a <see cref="TransactionBriefModel"/>.</param>
+        /// <returns>The transaction model or null if not found.</returns>
+        Task<TransactionModel> GetRawTransactionAsync(string txid, int verbose = 0);
+
+        /// <summary>
+        /// Lists the index names from the index store.
+        /// </summary>
+        /// <returns>An array of index names.</returns>
+        string[] ListIndexNames();
+    }
+
+    public class IndexStoreRPCController : FeatureController, IIndexStoreRPCController
     {
         private readonly ILogger logger;
         protected IndexStoreManager IndexManager;
@@ -25,9 +70,10 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             this.IndexManager = indexManager;
         }
 
+        /// <inheritdoc />
         [ActionName("createindex")]
         //[ActionDescription("Creates and index in the index store.")]
-        public async Task<bool>CreateIndexAsync(string name, bool multiValue, string builder, string[] dependancies = null)
+        public async Task<bool> CreateIndexAsync(string name, bool multiValue, string builder, string[] dependancies = null)
         {
             if (dependancies?.Length == 0)
                 dependancies = null;
@@ -35,6 +81,7 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             return await this.IndexManager.IndexRepository.CreateIndexAsync(name, multiValue, builder, dependancies);
         }
 
+        /// <inheritdoc />
         [ActionName("dropindex")]
         //[ActionDescription("Drops an index from the index store.")]
         public async Task<bool> DropIndexAsync(string name)
@@ -42,6 +89,7 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             return await this.IndexManager.IndexRepository.DropIndexAsync(name);
         }
 
+        /// <inheritdoc />
         [ActionName("listindexnames")]
         //[ActionDescription("Lists the names of the indexes in the index store.")]
         public string[] ListIndexNames()
@@ -49,6 +97,7 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             return this.IndexManager.IndexRepository.Indexes.Keys.ToArray();
         }
 
+        /// <inheritdoc />
         [ActionName("describeindex")]
         //[ActionDescription("Describes an index in the index store.")]
         public string[] DescribeIndex(string name)
@@ -58,8 +107,9 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
 
             return new string[] { index.ToString() };
         }
-/*
-        [ActionName("getrawtransaction")]
+
+        /// <inheritdoc />
+        [ActionName("getrawindexstoretransaction")]
         //[ActionDescription("Gets a raw transaction from the index store.")]
         public async Task<TransactionModel> GetRawTransactionAsync(string txid, int verbose = 0)
         {
@@ -67,7 +117,9 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             if (!uint256.TryParse(txid, out trxid))
                 throw new ArgumentException(nameof(txid));
 
-            Transaction trx = (await this.MempoolManager?.InfoAsync(trxid))?.Trx;
+            Transaction trx = null;
+            if (this.MempoolManager != null)
+                trx = (await this.MempoolManager?.InfoAsync(trxid))?.Trx;
 
             if (trx == null)
                 trx = await this.IndexManager?.BlockRepository?.GetTrxAsync(trxid);
@@ -83,7 +135,7 @@ namespace Stratis.Bitcoin.Features.RPC.Controllers
             else
                 return new TransactionBriefModel(trx);
         }
-*/
+
         private async Task<ChainedBlock> GetTransactionBlockAsync(uint256 trxid)
         {
             ChainedBlock block = null;

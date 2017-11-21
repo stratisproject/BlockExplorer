@@ -699,7 +699,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 await repository.CreateIndexAsync("Transaction", false, builder);
                 await repository.CreateIndexAsync("Block", false, builder);
            
-                var indexes = repository.ListIndexes();
+                var indexes = repository.ListIndexes().OrderBy(i=> i.Key).ToList();
 
                 // verify it exists.
                 Assert.Equal(2, indexes.Count());
