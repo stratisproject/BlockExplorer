@@ -8,6 +8,7 @@ using Xunit;
 using Stratis.Bitcoin.Utilities;
 using System.Threading.Tasks;
 using System;
+using Stratis.Bitcoin.Configuration;
 
 namespace Stratis.Bitcoin.Features.IndexStore.Tests
 {
@@ -658,6 +659,113 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 result = repository.GetIndexTables();
 
                 Assert.Single(result);
+            }
+        }
+
+        [Fact]
+        public async Task DropIndexAsync_WithName_DropsIndexTableAsync()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
+                    " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
+                await repository.CreateIndexAsync("Transaction", false, builder);
+
+                var indexes = repository.ListIndexes();
+                // verify it exists.
+                Assert.Single(indexes);
+                Assert.True(indexes.First().Key == "Transaction");
+
+                await repository.DropIndexAsync("Transaction");
+
+                indexes = repository.ListIndexes();
+
+                // verify it is dropped.
+                Assert.Empty(indexes);
+            }            
+        }  
+        
+        [Fact]
+        public async Task ListIndexes_HavingEmptyIncludeFilter_ReturnsAllIndexesAsync()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
+                    " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
+                await repository.CreateIndexAsync("Transaction", false, builder);
+                await repository.CreateIndexAsync("Block", false, builder);
+           
+                var indexes = repository.ListIndexes();
+
+                // verify it exists.
+                Assert.Equal(2, indexes.Count());
+                Assert.True(indexes[0].Key == "Block");
+                Assert.True(indexes[1].Key == "Transaction");
+            }
+        }
+
+        
+        [Fact]
+        public async Task ListIndexes_HavingnIncludeFilter_ReturnsMatchingIndexesAsync()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
+                    " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
+                await repository.CreateIndexAsync("Transaction", false, builder);
+                await repository.CreateIndexAsync("Block", false, builder);
+                      
+                var indexes = repository.ListIndexes(i => i.Key == "Transaction");
+
+                // verify it exists.
+                Assert.Single(indexes);
+                Assert.True(indexes.First().Key == "Transaction");
+            }
+        }
+        
+        [Fact]
+        public void GetIndexTableName_WithIndexName_ReturnsIndexTableName()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var result = repository.GetIndexTableName("Trans");
+
+                Assert.Equal("Index_Trans", result);
+            }
+        }
+       
+        [Fact]
+        public void GetDbreezeEngine_ReturnsUnderlyingDbreezeEngine()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var result = repository.GetDbreezeEngine();
+
+                Assert.NotNull(result);
+                Assert.True(result is DBreezeEngine);
+            }
+        }
+
+        [Fact]
+        public void GetNetwork_ReturnsIndexRepositoryNetwork()
+        {
+            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
+
+            using (var repository = SetupRepository(Network.Main, dir))
+            {
+                var result = repository.GetNetwork();
+
+                Assert.Equal(Network.Main, result);
             }
         }
 

@@ -148,6 +148,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
 
         private void DropIndex(string name, DBreeze.Transactions.Transaction transaction)
         {
+            Guard.NotNull(name, nameof(name));
             Guard.NotNull(transaction, nameof(transaction));
 
             string indexTableName = GetIndexTableName(name);
@@ -158,6 +159,9 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 transaction.RemoveKey<string>("Common", indexTableName);
                 if (this.tableNames.Contains(indexTableName))
                     this.tableNames.Remove(indexTableName);
+
+                if (this.Indexes.ContainsKey(name))
+                    this.Indexes.TryRemove(name, out Index index);
             }
         }
 
