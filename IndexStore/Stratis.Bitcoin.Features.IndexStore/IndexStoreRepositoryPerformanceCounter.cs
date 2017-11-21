@@ -1,5 +1,6 @@
 ﻿using Stratis.Bitcoin.Base;
 using Stratis.Bitcoin.Features.BlockStore;
+using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.IndexStore
 {

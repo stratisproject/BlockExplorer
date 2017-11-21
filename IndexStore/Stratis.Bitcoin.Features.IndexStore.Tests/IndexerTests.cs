@@ -14,9 +14,9 @@ using Stratis.Bitcoin.Features.RPC;
 using Xunit;
 
 namespace Stratis.Bitcoin.Features.IndexStore.Tests
-{    
+{
     public class IndexStoreTests
-    {     
+    {
         /// <summary>
         /// Creates a full node with data folder set to the test folder.
         /// </summary>
@@ -30,8 +30,8 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
 
             System.IO.Directory.CreateDirectory(folderName);
 
-            NodeSettings nodeSettings = NodeSettings.FromArguments(new string[] { $"-datadir={folderName}" }, 
-                "stratis", Network.StratisTest, ProtocolVersion.ALT_PROTOCOL_VERSION);
+            NodeSettings nodeSettings = new NodeSettings("stratis", Network.StratisTest, ProtocolVersion.ALT_PROTOCOL_VERSION);
+            nodeSettings = nodeSettings.LoadArguments(new string[] { $"-datadir={folderName}" });
 
             return new FullNodeBuilder()
                 .UseNodeSettings(nodeSettings)
@@ -66,14 +66,14 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
             using (var node = this.CreateTestNode())
             {
                 node.Start();
-                var client = this.CreateRPCClient(node); 
+                var client = this.CreateRPCClient(node);
                 var response = bool.Parse((string)client.SendCommand("createindex", "Output", false,
                     "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[] { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })").Result);
 
                 Assert.True(response);
-            }            
+            }
         }
-        
+
         /// <summary>
         /// Tests whether indexes can be dropped via RPC.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 Assert.True(response2);
             }
         }
-        
+
         /// <summary>
         /// Tests whether indexes can be listed via RPC.
         /// </summary>
@@ -116,7 +116,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 Assert.Contains("Script", result);
             }
         }
-        
+
         /// <summary>
         /// Tests whether indexes can be described via RPC.
         /// </summary>
@@ -135,7 +135,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 Assert.Equal("{\"Name\":\"Output\",\"Table\":\"Index_Output\",\"Builder\":\"" + expr + "\",\"Many\":false,\"Uses\":[\"System\",\"System.Linq\",\"System.Linq.Expressions\",\"System.Collections.Generic\",\"NBitcoin\"]}", description);
             }
         }
-        
+
         /// <summary>
         /// Tests whether a configured single-value index is automatically updated.
         /// </summary>
@@ -148,7 +148,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
             }))
             {
                 node.Start();
-                
+
                 // Transaction has outputs
                 var block = new Block();
                 var trans = new Transaction();
@@ -218,5 +218,5 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
                 Assert.Equal("True", resp);
             }
         }
-    }  
+    }
 }

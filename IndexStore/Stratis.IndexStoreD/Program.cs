@@ -21,7 +21,8 @@ namespace Stratis.IndexStoreD
         public static async Task MainAsync(string[] args)
         {
             Network network = args.Contains("-testnet") ? Network.StratisTest : Network.StratisMain;
-            NodeSettings nodeSettings = NodeSettings.FromArguments(args, "stratis", network, ProtocolVersion.ALT_PROTOCOL_VERSION);
+            NodeSettings nodeSettings = new NodeSettings( "stratis", network, ProtocolVersion.ALT_PROTOCOL_VERSION);
+            nodeSettings = nodeSettings.LoadArguments(args);
 
             // NOTES: running BTC and STRAT side by side is not possible yet as the flags for serialization are static
 
