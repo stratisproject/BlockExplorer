@@ -17,7 +17,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void InitializesGenBlockAndTxIndexOnFirstLoad_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/InitializeGenBlockAndTxIndex");
+            var dir = CreateTestDir(this);
             using (var repository = SetupRepository(Network.Main, dir))
             {
             }
@@ -37,7 +37,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void DoesNotOverwriteExistingBlockAndTxIndexOnFirstLoad_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/NoOverwriteExistingBlockAndTxIndex");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -67,7 +67,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxAsyncWithoutTransactionIndexReturnsNewTransaction_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxAsyncWithoutTxIndex");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -90,7 +90,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxAsyncWithoutTransactionInIndexReturnsNull_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxAsyncWithoutTransactionFound");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -113,7 +113,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxAsyncWithTransactionReturnsExistingTransaction_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxAsyncWithTransaction");
+            var dir = CreateTestDir(this);
             var trans = new Transaction { Version = 125 };
 
             using (var engine = new DBreezeEngine(dir))
@@ -142,7 +142,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxBlockIdAsyncWithoutTxIndexReturnsDefaultId_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxBlockIdAsyncWithoutTxIndex");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -164,7 +164,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxBlockIdAsyncWithoutExistingTransactionReturnsNull_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxBlockIdAsyncWithoutTransaction");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -186,7 +186,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetTrxBlockIdAsyncWithTransactionReturnsBlockId_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetTrxBlockIdAsyncWithoutTransaction");
+            var dir = CreateTestDir(this);
 
             using (var engine = new DBreezeEngine(dir))
             {
@@ -209,7 +209,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void PutAsyncWritesBlocksAndTransactionsToDbAndSavesNextBlockHash_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/PutAsyncStoresBlocksAndTxs");
+            var dir = CreateTestDir(this);
 
             var nextBlockHash = new uint256(1241256);
             var blocks = new List<Block>();
@@ -270,7 +270,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void SetTxIndexUpdatesTxIndex_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/SetTxIndexUpdatesTxIndex");
+            var dir = CreateTestDir(this);
             using (var engine = new DBreezeEngine(dir))
             {
                 var trans = engine.GetTransaction();
@@ -296,7 +296,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void SetBlockHashUpdatesBlockHash_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/SetBlockHashUpdatesBlockHash");
+            var dir = CreateTestDir(this);
             using (var engine = new DBreezeEngine(dir))
             {
                 var trans = engine.GetTransaction();
@@ -322,7 +322,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetAsyncWithExistingBlockReturnsBlock_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetAsyncWithExistingBlock");
+            var dir = CreateTestDir(this);
             var block = new Block();
 
             using (var engine = new DBreezeEngine(dir))
@@ -343,10 +343,8 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
 
         [Fact]
         public void GetAsyncWithoutExistingBlockReturnsNull_IX()
-        {
-            var dir = AssureEmptyDir("TestData/IndexRepository/GetAsyncWithoutExistingBlock");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+        {            
+            using (var repository = SetupRepository(Network.Main))
             {
                 var task = repository.GetAsync(new uint256());
                 task.Wait();
@@ -358,7 +356,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void ExistAsyncWithExistingBlockReturnsTrue_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/ExistAsyncWithExistingBlock");
+            var dir = CreateTestDir(this);
             var block = new Block();
 
             using (var engine = new DBreezeEngine(dir))
@@ -379,10 +377,8 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
 
         [Fact]
         public void ExistAsyncWithoutExistingBlockReturnsFalse_IX()
-        {
-            var dir = AssureEmptyDir("TestData/IndexRepository/ExistAsyncWithoutExistingBlock");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+        {            
+            using (var repository = SetupRepository(Network.Main))
             {
                 var task = repository.ExistAsync(new uint256());
                 task.Wait();
@@ -394,7 +390,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void CreateIndexCreatesMultiValueIndex()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/CreateIndexCreatesMultiValueIndex");
+            var dir = CreateTestDir(this);
             var block = new Block();
             var trans = new Transaction();
             Key key = new Key(); // generate a random private key
@@ -467,7 +463,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void CreateIndexCreatesSingleValueIndex()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/CreateIndexCreatesSingleValueIndex");
+            var dir = CreateTestDir(this);
 
             // Transaction has outputs
             var block = new Block();
@@ -529,7 +525,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void DeleteAsyncRemovesBlocksAndTransactions_IX()
         {
-            var dir = AssureEmptyDir("TestData/IndexRepository/DeleteAsyncRemovesBlocksAndTransactions");
+            var dir = CreateTestDir(this);
             var block = new Block();
             block.Transactions.Add(new Transaction());
 
@@ -565,9 +561,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetIndexTables_NoIndexTablesExist_ReturnsEmptyList()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var engine = repository.GetDbreezeEngine();
                 var transaction = engine.GetTransaction();
@@ -583,9 +577,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetIndexTables_IndexTablesExist_ReturnsIndexTables()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var engine = repository.GetDbreezeEngine();
                 var transaction = engine.GetTransaction();
@@ -605,9 +597,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
-                var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-                using (var repository = SetupRepository(Network.Main, dir))
+                using (var repository = SetupRepository(Network.Main))
                 {
                     repository.DeleteIndexTable("Test");
                 }
@@ -617,9 +607,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void DeleteIndexTable_GivenIndexTableExists_RemovesTable()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var engine = repository.GetDbreezeEngine();
                 var transaction = engine.GetTransaction();
@@ -641,9 +629,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void DeleteIndexTable_GivenIndexTableDoesNotExist_Continues()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var engine = repository.GetDbreezeEngine();
                 var transaction = engine.GetTransaction();
@@ -665,9 +651,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public async Task DropIndexAsync_WithName_DropsIndexTableAsync()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
                     " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
@@ -690,9 +674,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public async Task ListIndexes_HavingEmptyIncludeFilter_ReturnsAllIndexesAsync()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
                     " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
@@ -712,9 +694,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public async Task ListIndexes_HavingnIncludeFilter_ReturnsMatchingIndexesAsync()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var builder = "(t,b,n) => t.Inputs.Select((i, N) => new object[] { new object[]" +
                     " { i.PrevOut.Hash, i.PrevOut.N }, t.GetHash() })";
@@ -732,9 +712,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetIndexTableName_WithIndexName_ReturnsIndexTableName()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var result = repository.GetIndexTableName("Trans");
 
@@ -745,9 +723,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetDbreezeEngine_ReturnsUnderlyingDbreezeEngine()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var result = repository.GetDbreezeEngine();
 
@@ -759,9 +735,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void GetNetwork_ReturnsIndexRepositoryNetwork()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexRepository/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main))
             {
                 var result = repository.GetNetwork();
 
@@ -769,8 +743,11 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
             }
         }
 
-        private Features.IndexStore.IIndexRepository SetupRepository(Network main, string dir)
+        private Features.IndexStore.IIndexRepository SetupRepository(Network main, string dir = null)
         {
+            if (dir == null)
+                dir = CreateTestDir(this);
+
             var repository = new IndexRepository(main, dir, DateTimeProvider.Default, this.loggerFactory);
             repository.InitializeAsync().GetAwaiter().GetResult();
 

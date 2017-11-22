@@ -75,9 +75,7 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
         [Fact]
         public void ListIndexNames_IndexesExist_ReturnsIndexNames()
         {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexStoreRPCController/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+            using (var repository = SetupRepository(Network.Main, CreateTestDir(this)))
             {
                 var builder = "(t,b,n) => t.Outputs.Where(o => o.ScriptPubKey.GetDestinationAddress(n)!=null).Select((o, N) => new object[] { new uint160(o.ScriptPubKey.Hash.ToBytes()), new object[] { t.GetHash(), (uint)N } })";
                 var index = new Index(repository as IndexRepository, "Script", true, builder);
@@ -115,10 +113,8 @@ namespace Stratis.Bitcoin.Features.IndexStore.Tests
 
         [Fact]
         public void DescribeIndex_IndexExists_ReturnsIndexDescription()
-        {
-            var dir = AssureEmptyDirWithMethodName("TestData/IndexStoreRPCController/");
-
-            using (var repository = SetupRepository(Network.Main, dir))
+        {            
+            using (var repository = SetupRepository(Network.Main, CreateTestDir(this)))
             {
                 var builder = "(t,b,n) => t.Outputs.Where(o => o.ScriptPubKey.GetDestinationAddress(n)!=null).Select((o, N) => new object[] { new uint160(o.ScriptPubKey.Hash.ToBytes()), new object[] { t.GetHash(), (uint)N } })";
                 var index = new Index(repository as IndexRepository, "Script", true, builder);
