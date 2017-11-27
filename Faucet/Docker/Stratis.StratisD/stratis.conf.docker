@@ -1,0 +1,35 @@
+####RPC Settings####
+#Activate RPC Server (default: 0)
+server=1
+#Where the RPC Server binds (default: 127.0.0.1 and ::1)
+rpcbind=127.0.0.1
+#Ip address allowed to connect to RPC (default all: 0.0.0.0 and ::)
+rpcallowip=127.0.0.1
+
+apiuri=http://0.0.0.0:37220
+testnet=1
+
+
+addnode=104.219.251.201
+addnode=13.64.76.48
+addnode=13.79.231.82
+addnode=145.249.106.101
+addnode=175.100.48.217
+addnode=175.100.48.242
+addnode=207.244.108.244
+addnode=40.76.18.114
+addnode=51.141.45.80
+addnode=71.89.0.76
+addnode=84.192.155.226
+addnode=173.239.230.26
+addnode=174.117.121.169
+addnode=174.20.111.107
+addnode=206.211.154.16
+addnode=213.93.116.250
+addnode=24.156.246.122
+addnode=63.228.1.11
+addnode=67.169.42.166
+addnode=75.73.97.82
+addnode=87.214.214.101
+addnode=89.188.21.218
+addnode=93.83.225.54
