@@ -1,0 +1,21 @@
+{
+  "Logging": {
+    "IncludeScopes": false,
+    "Debug": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    }
+  },
+  "Faucet": {
+    "FullNodeApiurl": "http://0.0.0.0:37220",
+    "FullNodePassword": "<password>",
+    "FullNodeAccountName": "account 0",
+    "FullNodeWalletName": "<wallet>"
+  }
+}
