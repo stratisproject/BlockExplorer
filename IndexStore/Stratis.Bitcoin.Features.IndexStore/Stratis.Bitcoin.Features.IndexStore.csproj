@@ -25,11 +25,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="NStratis" Version="4.0.0.33" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.0.5-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.5-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.5-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.MemoryPool" Version="1.0.5-alpha" />
+    <PackageReference Include="NStratis" Version="4.0.0.34" />
+    <PackageReference Include="Stratis.Bitcoin" Version="1.0.6-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.6-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.6-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.MemoryPool" Version="1.0.6-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.RPC" Version="1.0.6-alpha" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">

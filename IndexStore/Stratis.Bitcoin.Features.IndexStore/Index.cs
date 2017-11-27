@@ -9,13 +9,19 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using NBitcoin;
 using Newtonsoft.Json;
+using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.IndexStore
 {
     public class IndexExpression
     {
         public static string[] DefaultDependancies = new string[] {
-                    "System", "System.Linq", "System.Linq.Expressions", "System.Collections.Generic", "NBitcoin" };
+            "System",
+            "System.Linq",
+            "System.Linq.Expressions",
+            "System.Collections.Generic",
+            "NBitcoin"
+        };
 
         [JsonProperty(PropertyName = "Builder")]
         public string Builder { get; private set; }
@@ -56,8 +62,8 @@ namespace Stratis.Bitcoin.Features.IndexStore
         }
     }
 
-    public class Index:IndexExpression
-    {     
+    public class Index : IndexExpression
+    {
         public class Comparer : IEqualityComparer<byte[]>
         {
             public bool Equals(byte[] a, byte[] b)
@@ -86,26 +92,30 @@ namespace Stratis.Bitcoin.Features.IndexStore
         [JsonProperty(PropertyName = "Table")]
         public string Table { get; private set; }
 
-        private IndexRepository repository;
+        private IIndexRepository repository;
         private Comparer comparer = new Comparer();
         private ByteListComparer byteListComparer = new ByteListComparer();
 
         private readonly DBreezeEngine dbreeze;
 
-        public Index(IndexRepository repository) 
-            :base(false, null)
+        public Index(IIndexRepository repository)
+            : base(false, null)
         {
+            Guard.NotNull(repository, nameof(repository));
+
             this.repository = repository;
             this.dbreeze = repository.GetDbreezeEngine();
         }
 
-        public Index(IndexRepository repository, string name, bool multiValue, string builder, string[] dependencies = null)
-            :base(multiValue, builder, dependencies)
+        public Index(IIndexRepository repository, string name, bool multiValue, string builder, string[] dependencies = null)
+            : base(multiValue, builder, dependencies)
         {
+            Guard.NotNull(repository, nameof(repository));
+
             this.repository = repository;
             this.dbreeze = repository.GetDbreezeEngine();
             this.Name = name;
-            this.Table = repository.IndexTableName(name);
+            this.Table = repository.GetIndexTableName(name);
 
             try
             {
@@ -116,8 +126,8 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 throw new IndexStoreException("Could not compile index '" + name + "': " + e.Message);
             }
         }
-        
-        public static Index Parse(IndexRepository repository, string json, string table = null)
+
+        public static Index Parse(IIndexRepository repository, string json, string table = null)
         {
             var index = new Index(repository);
 
@@ -212,7 +222,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
             {
                 uint256 blockId = block.GetHash();
                 uint256 trxId = transaction.GetHash();
-                
+
                 foreach (object[] kv in this.compiled(transaction, block, this.repository.GetNetwork()))
                 {
                     byte[] key = kv[0].ToBytes();

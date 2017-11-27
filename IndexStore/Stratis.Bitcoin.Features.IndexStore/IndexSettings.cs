@@ -8,26 +8,26 @@ namespace Stratis.Bitcoin.Features.IndexStore
     /// <summary>
     /// Configuration related to storage of transactions.
     /// </summary>
-    public class IndexSettings:StoreSettings
+    public class IndexSettings : StoreSettings
     {
         private Action<IndexSettings> callback = null;
-        public Dictionary<string, IndexExpression> indexes { get; private set; }
+        public Dictionary<string, IndexExpression> Indexes { get; private set; }
 
         public IndexSettings()
-            :base()
+            : base()
         {
-            this.indexes = new Dictionary<string, IndexExpression>();
+            this.Indexes = new Dictionary<string, IndexExpression>();
         }
 
         public IndexSettings(Action<IndexSettings> callback)
-            :this()
+            : this()
         {
             this.callback = callback;
         }
 
         public void RegisterIndex(string name, string builder, bool multiValue, string[] dependencies = null)
         {
-            this.indexes[name] = new IndexExpression(multiValue, builder, dependencies);
+            this.Indexes[name] = new IndexExpression(multiValue, builder, dependencies);
         }
 
         /// <summary>

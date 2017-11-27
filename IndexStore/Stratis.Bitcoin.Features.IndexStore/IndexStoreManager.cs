@@ -3,18 +3,19 @@ using Stratis.Bitcoin.Base;
 using Stratis.Bitcoin.Configuration;
 using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.Features.BlockStore;
+using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.IndexStore
 {
-    public class IndexStoreManager: BlockStoreManager
+    public class IndexStoreManager : BlockStoreManager
     {
         public IndexStoreManager(ConcurrentChain chain, IConnectionManager connection, IIndexRepository indexRepository,
-            IDateTimeProvider dateTimeProvider, NodeSettings nodeArgs, ChainState chainState, IndexStoreLoop indexStoreLoop):
+            IDateTimeProvider dateTimeProvider, NodeSettings nodeArgs, ChainState chainState, IndexStoreLoop indexStoreLoop) :
             base(chain, connection, indexRepository, dateTimeProvider, nodeArgs, chainState, indexStoreLoop)
         {
 
-        }       
-        
-        public IndexRepository IndexRepository {  get { return this.BlockRepository as IndexRepository;  } }
+        }
+
+        public IIndexRepository IndexRepository { get { return this.BlockRepository as IIndexRepository; } }
     }
 }

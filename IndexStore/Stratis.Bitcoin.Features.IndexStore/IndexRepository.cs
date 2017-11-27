@@ -10,6 +10,7 @@ using Stratis.Bitcoin.Base;
 using Stratis.Bitcoin.Configuration;
 using Stratis.Bitcoin.Features.BlockStore;
 using Stratis.Bitcoin.Utilities;
+using DBreeze;
 
 namespace Stratis.Bitcoin.Features.IndexStore
 {
@@ -18,33 +19,39 @@ namespace Stratis.Bitcoin.Features.IndexStore
         Task<bool> CreateIndexAsync(string name, bool multiValue, string builder, string[] dependencies = null);
         Task<bool> DropIndexAsync(string name);
         KeyValuePair<string, Index>[] ListIndexes(Func<KeyValuePair<string, Index>, bool> include = null);
+        string GetIndexTableName(string indexName);
+        DBreezeEngine GetDbreezeEngine();
+        Network GetNetwork();
+        ConcurrentDictionary<string, Index> Indexes { get; }
 
         Task<byte[]> LookupAsync(string indexName, byte[] key);
         Task<List<byte[]>> LookupManyAsync(string indexName, byte[] key);
         Task<List<byte[]>> LookupAsync(string indexName, List<byte[]> keys);
+        void DeleteIndexTable(string name);
+        List<string> GetIndexTables();
     }
 
     public class IndexRepository : BlockRepository, IIndexRepository
     {
         private readonly HashSet<string> tableNames;
-        public ConcurrentDictionary<string, Index> Indexes;
+        public ConcurrentDictionary<string, Index> Indexes { get; private set; }
         private Dictionary<string, IndexExpression> requiredIndexes;
 
-        private const string IndexTablePrefix = "Index_";
-
-        public string IndexTableName(string indexName)
-        {
-            return IndexTablePrefix + indexName;
-        }
+        public const string IndexTablePrefix = "Index_";
 
         public IndexRepository(Network network, DataFolder dataFolder, IDateTimeProvider dateTimeProvider, ILoggerFactory loggerFactory, IndexSettings indexSettings = null)
-            : this(network, dataFolder.IndexPath, dateTimeProvider, loggerFactory, indexSettings.indexes)
+            : this(network, dataFolder.IndexPath, dateTimeProvider, loggerFactory, indexSettings.Indexes)
         {
         }
 
-        public IndexRepository(Network network, string folder, IDateTimeProvider dateTimeProvider, ILoggerFactory loggerFactory, Dictionary<string, IndexExpression> requiredIndexes = null):
+        public IndexRepository(Network network, string folder, IDateTimeProvider dateTimeProvider, ILoggerFactory loggerFactory, Dictionary<string, IndexExpression> requiredIndexes = null) :
             base(network, folder, dateTimeProvider, loggerFactory)
         {
+            Guard.NotNull(network, nameof(network));
+            Guard.NotEmpty(folder, nameof(folder));
+            Guard.NotNull(dateTimeProvider, nameof(dateTimeProvider));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+
             this.tableNames = new HashSet<string> { "Block", "Transaction", "Common" };
             this.Indexes = new ConcurrentDictionary<string, Index>();
             this.requiredIndexes = requiredIndexes;
@@ -72,7 +79,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 // Remove any index tables that are not being used (not transactional).
                 foreach (string indexTable in this.GetIndexTables())
                     if (!transaction.Select<string, string>("Common", indexTable).Exists)
-                        this.DeleteTable(indexTable);
+                        this.DeleteIndexTable(indexTable);
             }
         }
 
@@ -83,7 +90,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
 
         public override Task InitializeAsync()
         {
-            Task task = base.InitializeAsync().ContinueWith((o) => 
+            Task task = base.InitializeAsync().ContinueWith((o) =>
             {
                 using (DBreeze.Transactions.Transaction transaction = this.DBreeze.GetTransaction())
                 {
@@ -119,7 +126,7 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 }
             });
 
-            return task; 
+            return task;
         }
 
         public Task<bool> DropIndexAsync(string name)
@@ -141,7 +148,10 @@ namespace Stratis.Bitcoin.Features.IndexStore
 
         private void DropIndex(string name, DBreeze.Transactions.Transaction transaction)
         {
-            string indexTableName = IndexTableName(name);
+            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(transaction, nameof(transaction));
+
+            string indexTableName = GetIndexTableName(name);
 
             if (transaction.Select<string, string>("Common", indexTableName).Exists)
             {
@@ -149,12 +159,27 @@ namespace Stratis.Bitcoin.Features.IndexStore
                 transaction.RemoveKey<string>("Common", indexTableName);
                 if (this.tableNames.Contains(indexTableName))
                     this.tableNames.Remove(indexTableName);
+
+                if (this.Indexes.ContainsKey(name))
+                    this.Indexes.TryRemove(name, out Index index);
             }
         }
 
         public KeyValuePair<string, Index>[] ListIndexes(Func<KeyValuePair<string, Index>, bool> include = null)
         {
-            return this.Indexes.Where(include).ToArray();
+            if (include != null)
+            {
+                return this.Indexes.Where(include).ToArray();
+            }
+
+            return this.Indexes.ToArray();
+        }
+
+        public string GetIndexTableName(string indexName)
+        {
+            Guard.NotEmpty(indexName, nameof(indexName));
+
+            return IndexTablePrefix + indexName;
         }
 
         public Task<bool> CreateIndexAsync(string name, bool multiValue, string builder, string[] dependencies = null)
@@ -304,8 +329,16 @@ namespace Stratis.Bitcoin.Features.IndexStore
             return this.DBreeze.Scheme.GetUserTableNamesStartingWith(IndexTablePrefix);
         }
 
-        public void DeleteTable(string name)
+        public void DeleteIndexTable(string name)
         {
+            Guard.NotEmpty(name, nameof(name));
+
+            if (!name.StartsWith(IndexRepository.IndexTablePrefix))
+            {
+                throw new InvalidOperationException($"Table name {name} does not start with {IndexRepository.IndexTablePrefix}.");
+            }
+
+
             this.DBreeze.Scheme.DeleteTable(name);
         }
     }
