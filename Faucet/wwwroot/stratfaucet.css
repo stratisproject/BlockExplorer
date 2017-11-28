@@ -1,11 +1,6 @@
 body {
     font-family:  "Open Sans", Helvetica, Arial, sans-serif;
 }
-
-.navbar a:focus, .navbar a:hover{
-    color:black !important;
- }
-
- .btn {
-    border: 1px solid black;
- }
+body {
+  background: #f3f3f4;
+}
