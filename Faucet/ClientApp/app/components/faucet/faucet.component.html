@@ -1,21 +1,21 @@
-<div class="faucet col-sm-9">
-  <h1>Get TSTRAT for testing</h1>
-  <p>I have currently have {{ this.balance ? this.balance.balance : 0}} TSTRAT to share </p>
-  <p>When you're done, you can return them back here: {{this.balance ? this.balance.returnAddress : "?"}}</p>
-  <div class="row d-flex justify-content-center">
-    <form class="col-sm-12 text-left panel" [formGroup]="sendCoinForm">
-      <div class="form-group">
-        <label class="text-left" for="Address">Address</label>
-        <input type="text" class="form-control" id="address" formControlName="address" placeholder="Enter your TSTRAT address.">
-        <div *ngIf="formErrors.address" class="form-control-feedback">{{ formErrors.address }}</div>
-        <button type="button" class="btn btn-sm" [disabled]="!sendCoinForm.valid" (click)="onSendClick()">Get TSTRAT</button>
-      </div>
-    </form>
-    <div *ngIf="this.transaction" class="jumbotron">
-      <h3 class="row col-sm-12">Success! Transaction: </h3>
-      <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{this.transaction.confirmation}}.htm">
-        {{this.transaction.confirmation}}
-      </a>
+<div class="faucet">
+  <h2>Get TSTRAT For Testing</h2>
+  <p>
+    I have currently have {{ this.balance ? this.balance.balance : 0}} TSTRAT to share. 
+    When you're done, you can return them back here: {{this.balance ? this.balance.returnAddress : "?"}}
+  </p>
+  <form class="text-left panel" [formGroup]="sendCoinForm">
+    <div class="form-group">
+      <label class="control-label" for="Address">Address</label>
+      <input type="text" class="form-control" id="address" formControlName="address" placeholder="Enter your TSTRAT address.">
+      <div *ngIf="formErrors.address" class="form-control-feedback">{{ formErrors.address }}</div>
     </div>
+    <button type="button" class="btn btn-primary btn-block" [disabled]="!sendCoinForm.valid" (click)="onSendClick()">Get TSTRAT</button>
+  </form>
+  <div *ngIf="this.transaction" class="jumbotron">
+    <h3>Success! Transaction: </h3>
+    <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{this.transaction.confirmation}}.htm">
+      {{this.transaction.confirmation}}
+    </a>
   </div>
 </div>
