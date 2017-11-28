@@ -1,7 +1,7 @@
 <div class="faucet">
   <h2>Get TSTRAT For Testing</h2>
   <p>
-    I have currently have {{ this.balance ? this.balance.balance : 0}} TSTRAT to share. 
+    I have currently {{ this.balance ? this.balance.balance : 0}} TSTRAT to share. 
     When you're done, you can return them back here: {{this.balance ? this.balance.returnAddress : "?"}}
   </p>
   <form class="text-left panel" [formGroup]="sendCoinForm">
