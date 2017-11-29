@@ -60,7 +60,7 @@ namespace FaucetSite.Lib
         }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
-            var amount = (await GetBalance()).balance / 100;
+            var amount = 10m;
 
             BuildTransaction buildTransaction = new BuildTransaction
             {

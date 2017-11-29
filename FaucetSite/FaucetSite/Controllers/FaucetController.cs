@@ -15,12 +15,10 @@ namespace FaucetSite.Controllers
     public class FaucetController : Controller
     {
         private IWalletUtils walletUtils;
-        private readonly IConfiguration config;
 
         public FaucetController(IConfiguration config)
         {
             walletUtils = new WalletUtils(config);
-            this.config = config;
         }
 
 
@@ -41,15 +39,6 @@ namespace FaucetSite.Controllers
         public async Task<Transaction> SendCoin([FromBody] Recipient model)
         {
             return await walletUtils.SendCoin(model);
-        }
-
-        [HttpGet("Configs")]
-        public IActionResult Configs()
-        {
-            var apiUrl = config["Faucet:FullNodeApiUrl"];
-            var password = config["Faucet:FullNodePassword"];
-
-            return Json(new { apiUrl, password });
         }
     }
 }
