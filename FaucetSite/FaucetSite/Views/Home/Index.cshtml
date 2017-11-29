@@ -14,11 +14,11 @@
                     </div>
                     <button type="button" class="btn btn-primary btn-block" data-bind="click:onSendClick, enable: valid">Get TSTRAT</button>
                 </form>
-                <div data-bind="if:transaction">
+                <div data-bind="if:transactionId()">
                     <div class="alert alert-success">
                         <strong>Success! Transaction: </strong>
-                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transaction().transactionId}}.htm">
-                            {{transaction().confirmation}}
+                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transactionId}}.htm" target="_blank">
+                            {{transactionId}}
                         </a>
                         <p>When you're done, you can return them back here: {{balance.returnAddress}}</p>
                     </div>
