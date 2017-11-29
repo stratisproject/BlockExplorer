@@ -64,7 +64,7 @@ namespace FaucetSite.Lib
         }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
-            var amount = (await GetBalance()).balance / 100;
+            var amount = 0.1m;//?? (await GetBalance()).balance / 100;
 
             BuildTransaction buildTransaction = new BuildTransaction{
                 WalletName = walletName,
@@ -72,17 +72,13 @@ namespace FaucetSite.Lib
                 CoinType = 105,
                 Password = password,
                 DestinationAddress = recipient.address,
-                Amount = amount.ToString(),
+                Amount = amount,
                 FeeType = "low",
                 AllowUnconfirmed = true
             };
+
             var transaction = await stratApi.BuildTransaction(buildTransaction);
 
-            SendTransaction sendTransaction = new SendTransaction{
-                Hex = transaction.Hex
-            };
-
-          var resp =  await stratApi.SendTransaction(sendTransaction);
           return new Transaction{
               transactionId = transaction.TransactionId
           };

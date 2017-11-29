@@ -31,13 +31,13 @@ namespace FaucetSite.Controllers
         [HttpGet("GetBalance")]
         public async Task<Balance> GetBalance()
         {
-            return await walletUtils.GetBalance();
+          return await walletUtils.GetBalance();
         }
 
         [HttpPost("SendCoin")]
-        public async Task<Transaction> SendCoin([FromBody] Recipient address)
+        public async Task<Transaction> SendCoin([FromBody] Recipient model)
         {
-            return await walletUtils.SendCoin(address);
+            return await walletUtils.SendCoin(model);
         }
     }
 }
