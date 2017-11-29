@@ -5,8 +5,9 @@ function Model() {
     self.balance = { balance: ko.observable(0), returnAddress: ko.observable('') };
     self.address = ko.observable();
     self.transactionId = ko.observable();
-    self.valid = ko.computed(function () {
-        return $.trim(self.address()).length == 34;
+    self.inProgress = ko.observable(false);
+    self.disableSubmit = ko.computed(function () {
+        return self.inProgress() || $.trim(self.address()).length != 34;
     });
     self.confirmation = ko.observable(0);
     $.getJSON('api/Faucet/GetBalance').done(function (result) {
@@ -16,6 +17,7 @@ function Model() {
     });
 
     self.onSendClick = function () {
+        self.inProgress(true);
         $.ajax({
             url: 'api/Faucet/SendCoin', 
             method:'POST',
@@ -25,7 +27,9 @@ function Model() {
         }).done(function (result) {
             self.transactionId(result.transactionId);
             self.address('');
-        });
+            }).always(function () {
+                self.inProgress(false);
+            });
     }
 }
 

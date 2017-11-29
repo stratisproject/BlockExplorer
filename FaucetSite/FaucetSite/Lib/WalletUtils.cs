@@ -60,8 +60,6 @@ namespace FaucetSite.Lib
         }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
-            var amount = 10m;
-
             BuildTransaction buildTransaction = new BuildTransaction
             {
                 WalletName = walletName,
@@ -69,7 +67,7 @@ namespace FaucetSite.Lib
                 CoinType = 105,
                 Password = password,
                 DestinationAddress = recipient.address,
-                Amount = amount,
+                Amount = 4m,
                 FeeType = "low",
                 AllowUnconfirmed = true
             };
