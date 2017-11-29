@@ -60,7 +60,7 @@ namespace FaucetSite.Lib
         }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
-            var amount = 0.1m;//?? (await GetBalance()).balance / 100;
+            var amount = (await GetBalance()).balance / 100;
 
             BuildTransaction buildTransaction = new BuildTransaction
             {
@@ -75,6 +75,8 @@ namespace FaucetSite.Lib
             };
 
             var transaction = await stratApi.BuildTransaction(buildTransaction);
+
+            var resp = await stratApi.SendTransaction(new SendTransaction { Hex = transaction.Hex });
 
             return new Transaction
             {
