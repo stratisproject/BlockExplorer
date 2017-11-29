@@ -35,11 +35,7 @@ namespace FaucetSite.Lib
             accountName = _config["Faucet:FullNodeAccountName"];
             walletName = _config["Faucet:FullNodeWalletName"];
 
-            stratApi = RestService.For<IStratisWalletAPI>(apiUrl,
-            new RefitSettings
-            {
-            }
-          );
+            stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
         public async Task<Balance> GetBalance()
         {
@@ -50,7 +46,7 @@ namespace FaucetSite.Lib
                 return new Balance
                 {
                     balance = (bal.BalancesList.First().AmountConfirmed / coinDivisor),
-                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") -1)
+                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") - 1)
                 };
             }
             catch (Exception e)
@@ -66,7 +62,8 @@ namespace FaucetSite.Lib
         {
             var amount = 0.1m;//?? (await GetBalance()).balance / 100;
 
-            BuildTransaction buildTransaction = new BuildTransaction{
+            BuildTransaction buildTransaction = new BuildTransaction
+            {
                 WalletName = walletName,
                 AccountName = accountName,
                 CoinType = 105,
@@ -79,9 +76,10 @@ namespace FaucetSite.Lib
 
             var transaction = await stratApi.BuildTransaction(buildTransaction);
 
-          return new Transaction{
-              transactionId = transaction.TransactionId
-          };
+            return new Transaction
+            {
+                transactionId = transaction.TransactionId
+            };
         }
         public bool newRecipient(Recipient recipient)
         {
