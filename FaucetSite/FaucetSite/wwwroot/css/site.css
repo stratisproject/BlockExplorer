@@ -1,15 +1,29 @@
 ﻿body {
-    background: #f3f3f4;
+    background: url(/images/background.jpg) no-repeat #f3f3f4;
+    background-size: cover;
 }
 
 .body-content {
-    width: 460px;
-    background-color: #ffffff;
-    color: inherit;
-    padding: 15px 20px 20px 20px;
-    border-color: #e7eaec;
-    border-image: none;
-    border-style: solid solid none;
-    border-width: 1px 0;
     margin-top: 100px;
+}
+
+form{
+    margin-top:30px;
+    width:350px;
+}
+p {
+    color: #CCCCCC;
+}
+.main-title {
+    color: #1487C8;
+    font-weight: 600;
+    font-size: 3em;
+}
+
+.btn-primary {
+    background-color: #1487C8;
+}
+
+.alert{
+    margin-top:20px;
 }
