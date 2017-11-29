@@ -35,11 +35,7 @@ namespace FaucetSite.Lib
             accountName = _config["Faucet:FullNodeAccountName"];
             walletName = _config["Faucet:FullNodeWalletName"];
 
-            stratApi = RestService.For<IStratisWalletAPI>(apiUrl,
-            new RefitSettings
-            {
-            }
-          );
+            stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
         public async Task<Balance> GetBalance()
         {
@@ -50,7 +46,7 @@ namespace FaucetSite.Lib
                 return new Balance
                 {
                     balance = (bal.BalancesList.First().AmountConfirmed / coinDivisor),
-                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") -1)
+                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") - 1)
                 };
             }
             catch (Exception e)
@@ -64,28 +60,26 @@ namespace FaucetSite.Lib
         }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
-            var amount = (await GetBalance()).balance / 100;
+            var amount = 0.1m;//?? (await GetBalance()).balance / 100;
 
-            BuildTransaction buildTransaction = new BuildTransaction{
+            BuildTransaction buildTransaction = new BuildTransaction
+            {
                 WalletName = walletName,
                 AccountName = accountName,
                 CoinType = 105,
                 Password = password,
                 DestinationAddress = recipient.address,
-                Amount = amount.ToString(),
+                Amount = amount,
                 FeeType = "low",
                 AllowUnconfirmed = true
             };
+
             var transaction = await stratApi.BuildTransaction(buildTransaction);
 
-            SendTransaction sendTransaction = new SendTransaction{
-                Hex = transaction.Hex
+            return new Transaction
+            {
+                transactionId = transaction.TransactionId
             };
-
-          var resp =  await stratApi.SendTransaction(sendTransaction);
-          return new Transaction{
-              transactionId = transaction.TransactionId
-          };
         }
         public bool newRecipient(Recipient recipient)
         {

@@ -16,9 +16,10 @@ function Model() {
     });
 
     self.onSendClick = function () {
-        $.post({
+        $.ajax({
             url: 'api/Faucet/SendCoin', 
-            data: { address: self.address() },
+            method:'POST',
+            data: JSON.stringify({ address: self.address() }),
             dataType: 'json',
             contentType: 'application/json; charset=utf-8'
         }).done(function (result) {
