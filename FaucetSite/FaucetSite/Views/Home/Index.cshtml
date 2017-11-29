@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class='container-fluid'>
+    <div class='row' data-bind="visible:loaded" style="display:none;">
+        <div class='body-content center-block'>
+            <div class="faucet" >
+                <h2>Get TSTRAT For Testing</h2>
+                <p>
+                    I have currently {{balance.balance}} TSTRAT to share.
+                </p>
+                <form class="text-left panel">
+                    <div class="form-group">
+                        <label class="control-label" for="Address">Address</label>
+                        <input type="text" class="form-control" id="address" data-bind="textInput:address" placeholder="Enter your TSTRAT address.">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block" data-bind="click:onSendClick, enable: valid">Get TSTRAT</button>
+                </form>
+                <div data-bind="if:transaction">
+                    <div class="alert alert-success">
+                        <strong>Success! Transaction: </strong>
+                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transaction().confirmation}}.htm">
+                            {{transaction().confirmation}}
+                        </a>
+                        <p>When you're done, you can return them back here: {{balance.returnAddress}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
