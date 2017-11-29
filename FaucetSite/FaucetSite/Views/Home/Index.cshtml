@@ -17,7 +17,7 @@
                 <div data-bind="if:transaction">
                     <div class="alert alert-success">
                         <strong>Success! Transaction: </strong>
-                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transaction().confirmation}}.htm">
+                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transaction().transactionId}}.htm">
                             {{transaction().confirmation}}
                         </a>
                         <p>When you're done, you can return them back here: {{balance.returnAddress}}</p>
