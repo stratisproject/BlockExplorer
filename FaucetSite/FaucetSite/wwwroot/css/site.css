@@ -7,7 +7,7 @@
     margin-top: 160px;
 }
 
-form{
+form {
     margin-top:30px;
     width:420px;
 }
@@ -24,7 +24,7 @@ p {
     background-color: #1487C8 !important;
 }
 
-    .btn-primary:active, .btn-primary:hover, .btn-primary:focus {
+    .btn-primary:active, .btn-primary:hover:not(:disabled), .btn-primary:focus {
         background-color: #19aab4 !important;
     }
 
