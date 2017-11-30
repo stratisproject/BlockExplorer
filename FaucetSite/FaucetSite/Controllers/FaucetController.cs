@@ -29,12 +29,6 @@ namespace FaucetSite.Controllers
             return View();
         }
 
-        [HttpGet("GetBalance")]
-        public async Task<Balance> GetBalance()
-        {
-          return await walletUtils.GetBalance();
-        }
-
         [HttpPost("SendCoin")]
         public async Task<Transaction> SendCoin([FromBody] Recipient model)
         {

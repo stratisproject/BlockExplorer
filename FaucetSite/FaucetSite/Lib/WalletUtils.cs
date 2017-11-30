@@ -37,27 +37,6 @@ namespace FaucetSite.Lib
 
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
-        public async Task<Balance> GetBalance()
-        {
-            try
-            {
-                var bal = await stratApi.GetBalance(walletName);
-                var address = await stratApi.GetUnusedAddress(walletName, accountName, 0);
-                return new Balance
-                {
-                    balance = (bal.BalancesList.First().AmountConfirmed / coinDivisor),
-                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") - 1)
-                };
-            }
-            catch (Exception e)
-            {
-                Console.Write(e.ToString());
-                return new Balance
-                {
-                    balance = 0
-                };
-            }
-        }
         public async Task<Transaction> SendCoin(Recipient recipient)
         {
             BuildTransaction buildTransaction = new BuildTransaction
@@ -81,10 +60,5 @@ namespace FaucetSite.Lib
                 transactionId = transaction.TransactionId
             };
         }
-        public bool newRecipient(Recipient recipient)
-        {
-            return true;
-        }
-
     }
 }
