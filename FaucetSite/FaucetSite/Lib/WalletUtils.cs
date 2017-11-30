@@ -25,8 +25,11 @@ namespace FaucetSite.Lib
         private string walletName;
 
         private IStratisWalletAPI stratApi;
-
         private decimal coinDivisor = 100000000M;
+
+        private string ERROR_WALLET = "An error occurred when contacting the wallet";
+
+        private string ERROR_DUPE = "We have already sent you coins";
         public WalletUtils(IConfiguration config)
         {
             _config = config;
@@ -36,6 +39,10 @@ namespace FaucetSite.Lib
             walletName = _config["Faucet:FullNodeWalletName"];
 
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
+        }
+
+        public WalletUtils() {
+            
         }
         public async Task<Balance> GetBalance()
         {
@@ -58,34 +65,72 @@ namespace FaucetSite.Lib
                 };
             }
         }
-        public async Task<Transaction> SendCoin(Recipient recipient)
+        private void UpdateRecipient(Recipient recipient)
+        {
+            Throttling.Transactions.AddOrUpdate(recipient.address, recipient,  (key, oldValue) => recipient);
+        }
+
+        public async Task<Recipient> SendCoin(Recipient recipient)
         {
             var amount = 10m;
 
-            BuildTransaction buildTransaction = new BuildTransaction
+            if (newRecipient(recipient))
             {
-                WalletName = walletName,
-                AccountName = accountName,
-                CoinType = 105,
-                Password = password,
-                DestinationAddress = recipient.address,
-                Amount = amount,
-                FeeType = "low",
-                AllowUnconfirmed = true
-            };
+                try
+                {
+                    BuildTransaction buildTransaction = new BuildTransaction
+                    {
+                        WalletName = walletName,
+                        AccountName = accountName,
+                        CoinType = 105,
+                        Password = password,
+                        DestinationAddress = recipient.address,
+                        Amount = amount,
+                        FeeType = "low",
+                        AllowUnconfirmed = true
+                    };
+                    var transaction = await stratApi.BuildTransaction(buildTransaction);
 
-            var transaction = await stratApi.BuildTransaction(buildTransaction);
+                    SendTransaction sendTransaction = new SendTransaction
+                    {
+                        Hex = transaction.Hex
+                    };
 
-            var resp = await stratApi.SendTransaction(new SendTransaction { Hex = transaction.Hex });
+                    var resp = await stratApi.SendTransaction(sendTransaction);
+                   
+                    recipient.is_sent = true;
+                    UpdateRecipient(recipient);
 
-            return new Transaction
+                    Throttling.AddressesSeen.Enqueue(recipient.address);
+                    Throttling.IPAddressesSeen.Enqueue(recipient.ip_address);
+
+                    return recipient;
+                }
+                catch (Refit.ApiException exc)
+                {
+                    Console.WriteLine(exc.ToString());
+                    Console.WriteLine(exc.Content);
+                    recipient.is_error = true;
+                    UpdateRecipient(recipient);
+                    throw new FaucetException(ERROR_WALLET);
+                }
+
+            }
+            else
             {
-                transactionId = transaction.TransactionId
-            };
+                throw new FaucetException(ERROR_DUPE);
+            }
         }
         public bool newRecipient(Recipient recipient)
         {
-            return true;
+            if (Throttling.IPAddressesSeen.Contains(recipient.ip_address) || Throttling.AddressesSeen.Contains(recipient.address))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
     }

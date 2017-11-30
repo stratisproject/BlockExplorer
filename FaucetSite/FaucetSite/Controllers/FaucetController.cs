@@ -36,9 +36,18 @@ namespace FaucetSite.Controllers
         }
 
         [HttpPost("SendCoin")]
-        public async Task<Transaction> SendCoin([FromBody] Recipient model)
+        public Recipient SendCoin([FromBody] Recipient recipient)
         {
-            return await walletUtils.SendCoin(model);
+
+            recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().GetAddressBytes().ToString();
+
+            if (Throttling.Transactions.Count > 100)
+            {
+                throw new FaucetException("Too many faucet users");
+            }
+
+            Throttling.Transactions.GetOrAdd(recipient.address, recipient);
+            return Throttling.WaitForTransaction(recipient.address);
         }
     }
 }
