@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using FaucetSite.Lib;
+using FaucetSite.Models;
 
 namespace FaucetSite.Controllers
 
@@ -32,22 +33,29 @@ namespace FaucetSite.Controllers
         [HttpGet("GetBalance")]
         public async Task<Balance> GetBalance()
         {
-          return await walletUtils.GetBalance();
+            return await walletUtils.GetBalance();
         }
 
         [HttpPost("SendCoin")]
-        public Recipient SendCoin([FromBody] Recipient recipient)
+        public IActionResult SendCoin([FromBody] Recipient recipient)
         {
-
-            recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().GetAddressBytes().ToString();
-
-            if (Throttling.Transactions.Count > 100)
+            try
             {
-                throw new FaucetException("Too many faucet users");
-            }
+                recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().GetAddressBytes().ToString();
 
-            Throttling.Transactions.GetOrAdd(recipient.address, recipient);
-            return Throttling.WaitForTransaction(recipient.address);
+                if (Throttling.Transactions.Count > 100)
+                {
+                    throw new FaucetException("Too many faucet users");
+                }
+
+                Throttling.Transactions.GetOrAdd(recipient.address, recipient);
+                return new JsonResult(Throttling.WaitForTransaction(recipient.address));
+
+            }
+            catch (FaucetException ex)
+            {
+                throw new ApplicationException( ex.Message );
+            }
         }
     }
 }
