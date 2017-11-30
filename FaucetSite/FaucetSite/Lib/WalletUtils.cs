@@ -41,8 +41,9 @@ namespace FaucetSite.Lib
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
 
-        public WalletUtils() {
-            
+        public WalletUtils()
+        {
+
         }
         public async Task<Balance> GetBalance()
         {
@@ -67,12 +68,11 @@ namespace FaucetSite.Lib
         }
         private void UpdateRecipient(Recipient recipient)
         {
-            Throttling.Transactions.AddOrUpdate(recipient.address, recipient,  (key, oldValue) => recipient);
+            Throttling.Transactions.AddOrUpdate(recipient.address, recipient, (key, oldValue) => recipient);
         }
 
         public async Task<Recipient> SendCoin(Recipient recipient)
         {
-            var amount = 10m;
 
             if (newRecipient(recipient))
             {
@@ -85,7 +85,7 @@ namespace FaucetSite.Lib
                         CoinType = 105,
                         Password = password,
                         DestinationAddress = recipient.address,
-                        Amount = amount,
+                        Amount = 1m,
                         FeeType = "low",
                         AllowUnconfirmed = true
                     };
@@ -97,7 +97,7 @@ namespace FaucetSite.Lib
                     };
 
                     var resp = await stratApi.SendTransaction(sendTransaction);
-                   
+
                     recipient.is_sent = true;
                     UpdateRecipient(recipient);
 
