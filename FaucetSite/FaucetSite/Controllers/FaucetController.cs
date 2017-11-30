@@ -54,6 +54,8 @@ namespace FaucetSite.Controllers
             }
             catch (FaucetException ex)
             {
+
+                // TODO figure out the right way to do this for knockout::
                 throw new ApplicationException( ex.Message );
             }
         }
