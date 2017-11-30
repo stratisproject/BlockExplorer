@@ -1,1 +1,1 @@
-body{padding-top:50px;padding-bottom:20px}.body-content{padding-left:15px;padding-right:15px}.carousel-caption p{font-size:20px;line-height:1.4}.carousel-inner .item img[src$=".svg"]{width:100%}#qrCode{margin:15px}@media screen and (max-width:767px){.carousel-caption{display:none}}
+body{background:url(/images/background.jpg) no-repeat #f3f3f4;background-size:cover}.body-content{margin-top:100px}form{margin-top:30px;width:350px}p{color:#ccc}.main-title{color:#1487c8;font-weight:600;font-size:3em}.btn-primary{background-color:#1487c8}.alert{margin-top:20px}
