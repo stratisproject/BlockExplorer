@@ -1,15 +1,15 @@
 ﻿body {
-    background: url(/images/background.jpg) no-repeat #f3f3f4;
+    background: url(/images/background.jpg) no-repeat center center fixed;
     background-size: cover;
 }
 
 .body-content {
-    margin-top: 100px;
+    margin-top: 160px;
 }
 
 form{
     margin-top:30px;
-    width:350px;
+    width:420px;
 }
 p {
     color: #CCCCCC;
@@ -20,9 +20,13 @@ p {
     font-size: 3em;
 }
 
-.btn-primary {
-    background-color: #1487C8;
+.btn-primary,.btn-primary:disabled {
+    background-color: #1487C8 !important;
 }
+
+    .btn-primary:active, .btn-primary:hover, .btn-primary:focus {
+        background-color: #19aab4 !important;
+    }
 
 .alert{
     margin-top:20px;

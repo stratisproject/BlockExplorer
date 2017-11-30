@@ -1,37 +1,33 @@
-﻿
-<div class='container-fluid'>
-    <div class='row' data-bind="visible:loaded" style="display:none;">
-        <div class='body-content text-center'>
-            <div class="faucet">
-                <h1 class="main-title">Get TStrat For Testing</h1>
-                <p>
-                    I have currently {{balance.balance}} TStrat to share. <br />
-                    You will get 1 TStrat for per request.
-                </p>
-                <form class="center-block">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="address" data-bind="textInput:address" placeholder="Enter your TSTRAT address.">
-                    </div>
-                    <button type="button" class="btn btn-primary btn-block" data-bind="click:onSendClick, disable: disableSubmit">
-                        <i data-bind="visible:inProgress" class="fa fa-refresh fa-spin"></i> Get TStrat!
-                    </button>
-                    <div data-bind="if:transactionId() && !inProgress()">
-                        <div class="alert alert-info">
-                            <div>
-                                <strong>Success! </strong>
-                                <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transactionId}}.htm" target="_blank">
-                                    <strong>Click here </strong>
-                                </a> for track your transaction.
-                            </div>
-                            <hr />
-                            <div>
-                                When you're done, you can return them back here
-                                <strong>{{balance.returnAddress}}</strong>
-                            </div>
+﻿<div class='row' data-bind="visible:loaded" style="display:none;">
+    <div class='body-content text-center'>
+        <div class="faucet">
+            <h1 class="main-title">GET $TSTRAT FOR TESTING</h1>
+            <p>
+                You will receive 100 $TSTRAT per request.
+            </p>
+            <form class="center-block">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="address" data-bind="textInput:address" placeholder="Enter your $TSTRAT address.">
+                </div>
+                <button type="button" class="btn btn-primary btn-block" data-bind="click:onSendClick, disable: disableSubmit">
+                    <i data-bind="visible:inProgress" class="fa fa-refresh fa-spin"></i> Get $TSTRAT!
+                </button>
+                <div data-bind="if:transactionId() && !inProgress()">
+                    <div class="alert alert-info">
+                        <div>
+                            <strong>Success! </strong>
+                            <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transactionId}}.htm" target="_blank">
+                                <strong>Click here </strong>
+                            </a> for track your transaction.
+                        </div>
+                        <hr />
+                        <div>
+                            When you're done, you can return them back here
+                            <strong>{{balance.returnAddress}}</strong>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
