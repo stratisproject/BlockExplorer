@@ -41,6 +41,10 @@ namespace FaucetSite.Lib
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
 
+        private void UpdateRecipient(Recipient recipient)
+        {
+            Throttling.Transactions.AddOrUpdate(recipient.address, recipient, (key, oldValue) => recipient);
+        }
         public async Task<Recipient> SendCoin(Recipient recipient)
         {
 
