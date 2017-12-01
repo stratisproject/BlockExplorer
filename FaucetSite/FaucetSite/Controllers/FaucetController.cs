@@ -35,8 +35,7 @@ namespace FaucetSite.Controllers
         {
             try
             {
-                recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().GetAddressBytes().ToString();
-
+                recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
                 if (Throttling.Transactions.Count > 100)
                 {
                     throw new FaucetException("Too many faucet users");
