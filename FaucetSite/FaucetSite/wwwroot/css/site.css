@@ -22,6 +22,7 @@ p {
 
 .btn-primary,.btn-primary:disabled {
     background-color: #1487C8 !important;
+    margin-top:45px;
 }
 
     .btn-primary:active, .btn-primary:hover:not(:disabled), .btn-primary:focus {
@@ -30,4 +31,9 @@ p {
 
 .alert{
     margin-top:20px;
+}
+
+.g-recaptcha {
+    transform: scale(1.39);
+    transform-origin: 0 0;
 }

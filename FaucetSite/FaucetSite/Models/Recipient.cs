@@ -1,4 +1,5 @@
 public class Recipient
 {
-    public string address { get; set; }
+    public string Address { get; set; }
+    public string Captcha { get; set; }
 }

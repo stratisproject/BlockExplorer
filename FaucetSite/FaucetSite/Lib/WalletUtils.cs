@@ -45,7 +45,7 @@ namespace FaucetSite.Lib
                 AccountName = accountName,
                 CoinType = 105,
                 Password = password,
-                DestinationAddress = recipient.address,
+                DestinationAddress = recipient.Address,
                 Amount = 100m,
                 FeeType = "low",
                 AllowUnconfirmed = true

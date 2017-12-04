@@ -1,4 +1,7 @@
-﻿<div class='row' data-bind="visible:loaded" style="display:none;">
+﻿@using Microsoft.Extensions.Configuration;
+@inject IConfiguration config
+
+<div class='row' data-bind="visible:loaded" style="display:none;">
     <div class='body-content text-center'>
         <div class="faucet">
             <h1 class="main-title">GET $TSTRAT FOR TESTING</h1>
@@ -7,11 +10,19 @@
             </p>
             <form class="center-block">
                 <div class="form-group">
-                    <input type="text" class="form-control" id="address" data-bind="textInput:address" placeholder="Enter your $TSTRAT address">
+                    <input type="text" class="form-control" id="address" data-bind="textInput:address,disable:inProgress" placeholder="Enter your $TSTRAT address">
+                </div>
+                <div class="form-group">
+                    <div class="g-recaptcha" data-sitekey="@config["Captcha:siteKey"]" data-callback="captcha" data-size="400px"></div>
                 </div>
                 <button type="button" class="btn btn-primary btn-block" data-bind="click:onSendClick, disable: disableSubmit">
                     <i data-bind="visible:inProgress" class="fa fa-refresh fa-spin"></i> Get $TSTRAT
                 </button>
+                <div data-bind="if:errorMessage">
+                    <div class="alert alert-danger text-left">
+                        <strong>Error!</strong> {{errorMessage}}
+                    </div>
+                </div>
                 <div data-bind="if:transactionId() && !inProgress()">
                     <div class="alert alert-info text-left">
                         <strong>Success! </strong>
@@ -25,3 +36,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts{
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+}
