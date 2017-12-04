@@ -4,6 +4,7 @@ namespace FaucetSite.Lib
 {
     public interface IWalletUtils
     {
-        Task<Transaction> SendCoin(Recipient recipient);
+
+        Task<Recipient> SendCoin(Recipient recipient);
     }
 }

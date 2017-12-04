@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using FaucetSite.Lib;
+using FaucetSite.Models;
 
 namespace FaucetSite.Controllers
 
@@ -30,9 +31,26 @@ namespace FaucetSite.Controllers
         }
 
         [HttpPost("SendCoin")]
-        public async Task<Transaction> SendCoin([FromBody] Recipient model)
+        public IActionResult SendCoin([FromBody] Recipient recipient)
         {
-            return await walletUtils.SendCoin(model);
+            try
+            {
+                recipient.ip_address = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+                if (Throttling.Transactions.Count > 100)
+                {
+                    throw new FaucetException("Too many faucet users");
+                }
+
+                Throttling.Transactions.GetOrAdd(recipient.address, recipient);
+                return new JsonResult(Throttling.WaitForTransaction(recipient.address));
+
+            }
+            catch (FaucetException ex)
+            {
+
+                // TODO figure out the right way to do this for knockout::
+                throw new ApplicationException( ex.Message );
+            }
         }
     }
 }
