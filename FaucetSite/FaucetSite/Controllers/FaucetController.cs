@@ -14,11 +14,16 @@ namespace FaucetSite.Controllers
     [Route("api/[controller]")]
     public class FaucetController : Controller
     {
+        static AsyncLocker locker = new AsyncLocker();
         private IWalletUtils walletUtils;
+        private IConfiguration config;
+        private ICaptchaClient googleCaptcha;
 
-        public FaucetController(IConfiguration config)
+        public FaucetController(IConfiguration config, ICaptchaClient googleCaptcha)
         {
             walletUtils = new WalletUtils(config);
+            this.config = config;
+            this.googleCaptcha = googleCaptcha;
         }
 
 
@@ -30,9 +35,21 @@ namespace FaucetSite.Controllers
         }
 
         [HttpPost("SendCoin")]
-        public async Task<Transaction> SendCoin([FromBody] Recipient model)
+        public async Task<IActionResult> SendCoin([FromBody] Recipient model)
         {
-            return await walletUtils.SendCoin(model);
+            var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            var secretKey = config["Captcha:SecretKey"];
+            var response = await googleCaptcha.VerifyAsync(secretKey, model.Captcha, ipAddress);
+
+            if (!response.Success)
+            {
+                return BadRequest(new { ErrorMessage = "Invalid Captcha" });
+            }
+
+            using (await locker.LockAsync())
+            {
+                return Ok(await walletUtils.SendCoin(model));
+            }
         }
     }
 }
