@@ -23,13 +23,10 @@
                         <strong>Error!</strong> {{errorMessage}}
                     </div>
                 </div>
-                <div data-bind="if:transactionId() && !inProgress()">
+                <div data-bind="if:success() && !inProgress()">
                     <div class="alert alert-info text-left">
-                        <strong>Success! </strong>
-                        <a href="https://chainz.cryptoid.info/strat-test/tx.dws?{{transactionId}}.htm" target="_blank">
-                            <strong>Click here </strong>
-                        </a> to track your transaction.
-                        <br />Please note, there may be a short delay for the transaction to be visible.
+                        <strong>Success! </strong> Your request was submitted successfully.
+                        <br />Please check your account balance some time later.
                     </div>
                 </div>
             </form>

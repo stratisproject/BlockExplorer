@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using FaucetSite.Lib;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using FaucetSite.Lib;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace FaucetSite.Controllers
 
@@ -14,16 +10,15 @@ namespace FaucetSite.Controllers
     [Route("api/[controller]")]
     public class FaucetController : Controller
     {
-        static AsyncLocker locker = new AsyncLocker();
-        private IWalletUtils walletUtils;
+        private TransactionQueue transactionQueue;
         private IConfiguration config;
         private ICaptchaClient googleCaptcha;
 
-        public FaucetController(IConfiguration config, ICaptchaClient googleCaptcha)
+        public FaucetController(IConfiguration config, ICaptchaClient googleCaptcha, TransactionQueue transactionQueue)
         {
-            walletUtils = new WalletUtils(config);
             this.config = config;
             this.googleCaptcha = googleCaptcha;
+            this.transactionQueue = transactionQueue;
         }
 
 
@@ -35,7 +30,7 @@ namespace FaucetSite.Controllers
         }
 
         [HttpPost("SendCoin")]
-        public async Task<IActionResult> SendCoin([FromBody] Recipient model)
+        public async Task<IActionResult> SendCoin(Recipient model)
         {
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             var secretKey = config["Captcha:SecretKey"];
@@ -46,10 +41,9 @@ namespace FaucetSite.Controllers
                 return BadRequest(new { ErrorMessage = "Invalid Captcha" });
             }
 
-            using (await locker.LockAsync())
-            {
-                return Ok(await walletUtils.SendCoin(model));
-            }
+            transactionQueue.Enqueue(model.Address);
+
+            return Ok();
         }
     }
 }

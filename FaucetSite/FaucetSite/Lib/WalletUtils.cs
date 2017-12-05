@@ -37,7 +37,7 @@ namespace FaucetSite.Lib
 
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
-        public async Task<Transaction> SendCoin(Recipient recipient)
+        public async Task SendCoin(string address)
         {
             BuildTransaction buildTransaction = new BuildTransaction
             {
@@ -45,7 +45,7 @@ namespace FaucetSite.Lib
                 AccountName = accountName,
                 CoinType = 105,
                 Password = password,
-                DestinationAddress = recipient.Address,
+                DestinationAddress = address,
                 Amount = 100m,
                 FeeType = "low",
                 AllowUnconfirmed = true
@@ -54,11 +54,6 @@ namespace FaucetSite.Lib
             var transaction = await stratApi.BuildTransaction(buildTransaction);
 
             var resp = await stratApi.SendTransaction(new SendTransaction { Hex = transaction.Hex });
-
-            return new Transaction
-            {
-                transactionId = transaction.TransactionId
-            };
         }
     }
 }

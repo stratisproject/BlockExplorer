@@ -4,7 +4,7 @@ function Model() {
     var self = this;
     self.loaded = ko.observable(true);
     self.address = ko.observable();
-    self.transactionId = ko.observable();
+    self.success = ko.observable();
     self.inProgress = ko.observable(false);
     self.captcha = ko.observable();
     self.errorMessage = ko.observable();
@@ -14,15 +14,11 @@ function Model() {
     self.onSendClick = function () {
         self.inProgress(true);
         self.errorMessage(null);
-        $.ajax({
-            url: 'api/Faucet/SendCoin',
-            method: 'POST',
-            data: JSON.stringify({ address: self.address(), captcha: grecaptcha.getResponse() }),
-            dataType: 'json',
-            contentType: 'application/json; charset=utf-8'
-        }).done(function (result) {
-            self.transactionId(result.transactionId);
-            self.address('');
+        self.success(null);
+        $.post('api/Faucet/SendCoin', { address: self.address(), captcha: grecaptcha.getResponse() })
+            .done(function () {
+                self.success(true);
+                self.address('');
             }).fail(function (resp) {
                 var data = resp.responseJSON;
                 if (data && data.errorMessage) {
