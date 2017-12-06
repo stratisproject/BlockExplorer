@@ -26,7 +26,6 @@ namespace FaucetSite.Lib
 
         private IStratisWalletAPI stratApi;
 
-        private decimal coinDivisor = 100000000M;
         public WalletUtils(IConfiguration config)
         {
             _config = config;
@@ -37,7 +36,7 @@ namespace FaucetSite.Lib
 
             stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings { });
         }
-        public async Task SendCoin(string address)
+        public async Task<Transaction> SendCoin(string address)
         {
             BuildTransaction buildTransaction = new BuildTransaction
             {
@@ -54,6 +53,12 @@ namespace FaucetSite.Lib
             var transaction = await stratApi.BuildTransaction(buildTransaction);
 
             var resp = await stratApi.SendTransaction(new SendTransaction { Hex = transaction.Hex });
+
+            return new Transaction
+            {
+                TransactionId = transaction.TransactionId
+            };
+
         }
     }
 }

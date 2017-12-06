@@ -9,24 +9,43 @@ namespace FaucetSite.Lib
     public class TransactionQueue
     {
         private readonly IWalletUtils wallet;
-        private ActionBlock<string> queue;
+        private ActionBlock<Item> queue;
 
         public TransactionQueue(IWalletUtils wallet)
         {
             this.wallet = wallet;
-            this.queue = new ActionBlock<string>(SendCoinAsync, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1 });
+            this.queue = new ActionBlock<Item>(SendCoinAsync, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1 });
         }
 
-        public void Enqueue(string address) => queue.Post(address);
+        public async Task<Transaction> EnqueueAsync(string address)
+        {
+            var item = new Item(address);
+            queue.Post(item);
+            return await item.Completion;
+        }
 
-        private async Task SendCoinAsync(string address)
+        private async Task SendCoinAsync(Item item)
         {
             try
             {
-                await wallet.SendCoin(address);
+                var transaction = await wallet.SendCoin(item.Address);
+                item.TaskCompletionSource.SetResult(transaction);
             }
-            catch
+            catch (Exception e)
             {
+                item.TaskCompletionSource.SetException(e);
+            }
+        }
+
+        class Item
+        {
+            public TaskCompletionSource<Transaction> TaskCompletionSource;
+            public string Address { get; private set; }
+            public Task<Transaction> Completion => TaskCompletionSource.Task;
+            public Item(string address)
+            {
+                this.TaskCompletionSource = new TaskCompletionSource<Transaction>();
+                this.Address = address;
             }
         }
     }

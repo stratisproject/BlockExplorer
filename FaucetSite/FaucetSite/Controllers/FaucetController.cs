@@ -1,6 +1,7 @@
 using FaucetSite.Lib;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -41,9 +42,15 @@ namespace FaucetSite.Controllers
                 return BadRequest(new { ErrorMessage = "Invalid Captcha" });
             }
 
-            transactionQueue.Enqueue(model.Address);
+            var task = transactionQueue.EnqueueAsync(model.Address);
 
-            return Ok();
+            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30))); // Wait max 30 sec for completion. 
+
+            var result = task.IsCompletedSuccessfully ? 
+                            new { TransactionId = task.Result.TransactionId } : 
+                            new { TransactionId = (string)null };
+
+            return Json(result);
         }
     }
 }

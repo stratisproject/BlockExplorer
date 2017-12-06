@@ -1,4 +1,4 @@
 public class Transaction
 {
-    public string transactionId { get; set; }
+    public string TransactionId { get; set; }
 }
