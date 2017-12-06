@@ -46,11 +46,9 @@ namespace FaucetSite.Controllers
 
             await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30))); // Wait max 30 sec for completion. 
 
-            var result = task.IsCompletedSuccessfully ? 
-                            new { TransactionId = task.Result.TransactionId } : 
-                            new { TransactionId = (string)null };
+            var transactionId = task.IsCompletedSuccessfully ? task.Result.TransactionId : null;
 
-            return Json(result);
+            return Json(new { TransactionId = transactionId });
         }
     }
 }
