@@ -11,6 +11,11 @@ namespace FaucetSite.Lib
         private readonly IWalletUtils wallet;
         private ActionBlock<Item> queue;
 
+        /// <summary>
+        /// Number of items in queue waiting to be processed
+        /// </summary>
+        public int Count => queue.InputCount;
+
         public TransactionQueue(IWalletUtils wallet)
         {
             this.wallet = wallet;

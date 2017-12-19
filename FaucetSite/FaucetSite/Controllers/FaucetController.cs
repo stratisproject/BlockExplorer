@@ -44,9 +44,13 @@ namespace FaucetSite.Controllers
 
             var task = transactionQueue.EnqueueAsync(model.Address);
 
-            await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(30))); // Wait max 30 sec for completion. 
+            string transactionId = null;
+            if (transactionQueue.Count < 3) // dont wait queued item if it has more than 3 items in queue
+            {
+                await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(20))); // Wait max 30 sec for completion. 
 
-            var transactionId = task.IsCompletedSuccessfully ? task.Result.TransactionId : null;
+                transactionId = task.IsCompletedSuccessfully ? task.Result.TransactionId : null;
+            }
 
             return Json(new { TransactionId = transactionId });
         }
