@@ -281,7 +281,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     else
                     {
                         if(height < currentTip.Height)
-                            currentTip = currentTip.FindAncestorOrSelf(height);
+                            currentTip = currentTip.GetAncestor(height);
+                        if (currentTip == null || height > currentTip.Height)
+                            throw new InvalidOperationException("Ancestor block not found in chain.");
                         var chainChange = CreateChainChange(height, block);
                         if(chainChange.BlockId == currentTip.HashBlock)
                         {
