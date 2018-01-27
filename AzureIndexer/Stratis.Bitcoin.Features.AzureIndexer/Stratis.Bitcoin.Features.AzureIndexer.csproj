@@ -28,7 +28,7 @@
     <PackageReference Include="Stratis.Bitcoin" Version="1.0.4-alpha" />
     <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.4-alpha" />
     <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.4-alpha" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
