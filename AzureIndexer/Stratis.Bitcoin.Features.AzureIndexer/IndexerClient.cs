@@ -673,7 +673,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             if(chain.Tip != null && chain.Genesis.HashBlock != Configuration.Network.GetGenesis().GetHash())
                 throw new ArgumentException("Incompatible Network between the indexer and the chain", "chain");
             if(chain.Tip == null)
-                chain.SetTip(new ChainedBlock(Configuration.Network.GetGenesis().Header, 0));
+            {
+                Block genesis = Configuration.Network.GetGenesis();
+                chain.SetTip(new ChainedBlock(genesis.Header, genesis.GetHash(), 0));
+            }
             GetChainChangesUntilFork(chain.Tip, false)
                 .UpdateChain(chain);
         }
