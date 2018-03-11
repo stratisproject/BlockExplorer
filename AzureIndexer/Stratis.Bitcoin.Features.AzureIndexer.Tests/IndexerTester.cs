@@ -57,8 +57,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         public void Dispose()
         {
+            // TODO: Find a NodeServer replacement and fix this code
+            /*
             if (_NodeServer != null)
                 _NodeServer.Dispose();
+            */
             if (!Cached)
             {
                 foreach (var table in _Importer.Configuration.EnumerateTables())
@@ -95,7 +98,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         public uint256 KnownBlockId = uint256.Parse("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943");
         public uint256 UnknownBlockId = uint256.Parse("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4942");
-
+        
+        // TODO: Fix IndexBlocks and this code
+        /*
         internal void ImportCachedBlocks()
         {
             CreateLocalNode().ChainBuilder.Load(@"..\..\..\Data\blocks");
@@ -106,7 +111,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Indexer.IndexBlocks();
             }
         }
-
+        
         internal void ImportCachedTransactions()
         {
             CreateLocalNode().ChainBuilder.Load(@"..\..\..\Data\blocks");
@@ -117,7 +122,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Indexer.IndexTransactions();
             }
         }
-
+        */
         public IndexerClient _Client;
         public uint256 KnownTransactionId = uint256.Parse("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
         public uint256 UnknownTransactionId = uint256.Parse("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c");
@@ -133,7 +138,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 return _Client;
             }
         }
-
+        // TODO: Find a NodeServer replacement and fix this code
+        /*
         NodeServer _NodeServer;
         internal MiniNode CreateLocalNode()
         {
@@ -143,7 +149,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             Indexer.Configuration.Node = "127.0.0.1:" + nodeServer.LocalEndpoint.Port;
             return new MiniNode(this, nodeServer);
         }
-
+        */
         internal ChainBuilder CreateChainBuilder()
         {
             return new ChainBuilder(this);
