@@ -1,5 +1,4 @@
 ﻿using NBitcoin;
-using NBitcoin.Protocol;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using System;
 using System.Collections.Generic;
@@ -37,6 +36,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return _Checkpoint;
             }
         }
+
         private readonly IBlocksRepository _BlocksRepository;
         public IBlocksRepository BlocksRepository
         {
@@ -55,35 +55,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public BlockFetcher(Checkpoint checkpoint, Node node, ChainBase chain = null)
-        {
-            if(checkpoint == null)
-                throw new ArgumentNullException("checkpoint");
-            if(node == null)
-                throw new ArgumentNullException("node");
-            _BlockHeaders = chain ?? node.GetChain();
-            _BlocksRepository = new NodeBlocksRepository(node);
-            _Checkpoint = checkpoint;
-
-            InitDefault();
-        }
-
         private void InitDefault()
         {
             NeedSaveInterval = TimeSpan.FromMinutes(15);
             ToHeight = int.MaxValue;
         }
+
         public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain)
         {
-            if(blocksRepository == null)
+            if (blocksRepository == null)
                 throw new ArgumentNullException("blocksRepository");
-            if(chain == null)
+
+            if (chain == null)
                 throw new ArgumentNullException("blockHeaders");
-            if(checkpoint == null)
+
+            if (checkpoint == null)
                 throw new ArgumentNullException("checkpoint");
+
             _BlockHeaders = chain;
             _BlocksRepository = blocksRepository;
             _Checkpoint = checkpoint;
+
             InitDefault();
         }
 
@@ -156,8 +148,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         #endregion
 
-
-
         private DateTime _LastSaved = DateTime.UtcNow;
         public bool NeedSave
         {
@@ -188,7 +178,5 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             get;
             set;
         }
-
-
     }
 }
