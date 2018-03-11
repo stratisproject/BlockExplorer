@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Stratis Bitcoin Features Azure Indexer</Description>
     <AssemblyTitle>Stratis.Bitcoin.Features.AzureIndexer</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Stratis.Bitcoin.Features.AzureIndexer</AssemblyName>
     <PackageId>Stratis.Bitcoin.Features.AzureIndexer</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -24,10 +24,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="NStratis" Version="4.0.0.33" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.0.4-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.4-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.4-alpha" />
+    <PackageReference Include="Stratis.Bitcoin" Version="1.0.10-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.10-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.10-alpha" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
   </ItemGroup>
 
