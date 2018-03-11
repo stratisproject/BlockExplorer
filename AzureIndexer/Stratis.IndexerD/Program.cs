@@ -15,26 +15,20 @@ namespace Stratis.Bitcoin.Indexer.Console
         public static void Main(string[] args)
         {
             Network network = args.Contains("-testnet") ? Network.StratisTest : Network.StratisMain;
-
-            if (NodeSettings.PrintHelp(args, network))
-            {
-                AzureIndexerSettings.PrintHelp(network);
-                return;
-            }
-
-            NodeSettings nodeSettings = new NodeSettings("stratis", network, ProtocolVersion.ALT_PROTOCOL_VERSION);
-            nodeSettings.LoadArguments(args);
+            
+            NodeSettings nodeSettings = new NodeSettings(network, ProtocolVersion.ALT_PROTOCOL_VERSION, args:args, loadConfiguration:false);
 
             // NOTES: running BTC and STRAT side by side is not possible yet as the flags for serialization are static
 
             var node = new FullNodeBuilder()
                 .UseNodeSettings(nodeSettings)
-                .UseStratisConsensus()
+                .UsePosConsensus()
                 .UseBlockStore()
                 .UseAzureIndexer()
                 .Build();
 
-            node.RunAsync().Wait();
+            if (node != null)
+                node.RunAsync().Wait();
         }
     }
 }
