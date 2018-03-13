@@ -18,6 +18,24 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class IndexerConfiguration
     {
+        private const string IndexerBlobContainerName = "indexer";
+        private const string TransactionsTableName = "transactions";
+        private const string BalancesTableName = "balances";
+        private const string ChainTableName = "chain";
+        private const string WalletsTableName = "wallets";
+
+        public Network Network { get; set; }
+
+        public bool AzureStorageEmulatorUsed { get; set; }
+
+        public string Node { get; set; }
+
+        public string CheckpointSetName { get; set; }
+
+        public StorageCredentials StorageCredentials { get; set; }
+
+        public string StorageNamespace { get; set; }
+
         public IndexerConfiguration()
         {
             Network = Network.Main;
@@ -75,20 +93,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return result;
         }
 
-        
-
-        public Network Network
-        {
-            get;
-            set;
-        }
-
-        public bool AzureStorageEmulatorUsed
-        {
-            get;
-            set;
-        }
-
         public AzureIndexer CreateIndexer()
         {
             return new AzureIndexer(this);
@@ -103,30 +107,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
-        public string Node
-        {
-            get;
-            set;
-        }
-
-        public string CheckpointSetName
-        {
-            get;
-            set;
-        }
-
-        string _Container = "indexer";
-        string _TransactionTable = "transactions";
-        string _BalanceTable = "balances";
-        string _ChainTable = "chain";
-        string _WalletTable = "wallets";
-
-        public StorageCredentials StorageCredentials
-        {
-            get;
-            set;
-        }
-
         public CloudBlobClient CreateBlobClient()
         {
             return new CloudBlobClient(MakeUri("blob", AzureStorageEmulatorUsed), StorageCredentials);
@@ -139,12 +119,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CloudTable GetTransactionTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(_TransactionTable));
+            return CreateTableClient().GetTableReference(GetFullName(TransactionsTableName));
         }
 
         public CloudTable GetWalletRulesTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(_WalletTable));
+            return CreateTableClient().GetTableReference(GetFullName(WalletsTableName));
         }
 
         public CloudTable GetTable(string tableName)
@@ -159,17 +139,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CloudTable GetBalanceTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(_BalanceTable));
+            return CreateTableClient().GetTableReference(GetFullName(BalancesTableName));
         }
 
         public CloudTable GetChainTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(_ChainTable));
+            return CreateTableClient().GetTableReference(GetFullName(ChainTableName));
         }
 
         public CloudBlobContainer GetBlocksContainer()
         {
-            return CreateBlobClient().GetContainerReference(GetFullName(_Container));
+            return CreateBlobClient().GetContainerReference(GetFullName(IndexerBlobContainerName));
         }
 
         private Uri MakeUri(string clientType, bool azureStorageEmulatorUsed = false)
@@ -202,12 +182,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public CloudTableClient CreateTableClient()
         {
             return new CloudTableClient(MakeUri("table", AzureStorageEmulatorUsed), StorageCredentials);
-        }
-
-        public string StorageNamespace
-        {
-            get;
-            set;
         }
 
         public IEnumerable<CloudTable> EnumerateTables()
