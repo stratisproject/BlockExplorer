@@ -18,11 +18,29 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class IndexerConfiguration
     {
-        public static IndexerConfiguration FromConfiguration(IConfiguration configuration)
+        public IndexerConfiguration()
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration();
-            Fill(configuration, indexerConfig);
-            return indexerConfig;
+            Network = Network.Main;
+        }
+
+        public IndexerConfiguration(IConfiguration config)
+        {
+            var account = GetValue(config, "Azure.AccountName", true);
+            var key = GetValue(config, "Azure.Key", true);
+            this.StorageCredentials = new StorageCredentials(account, key);
+            this.StorageNamespace = GetValue(config, "StorageNamespace", false);
+            var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
+            this.Network = Network.GetNetwork(network);
+            if (this.Network == null)
+                throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
+            this.Node = GetValue(config, "Node", false);
+            this.CheckpointSetName = GetValue(config, "CheckpointSetName", false);
+            if (string.IsNullOrWhiteSpace(this.CheckpointSetName))
+                this.CheckpointSetName = "default";
+
+            var emulator = GetValue(config, "AzureStorageEmulatorUsed", false);
+            if (!string.IsNullOrWhiteSpace(emulator))
+                this.AzureStorageEmulatorUsed = bool.Parse(emulator);
         }
 
         public Task EnsureSetupAsync()
@@ -48,26 +66,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        protected static void Fill(IConfiguration config, IndexerConfiguration indexerConfig)
-        {  
-            var account = GetValue(config, "Azure.AccountName", true);
-            var key = GetValue(config, "Azure.Key", true);
-            indexerConfig.StorageCredentials = new StorageCredentials(account, key);
-            indexerConfig.StorageNamespace = GetValue(config, "StorageNamespace", false);
-            var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
-            indexerConfig.Network = Network.GetNetwork(network);
-            if (indexerConfig.Network == null)
-                throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
-            indexerConfig.Node = GetValue(config, "Node", false);
-            indexerConfig.CheckpointSetName = GetValue(config, "CheckpointSetName", false);
-            if (string.IsNullOrWhiteSpace(indexerConfig.CheckpointSetName))
-                indexerConfig.CheckpointSetName = "default";
-
-            var emulator = GetValue(config, "AzureStorageEmulatorUsed", false);
-            if(!string.IsNullOrWhiteSpace(emulator))
-                indexerConfig.AzureStorageEmulatorUsed = bool.Parse(emulator);
-        }
-
         protected static string GetValue(IConfiguration config, string setting, bool required)
         {			
             var result = config[setting];
@@ -77,10 +75,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return result;
         }
 
-        public IndexerConfiguration()
-        {
-            Network = Network.Main;
-        }
+        
 
         public Network Network
         {

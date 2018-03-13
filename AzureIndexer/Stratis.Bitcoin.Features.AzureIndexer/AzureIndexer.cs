@@ -26,7 +26,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         public static AzureIndexer CreateIndexer(IConfiguration config)
         {
-            var indexerConfig = IndexerConfiguration.FromConfiguration(config);
+            var indexerConfig = new IndexerConfiguration(config);
             return indexerConfig.CreateIndexer();
         }
 
