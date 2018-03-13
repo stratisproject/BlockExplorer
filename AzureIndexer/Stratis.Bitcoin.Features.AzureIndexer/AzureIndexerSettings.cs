@@ -46,8 +46,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public AzureIndexerSettings()
         {
-            this.AzureAccountName = "devstoreaccount1";
-            this.AzureKey = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
             this.AzureEmulatorUsed = true;
             this.From = 0;
             this.To = int.MaxValue;
@@ -61,8 +59,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// Initializes an instance of the object.
         /// </summary>
         /// <param name="callback">A callback for modifying the settings during startup.</param>
-        public AzureIndexerSettings(Action<AzureIndexerSettings> callback)
-            : this()
+        public AzureIndexerSettings(Action<AzureIndexerSettings> callback) : this()
         {
             this.callback = callback;
         }

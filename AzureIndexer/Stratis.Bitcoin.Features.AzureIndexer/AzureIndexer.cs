@@ -61,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private void SetThrottling()
         {
             Helper.SetThrottling();
-            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.CreateTableClient().BaseUri);
+            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
 

@@ -107,7 +107,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         private void SetThrottling()
         {
             Helper.SetThrottling();
-            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.CreateTableClient().BaseUri);
+            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
         ExponentialBackoff retry = new ExponentialBackoff(15, TimeSpan.FromMilliseconds(100),

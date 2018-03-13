@@ -5,6 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -36,6 +37,38 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public string StorageNamespace { get; set; }
 
+        public CloudStorageAccount StorageAccount { get; set; }
+
+        private CloudTableClient tableClient;
+        public CloudTableClient TableClient
+        {
+            get
+            {
+                if (this.tableClient != null)
+                {
+                    return this.tableClient;
+                }
+                this.tableClient = this.StorageAccount.CreateCloudTableClient();
+                return this.tableClient;
+            }
+            set => this.tableClient = value;
+        }
+
+        private CloudBlobClient blobClient;
+        public CloudBlobClient BlobClient
+        {
+            get
+            {
+                if (this.blobClient != null)
+                {
+                    return this.blobClient;
+                }
+                this.blobClient = this.StorageAccount.CreateCloudBlobClient();
+                return this.blobClient;
+            }
+            set => this.blobClient = value;
+        }
+
         public IndexerConfiguration()
         {
             Network = Network.Main;
@@ -45,7 +78,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             var account = GetValue(config, "Azure.AccountName", true);
             var key = GetValue(config, "Azure.Key", true);
-            this.StorageCredentials = new StorageCredentials(account, key);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
             var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
             this.Network = Network.GetNetwork(network);
@@ -59,6 +91,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var emulator = GetValue(config, "AzureStorageEmulatorUsed", false);
             if (!string.IsNullOrWhiteSpace(emulator))
                 this.AzureStorageEmulatorUsed = bool.Parse(emulator);
+
+            this.StorageCredentials = this.AzureStorageEmulatorUsed ? null : new StorageCredentials(account, key);
         }
 
         public Task EnsureSetupAsync()
@@ -75,6 +109,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             try
             {
+                this.StorageAccount = this.AzureStorageEmulatorUsed ?
+                    CloudStorageAccount.Parse("UseDevelopmentStorage=true;") :
+                    new CloudStorageAccount(this.StorageCredentials, true);
+
                 EnsureSetupAsync().Wait();
             }
             catch (AggregateException aex)
@@ -82,6 +120,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 ExceptionDispatchInfo.Capture(aex).Throw();
                 throw;
             }
+        }
+
+        public IEnumerable<CloudTable> EnumerateTables()
+        {
+            yield return GetTransactionTable();
+            yield return GetBalanceTable();
+            yield return GetChainTable();
+            yield return GetWalletRulesTable();
         }
 
         protected static string GetValue(IConfiguration config, string setting, bool required)
@@ -107,11 +153,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
-        public CloudBlobClient CreateBlobClient()
-        {
-            return new CloudBlobClient(MakeUri("blob", AzureStorageEmulatorUsed), StorageCredentials);
-        }
-
         public IndexerClient CreateIndexerClient()
         {
             return new IndexerClient(this);
@@ -119,77 +160,37 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CloudTable GetTransactionTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(TransactionsTableName));
+            return this.TableClient.GetTableReference(this.GetFullName(TransactionsTableName));
         }
 
         public CloudTable GetWalletRulesTable()
         {
-            return CreateTableClient().GetTableReference(GetFullName(WalletsTableName));
+            return this.TableClient.GetTableReference(this.GetFullName(WalletsTableName));
         }
 
         public CloudTable GetTable(string tableName)
         {
-            return CreateTableClient().GetTableReference(GetFullName(tableName));
+            return this.TableClient.GetTableReference(this.GetFullName(tableName));
+        }
+
+        public CloudTable GetBalanceTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(BalancesTableName));
+        }
+
+        public CloudTable GetChainTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(ChainTableName));
+        }
+
+        public CloudBlobContainer GetBlocksContainer()
+        {
+            return this.BlobClient.GetContainerReference(this.GetFullName(IndexerBlobContainerName));
         }
 
         private string GetFullName(string storageObjectName)
         {
             return (StorageNamespace + storageObjectName).ToLowerInvariant();
-        }
-
-        public CloudTable GetBalanceTable()
-        {
-            return CreateTableClient().GetTableReference(GetFullName(BalancesTableName));
-        }
-
-        public CloudTable GetChainTable()
-        {
-            return CreateTableClient().GetTableReference(GetFullName(ChainTableName));
-        }
-
-        public CloudBlobContainer GetBlocksContainer()
-        {
-            return CreateBlobClient().GetContainerReference(GetFullName(IndexerBlobContainerName));
-        }
-
-        private Uri MakeUri(string clientType, bool azureStorageEmulatorUsed = false)
-        {
-            if (!azureStorageEmulatorUsed)
-            {
-                return new Uri(String.Format("http://{0}.{1}.core.windows.net/", StorageCredentials.AccountName,
-                    clientType), UriKind.Absolute);
-            }
-            else
-            {
-                if (clientType.Equals("blob"))
-                {
-                    return new Uri("http://127.0.0.1:10000/devstoreaccount1");
-                }
-                else
-                {
-                    if (clientType.Equals("table"))
-                    {
-                        return new Uri("http://127.0.0.1:10002/devstoreaccount1");
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-        }
-
-        public CloudTableClient CreateTableClient()
-        {
-            return new CloudTableClient(MakeUri("table", AzureStorageEmulatorUsed), StorageCredentials);
-        }
-
-        public IEnumerable<CloudTable> EnumerateTables()
-        {
-            yield return GetTransactionTable();
-            yield return GetBalanceTable();
-            yield return GetChainTable();
-            yield return GetWalletRulesTable();
         }
     }
 }
