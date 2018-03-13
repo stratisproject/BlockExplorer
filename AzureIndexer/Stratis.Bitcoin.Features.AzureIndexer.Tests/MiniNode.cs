@@ -10,7 +10,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
 	public class MiniNode
 	{
-
+        // TODO: Find a NodeServer replacement and fix this code
+        /*
 		public MiniNode(IndexerTester tester, NodeServer server)
 		{
 			_Generator = new ChainBuilder(tester);
@@ -93,5 +94,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 				}
 			}
 		}
+        */
 	}
 }

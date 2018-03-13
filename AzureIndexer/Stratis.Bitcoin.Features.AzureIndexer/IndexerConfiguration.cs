@@ -1,14 +1,18 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
+using Stratis.Bitcoin.P2P.Peer;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -30,6 +34,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             tasks.Add(GetBlocksContainer().CreateIfNotExistsAsync());
             return Task.WhenAll(tasks.ToArray());
         }
+
         public void EnsureSetup()
         {
             try
@@ -64,18 +69,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         protected static string GetValue(IConfiguration config, string setting, bool required)
-        {
-			
+        {			
             var result = config[setting];
             result = String.IsNullOrWhiteSpace(result) ? null : result;
             if (result == null && required)
                 throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
             return result;
         }
+
         public IndexerConfiguration()
         {
             Network = Network.Main;
         }
+
         public Network Network
         {
             get;
@@ -93,11 +99,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return new AzureIndexer(this);
         }
 
-        public Node ConnectToNode(bool isRelay)
+        public NetworkPeer ConnectToNode(bool isRelay)
         {
             if (String.IsNullOrEmpty(Node))
                 throw new IndexerConfigurationErrorsException("Node setting is not configured");
-            return NBitcoin.Protocol.Node.Connect(Network, Node, isRelay: isRelay);
+
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(Network.StratisTest, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads());
+            return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
         public string Node
@@ -123,18 +131,22 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             get;
             set;
         }
+
         public CloudBlobClient CreateBlobClient()
         {
             return new CloudBlobClient(MakeUri("blob", AzureStorageEmulatorUsed), StorageCredentials);
         }
+
         public IndexerClient CreateIndexerClient()
         {
             return new IndexerClient(this);
         }
+
         public CloudTable GetTransactionTable()
         {
             return CreateTableClient().GetTableReference(GetFullName(_TransactionTable));
         }
+
         public CloudTable GetWalletRulesTable()
         {
             return CreateTableClient().GetTableReference(GetFullName(_WalletTable));
@@ -144,14 +156,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             return CreateTableClient().GetTableReference(GetFullName(tableName));
         }
+
         private string GetFullName(string storageObjectName)
         {
             return (StorageNamespace + storageObjectName).ToLowerInvariant();
         }
+
         public CloudTable GetBalanceTable()
         {
             return CreateTableClient().GetTableReference(GetFullName(_BalanceTable));
         }
+
         public CloudTable GetChainTable()
         {
             return CreateTableClient().GetTableReference(GetFullName(_ChainTable));
@@ -189,12 +204,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-
         public CloudTableClient CreateTableClient()
         {
             return new CloudTableClient(MakeUri("table", AzureStorageEmulatorUsed), StorageCredentials);
         }
-
 
         public string StorageNamespace
         {
