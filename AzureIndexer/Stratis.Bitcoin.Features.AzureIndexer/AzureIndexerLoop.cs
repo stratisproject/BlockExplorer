@@ -76,15 +76,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
         public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration();
-        
-            indexerConfig.StorageCredentials = new StorageCredentials(
-                indexerSettings.AzureAccountName, indexerSettings.AzureKey);
-            indexerConfig.StorageNamespace = indexerSettings.StorageNamespace;
-            indexerConfig.Network = network;
-            indexerConfig.CheckpointSetName = indexerSettings.CheckpointsetName;
-            indexerConfig.AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed;
-
+            IndexerConfiguration indexerConfig = new IndexerConfiguration
+            {
+                StorageNamespace = indexerSettings.StorageNamespace,
+                Network = network,
+                CheckpointSetName = indexerSettings.CheckpointsetName,
+                AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed,
+                StorageCredentials = indexerSettings.AzureEmulatorUsed ? null : new StorageCredentials(indexerSettings.AzureAccountName, indexerSettings.AzureKey)
+            };
             return indexerConfig;
         }
 

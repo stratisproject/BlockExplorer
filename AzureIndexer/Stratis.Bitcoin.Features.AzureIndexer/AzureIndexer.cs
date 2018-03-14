@@ -26,7 +26,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         public static AzureIndexer CreateIndexer(IConfiguration config)
         {
-            var indexerConfig = IndexerConfiguration.FromConfiguration(config);
+            var indexerConfig = new IndexerConfiguration(config);
             return indexerConfig.CreateIndexer();
         }
 
@@ -61,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private void SetThrottling()
         {
             Helper.SetThrottling();
-            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.CreateTableClient().BaseUri);
+            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
 
