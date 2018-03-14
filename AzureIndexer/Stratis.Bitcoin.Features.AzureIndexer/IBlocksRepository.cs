@@ -6,6 +6,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IBlocksRepository
     {
+        Block GetStoreTip();
         IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken);
     }
 
@@ -21,6 +22,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         #region IBlocksRepository Members
+
+        public Block GetStoreTip()
+        {
+            return _Repo.GetAsync(_Repo.BlockHash).GetAwaiter().GetResult();
+        }
 
         public IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken)
         {

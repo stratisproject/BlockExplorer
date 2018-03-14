@@ -114,9 +114,23 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 height = 0;
             }
 
-            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken).TakeWhile(b => b != null))
+            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
                 var header = _BlockHeaders.GetBlock(height);
+
+                if (block == null)
+                {
+                    var storeTip = _BlocksRepository.GetStoreTip();
+                    if (storeTip != null)
+                    {
+                        // Store is caught up with Chain but the block is missing from the store.
+                        if (header.Header.BlockTime <= storeTip.Header.BlockTime)
+                            throw new InvalidOperationException($"Chained block not found in store (height = { height }). Re-create the block store.");
+                    }
+                    // Allow Store to catch up with Chain.
+                    break;
+                }
+
                 _LastProcessed = header;
                 yield return new BlockInfo()
                 {
