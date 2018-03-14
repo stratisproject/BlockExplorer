@@ -199,7 +199,7 @@ namespace QBitNinja
 		{
 			var conf = new QBitNinjaConfiguration
 			{
-				Indexer = IndexerConfiguration.FromConfiguration(new ConfigurationManagerConfiguration()),
+				Indexer = new IndexerConfiguration(new ConfigurationManagerConfiguration()),
 				LocalChain = ConfigurationManager.AppSettings["LocalChain"],
 				ServiceBus = ConfigurationManager.AppSettings["ServiceBus"]
 			};
