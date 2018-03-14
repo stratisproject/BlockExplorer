@@ -19,6 +19,11 @@ namespace QBitNinja.Notifications
         }
         #region IBlocksRepository Members
 
+        public Block GetStoreTip()
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<NBitcoin.Block> GetBlocks(IEnumerable<NBitcoin.uint256> hashes, CancellationToken cancellation)
         {
             foreach (var h in hashes)

@@ -27,6 +27,11 @@ namespace QBitNinja
 
 		int MaxBlocks = 70;
 
+        public Block GetStoreTip()
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<NBitcoin.Block> GetBlocks(IEnumerable<NBitcoin.uint256> hashes, CancellationToken cancellation)
         {
             var asked = hashes.ToList();
