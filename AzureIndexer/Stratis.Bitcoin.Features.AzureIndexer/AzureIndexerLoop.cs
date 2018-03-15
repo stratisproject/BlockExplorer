@@ -235,7 +235,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     // All indexes will progress more or less in step
                     // Use 'minHeight' to track the current indexed height
-                    int minHeight = int.MaxValue;
+                    int? minHeight = null;
 
                     // Index a batch of blocks
                     if (!cancellationToken.IsCancellationRequested)
@@ -244,7 +244,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Blocks, cancellationToken);
                         task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        if (fetcher._LastProcessed != null)
+                            minHeight = Math.Min(minHeight ?? int.MaxValue, fetcher._LastProcessed.Height);
                     }
 
                     // Index a batch of transactions
@@ -254,7 +255,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Transactions, cancellationToken);
                         task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        if (fetcher._LastProcessed != null)
+                            minHeight = Math.Min(minHeight ?? int.MaxValue, fetcher._LastProcessed.Height);
                     }
 
                     // Index a batch of balances
@@ -264,7 +266,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Balances, cancellationToken);
                         task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        if (fetcher._LastProcessed != null)
+                            minHeight = Math.Min(minHeight ?? int.MaxValue, fetcher._LastProcessed.Height);
                     }
 
                     // Index a batch of wallets
@@ -274,11 +277,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Wallets, cancellationToken);
                         task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        if (fetcher._LastProcessed != null)
+                            minHeight = Math.Min(minHeight ?? int.MaxValue, fetcher._LastProcessed.Height);
                     }
 
                     // Update the StoreTip value from the minHeight
-                    this.SetStoreTip(this.Chain.GetBlock(Math.Min(minHeight, this.indexerSettings.To)));
+                    if (minHeight != null)
+                        this.SetStoreTip(this.Chain.GetBlock((int)minHeight));
                 }
                 catch (OperationCanceledException)
                 {

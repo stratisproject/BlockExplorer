@@ -101,7 +101,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<int> lastHeights = new Queue<int>();
 
             var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            _LastProcessed = fork;
             var headers = _BlockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height >= FromHeight && h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
