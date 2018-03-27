@@ -143,7 +143,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             return new AzureIndexer(this);
         }
-
+        /*
         public NetworkPeer ConnectToNode(bool isRelay)
         {
             if (String.IsNullOrEmpty(Node))
@@ -152,7 +152,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(Network.StratisTest, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads());
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
-
+        */
         public IndexerClient CreateIndexerClient()
         {
             return new IndexerClient(this);
