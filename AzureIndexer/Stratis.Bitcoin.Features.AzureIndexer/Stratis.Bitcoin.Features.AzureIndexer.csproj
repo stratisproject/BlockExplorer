@@ -24,9 +24,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.0.10-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.10-alpha" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.10-alpha" />
+    <PackageReference Include="Stratis.Bitcoin" Version="1.0.11-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.11-alpha" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.11-alpha" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
 
