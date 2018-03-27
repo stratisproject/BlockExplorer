@@ -61,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ToHeight = int.MaxValue;
         }
 
-        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain)
+        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedBlock lastProcessed)
         {
             if (blocksRepository == null)
                 throw new ArgumentNullException("blocksRepository");
@@ -75,6 +75,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             _BlockHeaders = chain;
             _BlocksRepository = blocksRepository;
             _Checkpoint = checkpoint;
+            _LastProcessed = lastProcessed;
 
             InitDefault();
         }
@@ -101,9 +102,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<int> lastHeights = new Queue<int>();
 
             var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            _LastProcessed = fork;
             var headers = _BlockHeaders.EnumerateAfter(fork);
-            headers = headers.Where(h => h.Height >= FromHeight && h.Height <= ToHeight);
+            headers = headers.Where(h => h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
             if(first == null)
                 yield break;
