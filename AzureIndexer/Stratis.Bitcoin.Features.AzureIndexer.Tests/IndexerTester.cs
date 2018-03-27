@@ -38,6 +38,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var config = AzureIndexerLoop.IndexerConfigFromSettings(
                 new AzureIndexerSettings() { StorageNamespace = folder }, Network.TestNet);
 
+            config.EnsureSetup();
+
             _Importer = config.CreateIndexer();
 
 			List<Task> creating = new List<Task>();
@@ -48,7 +50,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
 			creating.Add(config.GetBlocksContainer().CreateIfNotExistsAsync());
 			Task.WaitAll(creating.ToArray());
-            config.EnsureSetup();
+
             _Folder = folder;
         }
 
