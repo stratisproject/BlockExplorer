@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NBitcoin;
 using Stratis.Bitcoin.Builder;
 using Stratis.Bitcoin.Builder.Feature;
 using Stratis.Bitcoin.Configuration;
 using Stratis.Bitcoin.Configuration.Logging;
 using Stratis.Bitcoin.Interfaces;
-using System;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 [assembly: InternalsVisibleTo("Stratis.Bitcoin.Features.AzureIndexer.Tests")]
 
@@ -20,6 +21,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         /// <summary>The loop responsible for indexing blocks to azure.</summary>
         protected readonly AzureIndexerLoop indexerLoop;
+
+        /// <summary>The node's settings.</summary>
+        protected readonly NodeSettings nodeSettings;
 
         /// <summary>The Azure Indexer settings.</summary>
         protected readonly AzureIndexerSettings indexerSettings;
@@ -48,7 +52,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.name = name;
             this.indexerLoop = azureIndexerLoop;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            indexerSettings.Load(nodeSettings);
+            this.nodeSettings = nodeSettings;
             this.indexerSettings = indexerSettings;
         }
 
@@ -70,17 +74,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Starts the Azure Indexer feature.
         /// </summary>
-        public override void Start()
+        public override void Initialize()
         {
-            this.logger.LogInformation("Starting {0}...", this.name);
+            this.logger.LogTrace("()");
             this.indexerLoop.Initialize();         
             this.logger.LogTrace("(-)");
+        }
+
+        public override void LoadConfiguration()
+        {
+            this.indexerSettings.Load(this.nodeSettings);
+        }
+
+        public static void PrintHelp(Network network)
+        {
+            AzureIndexerSettings.PrintHelp(network);
         }
 
         /// <summary>
         /// Stops the Azure Indexer feature.
         /// </summary>
-        public override void Stop()
+        public override void Dispose()
         {
             this.logger.LogInformation("Stopping {0}...", this.name);
             this.indexerLoop.Shutdown();

@@ -1,30 +1,13 @@
-﻿using NBitcoin;
-using NBitcoin.Protocol;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
+using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IBlocksRepository
     {
+        Block GetStoreTip();
         IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken);
-    }
-
-    public class NodeBlocksRepository : IBlocksRepository
-    {
-        Node _Node;
-        public NodeBlocksRepository(Node node)
-        {
-            _Node = node;
-        }
-        #region IBlocksRepository Members
-
-        public IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken)
-        {
-            return _Node.GetBlocks(hashes, cancellationToken);
-        }
-
-        #endregion
     }
 
     public class FullNodeBlocksRepository : IBlocksRepository
@@ -39,6 +22,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         #region IBlocksRepository Members
+
+        public Block GetStoreTip()
+        {
+            return _Repo.GetAsync(_Repo.BlockHash).GetAwaiter().GetResult();
+        }
 
         public IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken)
         {

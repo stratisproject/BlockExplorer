@@ -50,6 +50,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
 
+        public BlockFetcher BlocksFetcher { get; private set; }
+        public BlockFetcher TransactionsFetcher { get; private set; }
+        public BlockFetcher BalancesFetcher { get; private set; }
+        public BlockFetcher WalletsFetcher { get; private set; }
+
         /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
         
@@ -76,15 +81,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
         public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration();
-        
-            indexerConfig.StorageCredentials = new StorageCredentials(
-                indexerSettings.AzureAccountName, indexerSettings.AzureKey);
-            indexerConfig.StorageNamespace = indexerSettings.StorageNamespace;
-            indexerConfig.Network = network;
-            indexerConfig.CheckpointSetName = indexerSettings.CheckpointsetName;
-            indexerConfig.AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed;
-
+            IndexerConfiguration indexerConfig = new IndexerConfiguration
+            {
+                StorageNamespace = indexerSettings.StorageNamespace,
+                Network = network,
+                CheckpointSetName = indexerSettings.CheckpointsetName,
+                AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed,
+                StorageCredentials = indexerSettings.AzureEmulatorUsed ? null : new StorageCredentials(indexerSettings.AzureAccountName, indexerSettings.AzureKey)
+            };
             return indexerConfig;
         }
 
@@ -106,19 +110,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             indexer.ToHeight = this.indexerSettings.To;
 
             this.AzureIndexer = indexer;
+            ChainedBlock ckpntBlocks = this.GetCheckPointBlock(IndexerCheckpoints.Blocks);
+            ChainedBlock ckpntBalances = this.GetCheckPointBlock(IndexerCheckpoints.Balances);
+            ChainedBlock ckpntTransactions = this.GetCheckPointBlock(IndexerCheckpoints.Transactions);
+            ChainedBlock ckpntWallets = this.GetCheckPointBlock(IndexerCheckpoints.Wallets);
 
             if (this.indexerSettings.IgnoreCheckpoints)
                 this.SetStoreTip(this.Chain.GetBlock(indexer.FromHeight));
             else
             {
-                int minHeight = int.MaxValue;
-                minHeight = Math.Min(minHeight, this.GetCheckPointBlock(IndexerCheckpoints.Blocks).Height);
-                minHeight = Math.Min(minHeight, this.GetCheckPointBlock(IndexerCheckpoints.Balances).Height);
-                minHeight = Math.Min(minHeight, this.GetCheckPointBlock(IndexerCheckpoints.Transactions).Height);
-                minHeight = Math.Min(minHeight, this.GetCheckPointBlock(IndexerCheckpoints.Wallets).Height);
+                int minHeight = ckpntBlocks.Height;
+                minHeight = Math.Min(minHeight, ckpntBalances.Height);
+                minHeight = Math.Min(minHeight, ckpntTransactions.Height);
+                minHeight = Math.Min(minHeight, ckpntWallets.Height);
 
                 this.SetStoreTip(this.Chain.GetBlock(minHeight));
             }
+
+            this.BlocksFetcher = this.GetBlockFetcher(IndexerCheckpoints.Blocks, this.nodeLifetime.ApplicationStopping, ckpntBlocks);
+            this.BalancesFetcher = this.GetBlockFetcher(IndexerCheckpoints.Balances, this.nodeLifetime.ApplicationStopping, ckpntBalances);
+            this.TransactionsFetcher = this.GetBlockFetcher(IndexerCheckpoints.Transactions, this.nodeLifetime.ApplicationStopping, ckpntTransactions);
+            this.WalletsFetcher = this.GetBlockFetcher(IndexerCheckpoints.Wallets, this.nodeLifetime.ApplicationStopping, ckpntWallets);
 
             this.StartLoop();
             
@@ -177,11 +189,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
         /// <param name="cancellationToken">The token used for cancellation.</param>
         /// <returns>A block fetcher that respects the given type of checkpoint.</returns>
-        private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints, CancellationToken cancellationToken)
+        private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints, CancellationToken cancellationToken, ChainedBlock lastProcessed)
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
-            return new BlockFetcher(checkpoint, repo, this.Chain)
+            return new BlockFetcher(checkpoint, repo, this.Chain, lastProcessed)
             {
                 NeedSaveInterval = this.indexerSettings.CheckpointInterval,
                 FromHeight = this.StoreTip.Height + 1,
@@ -235,51 +247,56 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 try
                 {
                     // All indexes will progress more or less in step
-                    // Use 'minHeight' to track the current indexed height
-                    int minHeight = int.MaxValue;
+                    int fromHeight = this.StoreTip.Height + 1;
+                    int toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
 
                     // Index a batch of blocks
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!cancellationToken.IsCancellationRequested && toHeight > this.BlocksFetcher._LastProcessed.Height)
                     {
+                        this.BlocksFetcher.FromHeight = Math.Max(this.BlocksFetcher._LastProcessed.Height + 1, fromHeight);
+                        this.BlocksFetcher.ToHeight = toHeight;
                         var task = new IndexBlocksTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Blocks, cancellationToken);
-                        task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler);
                     }
 
                     // Index a batch of transactions
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!cancellationToken.IsCancellationRequested && toHeight > this.TransactionsFetcher._LastProcessed.Height)
                     {
+                        this.TransactionsFetcher.FromHeight = Math.Max(this.TransactionsFetcher._LastProcessed.Height + 1, fromHeight);
+                        this.TransactionsFetcher.ToHeight = toHeight;
                         var task = new IndexTransactionsTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Transactions, cancellationToken);
-                        task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler);
                     }
 
                     // Index a batch of balances
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!cancellationToken.IsCancellationRequested && toHeight > this.BalancesFetcher._LastProcessed.Height)
                     {
+                        this.BalancesFetcher.FromHeight = Math.Max(this.BalancesFetcher._LastProcessed.Height + 1, fromHeight);
+                        this.BalancesFetcher.ToHeight = toHeight;
                         var task = new IndexBalanceTask(this.IndexerConfig, null);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Balances, cancellationToken);
-                        task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler);
                     }
 
                     // Index a batch of wallets
-                    if (!cancellationToken.IsCancellationRequested)
+                    if (!cancellationToken.IsCancellationRequested && toHeight > this.WalletsFetcher._LastProcessed.Height)
                     {
+                        this.WalletsFetcher.FromHeight = Math.Max(this.WalletsFetcher._LastProcessed.Height + 1, fromHeight);
+                        this.WalletsFetcher.ToHeight = toHeight;
                         var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules());
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        var fetcher = this.GetBlockFetcher(IndexerCheckpoints.Wallets, cancellationToken);
-                        task.Index(fetcher, this.AzureIndexer.TaskScheduler);
-                        minHeight = Math.Min(minHeight, fetcher._LastProcessed.Height);
+                        task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler);
                     }
 
                     // Update the StoreTip value from the minHeight
-                    this.SetStoreTip(this.Chain.GetBlock(Math.Min(minHeight, this.indexerSettings.To)));
+                    int minHeight = this.BlocksFetcher._LastProcessed.Height;
+                    minHeight = Math.Min(minHeight, this.BalancesFetcher._LastProcessed.Height);
+                    minHeight = Math.Min(minHeight, this.TransactionsFetcher._LastProcessed.Height);
+                    minHeight = Math.Min(minHeight, this.WalletsFetcher._LastProcessed.Height);
+
+                    this.SetStoreTip(this.Chain.GetBlock(minHeight));
                 }
                 catch (OperationCanceledException)
                 {
@@ -288,8 +305,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 catch (Exception ex)
                 {
                     // If something goes wrong then try again 1 minute later
+                    this.logger.LogError(ex.Message);
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
-                    await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
+                    await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
             }
 

@@ -1,5 +1,4 @@
 ﻿using NBitcoin;
-using NBitcoin.Protocol;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using System;
 using System.Collections.Generic;
@@ -37,6 +36,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return _Checkpoint;
             }
         }
+
         private readonly IBlocksRepository _BlocksRepository;
         public IBlocksRepository BlocksRepository
         {
@@ -55,35 +55,28 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public BlockFetcher(Checkpoint checkpoint, Node node, ChainBase chain = null)
-        {
-            if(checkpoint == null)
-                throw new ArgumentNullException("checkpoint");
-            if(node == null)
-                throw new ArgumentNullException("node");
-            _BlockHeaders = chain ?? node.GetChain();
-            _BlocksRepository = new NodeBlocksRepository(node);
-            _Checkpoint = checkpoint;
-
-            InitDefault();
-        }
-
         private void InitDefault()
         {
             NeedSaveInterval = TimeSpan.FromMinutes(15);
             ToHeight = int.MaxValue;
         }
-        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain)
+
+        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedBlock lastProcessed)
         {
-            if(blocksRepository == null)
+            if (blocksRepository == null)
                 throw new ArgumentNullException("blocksRepository");
-            if(chain == null)
+
+            if (chain == null)
                 throw new ArgumentNullException("blockHeaders");
-            if(checkpoint == null)
+
+            if (checkpoint == null)
                 throw new ArgumentNullException("checkpoint");
+
             _BlockHeaders = chain;
             _BlocksRepository = blocksRepository;
             _Checkpoint = checkpoint;
+            _LastProcessed = lastProcessed;
+
             InitDefault();
         }
 
@@ -109,9 +102,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<int> lastHeights = new Queue<int>();
 
             var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            _LastProcessed = fork;
             var headers = _BlockHeaders.EnumerateAfter(fork);
-            headers = headers.Where(h => h.Height >= FromHeight && h.Height <= ToHeight);
+            headers = headers.Where(h => h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
             if(first == null)
                 yield break;
@@ -122,9 +114,23 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 height = 0;
             }
 
-            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken).TakeWhile(b => b != null))
+            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
                 var header = _BlockHeaders.GetBlock(height);
+
+                if (block == null)
+                {
+                    var storeTip = _BlocksRepository.GetStoreTip();
+                    if (storeTip != null)
+                    {
+                        // Store is caught up with Chain but the block is missing from the store.
+                        if (header.Header.BlockTime <= storeTip.Header.BlockTime)
+                            throw new InvalidOperationException($"Chained block not found in store (height = { height }). Re-create the block store.");
+                    }
+                    // Allow Store to catch up with Chain.
+                    break;
+                }
+
                 _LastProcessed = header;
                 yield return new BlockInfo()
                 {
@@ -156,8 +162,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         #endregion
 
-
-
         private DateTime _LastSaved = DateTime.UtcNow;
         public bool NeedSave
         {
@@ -188,7 +192,5 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             get;
             set;
         }
-
-
     }
 }

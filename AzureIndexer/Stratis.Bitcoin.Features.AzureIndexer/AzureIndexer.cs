@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
-using NBitcoin.Protocol;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using Stratis.Bitcoin.Features.AzureIndexer.Internal;
 using System;
@@ -27,7 +26,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         public static AzureIndexer CreateIndexer(IConfiguration config)
         {
-            var indexerConfig = IndexerConfiguration.FromConfiguration(config);
+            var indexerConfig = new IndexerConfiguration(config);
             return indexerConfig.CreateIndexer();
         }
 
@@ -51,23 +50,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.ToHeight = int.MaxValue;
         }
 
-        public long IndexTransactions(ChainBase chain = null)
-        {
-            using(IndexerTrace.NewCorrelation("Import transactions to azure started"))
-            {
-                using(var node = this.Configuration.ConnectToNode(false))
-                {
-
-                    node.VersionHandshake();
-
-                    var task = new IndexTransactionsTask(this.Configuration);
-                    task.SaveProgression = !this.IgnoreCheckpoints;
-                    task.Index(this.GetBlockFetcher(this.GetCheckpointInternal(IndexerCheckpoints.Transactions), node, chain), this.TaskScheduler);
-                    return task.IndexedEntities;
-                }
-            }
-        }
-
         internal Checkpoint GetCheckpointInternal(IndexerCheckpoints checkpoint)
         {
             var chk = this.GetCheckpoint(checkpoint);
@@ -79,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private void SetThrottling()
         {
             Helper.SetThrottling();
-            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.CreateTableClient().BaseUri);
+            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
 
@@ -146,21 +128,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var task = new IndexTableEntitiesTask(this.Configuration, table);
             return task.IndexAsync(entities, this.TaskScheduler);
         }        
-        
-        public long IndexBlocks(ChainBase chain = null)
-        {
-            using(IndexerTrace.NewCorrelation("Import blocks to azure started"))
-            {
-                using(var node = this.Configuration.ConnectToNode(false))
-                {
-                    node.VersionHandshake();
-                    var task = new IndexBlocksTask(this.Configuration);
-                    task.SaveProgression = !this.IgnoreCheckpoints;
-                    task.Index(this.GetBlockFetcher(this.GetCheckpointInternal(IndexerCheckpoints.Blocks), node, chain), this.TaskScheduler);
-                    return task.IndexedBlocks;
-                }
-            }
-        }
 
         public Checkpoint GetCheckpoint(IndexerCheckpoints checkpoint)
         {
@@ -178,74 +145,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 ? "default" : this._Configuration.CheckpointSetName);
         }
 
-        /// <summary>
-        /// Get a block fetcher of the specified chain from the specified checkpoint
-        /// </summary>
-        /// <param name="checkpoint">The checkpoint to load from</param>
-        /// <param name="chain">The chain to fetcher (default: the Node's main chain)</param>
-        /// <returns>A BlockFetcher for enumerating blocks and saving progression</returns>
-        public BlockFetcher GetBlockFetcher(Checkpoint checkpoint, Node node, ChainBase chain = null)
-        {
-            if(checkpoint == null)
-                throw new ArgumentNullException("checkpoint");
-            if(node == null)
-                throw new ArgumentNullException("node");
-            chain = chain ?? this.GetNodeChain(node);
-            IndexerTrace.CheckpointLoaded(chain.FindFork(checkpoint.BlockLocator), checkpoint.CheckpointName);
-            return new BlockFetcher(checkpoint, new NodeBlocksRepository(node), chain)
-            {
-                NeedSaveInterval = this.CheckpointInterval,
-                FromHeight = this.FromHeight,
-                ToHeight = this.ToHeight
-            };
-        }
-
-        /// <summary>
-        /// Get a block fetcher of the specified chain from the specified checkpoint
-        /// </summary>
-        /// <param name="checkpoint">The checkpoint name to load from</param>
-        /// <param name="chain">The chain to fetcher (default: the Node's main chain)</param>
-        /// <returns>A BlockFetcher for enumerating blocks and saving progression</returns>
-        public BlockFetcher GetBlockFetcher(string checkpointName, Node node, ChainBase chain = null)
-        {
-            if(checkpointName == null)
-                throw new ArgumentNullException("checkpointName");
-            return this.GetBlockFetcher(this.GetCheckpointRepository().GetCheckpoint(checkpointName), node, chain);
-        }
-
-        public int IndexOrderedBalances(ChainBase chain)
-        {
-            using(IndexerTrace.NewCorrelation("Import balances to azure started"))
-            {
-                using(var node = this.Configuration.ConnectToNode(false))
-                {
-                    node.VersionHandshake();
-                    var task = new IndexBalanceTask(this.Configuration, null);
-                    task.SaveProgression = !this.IgnoreCheckpoints;
-                    task.Index(this.GetBlockFetcher(this.GetCheckpointInternal(IndexerCheckpoints.Balances), node, chain), this.TaskScheduler);
-                    return task.IndexedEntities;
-                }
-            }
-        }
-
         internal ChainBase GetMainChain()
         {
             return this.Configuration.CreateIndexerClient().GetMainChain();
-        }
-
-        public int IndexWalletBalances(ChainBase chain)
-        {
-            using(IndexerTrace.NewCorrelation("Import wallet balances to azure started"))
-            {
-                using(var node = this.Configuration.ConnectToNode(false))
-                {
-                    node.VersionHandshake();
-                    var task = new IndexBalanceTask(this.Configuration, this.Configuration.CreateIndexerClient().GetAllWalletRules());
-                    task.SaveProgression = !this.IgnoreCheckpoints;
-                    task.Index(this.GetBlockFetcher(this.GetCheckpointInternal(IndexerCheckpoints.Wallets), node, chain), this.TaskScheduler);
-                    return task.IndexedEntities;
-                }
-            }
         }
 
         public void IndexOrderedBalance(int height, Block block)
@@ -314,32 +216,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var table = this.Configuration.GetBalanceTable();
             var entities = OrderedBalanceChange.ExtractScriptBalances(tx).Select(t => t.ToEntity()).AsEnumerable();
             return this.IndexAsync(entities, table);
-        }
-
-        public ChainBase GetNodeChain()
-        {
-            IndexerTrace.Information("Connecting to node " + this.Configuration.Node);
-            using(var node = this.Configuration.ConnectToNode(false))
-            {
-                IndexerTrace.Information("Handshaking");
-                node.VersionHandshake();
-                return this.GetNodeChain(node);
-            }
-        }
-
-        public ChainBase GetNodeChain(Node node)
-        {
-            var chain = new ConcurrentChain(this.Configuration.Network);
-            IndexerTrace.Information("Synchronizing with local node");
-            node.SynchronizeChain(chain);
-            IndexerTrace.Information("Chain loaded with height " + chain.Height);
-            return chain;
-        }
-
-        public void IndexNodeMainChain()
-        {
-            var chain = this.GetNodeChain();
-            this.IndexChain(chain);
         }
 
         internal const int BlockHeaderPerRow = 6;
