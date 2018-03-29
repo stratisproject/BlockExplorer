@@ -6,6 +6,7 @@ using Stratis.Bitcoin.Utilities;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -98,6 +99,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public void Initialize()
         {
             this.logger.LogTrace("()");
+            this.logger.LogTrace("Initialising indexer...");
 
             this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network);
 
@@ -153,8 +155,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         private void StartLoop()
         {
+            this.logger.LogTrace("Starting loop...");
             this.asyncLoop = this.asyncLoopFactory.Run($"{this.StoreName}.IndexAsync", async token =>
             {
+                this.logger.LogTrace($"Loop token: {token}");
+
                 await IndexAsync(this.nodeLifetime.ApplicationStopping);
             },
             this.nodeLifetime.ApplicationStopping,
@@ -210,12 +215,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private async Task IndexChainAsync(CancellationToken cancellationToken)
         {
             this.logger.LogTrace("()");
+            this.logger.LogTrace("Indexing chain...");
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
-                {                  
+                {
+                    this.logger.LogTrace("New iteration");
                     this.AzureIndexer.IndexChain(this.Chain, cancellationToken);
+
+                    this.logger.LogTrace("Wait 1 minute for the next iteration");
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
@@ -225,6 +234,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 catch (Exception ex)
                 {
                     // If something goes wrong then try again 1 minute later
+                    this.logger.LogError(ex, "Error while importing " + this.StoreTip.HashBlock + " in azure blob");
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
@@ -255,6 +265,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.BlocksFetcher.FromHeight = Math.Max(this.BlocksFetcher._LastProcessed.Height + 1, fromHeight);
                         this.BlocksFetcher.ToHeight = toHeight;
+                        this.logger.LogTrace($"Index a batch of blocks. From {this.BlocksFetcher.FromHeight} to {this.BlocksFetcher.ToHeight}.");
                         var task = new IndexBlocksTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler);
@@ -265,6 +276,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.TransactionsFetcher.FromHeight = Math.Max(this.TransactionsFetcher._LastProcessed.Height + 1, fromHeight);
                         this.TransactionsFetcher.ToHeight = toHeight;
+                        this.logger.LogTrace($"Index a batch of transactions. From {this.TransactionsFetcher.FromHeight} to {this.TransactionsFetcher.ToHeight}.");
                         var task = new IndexTransactionsTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler);
@@ -275,6 +287,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.BalancesFetcher.FromHeight = Math.Max(this.BalancesFetcher._LastProcessed.Height + 1, fromHeight);
                         this.BalancesFetcher.ToHeight = toHeight;
+                        this.logger.LogTrace($"Index a batch of balances. From {this.BalancesFetcher.FromHeight} to {this.BalancesFetcher.ToHeight}.");
                         var task = new IndexBalanceTask(this.IndexerConfig, null);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler);
@@ -285,6 +298,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.WalletsFetcher.FromHeight = Math.Max(this.WalletsFetcher._LastProcessed.Height + 1, fromHeight);
                         this.WalletsFetcher.ToHeight = toHeight;
+                        this.logger.LogTrace($"Index a batch of wallets. From {this.WalletsFetcher.FromHeight} to {this.WalletsFetcher.ToHeight}.");
                         var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules());
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler);
@@ -300,6 +314,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
                 catch (OperationCanceledException)
                 {
+                    this.logger.LogWarning("IndexAsync: OperationCanceledException");
                     break;
                 }
                 catch (Exception ex)

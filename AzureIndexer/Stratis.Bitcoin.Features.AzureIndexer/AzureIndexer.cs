@@ -11,6 +11,8 @@ using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -24,6 +26,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public class AzureIndexer
     {
+        private readonly Serilog.ILogger logger = Log.ForContext<AzureIndexer>();
+
         public static AzureIndexer CreateIndexer(IConfiguration config)
         {
             var indexerConfig = new IndexerConfiguration(config);
@@ -87,12 +91,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void Index(params Block[] blocks)
         {
+            this.logger.Debug("Index with blocks: {numberOfBlocks}", blocks.Length);
             var task = new IndexBlocksTask(this.Configuration);
             task.Index(blocks, this.TaskScheduler);
         }
 
         public Task IndexAsync(params Block[] blocks)
         {
+            this.logger.Debug("IndexAsync with blocks: {numberOfBlocks}", blocks.Length);
             var task = new IndexBlocksTask(this.Configuration);
             return task.IndexAsync(blocks, this.TaskScheduler);
         }

@@ -9,6 +9,7 @@ using Stratis.Bitcoin.Features.BlockStore;
 using Stratis.Bitcoin.Features.Consensus;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Utilities;
+using Stratis.IndexerD;
 
 namespace Stratis.Bitcoin.Indexer.Console
 {

@@ -8,11 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public class IndexBlocksTask : IndexTask<BlockInfo>
     {
+        private readonly ILogger logger = Log.ForContext<IndexBlocksTask>();
         public IndexBlocksTask(IndexerConfiguration configuration)
             : base(configuration)
         {
@@ -45,6 +47,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
             catch (AggregateException aex)
             {
+                this.logger.Error(aex, "Index");
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
                 throw;
             }
@@ -62,7 +65,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }})))
                 .ToArray();
             foreach (var t in tasks)
+            {
+                this.logger.Debug("IndexAsync: run task {task}", t);
                 t.Start(taskScheduler);
+            }
+
             return Task.WhenAll(tasks);
         }
 
@@ -85,6 +92,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             watch.Start();
             while (true)
             {
+                this.logger.Debug("IndexCore loop");
                 var container = Configuration.GetBlocksContainer();
                 var client = container.ServiceClient;
                 client.DefaultRequestOptions.SingleBlobUploadThresholdInBytes = 32 * 1024 * 1024;
@@ -118,6 +126,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }
                 catch (StorageException ex)
                 {
+                    this.logger.Error(ex, "Error While Importing Block To Azure");
                     var alreadyExist = ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412;
                     if (!alreadyExist)
                     {
@@ -131,6 +140,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }
                 catch (Exception ex)
                 {
+                    this.logger.Error(ex, "Generic Exception While Importing Block To Azure");
                     IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
                     throw;
                 }

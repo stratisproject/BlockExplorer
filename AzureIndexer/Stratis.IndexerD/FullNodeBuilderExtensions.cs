@@ -13,6 +13,7 @@ namespace Stratis.IndexerD
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.RollingFile("log-{Date}.txt")
+                .WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
             builder.NodeSettings.LoggerFactory.AddSerilog();
             return builder;

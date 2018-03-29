@@ -7,11 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class Checkpoint
     {
+        private readonly ILogger logger = Log.ForContext<Checkpoint>();
         private readonly string _CheckpointName;
         public string CheckpointName
         {
@@ -36,8 +38,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     _BlockLocator.ReadWrite(data, false);
                     return;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    this.logger.Error(ex, "Checkpoint failure");
                 }
             }
             var list = new List<uint256>();
@@ -76,6 +79,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (AggregateException aex)
             {
+                this.logger.Error(aex, "SaveProgress failure");
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
                 return false;
             }
@@ -89,6 +93,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (StorageException ex)
             {
+                this.logger.Error(ex, "DeleteAsync failure");
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 404)
                     return;
                 throw;
@@ -108,6 +113,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (StorageException ex)
             {
+                this.logger.Error(ex, "SaveProgressAsync failure");
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412)
                     return false;
                 throw;
@@ -126,6 +132,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (StorageException ex)
             {
+                Log.Error(ex, "LoadBlobAsync failure");
                 if (ex.RequestInformation == null || ex.RequestInformation.HttpStatusCode != 404)
                     throw;
             }
