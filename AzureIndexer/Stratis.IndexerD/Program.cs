@@ -1,4 +1,5 @@
-﻿using NBitcoin;
+﻿using System;
+using NBitcoin;
 using NBitcoin.Protocol;
 using Stratis.Bitcoin.Builder;
 using Stratis.Bitcoin.Configuration;
@@ -7,6 +8,7 @@ using Stratis.Bitcoin.Features.Consensus;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Utilities;
 using System.Linq;
+using Stratis.IndexerD;
 
 namespace Stratis.Bitcoin.Indexer.Console
 {
@@ -15,7 +17,7 @@ namespace Stratis.Bitcoin.Indexer.Console
         public static void Main(string[] args)
         {
             Network network = args.Contains("-testnet") ? Network.StratisTest : Network.StratisMain;
-
+           
             if (NodeSettings.PrintHelp(args, network))
             {
                 AzureIndexerSettings.PrintHelp(network);
@@ -23,7 +25,6 @@ namespace Stratis.Bitcoin.Indexer.Console
             }
 
             NodeSettings nodeSettings = NodeSettings.FromArguments(args, "stratis", network, ProtocolVersion.ALT_PROTOCOL_VERSION);
-
             // NOTES: running BTC and STRAT side by side is not possible yet as the flags for serialization are static
 
             var node = new FullNodeBuilder()
@@ -31,9 +32,17 @@ namespace Stratis.Bitcoin.Indexer.Console
                 .UseStratisConsensus()
                 .UseBlockStore()
                 .UseAzureIndexer()
+                .UseSerilog()
                 .Build();
 
-            node.Run();
+            try
+            {
+                node.Run();
+            }
+            catch (Exception ex)
+            {
+                Serilog.Log.Fatal(ex, "Fatal crash");
+            }
         }
     }
 }

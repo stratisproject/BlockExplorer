@@ -25,6 +25,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="NStratis" Version="4.0.0.33" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Stratis.Bitcoin" Version="1.0.4-alpha" />
     <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.0.4-alpha" />
     <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.0.4-alpha" />
