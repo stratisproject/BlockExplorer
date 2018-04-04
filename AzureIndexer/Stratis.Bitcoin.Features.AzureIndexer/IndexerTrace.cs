@@ -6,13 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class IndexerTrace
     {
 		static ILogger _Logger = NullLogger.Instance;
-		public static void Configure(ILoggerFactory factory)
+
+        public static void Configure(ILoggerFactory factory)
 		{
 			_Logger = factory.CreateLogger("Stratis.Bitcoin.Features.AzureIndexer");
 		}
@@ -152,6 +155,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public static void Information(string message)
         {
 			_Logger.LogInformation(message);
+        }
+
+        public static void Trace(string message)
+        {
+            _Logger.LogTrace(message);
+            Log.Debug(message);
         }
 
         internal static void NoForkFoundWithStored()

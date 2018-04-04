@@ -72,6 +72,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.nodeLifetime = fullNode.NodeLifetime;
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
+
+            IndexerTrace.Configure(loggerFactory);
         }
 
         /// <summary>
@@ -229,6 +231,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
                 catch (OperationCanceledException)
                 {
+                    this.logger.LogTrace("OperationCanceledException");
                     break;
                 }
                 catch (Exception ex)

@@ -228,20 +228,28 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<ChainPartEntry> entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
+            IndexerTrace.Trace($"Found {entries.Count} chain part enties");
+
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
+            IndexerTrace.Trace($"Start height is {startHeight}");
             ChainPartEntry chainPart = null;
             for(int i = startHeight; i <= chain.Tip.Height; i++)
             {
-                if(chainPart == null)
+                if (chainPart == null)
+                {
+                    IndexerTrace.Trace($"Chain part is null, setting new chain part with offset {i}");
                     chainPart = new ChainPartEntry()
                     {
                         ChainOffset = i
                     };
+                }
 
                 var block = chain.GetBlock(i);
+                IndexerTrace.Trace($"Block is {block.Height}");
                 chainPart.BlockHeaders.Add(block.Header);
                 if(chainPart.BlockHeaders.Count == BlockHeaderPerRow)
                 {
+                    IndexerTrace.Trace($"chainPart.BlockHeaders.Count == BlockHeaderPerRow ({BlockHeaderPerRow})");
                     entries.Add(chainPart);
                     chainPart = null;
                 }
@@ -253,16 +261,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))
         {
+            IndexerTrace.Trace("Index: Get chain table");
             CloudTable table = this.Configuration.GetChainTable();
             TableBatchOperation batch = new TableBatchOperation();
             var last = chainParts[chainParts.Count - 1];
-
-            foreach(var entry in chainParts)
+            IndexerTrace.Trace($"Index: last chain part is {last}");
+            
+            foreach (var entry in chainParts)
             {
+                IndexerTrace.Trace($"Index: entry {entry.ChainOffset}");
                 batch.Add(TableOperation.InsertOrReplace(entry.ToEntity()));
                 if(batch.Count == 100)
                 {
-                    table.ExecuteBatchAsync(batch).GetAwaiter().GetResult();
+                    IndexerTrace.Trace("Index: batch count is 100, execute table batch");
+                    var result = table.ExecuteBatchAsync(batch).GetAwaiter().GetResult();
+                    IndexerTrace.Trace($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
                     batch = new TableBatchOperation();
                 }
                 IndexerTrace.RemainingBlockChain(entry.ChainOffset, last.ChainOffset + last.BlockHeaders.Count - 1);
@@ -270,7 +283,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if(batch.Count > 0)
             {
-                table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
+                IndexerTrace.Trace($"Index: execute remaining batch count of {batch.Count}");
+                var result = table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
+                IndexerTrace.Trace($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
             }
         }
 
@@ -296,11 +311,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             if(chain == null)
                 throw new ArgumentNullException("chain");
+            IndexerTrace.Trace("Setting throttling to max 100 connections");
             this.SetThrottling();
 
             using(IndexerTrace.NewCorrelation("Index main chain to azure started"))
             {
-                this.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                var createChainTable = this.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                IndexerTrace.Trace($"Creating chain table result: {createChainTable}");
                 IndexerTrace.InputChainTip(chain.Tip);
                 var client = this.Configuration.CreateIndexerClient();
                 var changes = client.GetChainChangesUntilFork(chain.Tip, true, cancellationToken).ToList();
