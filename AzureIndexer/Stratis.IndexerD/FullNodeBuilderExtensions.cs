@@ -12,7 +12,6 @@ namespace Stratis.IndexerD
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("", "")
                 .WriteTo.RollingFile("log-{Date}.txt")
                 .WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
