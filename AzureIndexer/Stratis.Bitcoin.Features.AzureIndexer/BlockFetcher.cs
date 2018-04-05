@@ -125,7 +125,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         // Store is caught up with Chain but the block is missing from the store.
                         if (header.Header.BlockTime <= storeTip.Header.BlockTime)
-                            throw new InvalidOperationException($"Chained block not found in store (height = { height }). Re-create the block store.");
+                        {
+                            IndexerTrace.Trace("header.Header.BlockTime <= storeTip.Header.BlockTime");
+                            IndexerTrace.Trace($"header.Header - height:{header.Height}, blockTime:{header.Header.BlockTime}, previousTime:{header.Previous.Header.BlockTime}");
+                            IndexerTrace.Trace($"storeTip.Header - blockTime:{storeTip.Header.BlockTime}");
+                            throw new InvalidOperationException(
+                                $"Chained block not found in store (height = {height}). Re-create the block store. header.Header.BlockTime = {header.Header.BlockTime} and storeTip.Header.BlockTime = {storeTip.Header.BlockTime}");
+                        }
                     }
                     // Allow Store to catch up with Chain.
                     break;
