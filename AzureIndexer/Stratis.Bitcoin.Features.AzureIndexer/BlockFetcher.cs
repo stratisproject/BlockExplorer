@@ -102,10 +102,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<int> lastHeights = new Queue<int>();
 
             var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
+            IndexerTrace.Trace($"Fork is {fork.Height}");
             var headers = _BlockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
-            if(first == null)
+            IndexerTrace.Trace($"First header is: {first?.Height}");
+            if (first == null)
                 yield break;
             var height = first.Height;
             if(first.Height == 1)
@@ -114,15 +116,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 height = 0;
             }
 
-            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
+            IndexerTrace.Trace($"Get blocks");
+            foreach (var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
+                IndexerTrace.Trace($"Block {block?.Header}");
                 var header = _BlockHeaders.GetBlock(height);
 
+                IndexerTrace.Trace($"Check if block is null");
                 if (block == null)
                 {
+                    IndexerTrace.Trace($"Block is NULL. Get store tip.");
                     var storeTip = _BlocksRepository.GetStoreTip();
                     if (storeTip != null)
                     {
+                        IndexerTrace.Trace($"Store tip is {storeTip.Header}.");
                         // Store is caught up with Chain but the block is missing from the store.
                         if (header.Header.BlockTime <= storeTip.Header.BlockTime)
                         {
@@ -137,6 +144,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     break;
                 }
 
+                IndexerTrace.Trace($"_LastProcessed is {_LastProcessed}.");
                 _LastProcessed = header;
                 yield return new BlockInfo()
                 {
