@@ -49,6 +49,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
         internal static void SetThrottling()
         {
+            IndexerTrace.Trace("Throttling parameters: UseNagleAlgorithm = false, Expect100Continue = false, DefaultConnectionLimit = 1000");
             ServicePointManager.UseNagleAlgorithm = false;
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.DefaultConnectionLimit = 1000;

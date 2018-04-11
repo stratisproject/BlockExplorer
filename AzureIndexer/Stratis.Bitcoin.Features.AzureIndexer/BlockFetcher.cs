@@ -179,8 +179,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void SaveCheckpoint()
         {
-            if(_LastProcessed != null)
+            IndexerTrace.Trace($"Save checkpoint");
+            if (_LastProcessed != null)
             {
+                IndexerTrace.Trace($"Last Processed: {_LastProcessed.Height}");
                 _Checkpoint.SaveProgress(_LastProcessed);
                 IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }

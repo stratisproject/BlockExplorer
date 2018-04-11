@@ -39,48 +39,75 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
         {
+            IndexerTrace.Trace("Running indexer");
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
             try
-            {               
+            {
                 SetThrottling();
-                if(EnsureIsSetup)
+                IndexerTrace.Trace($"Find Service Point for {Configuration.TableClient.BaseUri}");
+                if (EnsureIsSetup)
+                {
+                    IndexerTrace.Trace($"Wait for EnsureSetup to complete");
                     EnsureSetup().Wait();
+                }
 
+                IndexerTrace.Trace($"Set bulk import with partition size {PartitionSize}");
                 BulkImport<TIndexed> bulk = new BulkImport<TIndexed>(PartitionSize);
-                if(!SkipToEnd)
+                IndexerTrace.Trace($"Skip to end: {SkipToEnd}");
+                if (!SkipToEnd)
                 {
                     try
                     {
-
-                        foreach(var block in blockFetcher)
+                        IndexerTrace.Trace($"Iterate through blocks");
+                        foreach (var block in blockFetcher)
                         {
+                            IndexerTrace.Trace($"Current block {block.Height}");
                             ThrowIfException();
-                            if(blockFetcher.NeedSave)
+                            IndexerTrace.Trace($"Check if block save is needed");
+                            if (blockFetcher.NeedSave)
                             {
-                                if(SaveProgression)
+                                IndexerTrace.Trace($"Check if block save progression is needed");
+                                if (SaveProgression)
                                 {
+                                    IndexerTrace.Trace($"Enqueue tasks for bulk with partition size {bulk.PartitionSize}");
                                     EnqueueTasks(tasks, bulk, true, scheduler);
+                                    IndexerTrace.Trace($"Save progression");
                                     Save(tasks, blockFetcher, bulk);
                                 }
                             }
+                            IndexerTrace.Trace($"Process block {block.Height}");
                             ProcessBlock(block, bulk);
-                            if(bulk.HasFullPartition)
+                            IndexerTrace.Trace($"Check is bulk has full partition");
+                            if (bulk.HasFullPartition)
                             {
+                                IndexerTrace.Trace($"Partition has full partition. Enqueue tasks.");
                                 EnqueueTasks(tasks, bulk, false, scheduler);
                             }
                         }
+
+                        IndexerTrace.Trace($"Enqueue tasks.");
                         EnqueueTasks(tasks, bulk, true, scheduler);
                     }
                     catch(OperationCanceledException ex)
                     {
-                        if(ex.CancellationToken != blockFetcher.CancellationToken)
+                        IndexerTrace.Error($"Index failure.", ex);
+                        if (ex.CancellationToken != blockFetcher.CancellationToken)
                             throw;
                     }
                 }
                 else
+                {
+                    IndexerTrace.Trace($"Skip is set to true");
                     blockFetcher.SkipToEnd();
-                if(SaveProgression)
+                }
+
+                if (SaveProgression)
+                {
+                    IndexerTrace.Trace($"Save progression");
                     Save(tasks, blockFetcher, bulk);
+                }
+
+                IndexerTrace.Trace($"Wait finished tasks");
                 WaitFinished(tasks);
                 ThrowIfException();
             }
@@ -96,6 +123,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             get
             {
+                IndexerTrace.Trace($"Ensure Is Setup: {this.EnsureIsSetup}");
                 return _EnsureIsSetup;
             }
             set
@@ -106,7 +134,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void SetThrottling()
         {
+            IndexerTrace.Trace("Set Throttling");
             Helper.SetThrottling();
+            IndexerTrace.Trace($"Find Service Point for {Configuration.TableClient.BaseUri}");
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
@@ -115,23 +145,35 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                                               TimeSpan.FromMilliseconds(200));
         private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler)
         {
-            if(!uncompletePartitions && !bulk.HasFullPartition)
+            IndexerTrace.Trace($"UncompletePartitions ({uncompletePartitions}), bulk.HasFullPartition ({bulk.HasFullPartition})");
+            if (!uncompletePartitions && !bulk.HasFullPartition)
                 return;
             if(uncompletePartitions)
                 bulk.FlushUncompletePartitions();
 
-            while(bulk._ReadyPartitions.Count != 0)
+            IndexerTrace.Trace($"Bulk ready partitions coun is {bulk._ReadyPartitions.Count}");
+            while (bulk._ReadyPartitions.Count != 0)
             {
+                IndexerTrace.Trace($"Dequeue ready partitions");
                 var item = bulk._ReadyPartitions.Dequeue();
-                var task = retry.Do(() => IndexCore(item.Item1, item.Item2), scheduler);
+                var task = retry.Do(() =>
+                {
+                    IndexerTrace.Trace($"Index Core {item.Item1} {item.Item2.Length}");
+                    IndexCore(item.Item1, item.Item2);
+                }, scheduler);
+                IndexerTrace.Trace($"Try adding a task to dictionary");
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>
                 {
                     _Exception = prev.Exception ?? _Exception;
+                    IndexerTrace.Trace($"Setting exception to {_Exception}");
+                    IndexerTrace.Trace($"Try removing a task from dictionary");
                     tasks.TryRemove(prev, out prev);
                 });
-                if(tasks.Count > MaxQueued)
+                IndexerTrace.Trace($"Check if task count ({tasks.Count}) is greater than MaxQueued {MaxQueued}");
+                if (tasks.Count > MaxQueued)
                 {
+                    IndexerTrace.Trace($"Wait for finish ({tasks.Count}) with queued target of {MaxQueued / 2}");
                     WaitFinished(tasks, MaxQueued / 2);
                 }
             }
@@ -155,6 +197,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         int[] wait = new int[] { 100, 200, 400, 800, 1600 };
         private void WaitFinished(ConcurrentDictionary<Task, Task> tasks, int queuedTarget = 0)
         {
+            IndexerTrace.Trace($"Sleep is tasks.Count ({tasks.Count}) > queuedTarget ({queuedTarget})");
             while(tasks.Count > queuedTarget)
             {
                 Thread.Sleep(100);
@@ -163,11 +206,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void ThrowIfException()
         {
-            if(_Exception != null)
+            if (_Exception != null)
+            {
+                IndexerTrace.Error($"Exception is not null. Throwing", _Exception);
                 ExceptionDispatchInfo.Capture(_Exception).Throw();
+            }
         }
-
-
 
         protected TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
         public IndexerConfiguration Configuration

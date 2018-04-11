@@ -163,6 +163,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Log.Debug(message);
         }
 
+        public static void Error(string message, Exception ex)
+        {
+            _Logger.LogError(ex, message);
+        }
+
         internal static void NoForkFoundWithStored()
         {
 			_Logger.LogInformation("No fork found with the stored chain");
