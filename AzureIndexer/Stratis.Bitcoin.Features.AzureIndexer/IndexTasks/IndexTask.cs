@@ -123,7 +123,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             get
             {
-                IndexerTrace.Trace($"Ensure Is Setup: {this.EnsureIsSetup}");
+                IndexerTrace.Trace($"Ensure Is Setup: {_EnsureIsSetup}");
                 return _EnsureIsSetup;
             }
             set

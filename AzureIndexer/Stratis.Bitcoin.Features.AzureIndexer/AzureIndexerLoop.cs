@@ -161,7 +161,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.asyncLoop = this.asyncLoopFactory.Run($"{this.StoreName}.IndexAsync", async token =>
             {
                 this.logger.LogTrace($"Loop token: {token}");
-
                 await IndexAsync(this.nodeLifetime.ApplicationStopping);
             },
             this.nodeLifetime.ApplicationStopping,
