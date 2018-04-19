@@ -15,6 +15,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     /// </summary>
     public class AzureIndexerLoop
     {
+        private readonly ILoggerFactory loggerFactory;
+
         /// <summary>Factory for creating background async loop tasks.</summary>
         private readonly IAsyncLoopFactory asyncLoopFactory;
 
@@ -66,6 +68,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="loggerFactory">The logger factory.</param>
         public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
             this.asyncLoopFactory = fullNode.AsyncLoopFactory;
             this.FullNode = fullNode;
             this.Chain = fullNode.Chain;
@@ -270,7 +273,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.logger.LogTrace($"Index a batch of blocks. From {this.BlocksFetcher.FromHeight} to {this.BlocksFetcher.ToHeight}.");
                         var task = new IndexBlocksTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler, this.logger);
                     }
 
                     // Index a batch of transactions
@@ -281,7 +284,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.logger.LogTrace($"Index a batch of transactions. From {this.TransactionsFetcher.FromHeight} to {this.TransactionsFetcher.ToHeight}.");
                         var task = new IndexTransactionsTask(this.IndexerConfig);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler, this.logger);
                     }
 
                     // Index a batch of balances
@@ -292,7 +295,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.logger.LogTrace($"Index a batch of balances. From {this.BalancesFetcher.FromHeight} to {this.BalancesFetcher.ToHeight}.");
                         var task = new IndexBalanceTask(this.IndexerConfig, null);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler, this.logger);
                     }
 
                     // Index a batch of wallets
@@ -303,7 +306,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.logger.LogTrace($"Index a batch of wallets. From {this.WalletsFetcher.FromHeight} to {this.WalletsFetcher.ToHeight}.");
                         var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules());
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler, this.logger);
                     }
 
                     // Update the StoreTip value from the minHeight
