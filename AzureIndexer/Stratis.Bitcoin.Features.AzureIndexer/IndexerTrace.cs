@@ -5,57 +5,50 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Extensions.Logging.Abstractions;
 using Serilog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Serilog.Context;
+using ILogger = Serilog.ILogger;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
-    public class IndexerTrace
+    public static class IndexerTrace
     {
-		static ILogger _Logger = NullLogger.Instance;
-
-        public static void Configure(ILoggerFactory factory)
-		{
-			_Logger = factory.CreateLogger("Stratis.Bitcoin.Features.AzureIndexer");
-		}
-
-        internal static void ErrorWhileImportingBlockToAzure(uint256 id, Exception ex)
+        internal static void ErrorWhileImportingBlockToAzure(this ILogger logger, uint256 id, Exception ex)
         {
-			_Logger.LogError(ex, "Error while importing " + id + " in azure blob");
+            logger.Error(ex, "Error while importing {id} in azure blob", id);
         }
 
 
-        internal static void BlockAlreadyUploaded()
+        internal static void BlockAlreadyUploaded(this ILogger logger)
         {
-			_Logger.LogDebug("Block already uploaded");
+			logger.Debug("Block already uploaded");
         }
 
-        internal static void BlockUploaded(TimeSpan time, int bytes)
+        internal static void BlockUploaded(this ILogger logger, TimeSpan time, int bytes)
         {
             if (time.TotalSeconds == 0.0)
                 time = TimeSpan.FromMilliseconds(10);
             double speed = ((double)bytes / 1024.0) / time.TotalSeconds;
-			_Logger.LogDebug("Block uploaded successfully (" + speed.ToString("0.00") + " KB/S)");
+			logger.Debug("Block uploaded successfully (" + speed.ToString("0.00") + " KB/S)");
         }
 
         internal static IDisposable NewCorrelation(string activityName)
         {
-			return _Logger.BeginScope(activityName);
+			return LogContext.PushProperty("ActivityName", activityName);
         }
 
-        internal static void CheckpointLoaded(ChainedBlock block, string checkpointName)
+        internal static void CheckpointLoaded(this ILogger logger, ChainedBlock block, string checkpointName)
         {
-			_Logger.LogInformation("Checkpoint " + checkpointName + " loaded at " + ToString(block));
+			logger.Information("Checkpoint {checkpointName} loaded at {block}", checkpointName, ToString(block));
         }
 
-        internal static void CheckpointSaved(ChainedBlock block, string checkpointName)
+        internal static void CheckpointSaved(this ILogger logger, ChainedBlock block, string checkpointName)
         {
-			_Logger.LogInformation("Checkpoint " + checkpointName + " saved at " + ToString(block));
+			logger.Information("Checkpoint {checkpointName} saved at {block}", checkpointName, ToString(block));
         }
 
 
-        internal static void ErrorWhileImportingEntitiesToAzure(ITableEntity[] entities, Exception ex)
+        internal static void ErrorWhileImportingEntitiesToAzure(this ILogger logger, ITableEntity[] entities, Exception ex)
         {
             StringBuilder builder = new StringBuilder();
             int i = 0;
@@ -64,12 +57,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 builder.AppendLine("[" + i + "] " + entity.RowKey);
                 i++;
             }
-            _Logger.LogError(ex, "Error while importing entities (len:" + entities.Length + ")\r\n" + builder.ToString());
+            logger.Error(ex, "Error while importing entities (len: {entitiesLength}\r\n {builder}", entities.Length, builder.ToString());
         }
 
-        internal static void RetryWorked()
+        internal static void RetryWorked(this ILogger logger)
         {
-            _Logger.LogInformation("Retry worked");
+            logger.Information("Retry worked");
         }
 
         public static string Pretty(TimeSpan span)
@@ -90,25 +83,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return result;
         }
 
-        internal static void TaskCount(int count)
+        internal static void TaskCount(this ILogger logger, int count)
         {
-			_Logger.LogInformation("Upload thread count : " + count);
+			logger.Information("Upload thread count : " + count);
         }
 
-        internal static void ErrorWhileImportingBalancesToAzure(Exception ex, uint256 txid)
+        internal static void ErrorWhileImportingBalancesToAzure(this ILogger logger, Exception ex, uint256 txid)
         {
-			_Logger.LogError(ex, "Error while importing balances on " + txid);
+			logger.Error(ex, "Error while importing balances on {txId}", txid);
         }
 
-        internal static void MissingTransactionFromDatabase(uint256 txid)
+        internal static void MissingTransactionFromDatabase(this ILogger logger, uint256 txid)
         {
-			_Logger.LogError("Missing transaction from index while fetching outputs " + txid);
+			logger.Error("Missing transaction from index while fetching outputs " + txid);
         }
 
 
-        internal static void InputChainTip(ChainedBlock block)
+        internal static void InputChainTip(this ILogger logger, ChainedBlock block)
         {
-            _Logger.LogInformation("The input chain tip is at height " + ToString(block));
+            logger.Information("The input chain tip is at height " + ToString(block));
         }
 
         private static string ToString(uint256 blockId, int height)
@@ -116,19 +109,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return height.ToString();
         }
 
-        internal static void IndexedChainTip(uint256 blockId, int height)
+        internal static void IndexedChainTip(this ILogger logger, uint256 blockId, int height)
         {
-			_Logger.LogInformation("Indexed chain is at height " + ToString(blockId, height));
+			logger.Information("Indexed chain is at height {blockInfo}", ToString(blockId, height));
         }
 
-        internal static void InputChainIsLate()
+        internal static void InputChainIsLate(this ILogger logger)
         {
-			_Logger.LogInformation("The input chain is late compared to the indexed one");
+			logger.Information("The input chain is late compared to the indexed one");
         }
 
-        public static void IndexingChain(ChainedBlock from, ChainedBlock to)
+        public static void IndexingChain(this ILogger logger, ChainedBlock from, ChainedBlock to)
         {
-			_Logger.LogInformation("Indexing blocks from " + ToString(from) + " to " + ToString(to) + " (both included)");
+			logger.Information("Indexing blocks from " + ToString(from) + " to " + ToString(to) + " (both included)");
         }
 
         private static string ToString(ChainedBlock chainedBlock)
@@ -138,42 +131,41 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return ToString(chainedBlock.HashBlock, chainedBlock.Height);
         }
 
-        internal static void RemainingBlockChain(int height, int maxHeight)
+        internal static void RemainingBlockChain(this ILogger logger, int height, int maxHeight)
         {
             int remaining = height - maxHeight;
             if (remaining % 1000 == 0 && remaining != 0)
             {
-				_Logger.LogInformation("Remaining chain block to index : " + remaining + " (" + height + "/" + maxHeight + ")");
+				logger.Information("Remaining chain block to index : " + remaining + " (" + height + "/" + maxHeight + ")");
             }
         }
 
-        internal static void IndexedChainIsUpToDate(ChainedBlock block)
+        internal static void IndexedChainIsUpToDate(this ILogger logger, ChainedBlock block)
         {
-			_Logger.LogInformation("Indexed chain is up to date at height " + ToString(block));
+			logger.Information("Indexed chain is up to date at height " + ToString(block));
         }
 
-        public static void Information(string message)
+        public static void Information(this ILogger logger, string message)
         {
-			_Logger.LogInformation(message);
+            logger.Information(message);
         }
 
-        public static void Trace(string message)
+        public static void Trace(this ILogger logger, string message)
         {
-            _Logger.LogTrace(message);
-            Log.Debug(message);
+            logger.Debug(message);
         }
 
-        public static void Error(string message, Exception ex)
+        public static void Error(this ILogger logger, string message, Exception ex)
         {
-            _Logger.LogError(ex, message);
+            logger.Error(ex, message);
         }
 
-        internal static void NoForkFoundWithStored()
+        internal static void NoForkFoundWithStored(this ILogger logger)
         {
-			_Logger.LogInformation("No fork found with the stored chain");
+			logger.Information("No fork found with the stored chain");
         }
 
-        public static void Processed(int height, int totalHeight, Queue<DateTime> lastLogs, Queue<int> lastHeights)
+        public static void Processed(this ILogger logger, int height, int totalHeight, Queue<DateTime> lastLogs, Queue<int> lastHeights)
         {
             var lastLog = lastLogs.LastOrDefault();
             if (DateTime.UtcNow - lastLog > TimeSpan.FromSeconds(10))
@@ -187,7 +179,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     var remainingSize = GetSize(height, totalHeight);
                     var estimatedTime = downloadedSize < 1.0m ? TimeSpan.FromDays(999.0)
                         : TimeSpan.FromTicks((long)((remainingSize / downloadedSize) * time.Ticks));
-					_Logger.LogInformation("Blocks {0}/{1} (estimate : {2})", height, totalHeight, Pretty(estimatedTime));
+					logger.Information("Blocks {0}/{1} (estimate : {2})", height, totalHeight, Pretty(estimatedTime));
                 }
                 lastLogs.Enqueue(DateTime.UtcNow);
                 lastHeights.Enqueue(height);

@@ -10,10 +10,10 @@ namespace Stratis.IndexerD
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Debug)
                 .Enrich.FromLogContext()
                 .WriteTo.RollingFile("log-{Date}.txt")
-                .WriteTo.Seq("http://localhost:5341")
+                .WriteTo.Seq("http://52.151.72.210:5341")
                 .CreateLogger();
             builder.NodeSettings.LoggerFactory.AddSerilog();
             return builder;

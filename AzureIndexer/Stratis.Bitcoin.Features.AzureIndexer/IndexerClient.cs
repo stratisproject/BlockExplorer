@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -153,7 +154,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         if(parents[i] == null)
                         {
-                            IndexerTrace.MissingTransactionFromDatabase(result.Transaction.Inputs[i].PrevOut.Hash);
+                            Log.Logger.MissingTransactionFromDatabase(result.Transaction.Inputs[i].PrevOut.Hash);
                             return null;
                         }
                     }

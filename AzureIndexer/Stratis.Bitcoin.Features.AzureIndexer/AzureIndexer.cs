@@ -228,16 +228,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<ChainPartEntry> entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
-            IndexerTrace.Trace($"Found {entries.Count} chain part enties");
+            Log.Debug($"Found {entries.Count} chain part enties");
 
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
-            IndexerTrace.Trace($"Start height is {startHeight}");
+            Log.Debug($"Start height is {startHeight}");
             ChainPartEntry chainPart = null;
             for(int i = startHeight; i <= chain.Tip.Height; i++)
             {
                 if (chainPart == null)
                 {
-                    IndexerTrace.Trace($"Chain part is null, setting new chain part with offset {i}");
+                    Log.Debug($"Chain part is null, setting new chain part with offset {i}");
                     chainPart = new ChainPartEntry()
                     {
                         ChainOffset = i
@@ -245,11 +245,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
 
                 var block = chain.GetBlock(i);
-                IndexerTrace.Trace($"Block is {block.Height}");
+                Log.Debug($"Block is {block.Height}");
                 chainPart.BlockHeaders.Add(block.Header);
                 if(chainPart.BlockHeaders.Count == BlockHeaderPerRow)
                 {
-                    IndexerTrace.Trace($"chainPart.BlockHeaders.Count == BlockHeaderPerRow ({BlockHeaderPerRow})");
+                    Log.Debug($"chainPart.BlockHeaders.Count == BlockHeaderPerRow ({BlockHeaderPerRow})");
                     entries.Add(chainPart);
                     chainPart = null;
                 }
@@ -261,31 +261,31 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IndexerTrace.Trace("Index: Get chain table");
+            Log.Debug("Index: Get chain table");
             CloudTable table = this.Configuration.GetChainTable();
             TableBatchOperation batch = new TableBatchOperation();
             var last = chainParts[chainParts.Count - 1];
-            IndexerTrace.Trace($"Index: last chain part is {last}");
+            Log.Debug($"Index: last chain part is {last}");
             
             foreach (var entry in chainParts)
             {
-                IndexerTrace.Trace($"Index: entry {entry.ChainOffset}");
+                Log.Debug($"Index: entry {entry.ChainOffset}");
                 batch.Add(TableOperation.InsertOrReplace(entry.ToEntity()));
                 if(batch.Count == 100)
                 {
-                    IndexerTrace.Trace("Index: batch count is 100, execute table batch");
+                    Log.Debug("Index: batch count is 100, execute table batch");
                     var result = table.ExecuteBatchAsync(batch).GetAwaiter().GetResult();
-                    IndexerTrace.Trace($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
+                    Log.Debug($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
                     batch = new TableBatchOperation();
                 }
-                IndexerTrace.RemainingBlockChain(entry.ChainOffset, last.ChainOffset + last.BlockHeaders.Count - 1);
+                Log.Logger.RemainingBlockChain(entry.ChainOffset, last.ChainOffset + last.BlockHeaders.Count - 1);
             }
 
             if(batch.Count > 0)
             {
-                IndexerTrace.Trace($"Index: execute remaining batch count of {batch.Count}");
+                Log.Debug($"Index: execute remaining batch count of {batch.Count}");
                 var result = table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
-                IndexerTrace.Trace($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
+                Log.Debug($"Index: result of the table batch execution is {string.Join(",", result.Select(r => "Status: " + r.HttpStatusCode))}");
             }
         }
 
@@ -311,39 +311,39 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             if(chain == null)
                 throw new ArgumentNullException("chain");
-            IndexerTrace.Trace("Setting throttling to max 100 connections");
+            Log.Logger.Trace("Setting throttling to max 100 connections");
             this.SetThrottling();
 
             using(IndexerTrace.NewCorrelation("Index main chain to azure started"))
             {
                 var createChainTable = this.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult();
-                IndexerTrace.Trace($"Creating chain table result: {createChainTable}");
-                IndexerTrace.InputChainTip(chain.Tip);
+                Log.Logger.Trace($"Creating chain table result: {createChainTable}");
+                Log.Logger.InputChainTip(chain.Tip);
                 var client = this.Configuration.CreateIndexerClient();
                 var changes = client.GetChainChangesUntilFork(chain.Tip, true, cancellationToken).ToList();
 
                 var height = 0;
                 if(changes.Count != 0)
                 {
-                    IndexerTrace.IndexedChainTip(changes[0].BlockId, changes[0].Height);
+                    Log.Logger.IndexedChainTip(changes[0].BlockId, changes[0].Height);
                     if(changes[0].Height > chain.Tip.Height)
                     {
-                        IndexerTrace.InputChainIsLate();
+                        Log.Logger.InputChainIsLate();
                         return;
                     }
                     height = changes[changes.Count - 1].Height + 1;
                     if(height > chain.Height)
                     {
-                        IndexerTrace.IndexedChainIsUpToDate(chain.Tip);
+                        Log.Logger.IndexedChainIsUpToDate(chain.Tip);
                         return;
                     }
                 }
                 else
                 {
-                    IndexerTrace.NoForkFoundWithStored();
+                    Log.Logger.NoForkFoundWithStored();
                 }
 
-                IndexerTrace.IndexingChain(chain.GetBlock(height), chain.Tip);
+                Log.Logger.IndexingChain(chain.GetBlock(height), chain.Tip);
                 this.Index(chain, height, cancellationToken);
             }
         }

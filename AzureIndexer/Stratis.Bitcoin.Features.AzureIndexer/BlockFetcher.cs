@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -102,11 +103,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<int> lastHeights = new Queue<int>();
 
             var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            IndexerTrace.Trace($"Fork is {fork.Height}");
+            Log.Debug($"Fork is {fork.Height}");
             var headers = _BlockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
-            IndexerTrace.Trace($"First header is: {first?.Height}");
+            Log.Debug($"First header is: {first?.Height}");
             if (first == null)
                 yield break;
             var height = first.Height;
@@ -116,26 +117,26 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 height = 0;
             }
 
-            IndexerTrace.Trace($"Get blocks");
+            Log.Debug($"Get blocks");
             foreach (var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
-                IndexerTrace.Trace($"Block {block?.Header}");
+                Log.Debug($"Block {block?.Header}");
                 var header = _BlockHeaders.GetBlock(height);
 
-                IndexerTrace.Trace($"Check if block is null");
+                Log.Debug($"Check if block is null");
                 if (block == null)
                 {
-                    IndexerTrace.Trace($"Block is NULL. Get store tip.");
+                    Log.Debug($"Block is NULL. Get store tip.");
                     var storeTip = _BlocksRepository.GetStoreTip();
                     if (storeTip != null)
                     {
-                        IndexerTrace.Trace($"Store tip is {storeTip.Header}.");
+                        Log.Debug($"Store tip is {storeTip.Header}.");
                         // Store is caught up with Chain but the block is missing from the store.
                         if (header.Header.BlockTime <= storeTip.Header.BlockTime)
                         {
-                            IndexerTrace.Trace("header.Header.BlockTime <= storeTip.Header.BlockTime");
-                            IndexerTrace.Trace($"header.Header - height:{header.Height}, blockTime:{header.Header.BlockTime}, previousTime:{header.Previous.Header.BlockTime}");
-                            IndexerTrace.Trace($"storeTip.Header - blockTime:{storeTip.Header.BlockTime}");
+                            Log.Debug("header.Header.BlockTime <= storeTip.Header.BlockTime");
+                            Log.Debug($"header.Header - height:{header.Height}, blockTime:{header.Header.BlockTime}, previousTime:{header.Previous.Header.BlockTime}");
+                            Log.Debug($"storeTip.Header - blockTime:{storeTip.Header.BlockTime}");
                             throw new InvalidOperationException(
                                 $"Chained block not found in store (height = {height}). Re-create the block store. header.Header.BlockTime = {header.Header.BlockTime} and storeTip.Header.BlockTime = {storeTip.Header.BlockTime}");
                         }
@@ -144,7 +145,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     break;
                 }
 
-                IndexerTrace.Trace($"_LastProcessed is {_LastProcessed}.");
+                Log.Debug($"_LastProcessed is {_LastProcessed}.");
                 _LastProcessed = header;
                 yield return new BlockInfo()
                 {
@@ -153,7 +154,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     Height = header.Height
                 };
 
-                IndexerTrace.Processed(height, Math.Min(ToHeight, _BlockHeaders.Tip.Height), lastLogs, lastHeights);
+                Log.Logger.Processed(height, Math.Min(ToHeight, _BlockHeaders.Tip.Height), lastLogs, lastHeights);
                 height++;
             }
         }
@@ -162,7 +163,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             var height = Math.Min(ToHeight, _BlockHeaders.Tip.Height);
             _LastProcessed = _BlockHeaders.GetBlock(height);
-            IndexerTrace.Information("Skipped to the end at height " + height);
+            Log.Logger.Information("Skipped to the end at height " + height);
         }
 
         #endregion
@@ -187,12 +188,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void SaveCheckpoint()
         {
-            IndexerTrace.Trace($"Save checkpoint");
+            Log.Debug($"Save checkpoint");
             if (_LastProcessed != null)
             {
-                IndexerTrace.Trace($"Last Processed: {_LastProcessed.Height}");
+                Log.Debug($"Last Processed: {_LastProcessed.Height}");
                 _Checkpoint.SaveProgress(_LastProcessed);
-                IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
+                Log.Logger.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }
             _LastSaved = DateTime.UtcNow;
         }

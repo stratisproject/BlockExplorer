@@ -120,7 +120,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                         }
                     , new OperationContext()).GetAwaiter().GetResult();
                     watch.Stop();
-                    IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
+                    Log.Logger.BlockUploaded(watch.Elapsed, blockBytes.Length);
                     _IndexedBlocks++;
                     break;
                 }
@@ -130,18 +130,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     var alreadyExist = ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412;
                     if (!alreadyExist)
                     {
-                        IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
+                        Log.Logger.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
                         throw;
                     }
                     watch.Stop();
-                    IndexerTrace.BlockAlreadyUploaded();
+                    Log.Logger.BlockAlreadyUploaded();
                     _IndexedBlocks++;
                     break;
                 }
                 catch (Exception ex)
                 {
                     this.logger.Error(ex, "Generic Exception While Importing Block To Azure");
-                    IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
+                    Log.Logger.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
                     throw;
                 }
             }

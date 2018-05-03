@@ -10,6 +10,7 @@ using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
@@ -162,7 +163,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     }
                     else
                     {
-                        IndexerTrace.ErrorWhileImportingEntitiesToAzure(batch.Select(b => GetEntity(b)).ToArray(), ex);
+                        Log.Logger.ErrorWhileImportingEntitiesToAzure(batch.Select(b => GetEntity(b)).ToArray(), ex);
                         batches.Enqueue(batch);
                         throw;
                     }

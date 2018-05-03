@@ -68,7 +68,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public bool SaveProgress(ChainedBlock tip)
         {
-            IndexerTrace.Trace($"Save Progress: {tip.Height}");
+            Log.Logger.Debug($"Save Progress: {tip.Height}");
             return SaveProgress(tip.GetLocator());
         }
         public bool SaveProgress(BlockLocator locator)
@@ -80,7 +80,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (AggregateException aex)
             {
-                IndexerTrace.Error($"Save Progress failure", aex);
+                Log.Logger.Error($"Save Progress failure", aex);
                 this.logger.Error(aex, "SaveProgress failure");
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
                 return false;

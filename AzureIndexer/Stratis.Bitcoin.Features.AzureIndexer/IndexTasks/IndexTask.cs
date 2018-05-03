@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IIndexTask
     {
-        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, ILogger logger);
+        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler);
         bool SaveProgression
         {
             get;
@@ -40,78 +42,77 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, ILogger logger)
+        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
         {
-            _logger = logger;
-            logger.LogTrace("Running indexer");
+            Log.Debug("Running indexer");
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
             try
             {
                 SetThrottling();
-                logger.LogTrace($"Find Service Point for {Configuration.TableClient.BaseUri}");
+                Log.Debug($"Find Service Point for {Configuration.TableClient.BaseUri}");
                 if (EnsureIsSetup)
                 {
-                    logger.LogTrace($"Wait for EnsureSetup to complete");
+                    Log.Debug($"Wait for EnsureSetup to complete");
                     EnsureSetup().Wait();
                 }
 
-                logger.LogTrace($"Set bulk import with partition size {PartitionSize}");
+                Log.Debug($"Set bulk import with partition size {PartitionSize}");
                 BulkImport<TIndexed> bulk = new BulkImport<TIndexed>(PartitionSize);
-                logger.LogTrace($"Skip to end: {SkipToEnd}");
+                Log.Debug($"Skip to end: {SkipToEnd}");
                 if (!SkipToEnd)
                 {
                     try
                     {
-                        logger.LogTrace($"Iterate through blocks");
+                        Log.Debug($"Iterate through blocks");
                         foreach (var block in blockFetcher)
                         {
-                            logger.LogTrace($"Current block {block.Height}");
+                            Log.Debug($"Current block {block.Height}");
                             ThrowIfException();
-                            logger.LogTrace($"Check if block save is needed");
+                            Log.Debug($"Check if block save is needed");
                             if (blockFetcher.NeedSave)
                             {
-                                logger.LogTrace($"Check if block save progression is needed");
+                                Log.Debug($"Check if block save progression is needed");
                                 if (SaveProgression)
                                 {
-                                    logger.LogTrace($"Enqueue tasks for bulk with partition size {bulk.PartitionSize}");
+                                    Log.Debug($"Enqueue tasks for bulk with partition size {bulk.PartitionSize}");
                                     EnqueueTasks(tasks, bulk, true, scheduler);
-                                    logger.LogTrace($"Save progression");
+                                    Log.Debug($"Save progression");
                                     Save(tasks, blockFetcher, bulk);
                                 }
                             }
-                            logger.LogTrace($"Process block {block.Height}");
+                            Log.Debug($"Process block {block.Height}");
                             ProcessBlock(block, bulk);
-                            logger.LogTrace($"Check is bulk has full partition");
+                            Log.Debug($"Check is bulk has full partition");
                             if (bulk.HasFullPartition)
                             {
-                                logger.LogTrace($"Partition has full partition. Enqueue tasks.");
+                                Log.Debug($"Partition has full partition. Enqueue tasks.");
                                 EnqueueTasks(tasks, bulk, false, scheduler);
                             }
                         }
 
-                        logger.LogTrace($"Enqueue tasks.");
+                        Log.Debug($"Enqueue tasks.");
                         EnqueueTasks(tasks, bulk, true, scheduler);
                     }
                     catch(OperationCanceledException ex)
                     {
-                        IndexerTrace.Error($"Index failure.", ex);
+                        Log.Error(ex, $"Index failure.");
                         if (ex.CancellationToken != blockFetcher.CancellationToken)
                             throw;
                     }
                 }
                 else
                 {
-                    logger.LogTrace($"Skip is set to true");
+                    Log.Debug($"Skip is set to true");
                     blockFetcher.SkipToEnd();
                 }
 
                 if (SaveProgression)
                 {
-                    logger.LogTrace($"Save progression");
+                    Log.Debug($"Save progression");
                     Save(tasks, blockFetcher, bulk);
                 }
 
-                logger.LogTrace($"Wait finished tasks");
+                Log.Debug($"Wait finished tasks");
                 WaitFinished(tasks);
                 ThrowIfException();
             }
@@ -127,7 +128,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             get
             {
-                _logger.LogTrace($"Ensure Is Setup: {_EnsureIsSetup}");
+                Log.Debug($"Ensure Is Setup: {_EnsureIsSetup}");
                 return _EnsureIsSetup;
             }
             set
@@ -138,9 +139,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void SetThrottling()
         {
-            _logger.LogTrace("Set Throttling");
+            Log.Debug("Set Throttling");
             Helper.SetThrottling();
-            _logger.LogTrace($"Find Service Point for {Configuration.TableClient.BaseUri}");
+            Log.Debug($"Find Service Point for {Configuration.TableClient.BaseUri}");
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
         }
@@ -149,35 +150,35 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                                               TimeSpan.FromMilliseconds(200));
         private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler)
         {
-            _logger.LogTrace($"UncompletePartitions ({uncompletePartitions}), bulk.HasFullPartition ({bulk.HasFullPartition})");
+            Log.Debug($"UncompletePartitions ({uncompletePartitions}), bulk.HasFullPartition ({bulk.HasFullPartition})");
             if (!uncompletePartitions && !bulk.HasFullPartition)
                 return;
             if(uncompletePartitions)
                 bulk.FlushUncompletePartitions();
 
-            _logger.LogTrace($"Bulk ready partitions coun is {bulk._ReadyPartitions.Count}");
+            Log.Debug($"Bulk ready partitions coun is {bulk._ReadyPartitions.Count}");
             while (bulk._ReadyPartitions.Count != 0)
             {
-                _logger.LogTrace($"Dequeue ready partitions");
+                Log.Debug($"Dequeue ready partitions");
                 var item = bulk._ReadyPartitions.Dequeue();
                 var task = retry.Do(() =>
                 {
-                    _logger.LogTrace($"Index Core {item.Item1} {item.Item2.Length}");
+                    Log.Debug($"Index Core {item.Item1} {item.Item2.Length}");
                     IndexCore(item.Item1, item.Item2);
                 }, scheduler);
-                _logger.LogTrace($"Try adding a task to dictionary");
+                Log.Debug($"Try adding a task to dictionary");
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>
                 {
                     _Exception = prev.Exception ?? _Exception;
-                    _logger.LogTrace($"Setting exception to {_Exception}");
-                    _logger.LogTrace($"Try removing a task from dictionary");
+                    Log.Debug($"Setting exception to {_Exception}");
+                    Log.Debug($"Try removing a task from dictionary");
                     tasks.TryRemove(prev, out prev);
                 });
-                _logger.LogTrace($"Check if task count ({tasks.Count}) is greater than MaxQueued {MaxQueued}");
+                Log.Debug($"Check if task count ({tasks.Count}) is greater than MaxQueued {MaxQueued}");
                 if (tasks.Count > MaxQueued)
                 {
-                    _logger.LogTrace($"Wait for finish ({tasks.Count}) with queued target of {MaxQueued / 2}");
+                    Log.Debug($"Wait for finish ({tasks.Count}) with queued target of {MaxQueued / 2}");
                     WaitFinished(tasks, MaxQueued / 2);
                 }
             }
@@ -201,7 +202,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         int[] wait = new int[] { 100, 200, 400, 800, 1600 };
         private void WaitFinished(ConcurrentDictionary<Task, Task> tasks, int queuedTarget = 0)
         {
-            _logger.LogTrace($"Sleep is tasks.Count ({tasks.Count}) > queuedTarget ({queuedTarget})");
+            Log.Debug($"Sleep is tasks.Count ({tasks.Count}) > queuedTarget ({queuedTarget})");
             while(tasks.Count > queuedTarget)
             {
                 Thread.Sleep(100);
@@ -212,7 +213,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             if (_Exception != null)
             {
-                IndexerTrace.Error($"Exception is not null. Throwing", _Exception);
+                Log.Error(_Exception, $"Exception is not null. Throwing");
                 ExceptionDispatchInfo.Capture(_Exception).Throw();
             }
         }
