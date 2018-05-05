@@ -71,8 +71,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             set => this.blobClient = value;
         }
 
-        public IndexerConfiguration()
+        public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
             Network = Network.Main;
         }
 

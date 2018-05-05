@@ -83,9 +83,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="indexerSettings">The AzureIndexerSettings object to use.</param>
         /// <param name="network">The network to use.</param>
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
-        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network)
+        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration
+            IndexerConfiguration indexerConfig = new IndexerConfiguration (loggerFactory)
             {
                 StorageNamespace = indexerSettings.StorageNamespace,
                 Network = network,
@@ -103,7 +103,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network);
+            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory);
 
             var indexer = this.IndexerConfig.CreateIndexer();
             indexer.Configuration.EnsureSetup();

@@ -75,9 +75,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            return SaveProgress(tip.GetLocator());
+            bool progress = SaveProgress(tip.GetLocator());
 
-            this.logger.LogTrace("(-)");
+            this.logger.LogTrace("(-):{0}", progress);
+            return progress;
         }
         public bool SaveProgress(BlockLocator locator)
         {
@@ -93,9 +94,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (AggregateException aex)
             {
+                this.logger.LogError("Exception occured: {0}", aex.ToString());
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
 
-                this.logger.LogTrace("(-)");
+                this.logger.LogTrace("(-):false");
                 return false;
             }
         }
@@ -129,12 +131,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (StorageException ex)
             {
+                this.logger.LogError("Storage exception occured: {0}", ex.ToString());
+
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412)
                 {
                     this.logger.LogTrace("(-):false");
                     return false;
                 }
 
+                this.logger.LogTrace("(-)[STORAGEEX]");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Exception occured: {0}", ex.ToString());
+                this.logger.LogTrace("(-)[EX]");
                 throw;
             }
 
