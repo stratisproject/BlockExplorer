@@ -285,7 +285,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                         this.BlocksFetcher.FromHeight = Math.Max(this.BlocksFetcher._LastProcessed.Height + 1, fromHeight);
                         this.BlocksFetcher.ToHeight = toHeight;
-                        var task = new IndexBlocksTask(this.IndexerConfig);
+                        var task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler);
 
@@ -299,7 +299,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                         this.TransactionsFetcher.FromHeight = Math.Max(this.TransactionsFetcher._LastProcessed.Height + 1, fromHeight);
                         this.TransactionsFetcher.ToHeight = toHeight;
-                        var task = new IndexTransactionsTask(this.IndexerConfig);
+                        var task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler);
 
@@ -313,7 +313,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                         this.BalancesFetcher.FromHeight = Math.Max(this.BalancesFetcher._LastProcessed.Height + 1, fromHeight);
                         this.BalancesFetcher.ToHeight = toHeight;
-                        var task = new IndexBalanceTask(this.IndexerConfig, null);
+                        var task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler);
 
@@ -327,7 +327,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                         this.WalletsFetcher.FromHeight = Math.Max(this.WalletsFetcher._LastProcessed.Height + 1, fromHeight);
                         this.WalletsFetcher.ToHeight = toHeight;
-                        var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules());
+                        var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
                         task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler);
 

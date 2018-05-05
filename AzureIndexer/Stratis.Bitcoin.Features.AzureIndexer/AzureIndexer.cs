@@ -93,13 +93,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void Index(params Block[] blocks)
         {
-            var task = new IndexBlocksTask(this.Configuration);
+            var task = new IndexBlocksTask(this.Configuration, this.loggerFactory);
             task.Index(blocks, this.TaskScheduler);
         }
 
         public Task IndexAsync(params Block[] blocks)
         {
-            var task = new IndexBlocksTask(this.Configuration);
+            var task = new IndexBlocksTask(this.Configuration, this.loggerFactory);
             return task.IndexAsync(blocks, this.TaskScheduler);
         }
 
