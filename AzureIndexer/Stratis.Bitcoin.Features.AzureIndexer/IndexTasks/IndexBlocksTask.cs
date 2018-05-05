@@ -8,15 +8,20 @@ using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public class IndexBlocksTask : IndexTask<BlockInfo>
     {
-        public IndexBlocksTask(IndexerConfiguration configuration)
+        private readonly ILogger logger;
+
+        public IndexBlocksTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration)
         {
+            this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
+
         protected override int PartitionSize
         {
             get
@@ -37,21 +42,33 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         public void Index(Block[] blocks, TaskScheduler taskScheduler)
         {
+            this.logger.LogTrace("()");
+
             if (taskScheduler == null)
                 throw new ArgumentNullException("taskScheduler");
             try
             {
+                this.logger.LogTrace("Indexing...");
                 IndexAsync(blocks, taskScheduler).Wait();
+                this.logger.LogTrace("Indexing finished");
             }
             catch (AggregateException aex)
             {
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+
+                this.logger.LogTrace("Exception occurred: {0}", aex.ToString());
+
+                this.logger.LogTrace("(-):EXEPTION");
                 throw;
             }
+
+            this.logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(Block[] blocks, TaskScheduler taskScheduler)
         {
+            this.logger.LogTrace("()");
+
             if (taskScheduler == null)
                 throw new ArgumentNullException("taskScheduler");
             var tasks = blocks
@@ -61,8 +78,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     BlockId = b.GetHash()
                 }})))
                 .ToArray();
+
+            this.logger.LogTrace("Tasks created");
+
             foreach (var t in tasks)
                 t.Start(taskScheduler);
+
+            this.logger.LogTrace("(-)");
             return Task.WhenAll(tasks);
         }
 
@@ -77,6 +99,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override void IndexCore(string partitionName, IEnumerable<BlockInfo> blocks)
         {
+            this.logger.LogTrace("()");
+
             var first = blocks.First();
             var block = first.Block;
             var hash = first.BlockId.ToString();
@@ -85,6 +109,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             watch.Start();
             while (true)
             {
+                this.logger.LogTrace("Iteration start");
+
                 var container = Configuration.GetBlocksContainer();
                 var client = container.ServiceClient;
                 client.DefaultRequestOptions.SingleBlobUploadThresholdInBytes = 32 * 1024 * 1024;
@@ -114,6 +140,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     watch.Stop();
                     IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
                     _IndexedBlocks++;
+
+                    this.logger.LogTrace("Indexed");
                     break;
                 }
                 catch (StorageException ex)
@@ -127,14 +155,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     watch.Stop();
                     IndexerTrace.BlockAlreadyUploaded();
                     _IndexedBlocks++;
+
+                    this.logger.LogTrace("Storage exception occurred: {0}", ex.ToString());
                     break;
                 }
                 catch (Exception ex)
                 {
                     IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
+
+                    this.logger.LogTrace("Exception occurred: {0}", ex.ToString());
                     throw;
                 }
             }
+
+            this.logger.LogTrace("(-)");
         }
     }
 }

@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {
+        private readonly ILogger logger;
+
         WalletRuleEntryCollection _WalletRules;
-        public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules)
+        public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
             : base(conf)
         {
             _WalletRules = walletRules;
+            this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
@@ -31,6 +35,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk)
         {
+            this.logger.LogTrace("()");
+
             foreach (var tx in block.Block.Transactions)
             {
                 var txId = tx.GetHash();
@@ -41,6 +47,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     bulk.Add(entry.PartitionKey, entry);
                 }
             }
+
+            this.logger.LogTrace("(-)");
         }
 
         private IEnumerable<OrderedBalanceChange> extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height)
