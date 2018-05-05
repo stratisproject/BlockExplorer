@@ -6,13 +6,17 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class CheckpointRepository
     {
-        public CheckpointRepository(CloudBlobContainer container, Network network, string checkpointSet)
+        private readonly ILoggerFactory loggerFactory;
+
+        public CheckpointRepository(CloudBlobContainer container, Network network, string checkpointSet, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
             _Network = network;
             _Container = container;
             CheckpointSet = checkpointSet;
@@ -28,7 +32,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public Task<Checkpoint> GetCheckpointAsync(string checkpointName)
         {
             var blob = _Container.GetBlockBlobReference("Checkpoints/" + GetSetPart(checkpointName));
-            return Checkpoint.LoadBlobAsync(blob, _Network);
+            return Checkpoint.LoadBlobAsync(blob, _Network, this.loggerFactory);
         }
 
         private string GetSetPart(string checkpointName)
@@ -54,7 +58,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             foreach (var blob in _Container.ListBlobsAsync("Checkpoints/" + GetSetPart(), true, BlobListingDetails.None).GetAwaiter().GetResult().OfType<CloudBlockBlob>())
             {
-                checkpoints.Add(Checkpoint.LoadBlobAsync(blob, _Network));
+                checkpoints.Add(Checkpoint.LoadBlobAsync(blob, _Network, this.loggerFactory));
             }
             return Task.WhenAll(checkpoints.ToArray());
         }

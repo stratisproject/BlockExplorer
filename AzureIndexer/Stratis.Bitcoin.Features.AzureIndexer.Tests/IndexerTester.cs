@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
@@ -23,10 +24,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-		public static IndexerConfiguration CreateConfiguration()
+		public static IndexerConfiguration CreateConfiguration(ILoggerFactory loggerFactory)
 		{
 			var confBuilder = new ConfigurationBuilder();
-			var config = new IndexerConfiguration(confBuilder.Build());
+			var config = new IndexerConfiguration(confBuilder.Build(), loggerFactory);
 			return config;
 		}
 

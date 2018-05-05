@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -22,8 +23,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         CloudBlockBlob _Blob;
-        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob)
+
+        private readonly ILoggerFactory loggerFactory;
+        private readonly ILogger logger;
+
+        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
+            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+
             if (checkpointName == null)
                 throw new ArgumentNullException("checkpointName");
             _Blob = blob;
@@ -65,18 +73,29 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public bool SaveProgress(ChainedBlock tip)
         {
+            this.logger.LogTrace("()");
+
             return SaveProgress(tip.GetLocator());
+
+            this.logger.LogTrace("(-)");
         }
         public bool SaveProgress(BlockLocator locator)
         {
+            this.logger.LogTrace("()");
+
             _BlockLocator = locator;
             try
             {
-                return SaveProgressAsync().Result;
+                bool  result = SaveProgressAsync().Result;
+
+                this.logger.LogTrace("(-):{0}", result);
+                return result;
             }
             catch (AggregateException aex)
             {
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+
+                this.logger.LogTrace("(-)");
                 return false;
             }
         }
@@ -97,10 +116,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private async Task<bool> SaveProgressAsync()
         {
+            this.logger.LogTrace("()");
+
             var bytes = BlockLocator.ToBytes();
             try
             {
-
+                this.logger.LogTrace("Uploading block locator bytes");
                 await _Blob.UploadFromByteArrayAsync(bytes, 0, bytes.Length, new AccessCondition()
                 {
                     IfMatchETag = _Blob.Properties.ETag
@@ -109,13 +130,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             catch (StorageException ex)
             {
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412)
+                {
+                    this.logger.LogTrace("(-):false");
                     return false;
+                }
+
                 throw;
             }
+
+            this.logger.LogTrace("(-):true");
             return true;
         }
 
-        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network)
+        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network, ILoggerFactory loggerFactory)
         {
             var checkpointName = string.Join("/", blob.Name.Split('/').Skip(1).ToArray());
             MemoryStream ms = new MemoryStream();
@@ -129,7 +156,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 if (ex.RequestInformation == null || ex.RequestInformation.HttpStatusCode != 404)
                     throw;
             }
-            var checkpoint = new Checkpoint(checkpointName, network, ms, blob);
+            var checkpoint = new Checkpoint(checkpointName, network, ms, blob, loggerFactory);
             return checkpoint;
         }
 

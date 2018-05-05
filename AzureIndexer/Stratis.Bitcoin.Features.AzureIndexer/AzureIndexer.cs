@@ -11,6 +11,7 @@ using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -24,13 +25,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public class AzureIndexer
     {
-        public static AzureIndexer CreateIndexer(IConfiguration config)
+        public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory)
         {
-            var indexerConfig = new IndexerConfiguration(config);
+            var indexerConfig = new IndexerConfiguration(config, loggerFactory);
             return indexerConfig.CreateIndexer();
         }
 
         private readonly IndexerConfiguration _Configuration;
+
+        private readonly ILoggerFactory loggerFactory;
+
         public IndexerConfiguration Configuration
         {
             get
@@ -39,9 +43,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public AzureIndexer(IndexerConfiguration configuration)
+        public AzureIndexer(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            if(configuration == null)
+            this.loggerFactory = loggerFactory;
+
+            if (configuration == null)
                 throw new ArgumentNullException("configuration");
             this.TaskScheduler = TaskScheduler.Default;
             this.CheckpointInterval = TimeSpan.FromMinutes(15.0);
@@ -54,7 +60,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             var chk = this.GetCheckpoint(checkpoint);
             if(this.IgnoreCheckpoints)
-                chk = new Checkpoint(chk.CheckpointName, this.Configuration.Network, null, null);
+                chk = new Checkpoint(chk.CheckpointName, this.Configuration.Network, null, null, this.loggerFactory);
             return chk;
         }
 
@@ -142,7 +148,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             return new CheckpointRepository(this._Configuration.GetBlocksContainer(), 
                 this._Configuration.Network, string.IsNullOrWhiteSpace(this._Configuration.CheckpointSetName) 
-                ? "default" : this._Configuration.CheckpointSetName);
+                ? "default" : this._Configuration.CheckpointSetName, this.loggerFactory);
         }
 
         internal ChainBase GetMainChain()

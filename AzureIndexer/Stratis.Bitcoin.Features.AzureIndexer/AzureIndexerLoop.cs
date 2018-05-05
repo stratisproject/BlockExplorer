@@ -57,7 +57,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
-        
+
+
+        private readonly ILoggerFactory loggerFactory;
+
         /// <summary>
         /// Constructs the AzureIndexerLoop.
         /// </summary>
@@ -70,6 +73,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.Chain = fullNode.Chain;
             this.nodeLifetime = fullNode.NodeLifetime;
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
+            this.loggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
@@ -193,7 +197,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
-            return new BlockFetcher(checkpoint, repo, this.Chain, lastProcessed)
+            return new BlockFetcher(checkpoint, repo, this.Chain, lastProcessed, this.loggerFactory)
             {
                 NeedSaveInterval = this.indexerSettings.CheckpointInterval,
                 FromHeight = this.StoreTip.Height + 1,
