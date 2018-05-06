@@ -87,15 +87,35 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             _BlockLocator = locator;
             try
             {
-                bool  result = SaveProgressAsync().Result;
+                Task<bool> savingTask = Task.Run(new Func<Task<bool>>(async () =>
+                {
+                    this.logger.LogTrace("()");
+
+                    var saving = SaveProgressAsync();
+                    var timeout = Task.Delay(50000);
+
+                    await Task.WhenAny(saving, timeout).ConfigureAwait(false);
+
+                    if (saving.IsCompleted)
+                    {
+                        this.logger.LogTrace("Saving completed.");
+                        this.logger.LogTrace("(-):{0}", saving.Result);
+                        return saving.Result;
+                    }
+
+                    this.logger.LogTrace("(-):TIMEOUT");
+                    return false;
+                }));
+                
+                bool result = savingTask.GetAwaiter().GetResult();
 
                 this.logger.LogTrace("(-):{0}", result);
                 return result;
             }
-            catch (AggregateException aex)
+            catch (Exception aex)
             {
                 this.logger.LogError("Exception occured: {0}", aex.ToString());
-                ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(aex).Throw();
 
                 this.logger.LogTrace("(-):false");
                 return false;
