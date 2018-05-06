@@ -350,7 +350,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 catch (Exception ex)
                 {
                     // If something goes wrong then try again 1 minute later
-                    this.logger.LogError(ex.Message);
+                    this.logger.LogError("Exception occurred: {0}", ex.ToString());
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
