@@ -151,13 +151,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             catch (StorageException ex)
             {
-                this.logger.LogError("Storage exception occured: {0}", ex.ToString());
-
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412)
                 {
-                    this.logger.LogTrace("(-):false");
+                    this.logger.LogTrace("(-)[STORAGE_EXCEPTION_412]:false");
                     return false;
                 }
+                
+                this.logger.LogError("Storage exception occured: {0}", ex.ToString());
 
                 this.logger.LogTrace("(-)[STORAGEEX]");
                 throw;
