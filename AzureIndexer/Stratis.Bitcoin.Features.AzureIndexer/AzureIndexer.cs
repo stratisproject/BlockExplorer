@@ -61,9 +61,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         internal Checkpoint GetCheckpointInternal(IndexerCheckpoints checkpoint)
         {
-            this.logger.LogTrace("()");
+            this.logger.LogTrace("({0}:{1})", nameof(checkpoint), checkpoint);
 
-            var chk = this.GetCheckpoint(checkpoint);
+            Checkpoint chk = this.GetCheckpoint(checkpoint);
             if (this.IgnoreCheckpoints)
             {
                 this.logger.LogTrace("Checkpoints ignored");
