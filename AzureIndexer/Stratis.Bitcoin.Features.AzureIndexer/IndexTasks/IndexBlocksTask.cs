@@ -17,7 +17,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         private readonly ILogger logger;
 
         public IndexBlocksTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
-            : base(configuration)
+            : base(configuration, loggerFactory)
         {
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
