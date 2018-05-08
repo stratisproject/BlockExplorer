@@ -39,11 +39,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
 
-        public void Index(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
+        public async Task Index(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
             try
             {
-                IndexAsync(entities, taskScheduler).Wait();
+                await IndexAsync(entities, taskScheduler);
             }
             catch (AggregateException aex)
             {

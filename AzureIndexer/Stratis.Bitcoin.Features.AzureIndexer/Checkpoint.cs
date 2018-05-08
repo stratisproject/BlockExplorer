@@ -66,17 +66,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public bool SaveProgress(ChainedBlock tip)
+        public async Task<bool> SaveProgress(ChainedBlock tip)
         {
             Log.Logger.Debug($"Save Progress: {tip.Height}");
-            return SaveProgress(tip.GetLocator());
+            return await SaveProgress(tip.GetLocator());
         }
-        public bool SaveProgress(BlockLocator locator)
+        public async Task<bool> SaveProgress(BlockLocator locator)
         {
             _BlockLocator = locator;
             try
             {
-                return SaveProgressAsync().Result;
+                return await SaveProgressAsync();
             }
             catch (AggregateException aex)
             {

@@ -4,16 +4,11 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
-using NBitcoin.Protocol;
-using Stratis.Bitcoin.P2P.Peer;
-using Stratis.Bitcoin.P2P.Protocol.Payloads;
-using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -105,7 +100,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return Task.WhenAll(tasks.ToArray());
         }
 
-        public void EnsureSetup()
+        public async Task EnsureSetup()
         {
             try
             {
@@ -113,7 +108,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     CloudStorageAccount.Parse("UseDevelopmentStorage=true;") :
                     new CloudStorageAccount(this.StorageCredentials, true);
 
-                EnsureSetupAsync().Wait();
+                await EnsureSetupAsync();
             }
             catch (AggregateException aex)
             {

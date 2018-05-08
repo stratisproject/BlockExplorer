@@ -3,12 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Console;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -16,7 +13,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IIndexTask
     {
-        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler);
+        Task Index(BlockFetcher blockFetcher, TaskScheduler scheduler);
         bool SaveProgression
         {
             get;
@@ -34,15 +31,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         /// <summary>
         /// Fast forward indexing to the end (if scanning not useful)
         /// </summary>
-        protected virtual bool SkipToEnd
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected virtual bool SkipToEnd => false;
 
-        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
+        public async Task Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
         {
             Log.Debug("Running indexer");
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
@@ -53,7 +44,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (EnsureIsSetup)
                 {
                     Log.Debug($"Wait for EnsureSetup to complete");
-                    EnsureSetup().Wait();
+                    await EnsureSetup(); 
                 }
 
                 Log.Debug($"Set bulk import with partition size {PartitionSize}");
@@ -77,7 +68,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                     Log.Debug($"Enqueue tasks for bulk with partition size {bulk.PartitionSize}");
                                     EnqueueTasks(tasks, bulk, true, scheduler);
                                     Log.Debug($"Save progression");
-                                    Save(tasks, blockFetcher, bulk);
+                                    await Save(tasks, blockFetcher, bulk);
                                 }
                             }
                             Log.Debug($"Process block {block.Height}");
@@ -109,7 +100,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (SaveProgression)
                 {
                     Log.Debug($"Save progression");
-                    Save(tasks, blockFetcher, bulk);
+                    await Save(tasks, blockFetcher, bulk);
                 }
 
                 Log.Debug($"Wait finished tasks");
@@ -192,11 +183,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         Exception _Exception;
 
-        private void Save(ConcurrentDictionary<Task, Task> tasks, BlockFetcher fetcher, BulkImport<TIndexed> bulk)
+        private async Task Save(ConcurrentDictionary<Task, Task> tasks, BlockFetcher fetcher, BulkImport<TIndexed> bulk)
         {
             WaitFinished(tasks);
             ThrowIfException();
-            fetcher.SaveCheckpoint();
+            await fetcher.SaveCheckpoint();
         }
 
         int[] wait = new int[] { 100, 200, 400, 800, 1600 };

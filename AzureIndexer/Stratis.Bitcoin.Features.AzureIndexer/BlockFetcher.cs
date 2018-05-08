@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
@@ -30,31 +31,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
 
         private readonly Checkpoint _Checkpoint;
-        public Checkpoint Checkpoint
-        {
-            get
-            {
-                return _Checkpoint;
-            }
-        }
+        public Checkpoint Checkpoint => _Checkpoint;
 
         private readonly IBlocksRepository _BlocksRepository;
-        public IBlocksRepository BlocksRepository
-        {
-            get
-            {
-                return _BlocksRepository;
-            }
-        }
+        public IBlocksRepository BlocksRepository => _BlocksRepository;
 
-        private readonly ChainBase _BlockHeaders;
-        public ChainBase BlockHeaders
-        {
-            get
-            {
-                return _BlockHeaders;
-            }
-        }
+        private readonly ChainBase blockHeaders;
+        public ChainBase BlockHeaders => blockHeaders;
 
         private void InitDefault()
         {
@@ -64,18 +47,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedBlock lastProcessed)
         {
-            if (blocksRepository == null)
-                throw new ArgumentNullException("blocksRepository");
-
-            if (chain == null)
-                throw new ArgumentNullException("blockHeaders");
-
-            if (checkpoint == null)
-                throw new ArgumentNullException("checkpoint");
-
-            _BlockHeaders = chain;
-            _BlocksRepository = blocksRepository;
-            _Checkpoint = checkpoint;
+            blockHeaders = chain ?? throw new ArgumentNullException(nameof(chain));
+            _BlocksRepository = blocksRepository ?? throw new ArgumentNullException(nameof(blocksRepository));
+            _Checkpoint = checkpoint ?? throw new ArgumentNullException(nameof(checkpoint));
             _LastProcessed = lastProcessed;
 
             InitDefault();
@@ -102,9 +76,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<DateTime> lastLogs = new Queue<DateTime>();
             Queue<int> lastHeights = new Queue<int>();
 
-            var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
+            var fork = blockHeaders.FindFork(_Checkpoint.BlockLocator);
             Log.Debug($"Fork is {fork.Height}");
-            var headers = _BlockHeaders.EnumerateAfter(fork);
+            var headers = blockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height <= ToHeight);
             var first = headers.FirstOrDefault();
             Log.Debug($"First header is: {first?.Height}");
@@ -121,7 +95,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             foreach (var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
                 Log.Debug($"Block {block?.Header}");
-                var header = _BlockHeaders.GetBlock(height);
+                var header = blockHeaders.GetBlock(height);
 
                 Log.Debug($"Check if block is null");
                 if (block == null)
@@ -154,15 +128,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     Height = header.Height
                 };
 
-                Log.Logger.Processed(height, Math.Min(ToHeight, _BlockHeaders.Tip.Height), lastLogs, lastHeights);
+                Log.Logger.Processed(height, Math.Min(ToHeight, blockHeaders.Tip.Height), lastLogs, lastHeights);
                 height++;
             }
         }
 
         internal void SkipToEnd()
         {
-            var height = Math.Min(ToHeight, _BlockHeaders.Tip.Height);
-            _LastProcessed = _BlockHeaders.GetBlock(height);
+            var height = Math.Min(ToHeight, blockHeaders.Tip.Height);
+            _LastProcessed = blockHeaders.GetBlock(height);
             Log.Logger.Information("Skipped to the end at height " + height);
         }
 
@@ -178,21 +152,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         #endregion
 
         private DateTime _LastSaved = DateTime.UtcNow;
-        public bool NeedSave
-        {
-            get
-            {
-                return (DateTime.UtcNow - _LastSaved) > NeedSaveInterval;
-            }
-        }
+        public bool NeedSave => (DateTime.UtcNow - _LastSaved) > NeedSaveInterval;
 
-        public void SaveCheckpoint()
+        public async Task SaveCheckpoint()
         {
             Log.Debug($"Save checkpoint");
             if (_LastProcessed != null)
             {
                 Log.Debug($"Last Processed: {_LastProcessed.Height}");
-                _Checkpoint.SaveProgress(_LastProcessed);
+                await _Checkpoint.SaveProgress(_LastProcessed);
                 Log.Logger.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }
             _LastSaved = DateTime.UtcNow;

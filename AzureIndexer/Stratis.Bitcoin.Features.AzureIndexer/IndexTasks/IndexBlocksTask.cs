@@ -19,31 +19,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             : base(configuration)
         {
         }
-        protected override int PartitionSize
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        protected override int PartitionSize => 1;
 
-        volatile int _IndexedBlocks;
-        public int IndexedBlocks
-        {
-            get
-            {
-                return _IndexedBlocks;
-            }
-        }
+        volatile int indexedBlocks;
+        public int IndexedBlocks => indexedBlocks;
 
 
-        public void Index(Block[] blocks, TaskScheduler taskScheduler)
+        public async Task Index(Block[] blocks, TaskScheduler taskScheduler)
         {
             if (taskScheduler == null)
-                throw new ArgumentNullException("taskScheduler");
+                throw new ArgumentNullException(nameof(taskScheduler));
             try
             {
-                IndexAsync(blocks, taskScheduler).Wait();
+                await IndexAsync(blocks, taskScheduler);
             }
             catch (AggregateException aex)
             {
@@ -56,7 +44,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public Task IndexAsync(Block[] blocks, TaskScheduler taskScheduler)
         {
             if (taskScheduler == null)
-                throw new ArgumentNullException("taskScheduler");
+                throw new ArgumentNullException(nameof(taskScheduler));
             var tasks = blocks
                 .Select(b => new Task(() => IndexCore("o", new[]{new BlockInfo()
                 {
@@ -73,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             return Task.WhenAll(tasks);
         }
 
-        protected async override Task EnsureSetup()
+        protected override async Task EnsureSetup()
         {
             await Configuration.GetBlocksContainer().CreateIfNotExistsAsync().ConfigureAwait(false);
         }
@@ -121,7 +109,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     , new OperationContext()).GetAwaiter().GetResult();
                     watch.Stop();
                     Log.Logger.BlockUploaded(watch.Elapsed, blockBytes.Length);
-                    _IndexedBlocks++;
+                    indexedBlocks++;
                     break;
                 }
                 catch (StorageException ex)
@@ -135,7 +123,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     }
                     watch.Stop();
                     Log.Logger.BlockAlreadyUploaded();
-                    _IndexedBlocks++;
+                    indexedBlocks++;
                     break;
                 }
                 catch (Exception ex)

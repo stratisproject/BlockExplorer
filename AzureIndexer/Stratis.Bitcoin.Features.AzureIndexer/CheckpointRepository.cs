@@ -70,11 +70,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             await Task.WhenAll(deletions.ToArray()).ConfigureAwait(false);
         }
 
-        public void DeleteCheckpoints()
+        public async Task DeleteCheckpoints()
         {
             try
             {
-                DeleteCheckpointsAsync().Wait();
+                await DeleteCheckpointsAsync();
             }
             catch (AggregateException aex)
             {
@@ -82,11 +82,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public Checkpoint GetCheckpoint(string checkpointName)
+        public async Task<Checkpoint> GetCheckpoint(string checkpointName)
         {
             try
             {
-                return GetCheckpointAsync(checkpointName).Result;
+                return await GetCheckpointAsync(checkpointName);
             }
             catch (AggregateException aex)
             {

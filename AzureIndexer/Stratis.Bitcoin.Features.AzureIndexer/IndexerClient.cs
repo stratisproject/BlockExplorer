@@ -59,26 +59,26 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public TransactionEntry GetTransaction(bool loadPreviousOutput, uint256 txId)
+        public async Task<TransactionEntry> GetTransaction(bool loadPreviousOutput, uint256 txId)
         {
-            return GetTransactionAsync(loadPreviousOutput, txId).Result;
+            return await GetTransactionAsync(loadPreviousOutput, txId);
         }
         public Task<TransactionEntry> GetTransactionAsync(bool loadPreviousOutput, uint256 txId)
         {
             return GetTransactionAsync(loadPreviousOutput, false, txId);
         }
-        public TransactionEntry GetTransaction(uint256 txId)
+        public async Task<TransactionEntry> GetTransaction(uint256 txId)
         {
-            return GetTransactionAsync(txId).Result;
+            return await GetTransactionAsync(txId);
         }
         public Task<TransactionEntry> GetTransactionAsync(uint256 txId)
         {
             return GetTransactionAsync(true, false, txId);
         }
 
-        public TransactionEntry[] GetTransactions(bool loadPreviousOutput, uint256[] txIds)
+        public async Task<TransactionEntry[]> GetTransactions(bool loadPreviousOutput, uint256[] txIds)
         {
-            return GetTransactionsAsync(loadPreviousOutput, txIds).Result;
+            return await GetTransactionsAsync(loadPreviousOutput, txIds);
         }
         public Task<TransactionEntry[]> GetTransactionsAsync(bool loadPreviousOutput, uint256[] txIds)
         {
@@ -682,27 +682,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 .UpdateChain(chain);
         }
 
-        public bool MergeIntoWallet(string walletId,
+        public async Task<bool> MergeIntoWallet(string walletId,
                                     IDestination destination,
                                     WalletRule rule = null,
                                     CancellationToken cancel = default(CancellationToken))
         {
-            return MergeIntoWallet(walletId, destination.ScriptPubKey, rule, cancel);
+            return await MergeIntoWallet(walletId, destination.ScriptPubKey, rule, cancel);
         }
 
-        public bool MergeIntoWallet(string walletId, Script scriptPubKey, WalletRule rule = null, CancellationToken cancel = default(CancellationToken))
+        public async Task<bool> MergeIntoWallet(string walletId, Script scriptPubKey, WalletRule rule = null, CancellationToken cancel = default(CancellationToken))
         {
-            return MergeIntoWalletCore(walletId, new BalanceId(scriptPubKey), rule, cancel);
+            return await MergeIntoWalletCore(walletId, new BalanceId(scriptPubKey), rule, cancel);
         }
 
-        public bool MergeIntoWallet(string walletId, string walletSource,
+        public async Task<bool> MergeIntoWallet(string walletId, string walletSource,
             WalletRule rule = null,
             CancellationToken cancel = default(CancellationToken))
         {
-            return MergeIntoWalletCore(walletId, new BalanceId(walletSource), rule, cancel);
+            return await MergeIntoWalletCore(walletId, new BalanceId(walletSource), rule, cancel);
         }
 
-        private bool MergeIntoWalletCore(string walletId, BalanceId balanceId, WalletRule rule, CancellationToken cancel)
+        private async Task<bool> MergeIntoWalletCore(string walletId, BalanceId balanceId, WalletRule rule, CancellationToken cancel)
         {
             var indexer = Configuration.CreateIndexer();
 
@@ -731,10 +731,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 existing.Merge(kv.Value, rule);
                 entities.Add(existing);
                 if(entities.Count == 100)
-                    indexer.Index(entities);
+                    await indexer.Index(entities);
             }
             if(entities.Count != 0)
-                indexer.Index(entities);
+                await indexer.Index(entities);
             return true;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
@@ -74,10 +75,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Starts the Azure Indexer feature.
         /// </summary>
-        public override void Initialize()
+        public override async void Initialize()
         {
             this.logger.LogTrace("()");
-            this.indexerLoop.Initialize();         
+            await this.indexerLoop.Initialize();         
             this.logger.LogTrace("(-)");
         }
 

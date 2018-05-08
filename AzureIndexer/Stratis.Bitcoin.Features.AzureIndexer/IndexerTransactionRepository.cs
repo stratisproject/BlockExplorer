@@ -30,10 +30,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return tx.Transaction;
         }
 
-        public Task PutAsync(uint256 txId, Transaction tx)
+        public async Task PutAsync(uint256 txId, Transaction tx)
         {
-            _Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null));
-            return Task.FromResult(false);
+            await _Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null));
         }
 
         #endregion

@@ -5,11 +5,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {
-        WalletRuleEntryCollection _WalletRules;
+        private readonly WalletRuleEntryCollection walletRules;
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules)
             : base(conf)
         {
-            _WalletRules = walletRules;
+            this.walletRules = walletRules;
         }
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
@@ -21,13 +21,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             return item.ToEntity();
         }
 
-        protected override bool SkipToEnd
-        {
-            get
-            {
-                return _WalletRules != null && _WalletRules.Count == 0;
-            }
-        }
+        protected override bool SkipToEnd => walletRules != null && walletRules.Count == 0;
 
         protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk)
         {
@@ -35,7 +29,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             {
                 var txId = tx.GetHash();
 
-                var entries = extract(txId, tx, block.BlockId, block.Block.Header, block.Height);
+                var entries = Extract(txId, tx, block.BlockId, block.Block.Header, block.Height);
                 foreach (var entry in entries)
                 {
                     bulk.Add(entry.PartitionKey, entry);
@@ -43,10 +37,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        private IEnumerable<OrderedBalanceChange> extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height)
+        private IEnumerable<OrderedBalanceChange> Extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height)
         {
-            if (_WalletRules != null)
-                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, _WalletRules);
+            if (walletRules != null)
+                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, walletRules);
             else
                 return OrderedBalanceChange.ExtractScriptBalances(txId, tx, blockId, blockHeader, height);
         }

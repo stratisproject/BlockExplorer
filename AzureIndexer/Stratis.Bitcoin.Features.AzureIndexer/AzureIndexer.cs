@@ -11,7 +11,6 @@ using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
@@ -26,7 +25,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public class AzureIndexer
     {
-        private readonly Serilog.ILogger logger = Log.ForContext<AzureIndexer>();
+        private readonly ILogger logger = Log.ForContext<AzureIndexer>();
 
         public static AzureIndexer CreateIndexer(IConfiguration config)
         {
@@ -54,9 +53,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.ToHeight = int.MaxValue;
         }
 
-        internal Checkpoint GetCheckpointInternal(IndexerCheckpoints checkpoint)
+        internal async Task<Checkpoint> GetCheckpointInternal(IndexerCheckpoints checkpoint)
         {
-            var chk = this.GetCheckpoint(checkpoint);
+            var chk = await this.GetCheckpoint(checkpoint);
             if(this.IgnoreCheckpoints)
                 chk = new Checkpoint(chk.CheckpointName, this.Configuration.Network, null, null);
             return chk;
@@ -89,11 +88,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             set;
         }
 
-        public void Index(params Block[] blocks)
+        public async Task Index(params Block[] blocks)
         {
             this.logger.Debug("Index with blocks: {numberOfBlocks}", blocks.Length);
             var task = new IndexBlocksTask(this.Configuration);
-            task.Index(blocks, this.TaskScheduler);
+            await task.Index(blocks, this.TaskScheduler);
         }
 
         public Task IndexAsync(params Block[] blocks)
@@ -103,9 +102,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return task.IndexAsync(blocks, this.TaskScheduler);
         }
 
-        public void Index(params TransactionEntry.Entity[] entities)
+        public async Task Index(params TransactionEntry.Entity[] entities)
         {
-            this.Index(entities.Select(e => e.CreateTableEntity()).ToArray(), this.Configuration.GetTransactionTable());
+            await this.Index(entities.Select(e => e.CreateTableEntity()).ToArray(), this.Configuration.GetTransactionTable());
         }
 
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
@@ -113,9 +112,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.IndexAsync(entities.Select(e => e.CreateTableEntity()).ToArray(), this.Configuration.GetTransactionTable());
         }
 
-        public void Index(IEnumerable<OrderedBalanceChange> balances)
+        public async Task Index(IEnumerable<OrderedBalanceChange> balances)
         {
-            this.Index(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
+            await this.Index(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
         }
 
         public Task IndexAsync(IEnumerable<OrderedBalanceChange> balances)
@@ -123,10 +122,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.IndexAsync(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
         }
 
-        private void Index(IEnumerable<ITableEntity> entities, CloudTable table)
+        private async Task Index(IEnumerable<ITableEntity> entities, CloudTable table)
         {
             var task = new IndexTableEntitiesTask(this.Configuration, table);
-            task.Index(entities, this.TaskScheduler);
+            await task.Index(entities, this.TaskScheduler);
         }
 
         private Task IndexAsync(IEnumerable<ITableEntity> entities, CloudTable table)
@@ -135,9 +134,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return task.IndexAsync(entities, this.TaskScheduler);
         }        
 
-        public Checkpoint GetCheckpoint(IndexerCheckpoints checkpoint)
+        public async Task<Checkpoint> GetCheckpoint(IndexerCheckpoints checkpoint)
         {
-            return this.GetCheckpointRepository().GetCheckpoint(checkpoint.ToString().ToLowerInvariant());
+            return await this.GetCheckpointRepository().GetCheckpoint(checkpoint.ToString().ToLowerInvariant());
         }
         public Task<Checkpoint> GetCheckpointAsync(IndexerCheckpoints checkpoint)
         {
@@ -156,11 +155,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.Configuration.CreateIndexerClient().GetMainChain();
         }
 
-        public void IndexOrderedBalance(int height, Block block)
+        public async Task IndexOrderedBalance(int height, Block block)
         {
             var table = this.Configuration.GetBalanceTable();
-            var blockId = block == null ? null : block.GetHash();
-            var header = block == null ? null : block.Header;
+            var blockId = block?.GetHash();
+            var header = block?.Header;
+
+            if (block == null)
+            {
+                Log.Error("Block is null for IndexOrderedBalance");
+                throw new ApplicationException("Block is null for IndexOrderedBalance");
+            }
 
             var entities =
                     block
@@ -169,27 +174,33 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         .Select(_ => _.ToEntity())
                         .AsEnumerable();
 
-            this.Index(entities, table);
+            await this.Index(entities, table);
         }
 
-        public void IndexTransactions(int height, Block block)
-        {
+        public async Task IndexTransactions(int height, Block block)
+        { 
             var table = this.Configuration.GetTransactionTable();
-            var blockId = block == null ? null : block.GetHash();
+            var blockId = block?.GetHash();
+            if (block == null)
+            {
+                Log.Error("Block is null for IndexTransactions");
+                throw new ApplicationException("Block is null for IndexTransactions");
+            }
+
             var entities =
                         block
                         .Transactions
                         .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
                         .Select(c => c.CreateTableEntity())
                         .AsEnumerable();
-            this.Index(entities, table);
+            await this.Index(entities, table);
         }
 
-        public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
+        public async Task IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {
             try
             {
-                this.IndexWalletOrderedBalanceAsync(height, block, walletRules).Wait();
+                await this.IndexWalletOrderedBalanceAsync(height, block, walletRules);
             }
             catch(AggregateException ex)
             {
@@ -199,7 +210,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public Task IndexWalletOrderedBalanceAsync(int height, Block block, WalletRuleEntryCollection walletRules)
         {
             var table = this.Configuration.GetBalanceTable();
-            var blockId = block == null ? null : block.GetHash();
+            var blockId = block?.GetHash();
+
+
+            if (block == null)
+            {
+                Log.Error("Block is null for IndexWalletOrderedBalanceAsync");
+                throw new ApplicationException("Block is null for IndexWalletOrderedBalanceAsync");
+            }
 
             var entities =
                     block
@@ -211,11 +229,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.IndexAsync(entities, table);
         }
 
-        public void IndexOrderedBalance(Transaction tx)
+        public async Task IndexOrderedBalance(Transaction tx)
         {
             var table = this.Configuration.GetBalanceTable();
             var entities = OrderedBalanceChange.ExtractScriptBalances(tx).Select(t => t.ToEntity()).AsEnumerable();
-            this.Index(entities, table);
+            await this.Index(entities, table);
         }
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
@@ -310,7 +328,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public void IndexChain(ChainBase chain, CancellationToken cancellationToken = default(CancellationToken))
         {
             if(chain == null)
-                throw new ArgumentNullException("chain");
+                throw new ArgumentNullException(nameof(chain));
             Log.Logger.Trace("Setting throttling to max 100 connections");
             this.SetThrottling();
 

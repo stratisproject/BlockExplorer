@@ -88,10 +88,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return tx.ColoredTransaction;
         }
 
-        public Task PutAsync(uint256 txId, ColoredTransaction colored)
+        public async Task PutAsync(uint256 txId, ColoredTransaction colored)
         {
-            _Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, colored));
-            return Task.FromResult(false);
+            await _Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, colored));
         }
 
         ITransactionRepository _Transactions;
