@@ -162,7 +162,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            var task = new IndexTableEntitiesTask(this.Configuration, table);
+            var task = new IndexTableEntitiesTask(this.Configuration, table, this.loggerFactory);
             task.Index(entities, this.TaskScheduler);
 
             this.logger.LogTrace("(-)");
@@ -172,7 +172,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            var task = new IndexTableEntitiesTask(this.Configuration, table);
+            var task = new IndexTableEntitiesTask(this.Configuration, table, this.loggerFactory);
             Task indexTask = task.IndexAsync(entities, this.TaskScheduler);
 
             this.logger.LogTrace("(-)");

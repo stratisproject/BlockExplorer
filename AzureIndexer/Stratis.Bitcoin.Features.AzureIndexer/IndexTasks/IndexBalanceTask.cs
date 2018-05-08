@@ -10,7 +10,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         WalletRuleEntryCollection _WalletRules;
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
-            : base(conf)
+            : base(conf, loggerFactory)
         {
             _WalletRules = walletRules;
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
