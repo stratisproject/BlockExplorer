@@ -216,7 +216,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var entities =
                     block
                         .Transactions
-                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height))
+                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height, _Configuration.Network))
                         .Select(_ => _.ToEntity())
                         .AsEnumerable();
 
@@ -273,7 +273,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var entities =
                     block
                     .Transactions
-                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules))
+                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules, _Configuration.Network))
                     .Select(t => t.ToEntity())
                     .AsEnumerable();
 
@@ -288,7 +288,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.logger.LogTrace("()");
 
             var table = this.Configuration.GetBalanceTable();
-            var entities = OrderedBalanceChange.ExtractScriptBalances(tx).Select(t => t.ToEntity()).AsEnumerable();
+            var entities = OrderedBalanceChange.ExtractScriptBalances(tx, _Configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             this.Index(entities, table);
 
             this.logger.LogTrace("(-)");
@@ -296,7 +296,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
             var table = this.Configuration.GetBalanceTable();
-            var entities = OrderedBalanceChange.ExtractScriptBalances(tx).Select(t => t.ToEntity()).AsEnumerable();
+            var entities = OrderedBalanceChange.ExtractScriptBalances(tx, _Configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             return this.IndexAsync(entities, table);
         }
 

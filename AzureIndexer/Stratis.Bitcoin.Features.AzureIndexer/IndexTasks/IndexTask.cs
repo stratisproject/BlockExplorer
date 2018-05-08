@@ -6,12 +6,13 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IIndexTask
     {
-        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler);
+        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network);
         bool SaveProgression
         {
             get;
@@ -37,7 +38,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
+        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network)
         {
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
             try
@@ -63,7 +64,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                     Save(tasks, blockFetcher, bulk);
                                 }
                             }
-                            ProcessBlock(block, bulk);
+                            ProcessBlock(block, bulk, network);
                             if(bulk.HasFullPartition)
                             {
                                 EnqueueTasks(tasks, bulk, false, scheduler);
@@ -188,7 +189,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
 
         protected abstract Task EnsureSetup();
-        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk);
+        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk, Network network);
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
 
         public IndexTask(IndexerConfiguration configuration)

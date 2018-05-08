@@ -32,7 +32,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             return item;
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<ITableEntity> bulk)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<ITableEntity> bulk, Network network)
         {
             throw new NotSupportedException();
         }

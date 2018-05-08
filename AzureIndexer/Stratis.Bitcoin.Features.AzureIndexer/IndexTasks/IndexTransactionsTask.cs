@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
@@ -13,7 +14,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network)
         {
             this.logger.LogTrace("()");
 

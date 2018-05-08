@@ -45,7 +45,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly AzureIndexerSettings indexerSettings;
 
         /// <summary>The highest block that has been indexed.</summary>
-        internal ChainedBlock StoreTip { get; private set; }
+        internal ChainedHeader StoreTip { get; private set; }
 
         /// <summary>The Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
@@ -114,10 +114,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             indexer.ToHeight = this.indexerSettings.To;
 
             this.AzureIndexer = indexer;
-            ChainedBlock ckpntBlocks = this.GetCheckPointBlock(IndexerCheckpoints.Blocks);
-            ChainedBlock ckpntBalances = this.GetCheckPointBlock(IndexerCheckpoints.Balances);
-            ChainedBlock ckpntTransactions = this.GetCheckPointBlock(IndexerCheckpoints.Transactions);
-            ChainedBlock ckpntWallets = this.GetCheckPointBlock(IndexerCheckpoints.Wallets);
+            ChainedHeader ckpntBlocks = this.GetCheckPointBlock(IndexerCheckpoints.Blocks);
+            ChainedHeader ckpntBalances = this.GetCheckPointBlock(IndexerCheckpoints.Balances);
+            ChainedHeader ckpntTransactions = this.GetCheckPointBlock(IndexerCheckpoints.Transactions);
+            ChainedHeader ckpntWallets = this.GetCheckPointBlock(IndexerCheckpoints.Wallets);
 
             if (this.indexerSettings.IgnoreCheckpoints)
                 this.SetStoreTip(this.Chain.GetBlock(indexer.FromHeight));
@@ -146,12 +146,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
         /// <returns>The block that a checkpoint is at.</returns>
-        private ChainedBlock GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
+        private ChainedHeader GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
         {
             this.logger.LogTrace("()");
 
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
-            ChainedBlock fork = this.Chain.FindFork(checkpoint.BlockLocator);
+            ChainedHeader fork = this.Chain.FindFork(checkpoint.BlockLocator);
 
             this.logger.LogTrace("(-):{0}", fork?.ToString());
             return fork;
@@ -208,7 +208,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
         /// <param name="cancellationToken">The token used for cancellation.</param>
         /// <returns>A block fetcher that respects the given type of checkpoint.</returns>
-        private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints, CancellationToken cancellationToken, ChainedBlock lastProcessed)
+        private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints, CancellationToken cancellationToken, ChainedHeader lastProcessed)
         {
             this.logger.LogTrace("()");
 
@@ -287,7 +287,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.BlocksFetcher.ToHeight = toHeight;
                         var task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.BlocksFetcher, this.AzureIndexer.TaskScheduler, this.IndexerConfig.Network);
 
                         this.logger.LogTrace("Finished blocks");
                     }
@@ -301,7 +301,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.TransactionsFetcher.ToHeight = toHeight;
                         var task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.TransactionsFetcher, this.AzureIndexer.TaskScheduler, this.IndexerConfig.Network);
 
                         this.logger.LogTrace("Finished txes");
                     }
@@ -315,7 +315,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.BalancesFetcher.ToHeight = toHeight;
                         var task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.BalancesFetcher, this.AzureIndexer.TaskScheduler, this.IndexerConfig.Network);
 
                         this.logger.LogTrace("Finished balances");
                     }
@@ -329,7 +329,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         this.WalletsFetcher.ToHeight = toHeight;
                         var task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                         task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                        task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler);
+                        task.Index(this.WalletsFetcher, this.AzureIndexer.TaskScheduler, this.IndexerConfig.Network);
 
                         this.logger.LogTrace("Finished wallets");
                     }
@@ -362,13 +362,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Sets the StoreTip.
         /// </summary>
-        /// <param name="chainedBlock">The block to set the store tip to.</param>
-        internal void SetStoreTip(ChainedBlock chainedBlock)
+        /// <param name="ChainedHeader">The block to set the store tip to.</param>
+        internal void SetStoreTip(ChainedHeader ChainedHeader)
         {
-            this.logger.LogTrace("({0}:'{1}')", nameof(chainedBlock), chainedBlock?.HashBlock);
-            Guard.NotNull(chainedBlock, nameof(chainedBlock));
+            this.logger.LogTrace("({0}:'{1}')", nameof(ChainedHeader), ChainedHeader?.HashBlock);
+            Guard.NotNull(ChainedHeader, nameof(ChainedHeader));
 
-            this.StoreTip = chainedBlock;
+            this.StoreTip = ChainedHeader;
 
             this.logger.LogTrace("(-)");
         }

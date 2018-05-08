@@ -92,7 +92,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             await Configuration.GetBlocksContainer().CreateIfNotExistsAsync().ConfigureAwait(false);
         }
-        protected override void ProcessBlock(BlockInfo block, BulkImport<BlockInfo> bulk)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<BlockInfo> bulk, Network network)
         {
             bulk.Add("o", block);
         }

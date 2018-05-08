@@ -41,12 +41,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 			return _Logger.BeginScope(activityName);
         }
 
-        internal static void CheckpointLoaded(ChainedBlock block, string checkpointName)
+        internal static void CheckpointLoaded(ChainedHeader block, string checkpointName)
         {
 			_Logger.LogInformation("Checkpoint " + checkpointName + " loaded at " + ToString(block));
         }
 
-        internal static void CheckpointSaved(ChainedBlock block, string checkpointName)
+        internal static void CheckpointSaved(ChainedHeader block, string checkpointName)
         {
 			_Logger.LogInformation("Checkpoint " + checkpointName + " saved at " + ToString(block));
         }
@@ -103,7 +103,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
 
-        internal static void InputChainTip(ChainedBlock block)
+        internal static void InputChainTip(ChainedHeader block)
         {
             _Logger.LogInformation("The input chain tip is at height " + ToString(block));
         }
@@ -123,16 +123,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 			_Logger.LogInformation("The input chain is late compared to the indexed one");
         }
 
-        public static void IndexingChain(ChainedBlock from, ChainedBlock to)
+        public static void IndexingChain(ChainedHeader from, ChainedHeader to)
         {
 			_Logger.LogInformation("Indexing blocks from " + ToString(from) + " to " + ToString(to) + " (both included)");
         }
 
-        private static string ToString(ChainedBlock chainedBlock)
+        private static string ToString(ChainedHeader ChainedHeader)
         {
-            if (chainedBlock == null)
+            if (ChainedHeader == null)
                 return "(null)";
-            return ToString(chainedBlock.HashBlock, chainedBlock.Height);
+            return ToString(ChainedHeader.HashBlock, ChainedHeader.Height);
         }
 
         internal static void RemainingBlockChain(int height, int maxHeight)
@@ -144,7 +144,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        internal static void IndexedChainIsUpToDate(ChainedBlock block)
+        internal static void IndexedChainIsUpToDate(ChainedHeader block)
         {
 			_Logger.LogInformation("Indexed chain is up to date at height " + ToString(block));
         }

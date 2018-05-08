@@ -66,7 +66,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ToHeight = int.MaxValue;
         }
 
-        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedBlock lastProcessed, ILoggerFactory loggerFactory)
+        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedHeader lastProcessed, ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
             this.logger = this.loggerFactory.CreateLogger(GetType().FullName);
@@ -102,7 +102,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         #region IEnumerable<BlockInfo> Members
 
-        public ChainedBlock _LastProcessed { get; private set; }
+        public ChainedHeader _LastProcessed { get; private set; }
 
         public IEnumerator<BlockInfo> GetEnumerator()
         {

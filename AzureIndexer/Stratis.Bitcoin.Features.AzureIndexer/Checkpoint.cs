@@ -71,7 +71,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public bool SaveProgress(ChainedBlock tip)
+        public bool SaveProgress(ChainedHeader tip)
         {
             this.logger.LogTrace("()");
 
