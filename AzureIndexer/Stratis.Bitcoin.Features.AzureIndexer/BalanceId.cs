@@ -15,7 +15,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         const string WalletPrefix = "w$";
         const string HashPrefix = "h$";
 
-        internal const int MaxScriptSize = 512;
+        internal const int MaxScriptSize = 79;
         public BalanceId(string walletId)
         {
             _Internal = WalletPrefix + FastEncoder.Instance.EncodeData(Encoding.UTF8.GetBytes(walletId));
