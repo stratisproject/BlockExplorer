@@ -183,7 +183,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// will be ignored by "GetCheckpointInternal".
         /// </summary>
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
-        /// <param name="cancellationToken">The token used for cancellation.</param>
         /// <returns>A block fetcher that respects the given type of checkpoint.</returns>
         private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints)
         {
