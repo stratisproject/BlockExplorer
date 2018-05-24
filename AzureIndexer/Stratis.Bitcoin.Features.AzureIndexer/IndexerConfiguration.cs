@@ -39,6 +39,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CloudStorageAccount StorageAccount { get; set; }
 
+        private readonly ILoggerFactory loggerFactory;
+
         private CloudTableClient tableClient;
         public CloudTableClient TableClient
         {
@@ -69,13 +71,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             set => this.blobClient = value;
         }
 
-        public IndexerConfiguration()
+        public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
             Network = Network.Main;
         }
 
-        public IndexerConfiguration(IConfiguration config)
+        public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
+
             var account = GetValue(config, "Azure.AccountName", true);
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
@@ -141,7 +146,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public AzureIndexer CreateIndexer()
         {
-            return new AzureIndexer(this);
+            return new AzureIndexer(this, this.loggerFactory);
         }
 
         public IndexerClient CreateIndexerClient()

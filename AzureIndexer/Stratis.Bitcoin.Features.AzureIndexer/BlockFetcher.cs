@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -46,6 +47,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
+        private readonly ILoggerFactory loggerFactory;
+
+        private readonly ILogger logger;
+
         private readonly ChainBase _BlockHeaders;
         public ChainBase BlockHeaders
         {
@@ -61,8 +66,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ToHeight = int.MaxValue;
         }
 
-        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedBlock lastProcessed)
+        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedHeader lastProcessed, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
+            this.logger = this.loggerFactory.CreateLogger(GetType().FullName);
+
             if (blocksRepository == null)
                 throw new ArgumentNullException("blocksRepository");
 
@@ -94,7 +102,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         #region IEnumerable<BlockInfo> Members
 
-        public ChainedBlock _LastProcessed { get; private set; }
+        public ChainedHeader _LastProcessed { get; private set; }
 
         public IEnumerator<BlockInfo> GetEnumerator()
         {
@@ -173,12 +181,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void SaveCheckpoint()
         {
+            this.logger.LogTrace("()");
+
             if(_LastProcessed != null)
             {
+                this.logger.LogTrace("Saving checkpoints");
+
                 _Checkpoint.SaveProgress(_LastProcessed);
                 IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }
             _LastSaved = DateTime.UtcNow;
+
+            this.logger.LogTrace("(-)");
         }
 
         public int FromHeight

@@ -257,7 +257,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             };
         }
 
-        public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedBlock currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))
+        public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedHeader currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))
         {
             var oldTip = currentTip;
             var table = Configuration.GetChainTable();
@@ -675,7 +675,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             if(chain.Tip == null)
             {
                 Block genesis = Configuration.Network.GetGenesis();
-                chain.SetTip(new ChainedBlock(genesis.Header, genesis.GetHash(), 0));
+                chain.SetTip(new ChainedHeader(genesis.Header, genesis.GetHash(), 0));
             }
             GetChainChangesUntilFork(chain.Tip, false)
                 .UpdateChain(chain);

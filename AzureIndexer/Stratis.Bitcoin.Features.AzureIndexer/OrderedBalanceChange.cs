@@ -12,7 +12,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     public class OrderedBalanceChange
     {
-        public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(uint256 txId, Transaction transaction, uint256 blockId, BlockHeader blockHeader, int height)
+        public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(uint256 txId, Transaction transaction, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
             if(transaction == null)
                 throw new ArgumentNullException("transaction");
@@ -34,11 +34,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 TxDestination signer = null;
                 if(input.ScriptSig.Length != 0)
                 {
-                    signer = input.ScriptSig.GetSigner();
+                    signer = input.ScriptSig.GetSigner(network);
                 }
                 else
                 {
-                    signer = GetSigner(input.WitScript);
+                    signer = GetSigner(input.WitScript, network);
                 }
                 if(signer != null)
                 {
@@ -89,11 +89,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return changeByScriptPubKey.Values;
         }
 
-        public static TxDestination GetSigner(WitScript witScript)
+        public static TxDestination GetSigner(WitScript witScript, Network network)
         {
             if(witScript == WitScript.Empty)
                 return null;
-            var parameters = PayToWitPubKeyHashTemplate.Instance.ExtractWitScriptParameters(witScript);
+            var parameters = PayToWitPubKeyHashTemplate.Instance.ExtractWitScriptParameters(network, witScript);
             if(parameters != null)
                 return parameters.PublicKey.WitHash;
             return Script.FromBytesUnsafe(witScript.GetUnsafePush(witScript.PushCount - 1)).WitHash;
@@ -105,10 +105,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                                                                             uint256 blockId,
                                                                             BlockHeader blockHeader,
                                                                             int height,
-                                                                            WalletRuleEntryCollection walletCollection)
+                                                                            WalletRuleEntryCollection walletCollection,
+                                                                            Network network)
         {
             Dictionary<string, OrderedBalanceChange> entitiesByWallet = new Dictionary<string, OrderedBalanceChange>();
-            var scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height);
+            var scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
             foreach(var scriptBalance in scriptBalances)
             {
                 foreach(var walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
@@ -653,9 +654,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         const string DateFormat = "yyyyMMddhhmmssff";
 
 
-        public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(Transaction tx)
+        public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(Transaction tx, Network network)
         {
-            return ExtractScriptBalances(null, tx, null, null, 0);
+            return ExtractScriptBalances(null, tx, null, null, 0, network);
         }
 
         Script _ScriptPubKey;

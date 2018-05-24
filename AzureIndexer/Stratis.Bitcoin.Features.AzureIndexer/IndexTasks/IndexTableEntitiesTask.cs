@@ -10,6 +10,7 @@ using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
@@ -17,8 +18,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     {
         CloudTable _Table;
 
-        public IndexTableEntitiesTask(IndexerConfiguration conf, CloudTable table)
-            : base(conf)
+        public IndexTableEntitiesTask(IndexerConfiguration conf, CloudTable table, ILoggerFactory loggerFactory)
+            : base(conf, loggerFactory)
         {
             _Table = table;
         }
@@ -33,7 +34,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             return item;
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<ITableEntity> bulk)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<ITableEntity> bulk, Network network)
         {
             throw new NotSupportedException();
         }
@@ -72,8 +73,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
     public abstract class IndexTableEntitiesTaskBase<TIndexed> : IndexTask<TIndexed>
     {
-        public IndexTableEntitiesTaskBase(IndexerConfiguration configuration)
-            : base(configuration)
+        public IndexTableEntitiesTaskBase(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
+            : base(configuration, loggerFactory)
         {
 
         }

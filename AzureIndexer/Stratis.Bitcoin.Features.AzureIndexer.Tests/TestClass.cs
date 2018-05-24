@@ -105,9 +105,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void DoesNotCrashExtractingAddressFromBigTransaction()
         {
-            var tx = new Transaction(Encoders.Hex.DecodeData(File.ReadAllText("../../../Data/BigTransaction.txt")));
+            var tx = Transaction.Load(Encoders.Hex.DecodeData(File.ReadAllText("../../../Data/BigTransaction.txt")), Network.StratisMain);
             var txId = tx.GetHash();
-            var result = OrderedBalanceChange.ExtractScriptBalances(txId, tx, null, null, 0);
+            var result = OrderedBalanceChange.ExtractScriptBalances(txId, tx, null, null, 0, Network.StratisMain);
             foreach(var e in result)
             {
                 var entity = e.ToEntity();
@@ -275,7 +275,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 //Colored coin Payment
                 //GoldGuy emits gold to Nico
-                var txBuilder = new TransactionBuilder();
+                var txBuilder = new TransactionBuilder(Network.StratisMain);
 
                 var issuanceCoinsTransaction
                     = new Transaction()
@@ -312,7 +312,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.NotNull(entry.ColoredTransaction);
                 Assert.Equal(Money.Parse("1.0"), entry.Amount);
 
-                txBuilder = new TransactionBuilder();
+                txBuilder = new TransactionBuilder(Network.StratisMain);
                 txBuilder.StandardTransactionPolicy.MinRelayTxFee = new FeeRate(Money.Satoshis(1000));
                 var tx = txBuilder
                     .AddKeys(goldGuy)
@@ -335,7 +335,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var coloredCoins = ColoredCoin.Find(tx, ctx).ToArray();
                 var nicoGold = coloredCoins[0];
 
-                txBuilder = new TransactionBuilder(1);
+                txBuilder = new TransactionBuilder(Network.StratisMain);
                 txBuilder.StandardTransactionPolicy.MinRelayTxFee = new FeeRate(Money.Satoshis(1000));
                 //GoldGuy sends 20 gold to alice against 0.6 BTC. Nico sends 10 gold to alice + 0.02 BTC.
                 tx = txBuilder
@@ -377,25 +377,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
         
-        private Block PushStore(NBitcoin.BitcoinCore.BlockStore store, Transaction tx, Block prev = null)
-        {
-            if(prev == null)
-                prev = Network.Main.GetGenesis();
-            var b = new Block()
-               {
-                   Header =
-                   {
-                       Nonce = RandomUtils.GetUInt32(),
-                       HashPrevBlock = prev.GetHash()
-                   },
-                   Transactions =
-                    {
-                        tx
-                    }
-               };
-            store.Append(b);
-            return b;
-        }
         // TODO: Fix this test case
         /*
         [Fact]
@@ -489,7 +470,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public void DoNotCrashOnEmptyScript()
         {
             var tx = Transaction.Parse("01000000014cee27ba570d2cca50bb9b3f7374c7eb24ec16ffec0a077c84c1cc23b0161804010000008b48304502200f1100f78596c8d46fb2f39c570ce6945956a3dd33c48fbdbe53af1c383182ed022100a85b528ea21ee7f39b2ec1568ac19f26f4dd4fb9d3dbf70587986de3c2c90fa801410426e4d0890ad5272b2b9a10ca3f518f7e025932caa62f13467e444df89ed25f24f4fc5075cad32f468c8f7f913e30057449d65623726e7102f5eaa326d486ebf7ffffffff020010000000000000006020e908000000001976a914947236437233a71cb033a53932008dbfe346388e88ac00000000");
-            OrderedBalanceChange.ExtractScriptBalances(null, tx, null, null, 0);
+            OrderedBalanceChange.ExtractScriptBalances(null, tx, null, null, 0, Network.StratisMain);
         }
 
         [Fact]
@@ -544,7 +525,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 //Merge alice2 into Alice with a tx involving alice1
                 tx
-                   = new TransactionBuilder()
+                   = new TransactionBuilder(Network.StratisMain)
                        .AddKeys(alice1)
                        .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey)) //Alice1 10
                        .Send(alice2, "2.0")
@@ -587,7 +568,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     }
                 };
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey))
@@ -686,7 +667,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Equal(2, rules.Length);
                 /////////////////////////////////////////////
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .AddKeys(alice1)
                         .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey))
                         .Send(alice2, "2.0")
@@ -733,7 +714,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     }
                 };
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(prevTx.GetHash(), 0, prevTx.Outputs[0].Value, prevTx.Outputs[0].ScriptPubKey))
@@ -773,7 +754,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 tester.Client.AddWalletRule("Alice", new ScriptRule(alice1.PubKey.ScriptPubKey.Hash, alice1.PubKey.ScriptPubKey));
                 tester.Client.AddWalletRule("Alice", new ScriptRule(alice2.PubKey.ScriptPubKey.Hash, null));
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(prevTx.GetHash(), 0, prevTx.Outputs[0].Value, prevTx.Outputs[0].ScriptPubKey))
@@ -800,7 +781,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.False(aliceBalance[0].ReceivedCoins[1] is ScriptCoin);
                 Assert.False(aliceBalance[0].ReceivedCoins[2] is ScriptCoin);
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .AddKeys(alice1, alice2)
                         .AddCoins(aliceBalance[0].ReceivedCoins[0])
                         .Send(satoshi, "0.0001")
@@ -1173,7 +1154,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 }
 
                 tx.Outputs.Add(new TxOut(Money.Coins(0.1m), alice));
-                tx.Sign(bob, false);
+                tx.Sign(Network.StratisMain, bob, false);
                 chainBuilder.Emit(tx);
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
@@ -1231,7 +1212,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 ScriptSig = bob.ScriptPubKey
             });
             tx.Outputs.Add(new TxOut(Money.Coins(0.1m), alice));
-            tx.Sign(bob, false);
+            tx.Sign(Network.StratisMain, bob, false);
             chainBuilder.Emit(tx);
             chainBuilder.SubmitBlock();
             chainBuilder.SyncIndexer();
@@ -1264,7 +1245,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var aliceBalance = tester.Client.GetOrderedBalance(alice.PubKey.WitHash).ToArray();
                 Assert.True(aliceBalance.Length == 1);
 
-                var tx = new TransactionBuilder()
+                var tx = new TransactionBuilder(Network.StratisMain)
                     .AddCoins(aliceBalance[0].ReceivedCoins)
                     .AddKeys(alice)
                     .Send(bob.PubKey.WitHash, "5.0")
@@ -1307,8 +1288,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var aliceBalance = tester.Client.GetOrderedBalance(alice.PubKey.ScriptPubKey.WitHash).ToArray();
                 Assert.True(aliceBalance.Length == 1);
 
-                var tx = new TransactionBuilder()
-                    .AddCoins(new ScriptCoin((Coin)aliceBalance[0].ReceivedCoins[0], alice.PubKey.ScriptPubKey))
+                var tx = new TransactionBuilder(Network.StratisMain)
+                    .AddCoins(ScriptCoin.Create(Network.StratisMain, (Coin)aliceBalance[0].ReceivedCoins[0], alice.PubKey.ScriptPubKey))
                     .AddKeys(alice)
                     .Send(bob.PubKey.ScriptPubKey.WitHash, "5.0")
                     .SetChange(alice.PubKey.ScriptPubKey.WitHash)
@@ -1357,7 +1338,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(bobBalance[1].Amount == Money.Parse("50.0"));
 
                 var aliceBalance = tester.Client.GetOrderedBalance(alice).ToArray();
-                var tx = new TransactionBuilder()
+                var tx = new TransactionBuilder(Network.StratisMain)
                     .AddCoins(bobBalance[0].ReceivedCoins)
                     .AddKeys(bob)
                     .Send(alice, "5.0")
@@ -1404,7 +1385,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var satoshiBalance = tester.Client.GetOrderedBalance(satoshi).ToArray();
                 Assert.True(satoshiBalance[0].Amount == Money.Parse("1.0"));
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                         .AddCoins(satoshiBalance[0].ReceivedCoins)
                         .AddKeys(satoshi)
                         .Send(alice, "0.2")
@@ -1414,7 +1395,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null));
                 tester.Indexer.IndexOrderedBalance(tx);
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                        .AddCoins(satoshiBalance[0].ReceivedCoins)
                        .AddKeys(satoshi)
                        .Send(alice, "0.3")
@@ -1428,7 +1409,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(satoshiBalance[0].Amount == -Money.Parse("0.3"));
                 Assert.True(satoshiBalance[1].Amount == -Money.Parse("0.2"));
 
-                tx = new TransactionBuilder()
+                tx = new TransactionBuilder(Network.StratisMain)
                        .AddCoins(satoshiBalance[0].ReceivedCoins)
                        .AddKeys(satoshi)
                        .Send(alice, "0.1")

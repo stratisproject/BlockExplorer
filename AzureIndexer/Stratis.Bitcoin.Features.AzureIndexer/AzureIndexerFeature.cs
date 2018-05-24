@@ -47,7 +47,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             NodeSettings nodeSettings,
             ILoggerFactory loggerFactory,
             AzureIndexerSettings indexerSettings,
-            string name = "AzureIndex")
+            string name = "AzureIndexer")
         {
             this.name = name;
             this.indexerLoop = azureIndexerLoop;
@@ -65,9 +65,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var highestBlock = this.indexerLoop.StoreTip;
 
             if (highestBlock != null)
-                benchLogs.AppendLine($"{this.name}.Height: ".PadRight(LoggingConfiguration.ColumnLength + 1) +
+                benchLogs.AppendLine($"{this.name}.Height: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
                     highestBlock.Height.ToString().PadRight(8) +
-                    $" {this.name}.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) +
+                    $" {this.name}.Hash: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
                     highestBlock.HashBlock);
         }
 
