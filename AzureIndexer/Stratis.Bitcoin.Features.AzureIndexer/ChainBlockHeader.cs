@@ -23,7 +23,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 			{
 				var newTip = toApply.Pop();
 
-				var chained = new ChainedBlock(newTip.Header, newTip.BlockId, chain.GetBlock(newTip.Header.HashPrevBlock));
+				var chained = new ChainedHeader(newTip.Header, newTip.BlockId, chain.GetBlock(newTip.Header.HashPrevBlock));
 				chain.SetTip(chained);
 			}
 		}

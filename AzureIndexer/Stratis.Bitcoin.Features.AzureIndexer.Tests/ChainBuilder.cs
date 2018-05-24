@@ -154,15 +154,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-        public void Load(string blockFolder)
-        {
-            var store = new NBitcoin.BitcoinCore.BlockStore(blockFolder, this._Tester.Client.Configuration.Network);
-            foreach (var block in store.Enumerate(false))
-            {
-                SubmitBlock(block.Item);
-            }
-        }
-
         public void SubmitBlock(Block block)
         {
             if (!Blocks.ContainsKey(block.GetHash()))
@@ -171,6 +162,5 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 SubmitBlock();
             }
         }
-
     }
 }

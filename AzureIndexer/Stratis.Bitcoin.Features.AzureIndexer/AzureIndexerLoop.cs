@@ -45,7 +45,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly AzureIndexerSettings indexerSettings;
 
         /// <summary>The highest block that has been indexed.</summary>
-        internal ChainedBlock StoreTip { get; private set; }
+        internal ChainedHeader StoreTip { get; private set; }
 
         /// <summary>The Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
@@ -57,7 +57,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
-        
+
+
+        private readonly ILoggerFactory loggerFactory;
+
         /// <summary>
         /// Constructs the AzureIndexerLoop.
         /// </summary>
@@ -70,6 +73,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.Chain = fullNode.Chain;
             this.nodeLifetime = fullNode.NodeLifetime;
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
+            this.loggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
@@ -79,9 +83,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="indexerSettings">The AzureIndexerSettings object to use.</param>
         /// <param name="network">The network to use.</param>
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
-        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network)
+        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration
+            IndexerConfiguration indexerConfig = new IndexerConfiguration (loggerFactory)
             {
                 StorageNamespace = indexerSettings.StorageNamespace,
                 Network = network,
@@ -99,7 +103,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network);
+            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory);
 
             var indexer = this.IndexerConfig.CreateIndexer();
             indexer.Configuration.EnsureSetup();
@@ -138,10 +142,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
         /// <returns>The block that a checkpoint is at.</returns>
-        private ChainedBlock GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
+        private ChainedHeader GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
         {
+            this.logger.LogTrace("()");
+
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
-            return this.Chain.FindFork(checkpoint.BlockLocator);
+            ChainedHeader fork = this.Chain.FindFork(checkpoint.BlockLocator);
+
+            this.logger.LogTrace("(-):{0}", fork?.ToString());
+            return fork;
         }
 
         /// <summary>
@@ -149,6 +158,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         private void StartLoop()
         {
+            this.logger.LogTrace("()");
+
             this.asyncLoop = this.asyncLoopFactory.Run($"{this.StoreName}.IndexAsync", async token =>
             {
                 await IndexAsync(this.nodeLifetime.ApplicationStopping);
@@ -165,6 +176,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             repeatEvery: TimeSpans.RunOnce,
             startAfter: TimeSpans.Minute);
 
+            this.logger.LogTrace("(-)");
         }
 
         /// <summary>
@@ -172,8 +184,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public void Shutdown()
         {
+            this.logger.LogTrace("()");
+
             this.asyncLoop.Dispose();
+
+            this.logger.LogTrace("AsyncLoop disposed");
+
             this.asyncLoopChain.Dispose();
+
+            this.logger.LogTrace("(-)");
         }
 
         /// <summary>
@@ -186,6 +205,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <returns>A block fetcher that respects the given type of checkpoint.</returns>
         private BlockFetcher GetBlockFetcher(IndexerCheckpoints indexerCheckpoints)
         {
+            this.logger.LogTrace("()");
+
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
 
@@ -196,6 +217,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 ToHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To),
                 CancellationToken = this.nodeLifetime.ApplicationStopping
             };
+
+            this.logger.LogTrace("(-)");
+            return fetcher;
         }
 
         /// <summary>
@@ -220,6 +244,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
                 catch (Exception ex)
                 {
+                    this.logger.LogTrace("Exception occurred: {0}", ex.ToString());
+
                     // If something goes wrong then try again 1 minute later
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
@@ -294,6 +320,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     int fromHeight = this.StoreTip.Height + 1;
                     int toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
 
+                    this.logger.LogTrace("Starting indexing from {0}, to {1}", fromHeight, toHeight);
+
                     // Index a batch of blocks
                     PerformIndexing(IndexerCheckpoints.Blocks, fromHeight, toHeight);
 
@@ -316,7 +344,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 catch (Exception ex)
                 {
                     // If something goes wrong then try again 1 minute later
-                    this.logger.LogError(ex.Message);
+                    this.logger.LogError("Exception occurred: {0}", ex.ToString());
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
@@ -328,13 +356,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Sets the StoreTip.
         /// </summary>
-        /// <param name="chainedBlock">The block to set the store tip to.</param>
-        internal void SetStoreTip(ChainedBlock chainedBlock)
+        /// <param name="ChainedHeader">The block to set the store tip to.</param>
+        internal void SetStoreTip(ChainedHeader ChainedHeader)
         {
-            this.logger.LogTrace("({0}:'{1}')", nameof(chainedBlock), chainedBlock?.HashBlock);
-            Guard.NotNull(chainedBlock, nameof(chainedBlock));
+            this.logger.LogTrace("({0}:'{1}')", nameof(ChainedHeader), ChainedHeader?.HashBlock);
+            Guard.NotNull(ChainedHeader, nameof(ChainedHeader));
 
-            this.StoreTip = chainedBlock;
+            this.StoreTip = ChainedHeader;
 
             this.logger.LogTrace("(-)");
         }

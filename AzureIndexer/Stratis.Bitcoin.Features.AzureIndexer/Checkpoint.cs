@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -22,8 +23,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         CloudBlockBlob _Blob;
-        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob)
+
+        private readonly ILoggerFactory loggerFactory;
+        private readonly ILogger logger;
+
+        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob, ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
+            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+
             if (checkpointName == null)
                 throw new ArgumentNullException("checkpointName");
             _Blob = blob;
@@ -63,20 +71,53 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public bool SaveProgress(ChainedBlock tip)
+        public bool SaveProgress(ChainedHeader tip)
         {
-            return SaveProgress(tip.GetLocator());
+            this.logger.LogTrace("()");
+
+            bool progress = SaveProgress(tip.GetLocator());
+
+            this.logger.LogTrace("(-):{0}", progress);
+            return progress;
         }
         public bool SaveProgress(BlockLocator locator)
         {
+            this.logger.LogTrace("()");
+
             _BlockLocator = locator;
             try
             {
-                return SaveProgressAsync().Result;
+                Task<bool> savingTask = Task.Run(new Func<Task<bool>>(async () =>
+                {
+                    this.logger.LogTrace("()");
+
+                    var saving = SaveProgressAsync();
+                    var timeout = Task.Delay(50000);
+
+                    await Task.WhenAny(saving, timeout).ConfigureAwait(false);
+
+                    if (saving.IsCompleted)
+                    {
+                        this.logger.LogTrace("Saving completed.");
+                        this.logger.LogTrace("(-):{0}", saving.Result);
+                        return saving.Result;
+                    }
+
+                    this.logger.LogTrace("(-):TIMEOUT");
+                    return false;
+                }));
+                
+                bool result = savingTask.GetAwaiter().GetResult();
+
+                this.logger.LogTrace("(-):{0}", result);
+                return result;
             }
-            catch (AggregateException aex)
+            catch (Exception aex)
             {
-                ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+                this.logger.LogError("Exception occured: {0}", aex.ToString());
+                ExceptionDispatchInfo.Capture(aex).Throw();
+
+                this.logger.LogTrace("(-):false");
                 return false;
             }
         }
@@ -97,10 +138,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private async Task<bool> SaveProgressAsync()
         {
+            this.logger.LogTrace("()");
+
             var bytes = BlockLocator.ToBytes();
             try
             {
-
+                this.logger.LogTrace("Uploading block locator bytes");
                 await _Blob.UploadFromByteArrayAsync(bytes, 0, bytes.Length, new AccessCondition()
                 {
                     IfMatchETag = _Blob.Properties.ETag
@@ -109,13 +152,28 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             catch (StorageException ex)
             {
                 if (ex.RequestInformation != null && ex.RequestInformation.HttpStatusCode == 412)
+                {
+                    this.logger.LogTrace("(-)[STORAGE_EXCEPTION_412]:false");
                     return false;
+                }
+                
+                this.logger.LogError("Storage exception occured: {0}", ex.ToString());
+
+                this.logger.LogTrace("(-)[STORAGEEX]");
                 throw;
             }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Exception occured: {0}", ex.ToString());
+                this.logger.LogTrace("(-)[EX]");
+                throw;
+            }
+
+            this.logger.LogTrace("(-):true");
             return true;
         }
 
-        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network)
+        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network, ILoggerFactory loggerFactory)
         {
             var checkpointName = string.Join("/", blob.Name.Split('/').Skip(1).ToArray());
             MemoryStream ms = new MemoryStream();
@@ -129,7 +187,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 if (ex.RequestInformation == null || ex.RequestInformation.HttpStatusCode != 404)
                     throw;
             }
-            var checkpoint = new Checkpoint(checkpointName, network, ms, blob);
+            var checkpoint = new Checkpoint(checkpointName, network, ms, blob, loggerFactory);
             return checkpoint;
         }
 

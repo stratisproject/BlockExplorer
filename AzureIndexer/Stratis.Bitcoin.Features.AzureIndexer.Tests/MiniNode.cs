@@ -42,7 +42,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 			var getheader = message.Message.Payload as GetHeadersPayload;
 			if(getheader != null)
 			{
-				ChainedBlock forkPos = null;
+				ChainedHeader forkPos = null;
 				int height = 0;
 				foreach(var blk in getheader.BlockLocators.Blocks)
 				{

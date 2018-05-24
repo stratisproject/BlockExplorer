@@ -6,12 +6,14 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     public interface IIndexTask
     {
-        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler);
+        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network);
         bool SaveProgression
         {
             get;
@@ -23,8 +25,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             set;
         }
     }
+
     public abstract class IndexTask<TIndexed> : IIndexTask
     {
+        private readonly ILogger logger;
+
+        public IndexTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
+        {
+            if (configuration == null)
+                throw new ArgumentNullException("configuration");
+            this.Configuration = configuration;
+            SaveProgression = true;
+            MaxQueued = 100;
+            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+        }
 
         /// <summary>
         /// Fast forward indexing to the end (if scanning not useful)
@@ -37,8 +51,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler)
+        public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network)
         {
+            this.logger.LogTrace("()");
+
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
             try
             {               
@@ -63,7 +79,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                     Save(tasks, blockFetcher, bulk);
                                 }
                             }
-                            ProcessBlock(block, bulk);
+                            ProcessBlock(block, bulk, network);
                             if(bulk.HasFullPartition)
                             {
                                 EnqueueTasks(tasks, bulk, false, scheduler);
@@ -78,7 +94,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     }
                 }
                 else
+                {
+                    this.logger.LogTrace("Skipping to end");
                     blockFetcher.SkipToEnd();
+                }
+
                 if(SaveProgression)
                     Save(tasks, blockFetcher, bulk);
                 WaitFinished(tasks);
@@ -89,6 +109,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
                 throw;
             }
+
+            this.logger.LogTrace("(-)");
         }
 
         bool _EnsureIsSetup = true;
@@ -106,17 +128,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void SetThrottling()
         {
+            this.logger.LogTrace("()");
+
             Helper.SetThrottling();
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
+
+            this.logger.LogTrace("(-)");
         }
         ExponentialBackoff retry = new ExponentialBackoff(15, TimeSpan.FromMilliseconds(100),
                                                               TimeSpan.FromSeconds(10),
                                                               TimeSpan.FromMilliseconds(200));
         private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler)
         {
-            if(!uncompletePartitions && !bulk.HasFullPartition)
+            this.logger.LogTrace("()");
+
+            if (!uncompletePartitions && !bulk.HasFullPartition)
+            {
+                this.logger.LogTrace("(-):PARTITIONS {0}:{1},{2}:{3}", nameof(uncompletePartitions), uncompletePartitions, nameof(bulk.HasFullPartition), bulk.HasFullPartition);
                 return;
+            }
+
             if(uncompletePartitions)
                 bulk.FlushUncompletePartitions();
 
@@ -130,11 +162,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     _Exception = prev.Exception ?? _Exception;
                     tasks.TryRemove(prev, out prev);
                 });
+
                 if(tasks.Count > MaxQueued)
                 {
                     WaitFinished(tasks, MaxQueued / 2);
                 }
             }
+
+            this.logger.LogTrace("(-)");
         }
 
         public int MaxQueued
@@ -147,27 +182,37 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void Save(ConcurrentDictionary<Task, Task> tasks, BlockFetcher fetcher, BulkImport<TIndexed> bulk)
         {
+            this.logger.LogTrace("()");
+
             WaitFinished(tasks);
             ThrowIfException();
             fetcher.SaveCheckpoint();
+
+            this.logger.LogTrace("(-)");
         }
 
         int[] wait = new int[] { 100, 200, 400, 800, 1600 };
         private void WaitFinished(ConcurrentDictionary<Task, Task> tasks, int queuedTarget = 0)
         {
-            while(tasks.Count > queuedTarget)
+            this.logger.LogTrace("()");
+
+            while (tasks.Count > queuedTarget)
             {
                 Thread.Sleep(100);
             }
+
+            this.logger.LogTrace("(-)");
         }
 
         private void ThrowIfException()
         {
-            if(_Exception != null)
+            this.logger.LogTrace("()");
+
+            if (_Exception != null)
                 ExceptionDispatchInfo.Capture(_Exception).Throw();
+
+            this.logger.LogTrace("(-)");
         }
-
-
 
         protected TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
         public IndexerConfiguration Configuration
@@ -186,18 +231,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             get;
         }
 
-
         protected abstract Task EnsureSetup();
-        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk);
+        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk, Network network);
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
-
-        public IndexTask(IndexerConfiguration configuration)
-        {
-            if(configuration == null)
-                throw new ArgumentNullException("configuration");
-            this.Configuration = configuration;
-            SaveProgression = true;
-            MaxQueued = 100;
-        }
     }
 }
