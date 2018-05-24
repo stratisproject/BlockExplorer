@@ -85,7 +85,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
         public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration (loggerFactory)
+            IndexerConfiguration indexerConfig = new IndexerConfiguration(loggerFactory)
             {
                 StorageNamespace = indexerSettings.StorageNamespace,
                 Network = network,
@@ -336,6 +336,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                     // Update the StoreTip 
                     UpdateStoreTip();
+                    this.logger.LogTrace("Indexing iteration finished");
                 }
                 catch (OperationCanceledException)
                 {
