@@ -210,7 +210,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
 
-            return new BlockFetcher(checkpoint, repo, this.Chain, this.Chain.FindFork(checkpoint.BlockLocator))
+            var fetcher = new BlockFetcher(checkpoint, repo, this.Chain, this.Chain.FindFork(checkpoint.BlockLocator), this.loggerFactory)
             {
                 NeedSaveInterval = this.indexerSettings.CheckpointInterval,
                 FromHeight = this.StoreTip.Height + 1,
@@ -260,7 +260,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         /// <param name="type">The type of checkpoint.</param>
         /// <returns>The last processed block.</returns>
-        private ChainedBlock LastProcessed(IndexerCheckpoints type)
+        private ChainedHeader LastProcessed(IndexerCheckpoints type)
         {
             return this.Chain.FindFork(this.AzureIndexer.GetCheckpointInternal(type).BlockLocator);
         }
@@ -285,20 +285,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     switch (type)
                     {
                         case IndexerCheckpoints.Blocks:
-                            task = new IndexBlocksTask(this.IndexerConfig);
+                            task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Transactions:
-                            task = new IndexTransactionsTask(this.IndexerConfig);
+                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Balances:
-                            task = new IndexBalanceTask(this.IndexerConfig, null);
+                            task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Wallets:
-                            task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules());
+                            task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                             break;
                     }
                     task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
-                    task.Index(fetcher, this.AzureIndexer.TaskScheduler);
+                    task.Index(fetcher, this.AzureIndexer.TaskScheduler, this.FullNode.Network);
                 }
             }
         }
