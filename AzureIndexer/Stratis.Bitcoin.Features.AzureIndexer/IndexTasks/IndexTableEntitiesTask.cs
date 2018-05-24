@@ -17,6 +17,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     public class IndexTableEntitiesTask : IndexTableEntitiesTaskBase<ITableEntity>
     {
         CloudTable _Table;
+
         public IndexTableEntitiesTask(IndexerConfiguration conf, CloudTable table, ILoggerFactory loggerFactory)
             : base(conf, loggerFactory)
         {
@@ -38,7 +39,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             throw new NotSupportedException();
         }
 
-
         public void Index(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
             try
@@ -51,6 +51,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 throw;
             }
         }
+
         public Task IndexAsync(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
             taskScheduler = taskScheduler ?? TaskScheduler.Default;
@@ -60,13 +61,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                     .Partition(PartitionSize)
                                     .Select(batch => new Task(() => IndexCore(group.Key, batch))))
                 .ToArray();
+
             foreach (var t in tasks)
             {
                 t.Start(taskScheduler);
             }
+
             return Task.WhenAll(tasks);
         }
     }
+
     public abstract class IndexTableEntitiesTaskBase<TIndexed> : IndexTask<TIndexed>
     {
         public IndexTableEntitiesTaskBase(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
@@ -76,6 +80,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         int _IndexedEntities = 0;
+
         public int IndexedEntities
         {
             get
@@ -83,6 +88,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 return _IndexedEntities;
             }
         }
+
         protected override int PartitionSize
         {
             get
@@ -90,7 +96,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 return 100;
             }
         }
-
 
         protected override Task EnsureSetup()
         {
@@ -100,14 +105,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         protected abstract CloudTable GetCloudTable();
         protected abstract ITableEntity ToTableEntity(TIndexed item);
 
-
         protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items)
         {
             var batch = new TableBatchOperation();
             foreach (var item in items)
-            {
                 batch.Add(TableOperation.InsertOrReplace(ToTableEntity(item)));
-            }
 
             var table = GetCloudTable();
 
@@ -125,10 +127,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             while (batches.Count > 0)
             {
                 batch = batches.Dequeue();
+
                 try
                 {
                     Stopwatch watch = new Stopwatch();
                     watch.Start();
+
                     if (batch.Count > 1)
                         table.ExecuteBatchAsync(batch, options, context).GetAwaiter().GetResult();
                     else
@@ -136,17 +140,38 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                         if (batch.Count == 1)
                             table.ExecuteAsync(batch[0], options, context).GetAwaiter().GetResult();
                     }
+
                     Interlocked.Add(ref _IndexedEntities, batch.Count);
                 }
                 catch (Exception ex)
                 {
-                    if (IsError413(ex))
+                    if (IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
                     {
-                        var split = batch.Count / 2;
-                        var batch1 = batch.Take(split).ToList();
-                        var batch2 = batch.Skip(split).Take(batch.Count - split).ToList();
-                        batches.Enqueue(ToBatch(batch1));
-                        batches.Enqueue(ToBatch(batch2));
+                        // Reduce the size of all batches to half the size of the offending batch.
+                        int maxSize = Math.Max(1, batch.Count / 2);
+                        bool workDone = false;
+                        Queue<TableBatchOperation> newBatches = new Queue<TableBatchOperation>();
+
+                        for (/* starting with the current batch */; ; batch = batches.Dequeue())
+                        {
+                            for (; batch.Count > maxSize; )
+                            {
+                                newBatches.Enqueue(ToBatch(batch.Take(maxSize).ToList()));
+                                batch = ToBatch(batch.Skip(maxSize).ToList());
+                                workDone = true;
+                            }
+
+                            if (batch.Count > 0)
+                                newBatches.Enqueue(batch);
+
+                            if (batches.Count == 0)
+                                break;
+                        }
+
+                        batches = newBatches;
+
+                        // Nothing could be done?
+                        if (!workDone) throw;
                     }
                     else if (Helper.IsError(ex, "EntityTooLarge"))
                     {
@@ -158,6 +183,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                             .GetBlocksContainer()
                             .GetBlockBlobReference(entity.GetFatBlobName())
                             .UploadFromByteArrayAsync(serialized, 0, serialized.Length).GetAwaiter().GetResult();
+
                         entity.MakeFat(serialized.Length);                       
                         batches.Enqueue(batch);
                     }
@@ -171,31 +197,32 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-
         private ITableEntity GetEntity(TableOperation op)
         {
             return (ITableEntity)typeof(TableOperation).GetProperty("Entity", BindingFlags.Instance |
-                            BindingFlags.NonPublic |
-                            BindingFlags.Public)
-                            .GetValue(op);
+                BindingFlags.NonPublic |
+                BindingFlags.Public)
+                .GetValue(op);
         }
-
 
         private bool IsError413(Exception ex)
         {
             var storage = ex as StorageException;
             if (storage == null)
                 return false;
+
             return storage.RequestInformation != null && storage.RequestInformation.HttpStatusCode == 413;
         }
 
         private TableOperation GetFaultyOperation(Exception ex, TableBatchOperation batch)
         {
-            if(batch.Count == 1)
+            if (batch.Count == 1)
                 return batch[0];
+
             var storage = ex as StorageException;
             if (storage == null)
                 return null;
+
             if (storage.RequestInformation != null
                && storage.RequestInformation.ExtendedErrorInformation != null)
             {
@@ -203,16 +230,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (match.Success)
                     return batch[int.Parse(match.Value)];
             }
+
             return null;
         }
+
         private TableBatchOperation ToBatch(List<TableOperation> ops)
         {
             var op = new TableBatchOperation();
-            foreach(var operation in ops)
+            foreach (var operation in ops)
                 op.Add(operation);
+
             return op;
         }        
-
-
     }
 }
