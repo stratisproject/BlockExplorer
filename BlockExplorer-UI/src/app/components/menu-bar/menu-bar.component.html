@@ -1,0 +1,33 @@
+<nav class="navbar fixed-top navbar-expand-md navbar-dark bg-primary">
+    <button class="navbar-toggler order-sm-3 order-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse col-12 col-md-5 order-md-0 order-sm-3 order-3" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item text-center">
+                <a class="nav-link" href="#">Contracts</a>
+            </li>
+            <li class="nav-item text-center">
+                <a class="nav-link" href="">Transactions</a>
+            </li>
+            <li class="nav-item active text-center">
+                <a class="nav-link" href="">Hash Tx</a>
+            </li>
+        </ul>
+    </div>
+    <a class="navbar-brand mr-0 mx-md-auto order-sm-0 col-sm-1 mr-sm-auto order-0 col-2" href="#">
+        <img src="../../../assets/images/logo.svg" width="36" height="36" alt="Stratis">
+    </a>
+    <form class="form-inline col-8 col-sm-8 col-md-5 order-sm-2 order-1">
+        <div class="input-group col-lg-8 col-sm-12 ml-lg-auto">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="material-icons md-18">search</i>
+                </span>
+            </div>
+            <input [(ngModel)]="searchText" type="search" class="form-control" placeholder="Search by Address, TxHash, ..."
+                aria-label="" [ngModelOptions]="{standalone: true}" aria-describedby="">
+        </div>
+    </form>
+</nav>
