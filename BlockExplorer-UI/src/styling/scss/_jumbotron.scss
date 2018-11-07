@@ -1,0 +1,19 @@
+.jumbotron {
+  padding: $jumbotron-padding / 4;
+  margin-bottom: $jumbotron-padding;
+  background-color: $jumbotron-bg;
+  color: $black;
+  @include border-radius($border-radius-lg);
+  .lead {
+    margin-bottom: 0;
+    font-weight: 500;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+}
+
+.jumbotron-fluid {
+  padding-right: 0;
+  padding-left: 0;
+  @include border-radius(0);
+}

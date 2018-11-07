@@ -1,0 +1,39 @@
+// CUSTOM STYLES CAN'T BE DIRECTLY INTEGRATED TO THE OTHER SCSS TEMPLATES
+
+//// body {
+body {padding-top: 63px;}
+.lead {
+  margin-bottom: 0;
+  font-weight: 500;
+  word-break: break-all !important;
+  white-space: pre-wrap;
+  -ms-word-break: break-all;
+  word-break: break-all;
+
+   /* Non standard for WebKit */
+   word-break: break-word;
+
+    -webkit-hyphens: auto;
+       -moz-hyphens: auto;
+            hyphens: auto;
+}
+//// transaction
+// arrows sent / received
+.arrowTx {
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  border-radius: 50% !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $white;
+}
+// code
+pre {
+  &.language-csharp {
+    border-radius: $border-radius-lg !important;
+    padding: $card-spacer-x !important;
+  }
+}
