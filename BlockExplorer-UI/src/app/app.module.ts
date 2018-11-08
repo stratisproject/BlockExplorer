@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MenuBarComponent } from './components/menu-bar/menu-bar.component';
+import { ContractsModule } from './sub-modules/contracts/contracts.module';
+import { ApiServiceBase, FakeApiService } from './services/api.service';
 
 @NgModule({
   declarations: [
@@ -14,9 +16,10 @@ import { MenuBarComponent } from './components/menu-bar/menu-bar.component';
   imports: [
     BrowserModule,
     AppRoutingModule, 
-    FormsModule
+    FormsModule,
+    ContractsModule
   ],
-  providers: [],
+  providers: [{ provide: ApiServiceBase, useClass: FakeApiService }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
