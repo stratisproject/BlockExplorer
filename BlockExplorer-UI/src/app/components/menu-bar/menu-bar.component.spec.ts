@@ -12,7 +12,7 @@ describe('MenuBarComponent', () => {
             imports: [FormsModule],
             declarations: [MenuBarComponent]
         })
-            .compileComponents();
+        .compileComponents();
     }));
 
     beforeEach(() => {
