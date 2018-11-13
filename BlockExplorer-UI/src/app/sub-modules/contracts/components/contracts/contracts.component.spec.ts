@@ -1,6 +1,7 @@
 import { ContractsComponent } from './contracts.component';
 import { SearchTextService } from 'src/app/services/search-text.service';
 import { FakeApiService } from 'src/app/services/api.service';
+import { ContractsPageFactory } from './contracts.page';
 
 describe('ContractsComponent', () => {
     let component: ContractsComponent;
@@ -8,7 +9,8 @@ describe('ContractsComponent', () => {
 
     beforeEach(() => {
         apiService = new FakeApiService();
-        component = new ContractsComponent(new SearchTextService(), apiService);
+        const pageFactory = new ContractsPageFactory(apiService);
+        component = new ContractsComponent(new SearchTextService(), apiService, pageFactory);
     });
 
     it('currentPageDisplay set to 1 when firstPageClicked', () => {
