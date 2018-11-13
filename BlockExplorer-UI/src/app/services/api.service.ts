@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import * as _ from 'lodash';
 
 export abstract class ApiServiceBase {
     getContractCountAsync(): Observable<number> { return of(0); }
-    getContractsAsync(skip: number, take: number): Observable<{}> { return of({}); }
+    getContractsAsync(skip: number, take: number): Observable<any> { return of({}); }
 }
 
 @Injectable()
@@ -44,8 +45,10 @@ export class FakeApiService implements ApiServiceBase {
     getContractCountAsync(): Observable<number> {
         return of(this.fakeContracts.contracts.length);
     }
-    getContractsAsync(skip: number, take: number): Observable<{}> {
-        return of(this.fakeContracts);
+    getContractsAsync(skip: number, take: number): Observable<any> {
+        const contracts = this.fakeContracts.contracts;
+        console.assert(skip >= 0 && skip < contracts.length);
+        return of(_.slice(contracts, skip, skip+take));
     }
 }
 
@@ -55,7 +58,7 @@ export class ApiService implements ApiServiceBase {
     getContractCountAsync(): Observable<number> {
         return this.fakeService.getContractCountAsync();
     }
-    getContractsAsync(skip: number, take: number): Observable<{}> {
+    getContractsAsync(skip: number, take: number): Observable<any> {
         return this.fakeService.getContractsAsync(skip, take);
     }
 }
