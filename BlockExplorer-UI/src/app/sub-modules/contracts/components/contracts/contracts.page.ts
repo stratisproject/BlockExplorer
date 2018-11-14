@@ -20,12 +20,13 @@ export class ContractsPage {
                               .pipe(map(x => this.processContracts(x)));
     }
 
-    private processContracts(response: any): Contract[] {
+    private processContracts(response: any) {
         const contracts = [];
         for (const contract of response) {
             contracts.push(new Contract(contract.address, contract.name, contract.hash))
         }
-        return contracts;
+        this.contracts = contracts.slice();
+        return this.contracts;
     }
 }
 
