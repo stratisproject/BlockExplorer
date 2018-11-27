@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Stratis.Bitcoin.Networks">
-      <HintPath>..\..\..\..\..\Users\igorgoldobin\.nuget\packages\stratis.bitcoin.networks\1.2.4-beta\lib\netstandard2.0\Stratis.Bitcoin.Networks.dll</HintPath>
+      <HintPath>C:\Users\aleksei.kogtev\.nuget\packages\stratis.bitcoin.networks\1.2.4-beta\lib\netstandard2.0\Stratis.Bitcoin.Networks.dll</HintPath>
     </Reference>
   </ItemGroup>
 
