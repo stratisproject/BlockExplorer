@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
@@ -17,7 +18,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     /// <summary>
     /// The AzureIndexerFeature provides the ".UseAzureIndexer" extension.
     /// </summary>
-    public class AzureIndexerFeature: FullNodeFeature, INodeStats
+    public class AzureIndexerFeature : FullNodeFeature
     {
         /// <summary>The loop responsible for indexing blocks to azure.</summary>
         protected readonly AzureIndexerLoop indexerLoop;
@@ -74,14 +75,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Starts the Azure Indexer feature.
         /// </summary>
-        public override void Initialize()
+        public void Initialize()
         {
             this.logger.LogTrace("()");
             this.indexerLoop.Initialize();         
             this.logger.LogTrace("(-)");
         }
 
-        public override void LoadConfiguration()
+        public void LoadConfiguration()
         {
             this.indexerSettings.Load(this.nodeSettings);
         }
@@ -89,6 +90,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public static void PrintHelp(Network network)
         {
             AzureIndexerSettings.PrintHelp(network);
+        }
+
+        public override Task InitializeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -74,7 +74,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
-            Network = Network.Main;
+            Network = Networks.Networks.Stratis.Mainnet();
         }
 
         public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
@@ -85,7 +85,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
             var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
-            this.Network = Network.GetNetwork(network);
+            this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
                 throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
             this.Node = GetValue(config, "Node", false);

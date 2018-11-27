@@ -107,7 +107,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="mainNet">Used for network-specific help (if any).</param>
         public static void PrintHelp(Network mainNet)
         {
-            var defaults = NodeSettings.Default();
+            var defaults = NodeSettings.Default(mainNet);
             var builder = new StringBuilder();
 
             builder.AppendLine($"-azureacc=<string>        Azure account name.");

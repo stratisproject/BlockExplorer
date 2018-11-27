@@ -25,7 +25,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         public Block GetStoreTip()
         {
-            return _Repo.GetAsync(_Repo.BlockHash).GetAwaiter().GetResult();
+            return _Repo.GetBlockAsync(_Repo.TipHashAndHeight.Hash).GetAwaiter().GetResult();
         }
 
         public IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (hash == _Node.Network.GenesisHash)
                     yield return _Node.Network.GetGenesis();
                 else
-                    yield return _Repo.GetAsync(hash).GetAwaiter().GetResult();
+                    yield return _Repo.GetBlockAsync(hash).GetAwaiter().GetResult();
             }
         }
 
