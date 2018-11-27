@@ -25,10 +25,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0-preview3-35497" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.2.4-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.2.4-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.2.4-beta" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="1.2.4-beta" />
+    <PackageReference Include="Stratis.Bitcoin" Version="1.2.5-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.2.5-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.2.5-beta" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="1.2.5-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
   <ItemGroup>
