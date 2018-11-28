@@ -7,6 +7,8 @@ using Stratis.Bitcoin.Features.IndexStore;
 using Stratis.Bitcoin.Features.MemoryPool;
 using Stratis.Bitcoin.Features.RPC.Models;
 using System;
+using Stratis.Bitcoin.Controllers;
+using Stratis.Bitcoin.Controllers.Models;
 
 namespace Stratis.Bitcoin.Features.RPC.Controllers
 {
