@@ -22,6 +22,11 @@
 
   <ItemGroup>
     <PackageReference Include="NBitcoin" Version="4.0.0.42" />
+    <PackageReference Include="Stratis.Bitcoin" Version="1.2.5-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj" />
   </ItemGroup>
 
 </Project>

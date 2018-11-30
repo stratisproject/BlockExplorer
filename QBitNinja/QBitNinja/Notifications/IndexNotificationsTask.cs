@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBitcoin;
 
 namespace QBitNinja.Notifications
 {
@@ -13,8 +15,8 @@ namespace QBitNinja.Notifications
     {
         private SubscriptionCollection _Subscriptions;
         private QBitNinjaConfiguration _Conf;
-        public IndexNotificationsTask(QBitNinjaConfiguration conf, SubscriptionCollection subscriptions)
-            : base(conf.Indexer)
+        public IndexNotificationsTask(QBitNinjaConfiguration conf, SubscriptionCollection subscriptions, ILoggerFactory loggerFactory)
+            : base(conf.Indexer, loggerFactory)
         {
             if(subscriptions == null)
                 throw new ArgumentNullException("subscriptions");
@@ -52,7 +54,7 @@ namespace QBitNinja.Notifications
             }
         }
 
-        protected override void ProcessBlock(Stratis.Bitcoin.Features.AzureIndexer.BlockInfo block, BulkImport<Notify> bulk)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<Notify> bulk, Network network)
         {
             var notif = new NewBlockNotificationData()
                     {

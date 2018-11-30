@@ -50,9 +50,9 @@ namespace QBitNinja.Client.Models
             set;
         }
 
-        public ChainedBlock GetChainedBlock(ChainBase chain)
+        public ChainedHeader GetChainedBlock(ChainBase chain)
         {
-            ChainedBlock chainedBlock;
+            ChainedHeader chainedBlock;
             if (Special != null && Special.Value == SpecialFeature.Last)
             {
                 chainedBlock = chain.Tip;
