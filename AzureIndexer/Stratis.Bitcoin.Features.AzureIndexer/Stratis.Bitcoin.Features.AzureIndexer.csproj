@@ -28,12 +28,13 @@
     <PackageReference Include="Stratis.Bitcoin" Version="1.2.5-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.2.5-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.2.5-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="1.2.5-beta" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="1.2.5-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Stratis.Bitcoin.Networks">
-      <HintPath>..\..\..\..\..\Users\igorgoldobin\.nuget\packages\stratis.bitcoin.networks\1.2.4-beta\lib\netstandard2.0\Stratis.Bitcoin.Networks.dll</HintPath>
+      <HintPath>C:\Users\aleksei.kogtev\.nuget\packages\stratis.bitcoin.networks\1.2.4-beta\lib\netstandard2.0\Stratis.Bitcoin.Networks.dll</HintPath>
     </Reference>
   </ItemGroup>
 
