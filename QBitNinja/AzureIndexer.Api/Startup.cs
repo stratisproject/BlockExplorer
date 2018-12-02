@@ -51,6 +51,12 @@ namespace AzureIndexer.Api
 
             services.AddSingleton<IHostedService, UpdateChainListener>();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Azure Indexer API", Version = "v1" });
+                c.DocInclusionPredicate((value, description) => description.ActionDescriptor.DisplayName.Contains("AzureIndexer.Api"));
+            });
+
             // Create the container builder.
             var builder = new ContainerBuilder();
             builder.Populate(services);
@@ -60,7 +66,7 @@ namespace AzureIndexer.Api
                     var loggerFactory = ctx.Resolve<ILoggerFactory>();
                     var config = new QBitNinjaConfiguration(this.Configuration, loggerFactory);
                     config.Indexer.EnsureSetup();
-                    config.EnsureSetup();
+                    //config.EnsureSetup();
                     return config;
                 }).As<QBitNinjaConfiguration>().SingleInstance();
             builder.Register(
@@ -110,11 +116,6 @@ namespace AzureIndexer.Api
 
             var csl = new AutofacServiceLocator(this.ApplicationContainer);
             ServiceLocator.SetLocatorProvider(() => csl);
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Azure Indexer API", Version = "v1" });
-            });
 
             // Create the IServiceProvider based on the container.
             return new AutofacServiceProvider(this.ApplicationContainer);
