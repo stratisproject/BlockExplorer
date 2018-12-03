@@ -31,7 +31,7 @@ namespace FaucetSite.Controllers
         }
 
         [HttpPost("SendCoin")]
-        public async Task<IActionResult> SendCoin(Recipient model)
+        public async Task<IActionResult> SendCoin(RecipientViewModel model)
         {
             var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             var secretKey = config["Captcha:SecretKey"];

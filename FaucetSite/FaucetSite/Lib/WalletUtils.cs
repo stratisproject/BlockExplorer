@@ -42,10 +42,8 @@ namespace FaucetSite.Lib
             {
                 WalletName = walletName,
                 AccountName = accountName,
-                CoinType = 105,
                 Password = password,
-                DestinationAddress = address,
-                Amount = 100m,
+                Recipients = new []{ new Recipient {  DestinationAddress = address, Amount = 100m  } },
                 FeeType = "low",
                 AllowUnconfirmed = true
             };
