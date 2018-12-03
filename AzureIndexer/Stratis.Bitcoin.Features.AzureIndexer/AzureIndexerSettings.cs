@@ -42,7 +42,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private Action<AzureIndexerSettings> callback = null;
 
         /// <summary>
-        /// Initializes an instance of the object.
+        /// Initializes a new instance of the <see cref="AzureIndexerSettings"/> class.
         /// </summary>
         public AzureIndexerSettings()
         {
@@ -52,7 +52,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.StorageNamespace = "";
             this.CheckpointsetName = "default";
             this.CheckpointInterval = TimeSpan.Parse("00:15:00");
-            
+
+            // For test.
+            this.AzureAccountName = "blockexplorerstoragedev";
+            this.AzureKey = "LOwWo8mktEZ6T96zHnddUHdTfIhcu8kgE2xrC15b878i7BsPRugeES0sDRxsxKjzLOGJzIR9bWQUUVrua+9iJA==";
         }
 
         /// <summary>
@@ -74,11 +77,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.AzureEmulatorUsed = config.GetOrDefault<bool>("azemu", false);
             if (!this.AzureEmulatorUsed)
             {
-                this.AzureAccountName = config.GetOrDefault<string>("azureacc", "");
-                this.AzureKey = config.GetOrDefault<string>("azurekey", "");
+                this.AzureAccountName = config.GetOrDefault<string>("azureacc", "blockexplorerstoragedev");
+                this.AzureKey = config.GetOrDefault<string>("azurekey", "LOwWo8mktEZ6T96zHnddUHdTfIhcu8kgE2xrC15b878i7BsPRugeES0sDRxsxKjzLOGJzIR9bWQUUVrua+9iJA==");
                 // Mime-encoded-data strings should always be a multiple of 4 in length. Provide trailing '='s if omitted..
                 this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
             }
+
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
             this.IgnoreCheckpoints = config.GetOrDefault<bool>("nochkpts", false);
             this.From = int.Parse(config.GetOrDefault<string>("indexfrom", "0"));
