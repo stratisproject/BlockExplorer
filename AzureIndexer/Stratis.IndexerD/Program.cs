@@ -1,17 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using NBitcoin;
-using NBitcoin.Protocol;
-using Stratis.Bitcoin.Builder;
-using Stratis.Bitcoin.Configuration;
-using Stratis.Bitcoin.Features.BlockStore;
-using Stratis.Bitcoin.Features.Consensus;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Utilities;
-
-namespace Stratis.Bitcoin.Indexer.Console
+﻿namespace Stratis.Bitcoin.Indexer.Console
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using NBitcoin;
+    using NBitcoin.Protocol;
+    using Stratis.Bitcoin.Builder;
+    using Stratis.Bitcoin.Configuration;
+    using Stratis.Bitcoin.Features.AzureIndexer;
+    using Stratis.Bitcoin.Features.BlockStore;
+    using Stratis.Bitcoin.Features.Consensus;
+    using Stratis.Bitcoin.Utilities;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -23,9 +23,9 @@ namespace Stratis.Bitcoin.Indexer.Console
         {
             try
             {
-                var nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
 
-                var node = new FullNodeBuilder()
+                IFullNode node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
                     .UsePosConsensus()
                     .UseBlockStore()
@@ -34,7 +34,9 @@ namespace Stratis.Bitcoin.Indexer.Console
 
                 // Run node.
                 if (node != null)
+                {
                     await node.RunAsync();
+                }
             }
             catch (Exception ex)
             {
