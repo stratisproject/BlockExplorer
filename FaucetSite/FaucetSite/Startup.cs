@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Refit;
 
 namespace FaucetSite
@@ -21,7 +23,7 @@ namespace FaucetSite
         {
             services.AddMvc();
             services.AddTransient(c => RestService.For<ICaptchaClient>("https://www.google.com"));
-            services.AddTransient<IWalletUtils,WalletUtils>();
+            services.AddTransient<IWalletUtils, WalletUtils>();
             services.AddSingleton<TransactionQueue>();
         }
 
@@ -39,6 +41,10 @@ namespace FaucetSite
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
             app.UseStaticFiles();
 
             app.UseMvc(routes =>

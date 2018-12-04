@@ -12,38 +12,28 @@ namespace FaucetSite
     {
         public partial class BuildTransaction
         {
-
-            [JsonProperty("walletName")]
-            public string WalletName { get; set; }
-
-            [JsonProperty("accountName")]
-            public string AccountName { get; set; }
-
-
-            [JsonProperty("coinType")]
-            public int CoinType { get; set; }
-
-
-            [JsonProperty("password")]
+            public string FeeAmount { get; set; }
             public string Password { get; set; }
-
-
-            [JsonProperty("destinationAddress")]
-            public string DestinationAddress { get; set; }
-
-
-            [JsonProperty("amount")]
-            public decimal Amount { get; set; }
-
-
-            [JsonProperty("feeType")]
+            public string OpReturnData { get; set; }
+            public string WalletName { get; set; }
+            public string AccountName { get; set; }
+            public Outpoint[] Outpoints { get; set; }
+            public Recipient[] Recipients { get; set; }
             public string FeeType { get; set; }
+            public bool AllowUnconfirmed { get; set; }
+            public bool ShuffleOutputs { get; set; }
+        }
 
+        public class Outpoint
+        {
+            public string TransactionId { get; set; }
+            public long Index { get; set; }
+        }
 
-            [JsonProperty("allowUnconfirmed")]
-            public Boolean AllowUnconfirmed { get; set; }
-
-
+        public class Recipient
+        {
+            public string DestinationAddress { get; set; }
+            public decimal Amount { get; set; }
         }
     }
 }
