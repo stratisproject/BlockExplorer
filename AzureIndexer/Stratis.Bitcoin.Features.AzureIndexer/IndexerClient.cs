@@ -108,9 +108,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             foreach(var e in await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false))
             {
                 if(e.IsFat())
-                    entities.Add(new TransactionEntry.Entity(await FetchFatEntity(e).ConfigureAwait(false)));
+                    entities.Add(new TransactionEntry.Entity(await FetchFatEntity(e).ConfigureAwait(false), Configuration.Network));
                 else
-                    entities.Add(new TransactionEntry.Entity(e));
+                    entities.Add(new TransactionEntry.Entity(e, Configuration.Network));
             }
             if(entities.Count == 0)
                 result = null;
@@ -125,7 +125,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         entities[0].Transaction = result.Transaction;
                         if(entities[0].Transaction != null)
                         {
-                            await UpdateEntity(table, entities[0].CreateTableEntity()).ConfigureAwait(false);
+                            await UpdateEntity(table, entities[0].CreateTableEntity(Configuration.Network)).ConfigureAwait(false);
                         }
                         break;
                     }
@@ -137,7 +137,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     entities[0].ColoredTransaction = result.ColoredTransaction;
                     if(entities[0].ColoredTransaction != null)
                     {
-                        await UpdateEntity(table, entities[0].CreateTableEntity()).ConfigureAwait(false);
+                        await UpdateEntity(table, entities[0].CreateTableEntity(Configuration.Network)).ConfigureAwait(false);
                     }
                 }
                 var needTxOut = result.SpentCoins == null && loadPreviousOutput && result.Transaction != null;
@@ -168,7 +168,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     entities[0].PreviousTxOuts.AddRange(outputs);
                     if(entities[0].IsLoaded)
                     {
-                        await UpdateEntity(table, entities[0].CreateTableEntity()).ConfigureAwait(false);
+                        await UpdateEntity(table, entities[0].CreateTableEntity(Configuration.Network)).ConfigureAwait(false);
                     }
                 }
             }

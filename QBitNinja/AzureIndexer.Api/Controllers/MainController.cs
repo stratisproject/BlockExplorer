@@ -107,16 +107,18 @@ namespace AzureIndexer.Api.Controllers
         [Route("transactions/{txId}")]
         [Route("tx/{txId}")]
         public async Task<object> Transaction(
-            [ModelBinder(typeof(BitcoinSerializableModelBinder))]
-            uint256 txId,
+            string txId,
             DataFormat format = DataFormat.Json,
             bool colored = false
             )
         {
             if (format == DataFormat.Json)
-                return await JsonTransaction(txId, colored);
+            {
+                var response = await JsonTransaction(uint256.Parse(txId), colored);
+                return response;
+            }
 
-            return await RawTransaction(txId);
+            return await RawTransaction(uint256.Parse(txId));
         }
 
         [HttpPost]

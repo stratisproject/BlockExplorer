@@ -7,10 +7,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     public class IndexTransactionsTask : IndexTableEntitiesTaskBase<TransactionEntry.Entity>
     {
         private readonly ILogger logger;
+        private readonly IndexerConfiguration config;
 
         public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
         {
+            this.config = configuration;
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
@@ -34,7 +36,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override ITableEntity ToTableEntity(TransactionEntry.Entity indexed)
         {
-            return indexed.CreateTableEntity();
+            return indexed.CreateTableEntity(config.Network);
         }
     }
 }

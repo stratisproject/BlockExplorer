@@ -134,14 +134,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            this.Index(entities.Select(e => e.CreateTableEntity()).ToArray(), this.Configuration.GetTransactionTable());
+            this.Index(entities.Select(e => e.CreateTableEntity(Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
 
             this.logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
         {
-            return this.IndexAsync(entities.Select(e => e.CreateTableEntity()).ToArray(), this.Configuration.GetTransactionTable());
+            return this.IndexAsync(entities.Select(e => e.CreateTableEntity(Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
         }
 
         public void Index(IEnumerable<OrderedBalanceChange> balances)
@@ -237,7 +237,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         block
                         .Transactions
                         .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
-                        .Select(c => c.CreateTableEntity())
+                        .Select(c => c.CreateTableEntity(Configuration.Network))
                         .AsEnumerable();
 
             this.logger.LogTrace("Indexing transactions");

@@ -4,6 +4,7 @@ using NBitcoin.OpenAsset;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Stratis.Bitcoin.Networks;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -40,7 +41,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 TxId = txId;
             }
 
-            public Entity(DynamicTableEntity entity)
+            public Entity(DynamicTableEntity entity, Network network)
             {
                 var splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.None);
                 _PartitionKey = entity.PartitionKey;
@@ -52,8 +53,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 var bytes = Helper.GetEntityProperty(entity, "a");
                 if(bytes != null && bytes.Length != 0)
                 {
-                    Transaction = new Transaction();
-                    Transaction.ReadWrite(bytes);
+                    Transaction = network.Consensus.ConsensusFactory.CreateTransaction(bytes);
                 }
                 bytes = Helper.GetEntityProperty(entity, "b");
                 if(bytes != null && bytes.Length != 0)
@@ -81,14 +81,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                        + ((ulong)value[index + 7] << 56);
             }
 
-            public DynamicTableEntity CreateTableEntity()
+            public DynamicTableEntity CreateTableEntity(Network network)
             {
                 var entity = new DynamicTableEntity();
                 entity.ETag = "*";
                 entity.PartitionKey = PartitionKey;
                 entity.RowKey = TxId + "-" + TypeLetter + "-" + BlockId;
                 if(Transaction != null)
-                    Helper.SetEntityProperty(entity, "a", Transaction.ToBytes());
+                    Helper.SetEntityProperty(entity, "a", Transaction.ToBytes(network.Consensus.ConsensusFactory));
                 if(ColoredTransaction != null)
                     Helper.SetEntityProperty(entity, "b", ColoredTransaction.ToBytes());
                 Helper.SetEntityProperty(entity, "c", Helper.SerializeList(PreviousTxOuts));
