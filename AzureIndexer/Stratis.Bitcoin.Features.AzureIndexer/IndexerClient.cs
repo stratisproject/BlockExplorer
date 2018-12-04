@@ -1,34 +1,25 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.OpenAsset;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using NBitcoin.OpenAsset;
+
     public class IndexerClient
     {
-        private readonly IndexerConfiguration _Configuration;
-        public IndexerConfiguration Configuration
-        {
-            get
-            {
-                return _Configuration;
-            }
-        }
-
         public IndexerClient(IndexerConfiguration configuration)
         {
-            if (configuration == null)
-                throw new ArgumentNullException("configuration");
-            _Configuration = configuration;
-            BalancePartitionSize = 50;
+            this.Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.BalancePartitionSize = 50;
         }
+
+        public IndexerConfiguration Configuration { get; }
 
         public int BalancePartitionSize
         {
@@ -39,7 +30,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public Block GetBlock(uint256 blockId)
         {
             var ms = new MemoryStream();
-            var container = Configuration.GetBlocksContainer();
+            var container = this.Configuration.GetBlocksContainer();
             try
             {
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
@@ -54,34 +45,39 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     return null;
                 }
+
                 throw;
             }
         }
 
         public TransactionEntry GetTransaction(bool loadPreviousOutput, uint256 txId)
         {
-            return GetTransactionAsync(loadPreviousOutput, txId).Result;
+            return this.GetTransactionAsync(loadPreviousOutput, txId).Result;
         }
+
         public Task<TransactionEntry> GetTransactionAsync(bool loadPreviousOutput, uint256 txId)
         {
-            return GetTransactionAsync(loadPreviousOutput, false, txId);
+            return this.GetTransactionAsync(loadPreviousOutput, false, txId);
         }
+
         public TransactionEntry GetTransaction(uint256 txId)
         {
-            return GetTransactionAsync(txId).Result;
+            return this.GetTransactionAsync(txId).Result;
         }
+
         public Task<TransactionEntry> GetTransactionAsync(uint256 txId)
         {
-            return GetTransactionAsync(true, false, txId);
+            return this.GetTransactionAsync(true, false, txId);
         }
 
         public TransactionEntry[] GetTransactions(bool loadPreviousOutput, uint256[] txIds)
         {
-            return GetTransactionsAsync(loadPreviousOutput, txIds).Result;
+            return this.GetTransactionsAsync(loadPreviousOutput, txIds).Result;
         }
+
         public Task<TransactionEntry[]> GetTransactionsAsync(bool loadPreviousOutput, uint256[] txIds)
         {
-            return GetTransactionsAsync(loadPreviousOutput, false, txIds);
+            return this.GetTransactionsAsync(loadPreviousOutput, false, txIds);
         }
 
         public async Task<TransactionEntry> GetTransactionAsync(bool loadPreviousOutput, bool fetchColor, uint256 txId)
@@ -103,11 +99,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                                         TableQuery.CombineFilters(
                                             TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThan, txId.ToString() + "-"),
                                             TableOperators.And,
-                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThan, txId.ToString() + "|")
-                                        )
-                                  ));
+                                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThan, txId.ToString() + "|"))));
 
-            query.TakeCount = 10; //Should not have more
+            query.TakeCount = 10; // Should not have more
             List<TransactionEntry.Entity> entities = new List<TransactionEntry.Entity>();
             foreach (var e in await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false))
             {
