@@ -36,6 +36,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         protected readonly string name;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AzureIndexerFeature"/> class.
         /// Constructs the Azure Indexer feature.
         /// </summary>
         /// <param name="azureIndexerLoop">The loop responsible for indexing blocks to azure.</param>
@@ -78,7 +79,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public void Initialize()
         {
             this.logger.LogTrace("()");
-            this.indexerLoop.Initialize();         
+            this.indexerLoop.Initialize();
             this.logger.LogTrace("(-)");
         }
 
@@ -94,6 +95,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public override Task InitializeAsync()
         {
+            this.logger.LogTrace("()");
+            this.LoadConfiguration();
+            this.indexerLoop.Initialize();
+            this.logger.LogTrace("(-)");
             return Task.CompletedTask;
         }
 

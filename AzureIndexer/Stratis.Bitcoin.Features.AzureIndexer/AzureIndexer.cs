@@ -293,6 +293,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             this.logger.LogTrace("(-)");
         }
+
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
             var table = this.Configuration.GetBalanceTable();
@@ -301,6 +302,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         internal const int BlockHeaderPerRow = 6;
+
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
             this.logger.LogTrace("({0}:{1})", nameof(startHeight), startHeight);
@@ -310,11 +312,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ChainPartEntry chainPart = null;
             for(int i = startHeight; i <= chain.Tip.Height; i++)
             {
-                if(chainPart == null)
+                if (chainPart == null)
+                {
                     chainPart = new ChainPartEntry()
                     {
                         ChainOffset = i
                     };
+                }
 
                 var block = chain.GetBlock(i);
                 chainPart.BlockHeaders.Add(block.Header);

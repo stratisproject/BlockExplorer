@@ -42,24 +42,26 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private Action<AzureIndexerSettings> callback = null;
 
         /// <summary>
-        /// Initializes an instance of the object.
+        /// Initializes a new instance of the <see cref="AzureIndexerSettings"/> class.
         /// </summary>
         public AzureIndexerSettings()
         {
-            this.AzureEmulatorUsed = true;
+            this.AzureEmulatorUsed = false;
             this.From = 0;
             this.To = int.MaxValue;
             this.StorageNamespace = "";
             this.CheckpointsetName = "default";
             this.CheckpointInterval = TimeSpan.Parse("00:15:00");
-            
+
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AzureIndexerSettings"/> class.
         /// Initializes an instance of the object.
         /// </summary>
         /// <param name="callback">A callback for modifying the settings during startup.</param>
-        public AzureIndexerSettings(Action<AzureIndexerSettings> callback) : this()
+        public AzureIndexerSettings(Action<AzureIndexerSettings> callback)
+            : this()
         {
             this.callback = callback;
         }
@@ -76,9 +78,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 this.AzureAccountName = config.GetOrDefault<string>("azureacc", "");
                 this.AzureKey = config.GetOrDefault<string>("azurekey", "");
+
                 // Mime-encoded-data strings should always be a multiple of 4 in length. Provide trailing '='s if omitted..
                 this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
             }
+
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
             this.IgnoreCheckpoints = config.GetOrDefault<bool>("nochkpts", false);
             this.From = int.Parse(config.GetOrDefault<string>("indexfrom", "0"));

@@ -19,56 +19,66 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 ConfirmedTransaction,
                 Colored
             }
+
             public Entity(uint256 txId, Transaction tx, uint256 blockId)
             {
-                if(txId == null)
+                if (txId == null)
+                {
                     txId = tx.GetHash();
-                Timestamp = DateTimeOffset.UtcNow;
-                TxId = txId;
-                Transaction = tx;
-                BlockId = blockId;
-                if(blockId == null)
-                    Type = TransactionEntryType.Mempool;
-                else
-                    Type = TransactionEntryType.ConfirmedTransaction;
+                }
+
+                this.Timestamp = DateTimeOffset.UtcNow;
+                this.TxId = txId;
+                this.Transaction = tx;
+                this.BlockId = blockId;
+                this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
             }
 
             public Entity(uint256 txId)
             {
-                if(txId == null)
+                if (txId == null)
+                {
                     throw new ArgumentNullException("txId");
-                Timestamp = DateTimeOffset.UtcNow;
-                TxId = txId;
+                }
+
+                this.Timestamp = DateTimeOffset.UtcNow;
+                this.TxId = txId;
             }
 
             public Entity(DynamicTableEntity entity, Network network)
             {
-                var splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.None);
-                _PartitionKey = entity.PartitionKey;
-                Timestamp = entity.Timestamp;
-                TxId = uint256.Parse(splitted[0]);
-                Type = GetType(splitted[1]);
-                if(splitted.Length >= 3 && splitted[2] != string.Empty)
-                    BlockId = uint256.Parse(splitted[2]);
-                var bytes = Helper.GetEntityProperty(entity, "a");
-                if(bytes != null && bytes.Length != 0)
+                string[] splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.None);
+                this._PartitionKey = entity.PartitionKey;
+                this.Timestamp = entity.Timestamp;
+                this.TxId = uint256.Parse(splitted[0]);
+                this.Type = this.GetType(splitted[1]);
+                if (splitted.Length >= 3 && splitted[2] != string.Empty)
                 {
-                    Transaction = network.Consensus.ConsensusFactory.CreateTransaction(bytes);
+                    this.BlockId = uint256.Parse(splitted[2]);
                 }
-                bytes = Helper.GetEntityProperty(entity, "b");
-                if(bytes != null && bytes.Length != 0)
-                {
-                    ColoredTransaction = new ColoredTransaction();
-                    ColoredTransaction.ReadWrite(bytes);
-                }
-                _PreviousTxOuts = Helper.DeserializeList<TxOut>(Helper.GetEntityProperty(entity, "c"));
 
-                var timestamp = Helper.GetEntityProperty(entity, "d");
-                if(timestamp != null && timestamp.Length == 8)
+                byte[] bytes = Helper.GetEntityProperty(entity, "a");
+                if (bytes != null && bytes.Length != 0)
                 {
-                    Timestamp = new DateTimeOffset((long)ToUInt64(timestamp, 0), TimeSpan.Zero);
+                    this.Transaction = network.Consensus.ConsensusFactory.CreateTransaction(bytes);
+                }
+
+                bytes = Helper.GetEntityProperty(entity, "b");
+                if (bytes != null && bytes.Length != 0)
+                {
+                    this.ColoredTransaction = new ColoredTransaction();
+                    this.ColoredTransaction.ReadWrite(bytes);
+                }
+
+                this._PreviousTxOuts = Helper.DeserializeList<TxOut>(Helper.GetEntityProperty(entity, "c"));
+
+                byte[] timestamp = Helper.GetEntityProperty(entity, "d");
+                if (timestamp != null && timestamp.Length == 8)
+                {
+                    this.Timestamp = new DateTimeOffset((long)ToUInt64(timestamp, 0), TimeSpan.Zero);
                 }
             }
+
             public static ulong ToUInt64(byte[] value, int index)
             {
                 return value[index]
@@ -83,14 +93,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             public DynamicTableEntity CreateTableEntity(Network network)
             {
-                var entity = new DynamicTableEntity();
-                entity.ETag = "*";
-                entity.PartitionKey = PartitionKey;
-                entity.RowKey = TxId + "-" + TypeLetter + "-" + BlockId;
-                if(Transaction != null)
-                    Helper.SetEntityProperty(entity, "a", Transaction.ToBytes(network.Consensus.ConsensusFactory));
-                if(ColoredTransaction != null)
+                var entity = new DynamicTableEntity
+                {
+                    ETag = "*", PartitionKey = PartitionKey, RowKey = TxId + "-" + TypeLetter + "-" + BlockId
+                };
+                if (this.Transaction != null)
+                {
+                    Helper.SetEntityProperty(entity, "a", this.Transaction.ToBytes(network.Consensus.ConsensusFactory));
+                }
+
+                if (this.ColoredTransaction != null)
+                {
                     Helper.SetEntityProperty(entity, "b", ColoredTransaction.ToBytes());
+                }
+
                 Helper.SetEntityProperty(entity, "c", Helper.SerializeList(PreviousTxOuts));
                 Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)Timestamp.UtcTicks, true));
                 return entity;
@@ -105,6 +121,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         Type == TransactionEntryType.Mempool ? "m" : "?";
                 }
             }
+
             public TransactionEntryType GetType(string letter)
             {
                 switch(letter[0])
@@ -121,6 +138,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
 
             string _PartitionKey;
+
             public string PartitionKey
             {
                 get
@@ -142,13 +160,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             public Entity(uint256 txId, ColoredTransaction colored)
             {
-                if(txId == null)
+                if (txId == null)
                     throw new ArgumentNullException("txId");
                 TxId = txId;
                 ColoredTransaction = colored;
                 Type = TransactionEntryType.Colored;
             }
-
 
             public bool IsLoaded
             {
@@ -165,7 +182,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 set;
             }
 
-
             public uint256 TxId
             {
                 get;
@@ -178,15 +194,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 set;
             }
 
-
             public Transaction Transaction
             {
                 get;
                 set;
             }
 
-
             readonly List<TxOut> _PreviousTxOuts = new List<TxOut>();
+
             public List<TxOut> PreviousTxOuts
             {
                 get
@@ -195,13 +210,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
             }
 
-
             public TransactionEntryType Type
             {
                 get;
                 set;
             }
         }
+
         internal TransactionEntry(Entity[] entities)
         {
             TransactionId = entities[0].TxId;
@@ -264,16 +279,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return SpentCoins.Select(o => o.TxOut.Value).Sum() - Transaction.TotalOut;
             }
         }
+
         public uint256[] BlockIds
         {
             get;
             internal set;
         }
+
         public uint256 TransactionId
         {
             get;
             internal set;
         }
+
         public Transaction Transaction
         {
             get;
