@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.Protocol;
-using Stratis.Bitcoin.P2P.Peer;
-using Stratis.Bitcoin.P2P.Protocol.Payloads;
-using Stratis.Bitcoin.Utilities;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.ExceptionServices;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Auth;
+    using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using Stratis.Bitcoin.Utilities;
+
     public class IndexerConfiguration
     {
         private const string IndexerBlobContainerName = "indexer";
@@ -42,6 +39,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILoggerFactory loggerFactory;
 
         private CloudTableClient tableClient;
+
         public CloudTableClient TableClient
         {
             get
@@ -50,6 +48,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     return this.tableClient;
                 }
+
                 this.tableClient = this.StorageAccount.CreateCloudTableClient();
                 return this.tableClient;
             }
@@ -57,6 +56,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         private CloudBlobClient blobClient;
+
         public CloudBlobClient BlobClient
         {
             get
@@ -65,6 +65,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     return this.blobClient;
                 }
+
                 this.blobClient = this.StorageAccount.CreateCloudBlobClient();
                 return this.blobClient;
             }
@@ -74,7 +75,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
-            Network = Networks.Networks.Stratis.Mainnet();
+            this.Network = Networks.Networks.Stratis.Mainnet();
         }
 
         public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
@@ -87,15 +88,23 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
             this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
-                throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
+            {
+                throw new IndexerConfigurationErrorsException($"Invalid value {network} in appSettings (expecting Main, Test or Seg)");
+            }
+
             this.Node = GetValue(config, "Node", false);
             this.CheckpointSetName = GetValue(config, "CheckpointSetName", false);
             if (string.IsNullOrWhiteSpace(this.CheckpointSetName))
-                this.CheckpointSetName = "default";
+            {
+                this.CheckpointSetName = $"default";
+            }
 
             var emulator = GetValue(config, "AzureStorageEmulatorUsed", false);
+
             if (!string.IsNullOrWhiteSpace(emulator))
+            {
                 this.AzureStorageEmulatorUsed = bool.Parse(emulator);
+            }
 
             this.StorageCredentials = this.AzureStorageEmulatorUsed ? null : new StorageCredentials(account, key);
         }
@@ -111,11 +120,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public Task EnsureSetupAsync()
         {
-            var tasks = EnumerateTables()
+            List<Task> tasks = this.EnumerateTables()
                 .Select(t => t.CreateIfNotExistsAsync())
                 .OfType<Task>()
                 .ToList();
-            tasks.Add(GetBlocksContainer().CreateIfNotExistsAsync());
+            tasks.Add(this.GetBlocksContainer().CreateIfNotExistsAsync());
             return Task.WhenAll(tasks.ToArray());
         }
 
@@ -127,7 +136,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     CloudStorageAccount.Parse("UseDevelopmentStorage=true;") :
                     new CloudStorageAccount(this.StorageCredentials, true);
 
-                EnsureSetupAsync().Wait();
+                this.EnsureSetupAsync().Wait();
             }
             catch (AggregateException aex)
             {
@@ -138,18 +147,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public IEnumerable<CloudTable> EnumerateTables()
         {
-            yield return GetTransactionTable();
-            yield return GetBalanceTable();
-            yield return GetChainTable();
-            yield return GetWalletRulesTable();
+            yield return this.GetTransactionTable();
+            yield return this.GetBalanceTable();
+            yield return this.GetChainTable();
+            yield return this.GetWalletRulesTable();
         }
 
         protected static string GetValue(IConfiguration config, string setting, bool required)
-        {			
+        {
             var result = config[setting];
             result = string.IsNullOrWhiteSpace(result) ? null : result;
             if (result == null && required)
+            {
                 throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
+            }
+
             return result;
         }
 
@@ -195,7 +207,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private string GetFullName(string storageObjectName)
         {
-            return (StorageNamespace + storageObjectName).ToLowerInvariant();
+            return (this.StorageNamespace + storageObjectName).ToLowerInvariant();
         }
     }
 }

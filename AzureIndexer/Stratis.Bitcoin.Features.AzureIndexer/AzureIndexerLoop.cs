@@ -51,17 +51,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public AzureIndexer AzureIndexer { get; private set; }
 
         public BlockFetcher BlocksFetcher { get; private set; }
+
         public BlockFetcher TransactionsFetcher { get; private set; }
+
         public BlockFetcher BalancesFetcher { get; private set; }
+
         public BlockFetcher WalletsFetcher { get; private set; }
 
         /// <summary>The Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
 
-
         private readonly ILoggerFactory loggerFactory;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AzureIndexerLoop"/> class.
         /// Constructs the AzureIndexerLoop.
         /// </summary>
         /// <param name="fullNode">The full node that will be indexed.</param>
@@ -116,12 +119,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.AzureIndexer = indexer;
 
             if (this.indexerSettings.IgnoreCheckpoints)
+            {
                 this.SetStoreTip(this.Chain.GetBlock(indexer.FromHeight));
+            }
             else
+            {
                 this.UpdateStoreTip();
+            }
 
             this.StartLoop();
-            
             this.logger.LogTrace("(-)");
         }
 
@@ -162,7 +168,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             this.asyncLoop = this.asyncLoopFactory.Run($"{this.StoreName}.IndexAsync", async token =>
             {
-                await IndexAsync(this.nodeLifetime.ApplicationStopping);
+                await this.IndexAsync(this.nodeLifetime.ApplicationStopping);
             },
             this.nodeLifetime.ApplicationStopping,
             repeatEvery: TimeSpans.RunOnce,
