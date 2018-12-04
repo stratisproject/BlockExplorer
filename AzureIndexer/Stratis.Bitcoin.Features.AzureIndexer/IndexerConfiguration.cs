@@ -1,4 +1,8 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using NBitcoin.Protocol;
+using Stratis.Bitcoin.P2P.Peer;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +16,7 @@
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
-    using Stratis.Bitcoin.Utilities;
+    using Utilities;
 
     public class IndexerConfiguration
     {
@@ -111,11 +115,13 @@
 
         public NetworkPeer ConnectToNode(bool isRelay)
         {
-            if (String.IsNullOrEmpty(Node))
+            if (string.IsNullOrEmpty(this.Node))
+            {
                 throw new IndexerConfigurationErrorsException("Node setting is not configured");
+            }
 
             NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads(), null, null, null); // TODO: fix last 3 parameters
-            return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
+            return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(this.Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
         public Task EnsureSetupAsync()
@@ -141,7 +147,6 @@
             catch (AggregateException aex)
             {
                 ExceptionDispatchInfo.Capture(aex).Throw();
-                throw;
             }
         }
 
@@ -151,18 +156,6 @@
             yield return this.GetBalanceTable();
             yield return this.GetChainTable();
             yield return this.GetWalletRulesTable();
-        }
-
-        protected static string GetValue(IConfiguration config, string setting, bool required)
-        {
-            var result = config[setting];
-            result = string.IsNullOrWhiteSpace(result) ? null : result;
-            if (result == null && required)
-            {
-                throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
-            }
-
-            return result;
         }
 
         public AzureIndexer CreateIndexer()
@@ -203,6 +196,18 @@
         public CloudBlobContainer GetBlocksContainer()
         {
             return this.BlobClient.GetContainerReference(this.GetFullName(IndexerBlobContainerName));
+        }
+
+        protected static string GetValue(IConfiguration config, string setting, bool required)
+        {
+            var result = config[setting];
+            result = string.IsNullOrWhiteSpace(result) ? null : result;
+            if (result == null && required)
+            {
+                throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
+            }
+
+            return result;
         }
 
         private string GetFullName(string storageObjectName)
