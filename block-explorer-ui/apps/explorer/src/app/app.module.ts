@@ -17,11 +17,17 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { storeFreeze } from 'ngrx-store-freeze';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { UiLayoutModule } from '@blockexplorer/ui/layout';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    NgbModule,
+    FormsModule,
+    UiLayoutModule,
     NxModule.forRoot(),
     RouterModule.forRoot([], { initialNavigation: 'enabled' }),
     StoreModule.forRoot(
