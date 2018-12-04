@@ -1,0 +1,47 @@
+<section class="col-xl-9 col-lg-10 col-sm-12 mx-auto my-5">
+    <div class="card">
+
+        <div class="col-12">
+            <div class="row">
+                <div class="card-header col-xs-12 col-md-4 text-center text-md-left">All Contracts</div>
+                <div class="col-xs-12 col-md-8">
+                    <nav class="d-flex justify-content-center justify-content-md-end row">
+                        <ul class="pagination float-right">
+                            <li class="page-item d-none d-sm-block"><a class="page-link" (click)="firstPageClicked()">First</a></li>
+                            <li class="page-item"><a class="page-link d-flex justify-content-center align-items-center"
+                                    (click)="previousPageClicked()"><i class="material-icons md-18">keyboard_arrow_left</i>
+                                    Previous</a></li>
+                            <li class="page-item active"><a class="page-link">Page <strong>{{currentPageDisplay}}</strong>
+                                    of
+                                    {{pageCount}}</a></li>
+                            <li class="page-item"><a class="page-link d-flex justify-content-center align-items-center"
+                                    (click)="nextPageClicked()">Next <i class="material-icons md-18">keyboard_arrow_right</i></a></li>
+                            <li class="page-item d-none d-sm-block"><a class="page-link" (click)="lastPageClicked()">Last</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <ul class="list-group" *ngIf="filteredContracts?.length">
+            <li class="list-group-item">
+                <div class="row" *ngFor="let contract of filteredContracts">
+                    <div class="order-0 col-xs-12 col-sm-6 order-sm-0 col-md-5 order-md-0">
+                        <label>Address</label>
+                        <div><a href="#">{{contract.address}}</a></div>
+                    </div>
+                    <div class="order-2 col-xs-12 col-sm-12 order-sm-2 col-md-2 order-md-1">
+                        <label>Name</label>
+                        <div><span class="badge badge-purple">{{contract.name}}</span></div>
+                    </div>
+                    <div class="order-1 col-xs-12 col-sm-6 order-sm-1 col-md-5 order-md-2">
+                        <label>Hash</label>
+                        <div><a href="#">{{contract.hash}}</a></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+
+</section>

@@ -23,11 +23,7 @@ namespace Stratis.Bitcoin.Indexer.Console
         {
             try
             {
-                Network network = args.Contains("-testnet") ? Network.StratisTest : Network.StratisMain;
-
-                NodeSettings nodeSettings = new NodeSettings(network, ProtocolVersion.ALT_PROTOCOL_VERSION, args: args, loadConfiguration: false);
-
-                // NOTES: running BTC and STRAT side by side is not possible yet as the flags for serialization are static
+                var nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
 
                 var node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)

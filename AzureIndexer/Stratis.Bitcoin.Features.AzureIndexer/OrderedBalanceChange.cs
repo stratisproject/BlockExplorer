@@ -142,9 +142,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        internal Task<bool> EnsureSpentCoinsLoadedAsync(uint256[] parentIds, Transaction[] transactions)
+        internal Task<bool> EnsureSpentCoinsLoadedAsync(uint256[] parentIds, Transaction[] transactions, IndexerConfiguration configuration)
         {
-            var repo = new NoSqlTransactionRepository();
+            var repo = new NoSqlTransactionRepository(configuration.Network);
             for(int i = 0; i < parentIds.Length; i++)
             {
                 if(transactions[i] == null)

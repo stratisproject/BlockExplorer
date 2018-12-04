@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
+using Stratis.Bitcoin.Utilities.JsonConverters;
 #if !CLIENT
 using QBitNinja.JsonConverters;
 #else
@@ -26,8 +27,8 @@ namespace QBitNinja.Client
 #endif
 		static void RegisterFrontConverters(JsonSerializerSettings settings, Network network = null)
         {
-			NBitcoin.JsonConverters.Serializer.RegisterFrontConverters(settings, network);
-			var unix = settings.Converters.OfType<NBitcoin.JsonConverters.DateTimeToUnixTimeConverter>().First();
+			Serializer.RegisterFrontConverters(settings, network);
+			var unix = settings.Converters.OfType<DateTimeToUnixTimeConverter>().First();
 			settings.Converters.Remove(unix);
 #if !CLIENT
 			settings.Converters.Add(new BalanceLocatorJsonConverter());

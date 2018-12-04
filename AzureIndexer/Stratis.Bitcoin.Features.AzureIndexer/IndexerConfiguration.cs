@@ -74,7 +74,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
-            Network = Network.Main;
+            Network = Networks.Networks.Stratis.Mainnet();
         }
 
         public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
@@ -85,7 +85,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
             var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
-            this.Network = Network.GetNetwork(network);
+            this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
                 throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
             this.Node = GetValue(config, "Node", false);
@@ -98,6 +98,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.AzureStorageEmulatorUsed = bool.Parse(emulator);
 
             this.StorageCredentials = this.AzureStorageEmulatorUsed ? null : new StorageCredentials(account, key);
+        }
+
+        public NetworkPeer ConnectToNode(bool isRelay)
+        {
+            if (String.IsNullOrEmpty(Node))
+                throw new IndexerConfigurationErrorsException("Node setting is not configured");
+
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads(), null, null, null); // TODO: fix last 3 parameters
+            return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
         public Task EnsureSetupAsync()
@@ -138,7 +147,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         protected static string GetValue(IConfiguration config, string setting, bool required)
         {			
             var result = config[setting];
-            result = String.IsNullOrWhiteSpace(result) ? null : result;
+            result = string.IsNullOrWhiteSpace(result) ? null : result;
             if (result == null && required)
                 throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
             return result;

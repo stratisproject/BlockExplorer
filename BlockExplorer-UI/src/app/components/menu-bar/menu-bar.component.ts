@@ -8,13 +8,8 @@ import { SearchTextService } from 'src/app/services/search-text.service';
     styleUrls: ['./menu-bar.component.scss']
 })
 export class MenuBarComponent {
-
     constructor(readonly searchTextService: SearchTextService) { }
 
     get searchText(): string { return this.searchTextService.searchText; }
-    @Input()
-    set searchText(value: string) {
-        console.log(value);
-        this.searchTextService.searchText = value;
-    }
+    @Input() set searchText(value: string) { this.searchTextService.searchText = value; }
 }

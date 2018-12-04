@@ -37,7 +37,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             TestUtils.EnsureNew(folder);
 
             var config = AzureIndexerLoop.IndexerConfigFromSettings(
-                new AzureIndexerSettings() { StorageNamespace = folder }, Network.TestNet, new LoggerFactory());
+                new AzureIndexerSettings() { StorageNamespace = folder }, KnownNetworks.TestNet, new LoggerFactory());
 
             config.EnsureSetup();
 

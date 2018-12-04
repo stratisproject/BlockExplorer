@@ -12,6 +12,8 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Stratis.Bitcoin;
 
 namespace QBitNinja
 {
@@ -48,14 +50,25 @@ namespace QBitNinja
     {
 
         QBitNinjaConfiguration _Conf;
-        public InitialIndexer(QBitNinjaConfiguration conf)
+        private readonly ILoggerFactory loggerFactory;
+
+        public InitialIndexer(QBitNinjaConfiguration conf, ILoggerFactory loggerFactory)
         {
             if (conf == null)
                 throw new ArgumentNullException("conf");
             _Conf = conf;
+            this.loggerFactory = loggerFactory;
             BlockGranularity = 100;
             TransactionsPerWork = 1000 * 1000;
             Init();
+        }
+
+        public Network Network
+        {
+            get
+            {
+                return _Conf.Indexer.Network;
+            }
         }
 
         public int BlockGranularity
@@ -74,12 +87,12 @@ namespace QBitNinja
         private void Init()
         {
             var indexer = _Conf.Indexer.CreateIndexer();
-            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Balances), new IndexBalanceTask(_Conf.Indexer, null));
-            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Blocks), new IndexBlocksTask(_Conf.Indexer));
-            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Transactions), new IndexTransactionsTask(_Conf.Indexer));
-            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Wallets), new IndexBalanceTask(_Conf.Indexer, _Conf.Indexer.CreateIndexerClient().GetAllWalletRules()));
+            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Balances), new IndexBalanceTask(_Conf.Indexer, null, this.loggerFactory));
+            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Blocks), new IndexBlocksTask(_Conf.Indexer, this.loggerFactory));
+            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Transactions), new IndexTransactionsTask(_Conf.Indexer, this.loggerFactory));
+            AddTaskIndex(indexer.GetCheckpoint(IndexerCheckpoints.Wallets), new IndexBalanceTask(_Conf.Indexer, _Conf.Indexer.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory));
             var subscription = indexer.GetCheckpointRepository().GetCheckpoint("subscriptions");
-            AddTaskIndex(subscription, new IndexNotificationsTask(_Conf, new SubscriptionCollection(_Conf.GetSubscriptionsTable().Read())));
+            AddTaskIndex(subscription, new IndexNotificationsTask(_Conf, new SubscriptionCollection(_Conf.GetSubscriptionsTable().Read()), this.loggerFactory));
         }
 
         Dictionary<string, Tuple<Checkpoint, IIndexTask>> _IndexTasks = new Dictionary<string, Tuple<Checkpoint, IIndexTask>>();
@@ -126,11 +139,12 @@ namespace QBitNinja
             {
 
                 ListenerTrace.Info("Handshaking...");
-                node.VersionHandshake();
+                node.VersionHandshakeAsync().Wait();
                 ListenerTrace.Info("Handshaked");
-                chain = chain ?? node.GetChain();
+                //chain = chain ?? node.GetChain(); TODO: review this later
                 ListenerTrace.Info("Current chain at height " + chain.Height);
-                var blockRepository = new NodeBlocksRepository(node);
+                // var blockRepository = new FullNodeBlocksRepository(node); TODO: review later
+                var blockRepository = new FullNodeBlocksRepository(new FullNode());
 
                 var blobLock = GetInitBlob();
                 string lease = null;
@@ -187,7 +201,7 @@ namespace QBitNinja
                             ListenerTrace.Info("Processing " + range.ToString());
                             totalProcessed++;
                             var task = _IndexTasks[range.Target];
-                            BlockFetcher fetcher = new BlockFetcher(task.Item1, blockRepository, chain)
+                            BlockFetcher fetcher = new BlockFetcher(task.Item1, blockRepository, chain, null, this.loggerFactory)
                             {
                                 FromHeight = range.From,
                                 ToHeight = range.From + range.Count - 1
@@ -198,7 +212,7 @@ namespace QBitNinja
                                 task.Item2.EnsureIsSetup = totalProcessed == 0;
                                 var index = Task.Factory.StartNew(() =>
                                 {
-                                    task.Item2.Index(fetcher, sched);
+                                    task.Item2.Index(fetcher, sched, _Conf.Indexer.Network);
                                 }, TaskCreationOptions.LongRunning);
                                 while(!index.Wait(TimeSpan.FromMinutes(4)))
                                 {
@@ -240,10 +254,10 @@ namespace QBitNinja
             ListenerTrace.Info("Checkpoints updated");
         }
 
-        private void EnqueueJobs(NodeBlocksRepository repo, ChainBase chain, CloudBlockBlob blobLock, string lease)
+        private void EnqueueJobs(FullNodeBlocksRepository repo, ChainBase chain, CloudBlockBlob blobLock, string lease)
         {
             int cumul = 0;
-            ChainedBlock from = chain.Genesis;
+            ChainedHeader from = chain.Genesis;
             int blockCount = 0;
             foreach (var block in repo.GetBlocks(new[] { chain.Genesis }.Concat(chain.EnumerateAfter(chain.Genesis)).Where(c => c.Height % BlockGranularity == 0).Select(c => c.HashBlock), default(CancellationToken)))
             {
@@ -251,7 +265,7 @@ namespace QBitNinja
                 blockCount += BlockGranularity;
                 if (cumul > TransactionsPerWork)
                 {
-                    var nextFrom = chain.GetBlock(chain.GetBlock(block.GetHash()).Height + BlockGranularity);
+                    var nextFrom = chain.GetBlock(chain.GetBlock((uint256) block.GetHash()).Height + BlockGranularity);
                     if (nextFrom == null)
                         break;
                     EnqueueRange(chain, from, blockCount);
@@ -271,7 +285,7 @@ namespace QBitNinja
             });
         }
 
-        private void EnqueueRange(ChainBase chain, ChainedBlock startCumul, int blockCount)
+        private void EnqueueRange(ChainBase chain, ChainedHeader startCumul, int blockCount)
         {
             ListenerTrace.Info("Enqueing from " + startCumul.Height + " " + blockCount + " blocks");
             if (blockCount == 0)

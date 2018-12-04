@@ -1,8 +1,8 @@
 ﻿#if !CLIENT
 using Stratis.Bitcoin.Features.AzureIndexer;
-using NBitcoin.JsonConverters;
 using Newtonsoft.Json;
 using System;
+using Stratis.Bitcoin.Utilities.JsonConverters;
 
 namespace QBitNinja.JsonConverters
 {

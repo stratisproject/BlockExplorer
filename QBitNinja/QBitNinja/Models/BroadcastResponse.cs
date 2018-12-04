@@ -1,9 +1,5 @@
 ﻿using NBitcoin.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
 #if !CLIENT
 namespace QBitNinja.Models

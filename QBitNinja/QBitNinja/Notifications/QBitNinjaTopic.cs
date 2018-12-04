@@ -18,6 +18,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Api;
 
 namespace QBitNinja.Notifications
 {

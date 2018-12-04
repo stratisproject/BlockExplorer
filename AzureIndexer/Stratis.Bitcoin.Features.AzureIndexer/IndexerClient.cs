@@ -614,7 +614,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var parents =
                 await GetTransactionsAsync(false, ColoredBalance, parentIds).ConfigureAwait(false);
 
-            var cache = new NoSqlTransactionRepository();
+            var cache = new NoSqlTransactionRepository(this.Configuration.Network);
             foreach(var parent in parents.Where(p => p != null))
                 cache.Put(parent.TransactionId, parent.Transaction);
 

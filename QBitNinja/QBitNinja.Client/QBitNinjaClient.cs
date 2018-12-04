@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NBitcoin.DataEncoders;
 using System.Net.Http.Headers;
+using System.Web;
 #if CLIENT
 using QBitNinja.Client.JsonConverters;
 using QBitNinja.Client.Models;
@@ -593,7 +594,7 @@ namespace QBitNinja.Client
 
 		public static string EscapeUrlPart(string str)
 		{
-			var path = System.Web.NBitcoin.HttpUtility.UrlEncode(str);
+			var path = HttpUtility.UrlEncode(str);
 			if(path.Contains("?") || path.Contains("/"))
 				throw new ArgumentException("Invalid character found in the path of the request ('?' or '/')");
 			return path;
