@@ -27,7 +27,7 @@
               </span>
           </div>
           <input [(ngModel)]="searchText" type="search" class="form-control" placeholder="Search by Address, TxHash, ..."
-              aria-label="" [ngModelOptions]="{standalone: true}" aria-describedby="">
+              aria-label="" [ngModelOptions]="{standalone: true}" (keyup.enter)="enterPressed()" aria-describedby="">
       </div>
   </form>
 </nav>
