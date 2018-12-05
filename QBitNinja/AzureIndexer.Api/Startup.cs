@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Threading;
 using AzureIndexer.Api.Infrastructure;
+using AzureIndexer.Api.JsonConverters;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBitcoin.Networks;
+using Newtonsoft.Json;
 using Stratis.Bitcoin.Networks;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -42,10 +44,16 @@ namespace AzureIndexer.Api
         {
             NetworkRegistration.Register(new StratisTest());
 
-            services.AddMvc(options =>
+            services
+                .AddMvc(options =>
+                    {
+                        options.Filters.Add<WebApiExceptionActionFilter>();
+                        options.Filters.Add<GlobalExceptionFilter>();
+                    })
+                .AddJsonOptions(options =>
                 {
-                    options.Filters.Add<WebApiExceptionActionFilter>();
-                    options.Filters.Add<GlobalExceptionFilter>();
+                    options.SerializerSettings.ContractResolver = new TransactionJsonConverter();
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

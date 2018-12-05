@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using AzureIndexer.Api.Infrastructure;
-using AzureIndexer.Api.ModelBinders;
+using AzureIndexer.Api.JsonConverters;
 using AzureIndexer.Api.Models;
 using AzureIndexer.Api.Notifications;
 using Microsoft.AspNetCore.Mvc;
@@ -106,19 +106,30 @@ namespace AzureIndexer.Api.Controllers
         [HttpGet]
         [Route("transactions/{txId}")]
         [Route("tx/{txId}")]
-        public async Task<object> Transaction(
+        public async Task<IActionResult> Transaction(
             string txId,
             DataFormat format = DataFormat.Json,
-            bool colored = false
-            )
+            bool colored = false)
         {
             if (format == DataFormat.Json)
             {
-                var response = await JsonTransaction(uint256.Parse(txId), colored);
-                return response;
+                var response = await this.JsonTransaction(uint256.Parse(txId), colored);
+
+                try
+                {
+                    var settings = new JsonSerializerSettings {ContractResolver = new TransactionJsonConverter(), MaxDepth = 4};
+                    var s = JsonConvert.SerializeObject(response, settings);
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                return this.Ok(response);
             }
 
-            return await RawTransaction(uint256.Parse(txId));
+            var binaryResult = await this.RawTransaction(uint256.Parse(txId));
+            return this.Ok(binaryResult);
         }
 
         [HttpPost]
@@ -170,18 +181,15 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/balance")]
         public BalanceModel WalletBalance(
             string walletName,
-            [ModelBinder(typeof(BalanceLocatorModelBinder))]
-            BalanceLocator continuation = null,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature until = null,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature from = null,
+            string continuation = null,
+            string until = null,
+            string from = null,
             bool includeImmature = false,
             bool unspentOnly = false,
             bool colored = false)
         {
             var balanceId = new BalanceId(walletName);
-            return Balance(balanceId, continuation, until, from, includeImmature, unspentOnly, colored);
+            return Balance(balanceId, continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
         }
 
         [HttpPost]
@@ -311,6 +319,7 @@ namespace AzureIndexer.Api.Controllers
             }
             return null;
         }
+
         [HttpGet]
         [Route("wallets/{walletName}/keysets/{keysetName}/keys")]
         public HDKeyData[] GetKeys(string walletName, string keysetName)
@@ -326,15 +335,14 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("wallets/{walletName}/summary")]
-        public BalanceSummary AddressBalanceSummary(
+        public BalanceSummary WalletBalanceSummary(
             string walletName,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature at = null,
+            string at = null,
             bool debug = false,
             bool colored = false)
         {
             BalanceId id = new BalanceId(walletName);
-            return BalanceSummary(id, at, debug, colored);
+            return BalanceSummary(id, at.ToBlockFeature(), debug, colored);
         }
 
         [HttpGet]
@@ -369,10 +377,10 @@ namespace AzureIndexer.Api.Controllers
                     ReasonPhrase = "Transaction not found"
                 });
 
-            if (tx.Transaction.LockTime.Height == 0)
-            {
-                tx.Transaction.LockTime = tx.Transaction.Time;
-            }
+            //if (tx.Transaction.LockTime.Height == 0)
+            //{
+            //    tx.Transaction.LockTime = new LockTime(500000000);
+            //}
 
             var response = new GetTransactionResponse()
             {
@@ -463,21 +471,18 @@ namespace AzureIndexer.Api.Controllers
         [HttpGet]
         [Route("blocks/{blockFeature}")]
         public object Block(
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature blockFeature, bool headerOnly = false, DataFormat format = DataFormat.Json, bool extended = false)
+            string blockFeature, bool headerOnly = false, DataFormat format = DataFormat.Json, bool extended = false)
         {
             if (format == DataFormat.Json)
-                return JsonBlock(blockFeature, headerOnly, extended);
+                return JsonBlock(blockFeature.ToBlockFeature(), headerOnly, extended);
 
-            return RawBlock(blockFeature, headerOnly);
+            return RawBlock(blockFeature.ToBlockFeature(), headerOnly);
         }
         [HttpGet]
         [Route("blocks/{blockFeature}/header")]
-        public WhatIsBlockHeader BlockHeader(
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature blockFeature)
+        public WhatIsBlockHeader BlockHeader(string blockFeature)
         {
-            var block = GetBlock(blockFeature, true);
+            var block = GetBlock(blockFeature.ToBlockFeature(), true);
             return new WhatIsBlockHeader(block.Header);
         }
 
@@ -500,23 +505,20 @@ namespace AzureIndexer.Api.Controllers
         [HttpGet]
         [Route("balances/{balanceId}/summary")]
         public BalanceSummary AddressBalanceSummary(
-            [ModelBinder(typeof(BalanceIdModelBinder))]
-            BalanceId balanceId,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature at = null,
+            [FromRoute] string balanceId,
+            string at = null,
             bool debug = false,
             bool colored = false)
         {
-            colored = colored || IsColoredAddress();
-            return BalanceSummary(balanceId, at, debug, colored);
+            colored = colored || this.IsColoredAddress();
+            return this.BalanceSummary(balanceId.ToBalanceId(this.Network), at.ToBlockFeature(), debug, colored);
         }
 
         public BalanceSummary BalanceSummary(
             BalanceId balanceId,
             BlockFeature at,
             bool debug,
-            bool colored
-            )
+            bool colored)
         {
             var repo = Configuration.CreateWalletRepository();
             CancellationTokenSource cancel = new CancellationTokenSource();
@@ -683,20 +685,16 @@ namespace AzureIndexer.Api.Controllers
         [HttpGet]
         [Route("balances/{balanceId}")]
         public BalanceModel AddressBalance(
-            [ModelBinder(typeof(BalanceIdModelBinder))]
-            BalanceId balanceId,
-            [ModelBinder(typeof(BalanceLocatorModelBinder))]
-            BalanceLocator continuation = null,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature until = null,
-            [ModelBinder(typeof(BlockFeatureModelBinder))]
-            BlockFeature from = null,
+            string balanceId,
+            string continuation = null,
+            string until = null,
+            string from = null,
             bool includeImmature = false,
             bool unspentOnly = false,
             bool colored = false)
         {
             colored = colored || IsColoredAddress();
-            return Balance(balanceId, continuation, until, from, includeImmature, unspentOnly, colored);
+            return Balance(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
         }
 
         //Property passed by BalanceIdModelBinder
