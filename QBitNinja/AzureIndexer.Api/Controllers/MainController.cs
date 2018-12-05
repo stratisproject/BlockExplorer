@@ -369,6 +369,11 @@ namespace AzureIndexer.Api.Controllers
                     ReasonPhrase = "Transaction not found"
                 });
 
+            if (tx.Transaction.LockTime.Height == 0)
+            {
+                tx.Transaction.LockTime = tx.Transaction.Time;
+            }
+
             var response = new GetTransactionResponse()
             {
                 TransactionId = tx.TransactionId,
