@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.Infrastructure
+﻿using Serilog;
+
+namespace AzureIndexer.Api.Infrastructure
 {
     using System;
     using System.Threading;
@@ -7,46 +9,43 @@
     using NBitcoin;
     using Stratis.Bitcoin.Features.AzureIndexer;
 
-    public class UpdateChainListener : IHostedService
+    public class UpdateChainListener : BackgroundService
     {
         private readonly IndexerClient indexer;
         private readonly ConcurrentChain chain;
-        private readonly QBitNinjaConfiguration config;
-        private IDisposable subscription;
+        private readonly ILogger logger;
 
-        public UpdateChainListener(IndexerClient indexer, ConcurrentChain chain, QBitNinjaConfiguration config)
+        public UpdateChainListener(
+            IndexerClient indexer,
+            ConcurrentChain chain,
+            ILogger logger)
         {
             this.indexer = indexer;
             this.chain = chain;
-            this.config = config;
+            this.logger = logger;
         }
 
-        internal Timer Timer { get; set; }
+        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(10);
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this.Timer = new Timer(_ => this.UpdateChain());
-            this.Timer.Change(0, (int)TimeSpan.FromSeconds(30).TotalMilliseconds);
+            this.logger.Information("{UpdateChainListener} task is starting.", nameof(UpdateChainListener));
 
-            this.subscription =
-                this.config.Topics
-                    .NewBlocks
-                    .CreateConsumer("webchain", true)
-                    .EnsureSubscriptionExists()
-                    .OnMessage(b =>
-                    {
-                        this.UpdateChain();
-                    });
-            return Task.CompletedTask;
-        }
+            stoppingToken.Register(() => this.logger.Debug("{UpdateChainListener} background task is stopping.", nameof(UpdateChainListener)));
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            this.Timer?.Dispose();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    this.UpdateChain();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.Warning(ex, "{ErrorMessage}", ex.Message);
+                }
 
-            this.subscription?.Dispose();
-
-            return Task.CompletedTask;
+                await Task.Delay(this.Delay, stoppingToken);
+            }
         }
 
         private bool UpdateChain()

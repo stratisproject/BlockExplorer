@@ -56,9 +56,9 @@ namespace QBitNinja.Client.Models
             set;
         }
     }
-    public class GetTransactionResponse
+    public class TransactionResponse
     {
-        public GetTransactionResponse()
+        public TransactionResponse()
         {
             ReceivedCoins = new List<ICoin>();
             SpentCoins = new List<ICoin>();

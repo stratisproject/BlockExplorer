@@ -7,9 +7,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using AzureIndexer.Api.Infrastructure;
-using AzureIndexer.Api.JsonConverters;
 using AzureIndexer.Api.Models;
+using AzureIndexer.Api.Models.Response;
 using AzureIndexer.Api.Notifications;
 using Microsoft.AspNetCore.Mvc;
 using NBitcoin;
@@ -18,28 +19,26 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using BalanceModel = AzureIndexer.Api.Models.BalanceModel;
+using InsertWalletAddress = AzureIndexer.Api.Models.InsertWalletAddress;
+using WalletModel = AzureIndexer.Api.Models.WalletModel;
 
 namespace AzureIndexer.Api.Controllers
 {
     public class MainController : ControllerBase
     {
-        public MainController(ConcurrentChain chain, QBitNinjaConfiguration config)
+        private readonly IMapper mapper;
+
+        public MainController(ConcurrentChain chain, QBitNinjaConfiguration config, IMapper mapper)
         {
-            Configuration = config;
-            Chain = chain;
+            this.mapper = mapper;
+            this.Configuration = config;
+            this.Chain = chain;
         }
 
-        public ConcurrentChain Chain
-        {
-            get;
-            set;
-        }
+        public ConcurrentChain Chain { get; set; }
 
-        public new QBitNinjaConfiguration Configuration
-        {
-            get;
-            set;
-        }
+        public QBitNinjaConfiguration Configuration { get; set; }
 
         [HttpPost]
         [Route("transactions")]
@@ -106,30 +105,10 @@ namespace AzureIndexer.Api.Controllers
         [HttpGet]
         [Route("transactions/{txId}")]
         [Route("tx/{txId}")]
-        public async Task<IActionResult> Transaction(
-            string txId,
-            DataFormat format = DataFormat.Json,
-            bool colored = false)
+        public async Task<TransactionResponseModel> Transaction(string txId, bool colored = false)
         {
-            if (format == DataFormat.Json)
-            {
-                var response = await this.JsonTransaction(uint256.Parse(txId), colored);
-
-                try
-                {
-                    var settings = new JsonSerializerSettings {ContractResolver = new TransactionJsonConverter(), MaxDepth = 4};
-                    var s = JsonConvert.SerializeObject(response, settings);
-                }
-                catch (Exception ex)
-                {
-
-                }
-
-                return this.Ok(response);
-            }
-
-            var binaryResult = await this.RawTransaction(uint256.Parse(txId));
-            return this.Ok(binaryResult);
+            var response = await this.JsonTransaction(uint256.Parse(txId), colored);
+            return response;
         }
 
         [HttpPost]
@@ -341,8 +320,10 @@ namespace AzureIndexer.Api.Controllers
             bool debug = false,
             bool colored = false)
         {
-            BalanceId id = new BalanceId(walletName);
-            return BalanceSummary(id, at.ToBlockFeature(), debug, colored);
+            var id = new BalanceId(walletName);
+            var summary = this.BalanceSummary(id, at.ToBlockFeature(), debug, colored);
+            var mappedSummary = this.mapper.Map<BalanceSummaryModel>(summary);
+            return summary;
         }
 
         [HttpGet]
@@ -365,32 +346,29 @@ namespace AzureIndexer.Api.Controllers
             return result;
         }
 
-        internal async Task<GetTransactionResponse> JsonTransaction(uint256 txId, bool colored)
+        internal async Task<TransactionResponseModel> JsonTransaction(uint256 txId, bool colored)
         {
-            var client = Configuration.Indexer.CreateIndexerClient();
+            var client = this.Configuration.Indexer.CreateIndexerClient();
             var tx = await client.GetTransactionAsync(true, colored, txId);
             if (tx == null || (tx.ColoredTransaction == null && colored) || tx.SpentCoins == null)
-
+            {
                 throw new HttpResponseException(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.NotFound,
                     ReasonPhrase = "Transaction not found"
                 });
+            }
 
-            //if (tx.Transaction.LockTime.Height == 0)
-            //{
-            //    tx.Transaction.LockTime = new LockTime(500000000);
-            //}
-
-            var response = new GetTransactionResponse()
+            var response = new TransactionResponse()
             {
                 TransactionId = tx.TransactionId,
                 Transaction = tx.Transaction,
                 IsCoinbase = tx.Transaction.IsCoinBase,
                 Fees = tx.Fees,
-                Block = FetchBlockInformation(tx.BlockIds),
+                Block = this.FetchBlockInformation(tx.BlockIds),
                 FirstSeen = tx.FirstSeen
             };
+
             for (int i = 0; i < tx.Transaction.Outputs.Count; i++)
             {
                 var txout = tx.Transaction.Outputs[i];
@@ -403,7 +381,9 @@ namespace AzureIndexer.Api.Controllers
                 }
                 response.ReceivedCoins.Add(coin);
             }
+
             if (!response.IsCoinbase)
+            {
                 for (int i = 0; i < tx.Transaction.Inputs.Count; i++)
                 {
                     ICoin coin = new Coin(tx.SpentCoins[i].OutPoint, tx.SpentCoins[i].TxOut);
@@ -413,9 +393,12 @@ namespace AzureIndexer.Api.Controllers
                         if (entry != null)
                             coin = new ColoredCoin(entry.Asset, (Coin)coin);
                     }
+
                     response.SpentCoins.Add(coin);
                 }
-            return response;
+            }
+
+            return this.mapper.Map<TransactionResponseModel>(response);
         }
 
         private BlockInformation FetchBlockInformation(uint256[] blockIds)
@@ -478,6 +461,7 @@ namespace AzureIndexer.Api.Controllers
 
             return RawBlock(blockFeature.ToBlockFeature(), headerOnly);
         }
+
         [HttpGet]
         [Route("blocks/{blockFeature}/header")]
         public WhatIsBlockHeader BlockHeader(string blockFeature)
@@ -511,7 +495,9 @@ namespace AzureIndexer.Api.Controllers
             bool colored = false)
         {
             colored = colored || this.IsColoredAddress();
-            return this.BalanceSummary(balanceId.ToBalanceId(this.Network), at.ToBlockFeature(), debug, colored);
+            var summary = this.BalanceSummary(balanceId.ToBalanceId(this.Network), at.ToBlockFeature(), debug, colored);
+            var mappedSummary = this.mapper.Map<BalanceSummaryModel>(summary);
+            return summary;
         }
 
         public BalanceSummary BalanceSummary(
@@ -694,17 +680,21 @@ namespace AzureIndexer.Api.Controllers
             bool colored = false)
         {
             colored = colored || IsColoredAddress();
-            return Balance(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
+            var balance = this.Balance(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
+            var mappedBalance = this.mapper.Map<BalanceResponseModel>(balance);
+            return balance;
         }
 
-        //Property passed by BalanceIdModelBinder
+        // Property passed by BalanceIdModelBinder
         private bool IsColoredAddress()
         {
             return HttpContext.Items.ContainsKey("BitcoinColoredAddress");
         }
 
         TimeSpan Expiration = TimeSpan.FromHours(24.0);
-        BalanceModel Balance(BalanceId balanceId,
+
+        BalanceModel Balance(
+            BalanceId balanceId,
             BalanceLocator continuation,
             BlockFeature until,
             BlockFeature from,
@@ -956,8 +946,9 @@ namespace AzureIndexer.Api.Controllers
         [Route("whatisit/{data}")]
         public async Task<object> WhatIsIt(string data)
         {
-            WhatIsIt finder = new WhatIsIt(this);
-            return (await finder.Find(data)) ?? "Good question Holmes !";
+            var finder = new WhatIsIt(this);
+            var result = await finder.Find(data);
+            return result ?? "Good question Holmes !";
         }
 
         public Network Network

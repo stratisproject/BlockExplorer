@@ -1,13 +1,16 @@
 ﻿using System.IO;
 using System.Threading;
 using AzureIndexer.Api.Infrastructure;
+using AzureIndexer.Api.IoC;
 using AzureIndexer.Api.JsonConverters;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBitcoin.Networks;
 using Newtonsoft.Json;
+using Serilog;
 using Stratis.Bitcoin.Networks;
 using Swashbuckle.AspNetCore.Swagger;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace AzureIndexer.Api
 {
@@ -52,7 +55,6 @@ namespace AzureIndexer.Api
                     })
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.ContractResolver = new TransactionJsonConverter();
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -68,6 +70,8 @@ namespace AzureIndexer.Api
             // Create the container builder.
             var builder = new ContainerBuilder();
             builder.Populate(services);
+            builder.RegisterModule<AutomapperModule>();
+            builder.RegisterInstance(Log.Logger).As<Serilog.ILogger>();
             builder.Register(
                 ctx =>
                 {

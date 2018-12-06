@@ -257,6 +257,7 @@ namespace AzureIndexer.Api.Notifications
             {
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
             }
+
             return this;
         }
 
