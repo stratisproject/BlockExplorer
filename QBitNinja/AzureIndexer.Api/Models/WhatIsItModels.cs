@@ -334,6 +334,7 @@ namespace QBitNinja.Client.Models
 		{
 
 		}
+
 		public WhatIsAddress(BitcoinAddress address)
 			: base(address)
 		{

@@ -38,7 +38,7 @@
             {
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
                 ms.Position = 0;
-                Block b = this.Configuration.Network.Consensus.ConsensusFactory.CreateBlock();
+                Block b = new Block();
                 b.ReadWrite(ms, false);
                 return b;
             }

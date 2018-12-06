@@ -27,11 +27,11 @@
 
     public class TransactionResponseModel
     {
-        // [JsonProperty("transaction", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        // public Transaction Transaction { get; set; }
+        [JsonProperty("transaction", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public TransactionModel Transaction { get; set; }
 
         [JsonProperty("transactionId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 TransactionId { get; set; }
+        public string TransactionId { get; set; }
 
         [JsonProperty("isCoinbase", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsCoinbase { get; set; }
@@ -88,7 +88,7 @@
     public class BlockInformationModel
     {
         [JsonProperty("blockId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 BlockId { get; set; }
+        public string BlockId { get; set; }
 
         [JsonProperty("blockHeader", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BlockHeaderModel BlockHeader { get; set; }
@@ -114,8 +114,8 @@
         [JsonProperty("outpoint", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public OutPointModel Outpoint { get; set; }
 
-        //[JsonProperty("txOut", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        //public TxOut TxOut { get; set; }
+        [JsonProperty("txOut", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public TxOutModel TxOut { get; set; }
     }
 
     public class MoneyModel
@@ -153,9 +153,6 @@
         [JsonProperty("scriptSig", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptSig { get; set; }
 
-        [JsonProperty("witScript", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public WitScriptModel WitScript { get; set; }
-
         [JsonProperty("isFinal", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsFinal { get; set; }
     }
@@ -178,7 +175,7 @@
         public int? CurrentVersion { get; set; }
 
         [JsonProperty("hashPrevBlock", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 HashPrevBlock { get; set; }
+        public string HashPrevBlock { get; set; }
 
         [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Time { get; set; }
@@ -193,7 +190,7 @@
         public int? Nonce { get; set; }
 
         [JsonProperty("hashMerkleRoot", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 HashMerkleRoot { get; set; }
+        public string HashMerkleRoot { get; set; }
 
         [JsonProperty("isNull", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsNull { get; set; }
@@ -208,7 +205,7 @@
         public bool? IsNull { get; set; }
 
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 Hash { get; set; }
+        public string Hash { get; set; }
 
         [JsonProperty("n", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? N { get; set; }
@@ -238,9 +235,6 @@
         [JsonProperty("length", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Length { get; set; }
 
-        [JsonProperty("paymentScript", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ScriptModel PaymentScript { get; set; }
-
         [JsonProperty("isPushOnly", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsPushOnly { get; set; }
 
@@ -248,25 +242,19 @@
         public bool? HasCanonicalPushes { get; set; }
 
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ScriptIdModel Hash { get; set; }
+        public string Hash { get; set; }
 
-        [JsonProperty("WitHash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public WitScriptIdModel WitHash { get; set; }
+        [JsonProperty("paymentScriptHash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string PaymentScriptHash { get; set; }
 
         [JsonProperty("isUnspendable", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsUnspendable { get; set; }
 
+        [JsonProperty("addresses", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<string> Addresses { get; set; }
+
         [JsonProperty("isValid", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsValid { get; set; }
-    }
-
-    public class WitScriptModel
-    {
-        [JsonProperty("pushes", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<byte[]> Pushes { get; set; }
-
-        [JsonProperty("pushCount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public int? PushCount { get; set; }
     }
 
     public class TargetModel
@@ -287,7 +275,7 @@
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WalletModel
+    public class WalletResponseModel
     {
         [JsonProperty("name", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
@@ -332,10 +320,10 @@
         public int? Height { get; set; }
 
         [JsonProperty("blockId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 BlockId { get; set; }
+        public string BlockId { get; set; }
 
         [JsonProperty("transactionId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 TransactionId { get; set; }
+        public string TransactionId { get; set; }
 
         [JsonProperty("receivedCoins", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<CoinModel> ReceivedCoins { get; set; }
@@ -347,7 +335,7 @@
         public DateTimeOffset? FirstSeen { get; set; }
     }
 
-    public class InsertWalletAddress
+    public class InsertWalletAddressModel
     {
         [JsonProperty("mergePast", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? MergePast { get; set; }
@@ -575,7 +563,7 @@
         public MoneyModel GenesisReward { get; set; }
 
         [JsonProperty("genesisHash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 GenesisHash { get; set; }
+        public string GenesisHash { get; set; }
     }
 
     public class PubKeyModel
@@ -623,7 +611,7 @@
         public object BuriedDeployments { get; set; }
 
         [JsonProperty("bIP9Deployments", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public IBIP9DeploymentsArray BIP9Deployments { get; set; }
+        public IBIP9DeploymentsArrayModel BIP9Deployments { get; set; }
 
         [JsonProperty(
             "SubsidyHalvingInterval",
@@ -647,7 +635,7 @@
         public int? MajorityWindow { get; set; }
 
         [JsonProperty("bIP34Hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 BIP34Hash { get; set; }
+        public string BIP34Hash { get; set; }
 
         [JsonProperty("powLimit", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public TargetModel PowLimit { get; set; }
@@ -668,10 +656,10 @@
         public bool? PowNoRetargeting { get; set; }
 
         [JsonProperty("hashGenesisBlock", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 HashGenesisBlock { get; set; }
+        public string HashGenesisBlock { get; set; }
 
         [JsonProperty("minimumChainWork", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 MinimumChainWork { get; set; }
+        public string MinimumChainWork { get; set; }
 
         [JsonProperty(
             "MinerConfirmationWindow",
@@ -701,7 +689,7 @@
         public bool? IsProofOfStake { get; set; }
 
         [JsonProperty("defaultAssumeValid", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 DefaultAssumeValid { get; set; }
+        public string DefaultAssumeValid { get; set; }
 
         [JsonProperty("consensusFactory", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public object ConsensusFactory { get; set; }
@@ -755,10 +743,10 @@
     public class CheckpointInfoModel
     {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 Hash { get; set; }
+        public string Hash { get; set; }
 
         [JsonProperty("stakeModifierV2", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 StakeModifierV2 { get; set; }
+        public string StakeModifierV2 { get; set; }
     }
 
     public class Bech32EncoderModel
@@ -815,7 +803,7 @@
         public int? MaxStandardTxSigopsCost { get; set; }
     }
 
-    public class IBIP9DeploymentsArray
+    public class IBIP9DeploymentsArrayModel
     {
         [JsonProperty("length", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Length { get; set; }
@@ -962,10 +950,10 @@
         public string Version { get; set; }
 
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 Hash { get; set; }
+        public string Hash { get; set; }
 
         [JsonProperty("previous", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 Previous { get; set; }
+        public string Previous { get; set; }
 
         [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? Time { get; set; }
@@ -974,7 +962,7 @@
         public int? Nonce { get; set; }
 
         [JsonProperty("hashMerkelRoot", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public uint256 HashMerkelRoot { get; set; }
+        public string HashMerkelRoot { get; set; }
 
         [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Bits { get; set; }
@@ -993,6 +981,72 @@
 
         [JsonProperty("sincePeriodStart", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public VersionStatsModel SincePeriodStart { get; set; }
+    }
+
+    public class WhatIsPublicKeyModel
+    {
+        [JsonProperty("hex", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hex { get; set; }
+
+        [JsonProperty("isCompressed", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsCompressed { get; set; }
+
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsAddressModel Address { get; set; }
+
+        [JsonProperty("p2SHAddress", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsAddressModel P2SHAddress { get; set; }
+
+        [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsScriptModel ScriptPubKey { get; set; }
+    }
+
+    public class WhatIsAddressModel
+    {
+        [JsonProperty("isP2SH", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool? IsP2SH { get; set; }
+
+        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash { get; set; }
+
+        [JsonProperty("coloredAddress", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string ColoredAddress { get; set; }
+
+        [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsScriptModel ScriptPubKey { get; set; }
+
+        [JsonProperty("redeemScript", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsScriptModel RedeemScript { get; set; }
+
+        [JsonProperty("publicKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public WhatIsPublicKeyModel PublicKey { get; set; }
+
+        [JsonProperty("data", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Data { get; set; }
+
+        [JsonProperty("type", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [JsonProperty("stringType", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string StringType { get; set; }
+    }
+
+    public class WhatIsScriptModel
+    {
+        [JsonProperty("hash160", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash160 { get; set; }
+
+        [JsonProperty("hash256", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash256 { get; set; }
+
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Address { get; set; }
+
+        [JsonProperty("raw", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ScriptModel Raw { get; set; }
+
+        [JsonProperty("asm", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Asm { get; set; }
     }
 
     public class VersionStatsModel

@@ -420,6 +420,7 @@ namespace AzureIndexer.Api.Controllers
             {
                 return null;
             }
+
             return new BlockInformation
             {
                 BlockId = confirmed.HashBlock,
@@ -723,7 +724,7 @@ namespace AzureIndexer.Api.Controllers
 
             if (from != null)
             {
-                query.From = ToBalanceLocator(from);
+                query.From = this.ToBalanceLocator(from);
                 query.FromIncluded = true;
             }
 
@@ -739,27 +740,29 @@ namespace AzureIndexer.Api.Controllers
 
             if (query.From == null)
             {
-                query.From = new UnconfirmedBalanceLocator(DateTimeOffset.UtcNow - Expiration);
+                query.From = new UnconfirmedBalanceLocator(DateTimeOffset.UtcNow - this.Expiration);
             }
 
             if (until != null)
             {
-                query.To = ToBalanceLocator(until);
+                query.To = this.ToBalanceLocator(until);
                 query.FromIncluded = true;
             }
 
             if (query.To.IsGreaterThan(query.From))
-                throw InvalidParameters("Invalid argument : from < until");
+            {
+                throw this.InvalidParameters("Invalid argument : from < until");
+            }
 
-            var client = Configuration.Indexer.CreateIndexerClient();
+            var client = this.Configuration.Indexer.CreateIndexerClient();
             client.ColoredBalance = colored;
             var balance =
                 client
                 .GetOrderedBalance(balanceId, query)
                 .TakeWhile(_ => !cancel.IsCancellationRequested)
-                .WhereNotExpired(Expiration)
-                .Where(o => includeImmature || IsMature(o, Chain.Tip))
-                .AsBalanceSheet(Chain);
+                .WhereNotExpired(this.Expiration)
+                .Where(o => includeImmature || this.IsMature(o, this.Chain.Tip))
+                .AsBalanceSheet(this.Chain);
 
             var balanceChanges = balance.All;
 
@@ -810,6 +813,7 @@ namespace AzureIndexer.Api.Controllers
                     result.Continuation = lastop.CreateBalanceLocator();
                 }
             }
+
             return result;
         }
 
@@ -959,7 +963,7 @@ namespace AzureIndexer.Api.Controllers
         public async Task<object> WhatIsIt(string data)
         {
             var finder = new WhatIsIt(this);
-            var result = await finder.Find(data);
+            var result = await finder.Find(data, this.mapper);
             return result ?? "Good question Holmes !";
         }
 
@@ -979,12 +983,14 @@ namespace AzureIndexer.Api.Controllers
                 throw new HttpResponseException("Block not found", HttpStatusCode.NotFound);
             }
 
-            return new GetBlockResponse()
+            var response = new GetBlockResponse()
             {
                 AdditionalInformation = FetchBlockInformation(new[] { block.Header.GetHash() }) ?? new BlockInformation(block.Header),
                 ExtendedInformation = extended ? FetchExtendedBlockInformation(blockFeature, block) : null,
                 Block = headerOnly ? null : block
             };
+
+            return response;
         }
 
         private ExtendedBlockInformation FetchExtendedBlockInformation(BlockFeature blockFeature, Block block)

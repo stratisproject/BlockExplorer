@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using AzureIndexer.Api.Controllers;
 using AzureIndexer.Api.Models;
+using AzureIndexer.Api.Models.Response;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 
@@ -38,85 +40,110 @@ namespace AzureIndexer.Api.Infrastructure
         }
 
 
-        public async Task<object> Find(string data)
+        public async Task<object> Find(string data, IMapper mapper)
         {
             data = data.Trim();
-            var b58 = NoException(() => WhatIsBase58.GetFromBitcoinString(data));
+            var b58 = this.NoException(() => WhatIsBase58.GetFromBitcoinString(data));
             if (b58 != null)
             {
-                if (b58 is WhatIsAddress)
+                if (b58 is WhatIsAddress address)
                 {
-                    var address = (WhatIsAddress)b58;
-                    TryFetchRedeemOrPubKey(address);
+                    this.TryFetchRedeemOrPubKey(address);
                 }
-                return b58;
+
+                return mapper.Map<WhatIsAddressModel>(b58);
             }
 
             if (data.Length == 0x40)
             {
                 try
                 {
-                    return await Controller.JsonTransaction(uint256.Parse(data), false);
+                    return await this.Controller.JsonTransaction(uint256.Parse(data), false);
                 }
                 catch
                 {
                 }
             }
-            var b = NoException(() => Controller.JsonBlock(BlockFeature.Parse(data), true, false));
+
+            var b = this.NoException(() => this.Controller.JsonBlock(BlockFeature.Parse(data), true, false));
             if (b != null)
-                return b;
-
-            if (data.Length == 0x28) //Hash of pubkey or script
             {
-                TxDestination dest = new KeyId(data);
-                var address = new WhatIsAddress(dest.GetAddress(Network));
-                if (TryFetchRedeemOrPubKey(address))
-                    return address;
-
-                dest = new ScriptId(data);
-                address = new WhatIsAddress(dest.GetAddress(Network));
-                if (TryFetchRedeemOrPubKey(address))
-                    return address;
+                return b;
             }
 
+            // Hash of pubkey or script
+            if (data.Length == 0x28)
+            {
+                TxDestination dest = new KeyId(data);
+                var address = new WhatIsAddress(dest.GetAddress(this.Network));
+                if (this.TryFetchRedeemOrPubKey(address))
+                {
+                    return mapper.Map<WhatIsAddressModel>(address);
+                }
 
-            var script = NoException(() => GetScriptFromBytes(data));
-            if (script != null)
-                return new WhatIsScript(script, Network);
-            script = NoException(() => GetScriptFromText(data));
-            if (script != null)
-                return new WhatIsScript(script, Network);
+                dest = new ScriptId(data);
+                address = new WhatIsAddress(dest.GetAddress(this.Network));
+                if (this.TryFetchRedeemOrPubKey(address))
+                {
+                    return mapper.Map<WhatIsAddressModel>(address);
+                }
+            }
 
-            var sig = NoException(() => new TransactionSignature(Encoders.Hex.DecodeData(data)));
+            var script = this.NoException(() => GetScriptFromBytes(data));
+            if (script != null)
+            {
+                var scriptModel = new WhatIsScript(script, this.Network);
+                return mapper.Map<WhatIsScriptModel>(scriptModel);
+            }
+
+            script = this.NoException(() => GetScriptFromText(data));
+            if (script != null)
+            {
+                var scriptModel = new WhatIsScript(script, this.Network);
+                return mapper.Map<WhatIsScriptModel>(scriptModel);
+            }
+
+            var sig = this.NoException(() => new TransactionSignature(Encoders.Hex.DecodeData(data)));
             if (sig != null)
+            {
                 return new WhatIsTransactionSignature(sig);
+            }
 
-            var pubkeyBytes = NoException(() => Encoders.Hex.DecodeData(data));
+            var pubkeyBytes = this.NoException(() => Encoders.Hex.DecodeData(data));
             if (pubkeyBytes != null && PubKey.Check(pubkeyBytes, true))
             {
-                var pubKey = NoException(() => new PubKey(data));
+                var pubKey = this.NoException(() => new PubKey(data));
                 if (pubKey != null)
-                    return new WhatIsPublicKey(pubKey, Network);
+                {
+                    var pubKeyModel = new WhatIsPublicKey(pubKey, this.Network);
+                    return mapper.Map<WhatIsPublicKeyModel>(pubKeyModel);
+                }
             }
 
             if (data.Length == 80 * 2)
             {
-                var blockHeader = NoException(() =>
+                var blockHeader = this.NoException(() =>
                 {
                     var h = new BlockHeader();
                     h.ReadWrite(Encoders.Hex.DecodeData(data));
                     return h;
                 });
                 if (blockHeader != null)
+                {
                     return new WhatIsBlockHeader(blockHeader);
+                }
             }
+
             return null;
         }
 
         private static Script GetScriptFromText(string data)
         {
             if (!data.Contains(' '))
+            {
                 return null;
+            }
+
             return GetScriptFromBytes(Encoders.Hex.EncodeData(new Script(data).ToBytes(true)));
         }
 

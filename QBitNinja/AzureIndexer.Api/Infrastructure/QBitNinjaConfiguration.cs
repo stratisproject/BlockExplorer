@@ -240,7 +240,7 @@ namespace AzureIndexer.Api.Infrastructure
 
         private CloudTable GetChainCacheCloudTable()
         {
-            var table = this.Indexer.GetTable("chainchache");
+            var table = this.Indexer.GetTable("chain");
             table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
             return table;
         }
