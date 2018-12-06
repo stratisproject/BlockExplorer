@@ -61,10 +61,12 @@ namespace AzureIndexer.Api.Controllers
                         // tx = new Transaction(await Request.Content.ReadAsByteArrayAsync());
                         break;
                     }
+
                 default:
                     throw new HttpResponseException("UnsupportedMediaType", HttpStatusCode.UnsupportedMediaType);
             }
-            await Configuration
+
+            await this.Configuration
                 .Topics
                 .BroadcastedTransactions
                 .AddAsync(new BroadcastedTransaction(tx));
@@ -72,14 +74,18 @@ namespace AzureIndexer.Api.Controllers
             var hash = tx.GetHash();
             for (int i = 0; i < 10; i++)
             {
-                var indexed = await Configuration.Indexer.CreateIndexerClient().GetTransactionAsync(hash);
+                var indexed = await this.Configuration.Indexer.CreateIndexerClient().GetTransactionAsync(hash);
                 if (indexed != null)
+                {
                     return new BroadcastResponse()
                     {
                         Success = true
                     };
-                var reject = await Configuration.GetRejectTable().ReadOneAsync(hash.ToString());
+                }
+
+                var reject = await this.Configuration.GetRejectTable().ReadOneAsync(hash.ToString());
                 if (reject != null)
+                {
                     return new BroadcastResponse()
                     {
                         Success = false,
@@ -89,8 +95,11 @@ namespace AzureIndexer.Api.Controllers
                             Reason = reject.Reason
                         }
                     };
+                }
+
                 await Task.Delay(100 * i);
             }
+
             return new BroadcastResponse()
             {
                 Success = true,
@@ -116,11 +125,17 @@ namespace AzureIndexer.Api.Controllers
         public WalletModel CreateWallet(WalletModel wallet)
         {
             if (string.IsNullOrEmpty(wallet.Name))
+            {
                 throw new FormatException("Invalid wallet name");
-            AssertValidUrlPart(wallet.Name, "wallet name");
-            var repo = Configuration.CreateWalletRepository();
+            }
+
+            this.AssertValidUrlPart(wallet.Name, "wallet name");
+            var repo = this.Configuration.CreateWalletRepository();
             if (!repo.Create(wallet))
-                throw Error(409, "wallet already exist");
+            {
+                throw this.Error(409, "wallet already exist");
+            }
+
             return wallet;
         }
 
@@ -129,16 +144,18 @@ namespace AzureIndexer.Api.Controllers
         public async Task<Subscription> AddSubscription(Subscription subscription)
         {
             if (subscription.Id == null)
+            {
                 subscription.Id = Encoders.Hex.EncodeData(RandomUtils.GetBytes(32));
+            }
 
-            if (!await (Configuration
+            if (!await (this.Configuration
             .GetSubscriptionsTable()
             .CreateAsync(subscription.Id, subscription, false)))
             {
-                throw Error(409, "notification already exist");
+                throw this.Error(409, "notification already exist");
             }
 
-            await Configuration
+            await this.Configuration
                 .Topics
                 .SubscriptionChanges
                 .AddAsync(new SubscriptionChange(subscription, true));
@@ -148,7 +165,9 @@ namespace AzureIndexer.Api.Controllers
         private void AssertValidUrlPart(string str, string fieldName)
         {
             if (str.Contains('/') || str.Contains('?'))
-                throw Error(400, "A field contains illegal characters (" + fieldName + ")");
+            {
+                throw this.Error(400, "A field contains illegal characters (" + fieldName + ")");
+            }
         }
 
         private Exception Error(int httpCode, string reason)
@@ -168,7 +187,7 @@ namespace AzureIndexer.Api.Controllers
             bool colored = false)
         {
             var balanceId = new BalanceId(walletName);
-            return Balance(balanceId, continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
+            return this.Balance(balanceId, continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
         }
 
         [HttpPost]
@@ -179,13 +198,18 @@ namespace AzureIndexer.Api.Controllers
         {
             if (insertAddress.RedeemScript != null && insertAddress.Address == null)
             {
-                insertAddress.Address = insertAddress.RedeemScript.GetScriptAddress(Network);
+                insertAddress.Address = insertAddress.RedeemScript.GetScriptAddress(this.Network);
             }
+
             if (insertAddress.Address == null || !((insertAddress.Address) is IDestination))
-                throw Error(400, "Address is missing");
+            {
+                throw this.Error(400, "Address is missing");
+            }
 
             if (!insertAddress.IsCoherent())
-                throw Error(400, "The provided redeem script does not correspond to the given address");
+            {
+                throw this.Error(400, "The provided redeem script does not correspond to the given address");
+            }
 
             var address = new WalletAddress();
             address.Address = insertAddress.Address;
@@ -193,12 +217,14 @@ namespace AzureIndexer.Api.Controllers
             address.UserData = insertAddress.UserData;
             address.WalletName = walletName;
 
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
 
             if (!repo.AddWalletAddress(address, insertAddress.MergePast))
-                throw Error(409, "This address already exist in the wallet");
+            {
+                throw this.Error(409, "This address already exist in the wallet");
+            }
 
-            var unused = Configuration.Topics.AddedAddresses.AddAsync(new[] { address });
+            var unused = this.Configuration.Topics.AddedAddresses.AddAsync(new[] { address });
             return address;
         }
 
@@ -206,7 +232,7 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/addresses")]
         public WalletAddress[] WalletAddresses(string walletName)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             return repo.GetAddresses(walletName);
         }
 
@@ -214,11 +240,12 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/keysets/{keyset}")]
         public bool DeleteKeyset(string walletName, string keyset)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             if (!repo.DeleteKeySet(walletName, keyset))
             {
-                throw Error(404, "keyset not found");
+                throw this.Error(404, "keyset not found");
             }
+
             return true;
         }
 
@@ -226,14 +253,23 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/keysets")]
         public HDKeySet CreateKeyset(string walletName, [FromBody]HDKeySet keyset)
         {
-            AssertValidUrlPart(keyset.Name, "Keyset name");
+            this.AssertValidUrlPart(keyset.Name, "Keyset name");
             if (keyset.ExtPubKeys == null || keyset.ExtPubKeys.Length == 0)
-                throw Error(400, "ExtPubKeys not specified");
+            {
+                throw this.Error(400, "ExtPubKeys not specified");
+            }
+
             if (keyset.ExtPubKeys.Length < keyset.SignatureCount)
-                throw Error(400, "SignatureCount should not be higher than the number of HD Keys");
+            {
+                throw this.Error(400, "SignatureCount should not be higher than the number of HD Keys");
+            }
+
             if (keyset.Path != null && keyset.Path.ToString().Contains("'"))
-                throw Error(400, "The keypath should not contains hardened children");
-            var repo = Configuration.CreateWalletRepository();
+            {
+                throw this.Error(400, "The keypath should not contains hardened children");
+            }
+
+            var repo = this.Configuration.CreateWalletRepository();
 
             KeySetData keysetData = new KeySetData
             {
@@ -241,14 +277,17 @@ namespace AzureIndexer.Api.Controllers
                 State = new HDKeyState()
             };
             if (!repo.AddKeySet(walletName, keysetData))
-                throw Error(409, "Keyset already exists");
+            {
+                throw this.Error(409, "Keyset already exists");
+            }
 
             var newAddresses = repo.Scan(walletName, keysetData, 0, 20);
 
             foreach (var addresses in newAddresses.Partition(20))
             {
-                var unused = Configuration.Topics.AddedAddresses.AddAsync(addresses.ToArray());
+                var unused = this.Configuration.Topics.AddedAddresses.AddAsync(addresses.ToArray());
             }
+
             return keyset;
         }
 
@@ -315,12 +354,13 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/keysets/{keysetName}/keys")]
         public HDKeyData[] GetKeys(string walletName, string keysetName)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             var keys = repo.GetKeys(walletName, keysetName);
             if (keys.Length == 0)
             {
-                AssetWalletAndKeysetExists(walletName, keysetName);
+                this.AssetWalletAndKeysetExists(walletName, keysetName);
             }
+
             return keys;
         }
 
@@ -342,7 +382,7 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets")]
         public WalletModel[] Wallets()
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             return repo.Get();
         }
 
@@ -351,10 +391,13 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}")]
         public WalletModel GetWallet(string walletName)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             var result = repo.GetWallet(walletName);
             if (result == null)
-                throw Error(404, "Wallet not found");
+            {
+                throw this.Error(404, "Wallet not found");
+            }
+
             return result;
         }
 
@@ -389,8 +432,11 @@ namespace AzureIndexer.Api.Controllers
                 {
                     var entry = tx.ColoredTransaction.GetColoredEntry((uint)i);
                     if (entry != null)
+                    {
                         coin = new ColoredCoin(entry.Asset, (Coin)coin);
+                    }
                 }
+
                 response.ReceivedCoins.Add(coin);
             }
 
@@ -403,7 +449,9 @@ namespace AzureIndexer.Api.Controllers
                     {
                         var entry = tx.ColoredTransaction.Inputs.FirstOrDefault(ii => ii.Index == i);
                         if (entry != null)
+                        {
                             coin = new ColoredCoin(entry.Asset, (Coin)coin);
+                        }
                     }
 
                     response.SpentCoins.Add(coin);
@@ -415,7 +463,7 @@ namespace AzureIndexer.Api.Controllers
 
         private BlockInformation FetchBlockInformation(uint256[] blockIds)
         {
-            var confirmed = blockIds.Select(b => Chain.GetBlock(b)).Where(b => b != null).FirstOrDefault();
+            var confirmed = blockIds.Select(b => this.Chain.GetBlock(b)).Where(b => b != null).FirstOrDefault();
             if (confirmed == null)
             {
                 return null;
@@ -425,25 +473,26 @@ namespace AzureIndexer.Api.Controllers
             {
                 BlockId = confirmed.HashBlock,
                 BlockHeader = confirmed.Header,
-                Confirmations = Chain.Tip.Height - confirmed.Height + 1,
+                Confirmations = this.Chain.Tip.Height - confirmed.Height + 1,
                 Height = confirmed.Height,
                 MedianTimePast = confirmed.GetMedianTimePast(),
                 BlockTime = confirmed.Header.BlockTime
             };
         }
 
-        public async Task<HttpResponseMessage> RawTransaction(
-            uint256 txId
-            )
+        public async Task<HttpResponseMessage> RawTransaction(uint256 txId)
         {
-            var client = Configuration.Indexer.CreateIndexerClient();
+            var client = this.Configuration.Indexer.CreateIndexerClient();
             var tx = await client.GetTransactionAsync(txId);
             if (tx == null)
+            {
                 throw new HttpResponseException(new HttpResponseMessage
                 {
                     StatusCode = HttpStatusCode.NotFound,
                     ReasonPhrase = "Transaction not found"
                 });
+            }
+
             return Response(tx.Transaction);
         }
 
@@ -451,7 +500,7 @@ namespace AzureIndexer.Api.Controllers
         public HttpResponseMessage RawBlock(
             BlockFeature blockFeature, bool headerOnly)
         {
-            var block = GetBlock(blockFeature, headerOnly);
+            var block = this.GetBlock(blockFeature, headerOnly);
             if (block == null)
             {
                 throw new HttpResponseException(new HttpResponseMessage
@@ -470,16 +519,18 @@ namespace AzureIndexer.Api.Controllers
             string blockFeature, bool headerOnly = false, DataFormat format = DataFormat.Json, bool extended = false)
         {
             if (format == DataFormat.Json)
-                return JsonBlock(blockFeature.ToBlockFeature(), headerOnly, extended);
+            {
+                return this.JsonBlock(blockFeature.ToBlockFeature(), headerOnly, extended);
+            }
 
-            return RawBlock(blockFeature.ToBlockFeature(), headerOnly);
+            return this.RawBlock(blockFeature.ToBlockFeature(), headerOnly);
         }
 
         [HttpGet]
         [Route("blocks/{blockFeature}/header")]
         public WhatIsBlockHeader BlockHeader(string blockFeature)
         {
-            var block = GetBlock(blockFeature.ToBlockFeature(), true);
+            var block = this.GetBlock(blockFeature.ToBlockFeature(), true);
             return new WhatIsBlockHeader(block.Header);
         }
 
@@ -493,9 +544,10 @@ namespace AzureIndexer.Api.Controllers
             {
                 var jobj = new JObject();
                 jobj.Add("Name", check.CheckpointName);
-                jobj.Add("Height", Chain.FindFork(check.BlockLocator).Height);
+                jobj.Add("Height", this.Chain.FindFork(check.BlockLocator).Height);
                 arr.Add(jobj);
             }
+
             return arr;
         }
 
@@ -519,29 +571,34 @@ namespace AzureIndexer.Api.Controllers
             bool debug,
             bool colored)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             CancellationTokenSource cancel = new CancellationTokenSource();
             cancel.CancelAfter(30000);
-            var checkpoint = Configuration.Indexer.CreateIndexer()
+            var checkpoint = this.Configuration.Indexer.CreateIndexer()
                 .GetCheckpoint(balanceId.Type == BalanceType.Address ? IndexerCheckpoints.Balances : IndexerCheckpoints.Wallets);
 
-            var atBlock = AtBlock(at);
+            var atBlock = this.AtBlock(at);
 
             var query = new BalanceQuery();
             query.RawOrdering = true;
             query.From = null;
 
             if (at != null)
-                query.From = ToBalanceLocator(atBlock);
+            {
+                query.From = this.ToBalanceLocator(atBlock);
+            }
+
             if (query.From == null)
-                query.From = new UnconfirmedBalanceLocator(DateTimeOffset.UtcNow - Expiration);
+            {
+                query.From = new UnconfirmedBalanceLocator(DateTimeOffset.UtcNow - this.Expiration);
+            }
 
             query.PageSizes = new[] { 1, 10, 100 };
 
             var cacheTable = repo.GetBalanceSummaryCacheTable(balanceId, colored);
-            var cachedSummary = cacheTable.Query(Chain, query).FirstOrDefault(c => (((ConfirmedBalanceLocator)c.Locator).BlockHash == atBlock.HashBlock && at != null) ||
+            var cachedSummary = cacheTable.Query(this.Chain, query).FirstOrDefault(c => (((ConfirmedBalanceLocator)c.Locator).BlockHash == atBlock.HashBlock && at != null) ||
                                                                                    c.Immature.TransactionCount == 0 ||
-                                                                                   ((c.Immature.TransactionCount != 0) && !IsMature(c.OlderImmature, atBlock)));
+                                                                                   ((c.Immature.TransactionCount != 0) && !this.IsMature(c.OlderImmature, atBlock)));
 
             var cachedLocator = cachedSummary == null ? null : (ConfirmedBalanceLocator)cachedSummary.Locator;
             if (cachedSummary != null && at != null && cachedLocator.Height == atBlock.Height)
@@ -559,21 +616,23 @@ namespace AzureIndexer.Api.Controllers
             };
 
             int stopAtHeight = cachedSummary.Locator == null ? -1 : cachedLocator.Height;
-            int lookback = (int)(Expiration.Ticks / this.Network.Consensus.PowTargetSpacing.Ticks);
+            int lookback = (int)(this.Expiration.Ticks / this.Network.Consensus.PowTargetSpacing.Ticks);
             if (at == null)
+            {
                 stopAtHeight = stopAtHeight - lookback;
+            }
 
-            var client = Configuration.Indexer.CreateIndexerClient();
+            var client = this.Configuration.Indexer.CreateIndexerClient();
             client.ColoredBalance = colored;
 
             var diff =
                 client
                 .GetOrderedBalance(balanceId, query)
-                .WhereNotExpired(Expiration)
+                .WhereNotExpired(this.Expiration)
                 .TakeWhile(_ => !cancel.IsCancellationRequested)
                 // Some confirmation of the fetched unconfirmed may hide behind stopAtHeigh
                 .TakeWhile(_ => _.BlockId == null || _.Height > stopAtHeight - lookback)
-                .AsBalanceSheet(Chain);
+                .AsBalanceSheet(this.Chain);
 
             if (cancel.Token.IsCancellationRequested)
             {
@@ -584,22 +643,22 @@ namespace AzureIndexer.Api.Controllers
                 });
             }
 
-            RemoveBehind(diff, stopAtHeight);
-            RemoveConflicts(diff);
+            this.RemoveBehind(diff, stopAtHeight);
+            this.RemoveConflicts(diff);
 
             var unconfs = diff.Unconfirmed;
             var confs = cachedLocator == null ?
                                             diff.Confirmed :
                                             diff.Confirmed.Where(c => c.Height > cachedLocator.Height).ToList();
 
-            var immature = confs.Where(c => !IsMature(c, atBlock)).ToList();
+            var immature = confs.Where(c => !this.IsMature(c, atBlock)).ToList();
 
 
             var summary = new BalanceSummary()
             {
-                Confirmed = BalanceSummaryDetails.CreateFrom(confs, Network, colored),
-                Immature = BalanceSummaryDetails.CreateFrom(immature, Network, colored),
-                UnConfirmed = BalanceSummaryDetails.CreateFrom(unconfs, Network, colored),
+                Confirmed = BalanceSummaryDetails.CreateFrom(confs, this.Network, colored),
+                Immature = BalanceSummaryDetails.CreateFrom(immature, this.Network, colored),
+                UnConfirmed = BalanceSummaryDetails.CreateFrom(unconfs, this.Network, colored),
             };
             summary.Confirmed += cachedSummary.Confirmed;
             summary.Immature += cachedSummary.Immature;
@@ -619,9 +678,11 @@ namespace AzureIndexer.Api.Controllers
                     Locator = summary.Locator,
                     OlderImmature = Math.Min(cachedSummary.OlderImmature, olderImmature)
                 };
-                var checkpointBlock = Chain.GetBlock(checkpoint.BlockLocator.Blocks[0]);
+                var checkpointBlock = this.Chain.GetBlock(checkpoint.BlockLocator.Blocks[0]);
                 if (checkpointBlock != null && checkpointBlock.Height >= atBlock.Height)
+                {
                     cacheTable.Create(newCachedLocator, newCachedSummary);
+                }
             }
 
             summary.PrepareForSend(at, debug);
@@ -630,10 +691,10 @@ namespace AzureIndexer.Api.Controllers
 
         private void RemoveBehind(BalanceSheet diff, int stopAtHeight)
         {
-            RemoveBehind(diff.All, stopAtHeight);
-            RemoveBehind(diff.Confirmed, stopAtHeight);
-            RemoveBehind(diff.Unconfirmed, stopAtHeight);
-            RemoveBehind(diff.Prunable, stopAtHeight);
+            this.RemoveBehind(diff.All, stopAtHeight);
+            this.RemoveBehind(diff.Confirmed, stopAtHeight);
+            this.RemoveBehind(diff.Unconfirmed, stopAtHeight);
+            this.RemoveBehind(diff.Prunable, stopAtHeight);
         }
 
         private void RemoveBehind(List<OrderedBalanceChange> changes, int stopAtHeight)
@@ -643,14 +704,16 @@ namespace AzureIndexer.Api.Controllers
                 if (change.BlockId != null)
                 {
                     if (change.Height <= stopAtHeight)
+                    {
                         changes.Remove(change);
+                    }
                 }
             }
         }
 
         private ConfirmedBalanceLocator ToBalanceLocator(BlockFeature feature)
         {
-            return ToBalanceLocator(AtBlock(feature));
+            return this.ToBalanceLocator(this.AtBlock(feature));
         }
 
         private ConfirmedBalanceLocator ToBalanceLocator(ChainedHeader atBlock)
@@ -660,25 +723,29 @@ namespace AzureIndexer.Api.Controllers
 
         private ChainedHeader AtBlock(BlockFeature at)
         {
-            var atBlock = Chain.Tip;
+            var atBlock = this.Chain.Tip;
             if (at != null)
             {
-                var chainedBlock = at.GetChainedBlock(Chain);
+                var chainedBlock = at.GetChainedBlock(this.Chain);
                 if (chainedBlock == null)
+                {
                     throw new FormatException("'at' not found in the blockchain");
+                }
+
                 atBlock = chainedBlock;
             }
+
             return atBlock;
         }
 
         private bool IsMature(int height, ChainedHeader tip)
         {
-            return tip.Height - height >= Configuration.CoinbaseMaturity;
+            return tip.Height - height >= this.Configuration.CoinbaseMaturity;
         }
 
         private bool IsMature(OrderedBalanceChange c, ChainedHeader tip)
         {
-            return !c.IsCoinbase || (c.BlockId != null && IsMature(c.Height, tip));
+            return !c.IsCoinbase || (c.BlockId != null && this.IsMature(c.Height, tip));
         }
 
         [HttpGet]
@@ -701,7 +768,7 @@ namespace AzureIndexer.Api.Controllers
         // Property passed by BalanceIdModelBinder
         private bool IsColoredAddress()
         {
-            return HttpContext.Items.ContainsKey("BitcoinColoredAddress");
+            return this.HttpContext.Items.ContainsKey("BitcoinColoredAddress");
         }
 
         TimeSpan Expiration = TimeSpan.FromHours(24.0);
@@ -776,18 +843,21 @@ namespace AzureIndexer.Api.Controllers
                     if (last.BlockId == null)
                     {
                         if (last.SeenUtc < older.SeenUtc)
+                        {
                             oldUnconfirmed.Add(last);
+                        }
                     }
                     else
                         break;
                 }
+
                 foreach (var unconf in oldUnconfirmed)
                 {
                     balanceChanges.Remove(unconf);
                 }
             }
 
-            var conflicts = RemoveConflicts(balance);
+            var conflicts = this.RemoveConflicts(balance);
 
             if (unspentOnly)
             {
@@ -796,6 +866,7 @@ namespace AzureIndexer.Api.Controllers
                 {
                     spents.Add(change.Outpoint);
                 }
+
                 foreach (var change in balanceChanges)
                 {
                     change.SpentCoins.Clear();
@@ -803,8 +874,8 @@ namespace AzureIndexer.Api.Controllers
                 }
             }
 
-            var result = new BalanceModel(balanceChanges, Chain);
-            result.ConflictedOperations = result.GetBalanceOperations(conflicts, Chain);
+            var result = new BalanceModel(balanceChanges, this.Chain);
+            result.ConflictedOperations = result.GetBalanceOperations(conflicts, this.Chain);
             if (cancel.IsCancellationRequested)
             {
                 if (balanceChanges.Count > 0)
@@ -829,8 +900,8 @@ namespace AzureIndexer.Api.Controllers
                     if (!spentOutputs.TryAdd(spent.Outpoint, balanceChange))
                     {
                         var balanceChange2 = spentOutputs[spent.Outpoint];
-                        var score = GetScore(balanceChange);
-                        var score2 = GetScore(balanceChange2);
+                        var score = this.GetScore(balanceChange);
+                        var score2 = this.GetScore(balanceChange2);
                         var conflicted =
                             score == score2 ?
                                     ((balanceChange.SeenUtc < balanceChange2.SeenUtc) ? balanceChange : balanceChange2) :
@@ -838,11 +909,14 @@ namespace AzureIndexer.Api.Controllers
                         conflicts.Add(conflicted);
 
                         var nonConflicted = conflicted == balanceChange ? balanceChange2 : balanceChange;
-                        if (nonConflicted.BlockId == null || !Chain.Contains(nonConflicted.BlockId))
+                        if (nonConflicted.BlockId == null || !this.Chain.Contains(nonConflicted.BlockId))
+                        {
                             unconfirmedConflicts.Add(conflicted);
+                        }
                     }
                 }
             }
+
             foreach (var conflict in conflicts)
             {
                 balance.All.Remove(conflict);
@@ -858,11 +932,12 @@ namespace AzureIndexer.Api.Controllers
             if (balance.BlockId != null)
             {
                 score += 10;
-                if (Chain.Contains(balance.BlockId))
+                if (this.Chain.Contains(balance.BlockId))
                 {
                     score += 100;
                 }
             }
+
             return score;
         }
 
@@ -880,13 +955,13 @@ namespace AzureIndexer.Api.Controllers
         public VersionStatsResponse GetVersionStats()
         {
             VersionStatsResponse resp = new VersionStatsResponse();
-            resp.Last144 = GetVersionStats(Chain.Tip.EnumerateToGenesis().Take(144).ToArray());
-            resp.Last2016 = GetVersionStats(Chain.Tip.EnumerateToGenesis().Take(2016).ToArray());
-            var difficultyAdjustmentInterval = (long)Network.Consensus.PowTargetTimespan.TotalSeconds /
-                                               (long)Network.Consensus.PowTargetSpacing.TotalSeconds;
+            resp.Last144 = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis().Take(144).ToArray());
+            resp.Last2016 = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis().Take(2016).ToArray());
+            var difficultyAdjustmentInterval = (long)this.Network.Consensus.PowTargetTimespan.TotalSeconds /
+                                               (long)this.Network.Consensus.PowTargetSpacing.TotalSeconds;
 
-            resp.SincePeriodStart = GetVersionStats(Chain.Tip.EnumerateToGenesis()
-                                                             .TakeWhile(s => Chain.Tip == s || s.Height % difficultyAdjustmentInterval != difficultyAdjustmentInterval - 1).ToArray());
+            resp.SincePeriodStart = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis()
+                                                             .TakeWhile(s => this.Chain.Tip == s || s.Height % difficultyAdjustmentInterval != difficultyAdjustmentInterval - 1).ToArray());
             return resp;
         }
 
@@ -894,7 +969,7 @@ namespace AzureIndexer.Api.Controllers
         [Route("bip9")]
         public JObject GetBIP9()
         {
-            var stats = GetVersionStats();
+            var stats = this.GetVersionStats();
             var result = JObject.Parse(JsonConvert.SerializeObject(stats));
             foreach (var period in result.OfType<JProperty>().Select(p => (JObject)p.Value))
             {
@@ -907,8 +982,10 @@ namespace AzureIndexer.Api.Controllers
                         stat.Remove("proposal");
                     }
                 }
+
                 period.Remove("stats");
             }
+
             return result;
         }
 
@@ -971,13 +1048,13 @@ namespace AzureIndexer.Api.Controllers
         {
             get
             {
-                return Configuration.Indexer.Network;
+                return this.Configuration.Indexer.Network;
             }
         }
 
         internal GetBlockResponse JsonBlock(BlockFeature blockFeature, bool headerOnly, bool extended)
         {
-            var block = GetBlock(blockFeature, headerOnly);
+            var block = this.GetBlock(blockFeature, headerOnly);
             if (block == null)
             {
                 throw new HttpResponseException("Block not found", HttpStatusCode.NotFound);
@@ -985,8 +1062,8 @@ namespace AzureIndexer.Api.Controllers
 
             var response = new GetBlockResponse()
             {
-                AdditionalInformation = FetchBlockInformation(new[] { block.Header.GetHash() }) ?? new BlockInformation(block.Header),
-                ExtendedInformation = extended ? FetchExtendedBlockInformation(blockFeature, block) : null,
+                AdditionalInformation = this.FetchBlockInformation(new[] { block.Header.GetHash() }) ?? new BlockInformation(block.Header),
+                ExtendedInformation = extended ? this.FetchExtendedBlockInformation(blockFeature, block) : null,
                 Block = headerOnly ? null : block
             };
 
@@ -996,27 +1073,36 @@ namespace AzureIndexer.Api.Controllers
         private ExtendedBlockInformation FetchExtendedBlockInformation(BlockFeature blockFeature, Block block)
         {
             var id = block.Header.GetHash().ToString();
-            var extendedInfo = Configuration.GetCacheTable<ExtendedBlockInformation>().ReadOne(id);
+            var extendedInfo = this.Configuration.GetCacheTable<ExtendedBlockInformation>().ReadOne(id);
             if (extendedInfo != null)
+            {
                 return extendedInfo;
-            ChainedHeader chainedBlock = blockFeature.GetChainedBlock(Chain);
+            }
+
+            ChainedHeader chainedBlock = blockFeature.GetChainedBlock(this.Chain);
             if (chainedBlock == null)
+            {
                 return null;
+            }
+
             if (block.Transactions.Count == 0)
             {
-                block = GetBlock(blockFeature, false);
+                block = this.GetBlock(blockFeature, false);
                 if (block == null || block.Transactions.Count == 0)
+                {
                     return null;
+                }
             }
+
             extendedInfo = new ExtendedBlockInformation()
             {
                 BlockReward = block.Transactions[0].TotalOut,
-                BlockSubsidy = GetBlockSubsidy(chainedBlock.Height),
-                Size = GetSize(block, TransactionOptions.All),
-                StrippedSize = GetSize(block, TransactionOptions.None),
+                BlockSubsidy = this.GetBlockSubsidy(chainedBlock.Height),
+                Size = this.GetSize(block, TransactionOptions.All),
+                StrippedSize = this.GetSize(block, TransactionOptions.None),
                 TransactionCount = block.Transactions.Count
             };
-            Configuration.GetCacheTable<ExtendedBlockInformation>().Create(id, extendedInfo, true);
+            this.Configuration.GetCacheTable<ExtendedBlockInformation>().Create(id, extendedInfo, true);
             return extendedInfo;
         }
 
@@ -1027,12 +1113,15 @@ namespace AzureIndexer.Api.Controllers
             data.ReadWrite(bms);
             return (int)bms.Counter.WrittenBytes;
         }
+
         Money GetBlockSubsidy(int nHeight)
         {
-            int halvings = nHeight / Configuration.Indexer.Network.Consensus.SubsidyHalvingInterval;
+            int halvings = nHeight / this.Configuration.Indexer.Network.Consensus.SubsidyHalvingInterval;
             // Force block reward to zero when right shift is undefined.
             if (halvings >= 64)
+            {
                 return 0;
+            }
 
             Money nSubsidy = Money.Coins(50);
             // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
@@ -1042,26 +1131,36 @@ namespace AzureIndexer.Api.Controllers
 
         private Block GetBlock(BlockFeature blockFeature, bool headerOnly)
         {
-            var chainedBlock = blockFeature.GetChainedBlock(Chain);
+            var chainedBlock = blockFeature.GetChainedBlock(this.Chain);
             var hash = chainedBlock == null ? blockFeature.BlockId : chainedBlock.HashBlock;
             if (hash == null)
+            {
                 return null;
+            }
+
             if (chainedBlock != null && chainedBlock.Height == 0)
-                return headerOnly ? new NBitcoin.Block(Network.GetGenesis().Header) : Network.GetGenesis();
-            var client = Configuration.Indexer.CreateIndexerClient();
-            return headerOnly ? GetHeader(hash, client) : client.GetBlock(hash);
+            {
+                return headerOnly ? new NBitcoin.Block(this.Network.GetGenesis().Header) : this.Network.GetGenesis();
+            }
+
+            var client = this.Configuration.Indexer.CreateIndexerClient();
+            return headerOnly ? this.GetHeader(hash, client) : client.GetBlock(hash);
         }
 
         private Block GetHeader(uint256 hash, IndexerClient client)
         {
-            var header = Chain.GetBlock(hash);
+            var header = this.Chain.GetBlock(hash);
             if (header == null)
             {
                 var b = client.GetBlock(hash);
                 if (b == null)
+                {
                     return null;
+                }
+
                 return new Block(b.Header);
             }
+
             return new Block(header.Header);
         }
 
