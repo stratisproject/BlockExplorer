@@ -1,20 +1,20 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using Stratis.Bitcoin.Features.AzureIndexer.Internal;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Runtime.ExceptionServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Runtime.ExceptionServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
+    using Stratis.Bitcoin.Features.AzureIndexer.Internal;
+
     public enum IndexerCheckpoints
     {
         Wallets,
@@ -27,75 +27,73 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory)
         {
-            var indexerConfig = new IndexerConfiguration(config, loggerFactory);
+            IndexerConfiguration indexerConfig = new IndexerConfiguration(config, loggerFactory);
             return indexerConfig.CreateIndexer();
         }
 
-        private readonly IndexerConfiguration _Configuration;
+        private readonly IndexerConfiguration _configuration;
 
-        private readonly ILoggerFactory loggerFactory;
+        private readonly ILoggerFactory _loggerFactory;
 
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
         public IndexerConfiguration Configuration
         {
             get
             {
-                return this._Configuration;
+                return this._configuration;
             }
         }
 
+        /// <inheritdoc />
         public AzureIndexer(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            this.loggerFactory = loggerFactory;
-
-            if (configuration == null)
-                throw new ArgumentNullException("configuration");
+            this._loggerFactory = loggerFactory;
             this.TaskScheduler = TaskScheduler.Default;
             this.CheckpointInterval = TimeSpan.FromMinutes(15.0);
-            this._Configuration = configuration;
+            this._configuration = configuration ?? throw new ArgumentNullException("configuration");
             this.FromHeight = 0;
             this.ToHeight = int.MaxValue;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this._logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
         internal Checkpoint GetCheckpointInternal(IndexerCheckpoints checkpoint)
         {
-            this.logger.LogTrace("({0}:{1})", nameof(checkpoint), checkpoint);
+            this._logger.LogTrace("({0}:{1})", nameof(checkpoint), checkpoint);
 
             Checkpoint chk = this.GetCheckpoint(checkpoint);
             if (this.IgnoreCheckpoints)
             {
-                this.logger.LogTrace("Checkpoints ignored");
-                chk = new Checkpoint(chk.CheckpointName, this.Configuration.Network, null, null, this.loggerFactory);
+                this._logger.LogTrace("Checkpoints ignored");
+                chk = new Checkpoint(chk.CheckpointName, this.Configuration.Network, null, null, this._loggerFactory);
             }
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
             return chk;
         }
 
         private void SetThrottling()
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
             Helper.SetThrottling();
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         private void PushTransactions(MultiValueDictionary<string, TransactionEntry.Entity> buckets,
                                         IEnumerable<TransactionEntry.Entity> indexedTransactions,
                                     BlockingCollection<TransactionEntry.Entity[]> transactions)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var array = indexedTransactions.ToArray();
+            TransactionEntry.Entity[] array = indexedTransactions.ToArray();
             transactions.Add(array);
             buckets.Remove(array[0].PartitionKey);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         private TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
@@ -111,46 +109,46 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void Index(params Block[] blocks)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var task = new IndexBlocksTask(this.Configuration, this.loggerFactory);
+            IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             task.Index(blocks, this.TaskScheduler);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params Block[] blocks)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var task = new IndexBlocksTask(this.Configuration, this.loggerFactory);
+            IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             Task indexTask = task.IndexAsync(blocks, this.TaskScheduler);
 
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
             return indexTask;
         }
 
         public void Index(params TransactionEntry.Entity[] entities)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            this.Index(entities.Select(e => e.CreateTableEntity(Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
+            this.Index(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
         {
-            return this.IndexAsync(entities.Select(e => e.CreateTableEntity(Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
+            return this.IndexAsync(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
         }
 
         public void Index(IEnumerable<OrderedBalanceChange> balances)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
             this.Index(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(IEnumerable<OrderedBalanceChange> balances)
@@ -160,29 +158,30 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private void Index(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var task = new IndexTableEntitiesTask(this.Configuration, table, this.loggerFactory);
+            IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             task.Index(entities, this.TaskScheduler);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         private Task IndexAsync(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var task = new IndexTableEntitiesTask(this.Configuration, table, this.loggerFactory);
+            IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             Task indexTask = task.IndexAsync(entities, this.TaskScheduler);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
             return indexTask;
-        }        
+        }
 
         public Checkpoint GetCheckpoint(IndexerCheckpoints checkpoint)
         {
             return this.GetCheckpointRepository().GetCheckpoint(checkpoint.ToString().ToLowerInvariant());
         }
+
         public Task<Checkpoint> GetCheckpointAsync(IndexerCheckpoints checkpoint)
         {
             return this.GetCheckpointRepository().GetCheckpointAsync(checkpoint.ToString().ToLowerInvariant());
@@ -190,13 +189,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CheckpointRepository GetCheckpointRepository()
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var repository = new CheckpointRepository(this._Configuration.GetBlocksContainer(), 
-                this._Configuration.Network, string.IsNullOrWhiteSpace(this._Configuration.CheckpointSetName) 
-                ? "default" : this._Configuration.CheckpointSetName, this.loggerFactory);
+            CheckpointRepository repository = new CheckpointRepository(
+                this._configuration.GetBlocksContainer(),
+                this._configuration.Network,
+                string.IsNullOrWhiteSpace(this._configuration.CheckpointSetName) ? "default" : this._configuration.CheckpointSetName,
+                this._loggerFactory);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
             return repository;
         }
 
@@ -207,97 +208,98 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void IndexOrderedBalance(int height, Block block)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var table = this.Configuration.GetBalanceTable();
-            var blockId = block == null ? null : block.GetHash();
-            var header = block == null ? null : block.Header;
+            CloudTable table = this.Configuration.GetBalanceTable();
+            uint256 blockId = block?.GetHash();
+            BlockHeader header = block?.Header;
 
-            var entities =
+            IEnumerable<DynamicTableEntity> entities =
                     block
                         .Transactions
-                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height, _Configuration.Network))
+                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height, this._configuration.Network))
                         .Select(_ => _.ToEntity())
                         .AsEnumerable();
 
-            this.logger.LogTrace("Indexing ordered balance");
+            this._logger.LogTrace("Indexing ordered balance");
 
             this.Index(entities, table);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public void IndexTransactions(int height, Block block)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var table = this.Configuration.GetTransactionTable();
-            var blockId = block == null ? null : block.GetHash();
-            var entities =
+            CloudTable table = this.Configuration.GetTransactionTable();
+            uint256 blockId = block?.GetHash();
+            IEnumerable<DynamicTableEntity> entities =
                         block
                         .Transactions
                         .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
-                        .Select(c => c.CreateTableEntity(Configuration.Network))
+                        .Select(c => c.CreateTableEntity(this.Configuration.Network))
                         .AsEnumerable();
 
-            this.logger.LogTrace("Indexing transactions");
+            this._logger.LogTrace("Indexing transactions");
 
             this.Index(entities, table);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
             try
             {
                 this.IndexWalletOrderedBalanceAsync(height, block, walletRules).Wait();
             }
-            catch(AggregateException ex)
+            catch (AggregateException ex)
             {
-                this.logger.LogTrace("Exception: {0}", ex.ToString());
+                this._logger.LogTrace("Exception: {0}", ex.ToString());
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
+
         public Task IndexWalletOrderedBalanceAsync(int height, Block block, WalletRuleEntryCollection walletRules)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var table = this.Configuration.GetBalanceTable();
-            var blockId = block == null ? null : block.GetHash();
+            CloudTable table = this.Configuration.GetBalanceTable();
+            uint256 blockId = block?.GetHash();
 
-            var entities =
+            IEnumerable<DynamicTableEntity> entities =
                     block
                     .Transactions
-                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules, _Configuration.Network))
+                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules, this._configuration.Network))
                     .Select(t => t.ToEntity())
                     .AsEnumerable();
 
             Task indexingTask = this.IndexAsync(entities, table);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
             return indexingTask;
         }
 
         public void IndexOrderedBalance(Transaction tx)
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
-            var table = this.Configuration.GetBalanceTable();
-            var entities = OrderedBalanceChange.ExtractScriptBalances(tx, _Configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
+            CloudTable table = this.Configuration.GetBalanceTable();
+            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this._configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             this.Index(entities, table);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
-            var table = this.Configuration.GetBalanceTable();
-            var entities = OrderedBalanceChange.ExtractScriptBalances(tx, _Configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
+            CloudTable table = this.Configuration.GetBalanceTable();
+            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this._configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             return this.IndexAsync(entities, table);
         }
 
@@ -305,12 +307,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this.logger.LogTrace("({0}:{1})", nameof(startHeight), startHeight);
+            this._logger.LogTrace("({0}:{1})", nameof(startHeight), startHeight);
 
-            List<ChainPartEntry> entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
+            var entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
             ChainPartEntry chainPart = null;
-            for(int i = startHeight; i <= chain.Tip.Height; i++)
+            for (var i = startHeight; i <= chain.Tip.Height; i++)
             {
                 if (chainPart == null)
                 {
@@ -320,48 +322,53 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     };
                 }
 
-                var block = chain.GetBlock(i);
+                ChainedHeader block = chain.GetBlock(i);
                 chainPart.BlockHeaders.Add(block.Header);
-                if(chainPart.BlockHeaders.Count == BlockHeaderPerRow)
+                if (chainPart.BlockHeaders.Count == BlockHeaderPerRow)
                 {
                     entries.Add(chainPart);
                     chainPart = null;
                 }
             }
-            if(chainPart != null)
+
+            if (chainPart != null)
+            {
                 entries.Add(chainPart);
+            }
+
             this.Index(entries, cancellationToken);
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
             CloudTable table = this.Configuration.GetChainTable();
             TableBatchOperation batch = new TableBatchOperation();
-            var last = chainParts[chainParts.Count - 1];
+            ChainPartEntry last = chainParts[chainParts.Count - 1];
 
-            foreach(var entry in chainParts)
+            foreach (ChainPartEntry entry in chainParts)
             {
                 batch.Add(TableOperation.InsertOrReplace(entry.ToEntity()));
-                if(batch.Count == 100)
+                if (batch.Count == 100)
                 {
                     table.ExecuteBatchAsync(batch).GetAwaiter().GetResult();
                     batch = new TableBatchOperation();
                 }
+
                 IndexerTrace.RemainingBlockChain(entry.ChainOffset, last.ChainOffset + last.BlockHeaders.Count - 1);
             }
 
-            if(batch.Count > 0)
+            if (batch.Count > 0)
             {
-                this.logger.LogTrace("Batch count: {0}", batch.Count);
+                this._logger.LogTrace("Batch count: {0}", batch.Count);
 
                 table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
             }
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public TimeSpan CheckpointInterval
@@ -384,44 +391,48 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void IndexChain(ChainBase chain, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this.logger.LogTrace("()");
+            this._logger.LogTrace("()");
 
             if (chain == null)
+            {
                 throw new ArgumentNullException("chain");
+            }
+
             this.SetThrottling();
 
-            using(IndexerTrace.NewCorrelation("Index main chain to azure started"))
+            using (IndexerTrace.NewCorrelation("Index main chain to azure started"))
             {
                 this.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult();
                 IndexerTrace.InputChainTip(chain.Tip);
-                var client = this.Configuration.CreateIndexerClient();
-                var changes = client.GetChainChangesUntilFork(chain.Tip, true, cancellationToken).ToList();
+                IndexerClient client = this.Configuration.CreateIndexerClient();
+                List<ChainBlockHeader> changes = client.GetChainChangesUntilFork(chain.Tip, true, cancellationToken).ToList();
 
                 var height = 0;
-                if(changes.Count != 0)
+                if (changes.Count != 0)
                 {
-                    this.logger.LogTrace("Changes count: {0}", changes.Count);
+                    this._logger.LogTrace("Changes count: {0}", changes.Count);
 
                     IndexerTrace.IndexedChainTip(changes[0].BlockId, changes[0].Height);
-                    if(changes[0].Height > chain.Tip.Height)
+                    if (changes[0].Height > chain.Tip.Height)
                     {
                         IndexerTrace.InputChainIsLate();
 
-                        this.logger.LogTrace("(-):LATE");
+                        this._logger.LogTrace("(-):LATE");
                         return;
                     }
+
                     height = changes[changes.Count - 1].Height + 1;
-                    if(height > chain.Height)
+                    if (height > chain.Height)
                     {
                         IndexerTrace.IndexedChainIsUpToDate(chain.Tip);
 
-                        this.logger.LogTrace("(-):UP_TO_DATE");
+                        this._logger.LogTrace("(-):UP_TO_DATE");
                         return;
                     }
                 }
                 else
                 {
-                    this.logger.LogTrace("No work found");
+                    this._logger.LogTrace("No work found");
                     IndexerTrace.NoForkFoundWithStored();
                 }
 
@@ -429,7 +440,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.Index(chain, height, cancellationToken);
             }
 
-            this.logger.LogTrace("(-)");
+            this._logger.LogTrace("(-)");
         }
 
         public int ToHeight
