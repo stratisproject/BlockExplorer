@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.IoC
+﻿using Stratis.Bitcoin.Features.AzureIndexer;
+
+namespace AzureIndexer.Api.IoC
 {
     using System.Net;
     using Autofac;
@@ -37,7 +39,7 @@
                 cfg.CreateMap<WitScriptId, Models.Response.WitScriptIdModel>();
                 cfg.CreateMap<WalletModel, Models.Response.WalletModel>();
                 cfg.CreateMap<Subscription, Models.Response.SubscriptionModel>();
-                cfg.CreateMap<BalanceModel, Models.Response.BalanceResponseModel>();
+                cfg.CreateMap<BalanceModel, Models.Response.BalanceResponseModel>().ForMember(d => d.Continuation, d => d.MapFrom(s => s.Continuation == null ? null : s.Continuation.ToString()));
                 cfg.CreateMap<BalanceOperation, Models.Response.BalanceOperationModel>();
                 cfg.CreateMap<InsertWalletAddress, Models.Response.InsertWalletAddress>();
                 cfg.CreateMap<IDestination, Models.Response.DestinationModel>();

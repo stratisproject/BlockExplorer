@@ -192,13 +192,13 @@ namespace AzureIndexer.Api.Infrastructure
                 this.GetCallbackTable(),
                 this.GetChainCacheCloudTable(),
                 this.GetCrudTable(),
-                this.GetRejectTable().Table,
-                this.GetSubscriptionsTable().Table,
+                // this.GetRejectTable().Table,
+                // this.GetSubscriptionsTable().Table,
             }.Select(t => t.CreateIfNotExistsAsync()).OfType<Task>().ToList();
 
-            tasks.Add(Indexer.EnsureSetupAsync());
-            tasks.Add(Topics.EnsureSetupAsync());
+            tasks.Add(this.Indexer.EnsureSetupAsync());
 
+            // tasks.Add(Topics.EnsureSetupAsync());
             Task.WaitAll(tasks.ToArray());
         }
 
@@ -224,21 +224,25 @@ namespace AzureIndexer.Api.Infrastructure
             }
         }
 
-
-
         public CloudTable GetCallbackTable()
         {
-            return Indexer.GetTable("callbacks");
+            var table = this.Indexer.GetTable("callbacks");
+            table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            return table;
         }
 
         private CloudTable GetCrudTable()
         {
-            return Indexer.GetTable("crudtable");
+            var table = this.Indexer.GetTable("crudtable");
+            table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            return table;
         }
 
         private CloudTable GetChainCacheCloudTable()
         {
-            return Indexer.GetTable("chainchache");
+            var table = this.Indexer.GetTable("chainchache");
+            table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            return table;
         }
 
 

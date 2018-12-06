@@ -256,18 +256,22 @@ namespace AzureIndexer.Api.Controllers
         [Route("wallets/{walletName}/keysets")]
         public KeySetData[] GetKeysets(string walletName)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             var sets = repo.GetKeysets(walletName);
             if (sets.Length == 0)
-                AssetWalletAndKeysetExists(walletName, null);
+            {
+                this.AssetWalletAndKeysetExists(walletName, null);
+            }
+
             return sets;
         }
+
         [HttpGet]
         [Route("wallets/{walletName}/keysets/{keysetName}")]
         public KeySetData GetKeyset(string walletName, string keysetName)
         {
-            var repo = Configuration.CreateWalletRepository();
-            return AssetWalletAndKeysetExists(walletName, keysetName);
+            var repo = this.Configuration.CreateWalletRepository();
+            return this.AssetWalletAndKeysetExists(walletName, keysetName);
         }
 
         [HttpGet]
@@ -275,27 +279,35 @@ namespace AzureIndexer.Api.Controllers
         public HDKeyData GetUnused(string walletName, string keysetName, int lookahead)
         {
             if (lookahead < 0 || lookahead > 20)
-                throw Error(400, "lookahead should be between 0 and 20");
-            var keySet = AssetWalletAndKeysetExists(walletName, keysetName);
-            var repo = Configuration.CreateWalletRepository();
+            {
+                throw this.Error(400, "lookahead should be between 0 and 20");
+            }
+
+            var keySet = this.AssetWalletAndKeysetExists(walletName, keysetName);
+            var repo = this.Configuration.CreateWalletRepository();
             return keySet.GetUnused(lookahead);
         }
 
         private KeySetData AssetWalletAndKeysetExists(string walletName, string keysetName)
         {
-            var repo = Configuration.CreateWalletRepository();
+            var repo = this.Configuration.CreateWalletRepository();
             var wallet = repo.GetWallet(walletName);
             if (wallet == null)
-                throw Error(404, "wallet does not exists");
+            {
+                throw this.Error(404, "wallet does not exists");
+            }
+
             if (keysetName != null)
             {
                 var keyset = repo.GetKeySetData(walletName, keysetName);
                 if (keyset == null)
                 {
-                    throw Error(404, "keyset does not exists");
+                    throw this.Error(404, "keyset does not exists");
                 }
+
                 return keyset;
             }
+
             return null;
         }
 
@@ -314,7 +326,7 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("wallets/{walletName}/summary")]
-        public BalanceSummary WalletBalanceSummary(
+        public BalanceSummaryModel WalletBalanceSummary(
             string walletName,
             string at = null,
             bool debug = false,
@@ -323,7 +335,7 @@ namespace AzureIndexer.Api.Controllers
             var id = new BalanceId(walletName);
             var summary = this.BalanceSummary(id, at.ToBlockFeature(), debug, colored);
             var mappedSummary = this.mapper.Map<BalanceSummaryModel>(summary);
-            return summary;
+            return mappedSummary;
         }
 
         [HttpGet]
@@ -488,7 +500,7 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("balances/{balanceId}/summary")]
-        public BalanceSummary AddressBalanceSummary(
+        public BalanceSummaryModel AddressBalanceSummary(
             [FromRoute] string balanceId,
             string at = null,
             bool debug = false,
@@ -497,7 +509,7 @@ namespace AzureIndexer.Api.Controllers
             colored = colored || this.IsColoredAddress();
             var summary = this.BalanceSummary(balanceId.ToBalanceId(this.Network), at.ToBlockFeature(), debug, colored);
             var mappedSummary = this.mapper.Map<BalanceSummaryModel>(summary);
-            return summary;
+            return mappedSummary;
         }
 
         public BalanceSummary BalanceSummary(
@@ -558,7 +570,7 @@ namespace AzureIndexer.Api.Controllers
                 .GetOrderedBalance(balanceId, query)
                 .WhereNotExpired(Expiration)
                 .TakeWhile(_ => !cancel.IsCancellationRequested)
-                //Some confirmation of the fetched unconfirmed may hide behind stopAtHeigh
+                // Some confirmation of the fetched unconfirmed may hide behind stopAtHeigh
                 .TakeWhile(_ => _.BlockId == null || _.Height > stopAtHeight - lookback)
                 .AsBalanceSheet(Chain);
 
@@ -570,6 +582,7 @@ namespace AzureIndexer.Api.Controllers
                     ReasonPhrase = "The server can't fetch the balance summary because the balance is too big. Please, load it in several step with ?at={blockFeature} parameter. Once fully loaded after all the step, the summary will return in constant time."
                 });
             }
+
             RemoveBehind(diff, stopAtHeight);
             RemoveConflicts(diff);
 
@@ -594,12 +607,11 @@ namespace AzureIndexer.Api.Controllers
 
             var newCachedLocator = (ConfirmedBalanceLocator)summary.Locator;
 
-            if (
-                cachedSummary.Locator == null ||
-                newCachedLocator.BlockHash != cachedLocator.BlockHash)
+            if (cachedSummary.Locator == null ||
+                newCachedLocator.BlockHash != cachedLocator?.BlockHash)
             {
                 var olderImmature = immature.Select(_ => _.Height).Concat(new[] { int.MaxValue }).Min();
-                var newCachedSummary = new Models.BalanceSummary()
+                var newCachedSummary = new BalanceSummary
                 {
                     Confirmed = summary.Confirmed,
                     Immature = summary.Immature,
@@ -670,7 +682,7 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("balances/{balanceId}")]
-        public BalanceModel AddressBalance(
+        public BalanceResponseModel AddressBalance(
             string balanceId,
             string continuation = null,
             string until = null,
@@ -679,10 +691,10 @@ namespace AzureIndexer.Api.Controllers
             bool unspentOnly = false,
             bool colored = false)
         {
-            colored = colored || IsColoredAddress();
+            colored = colored || this.IsColoredAddress();
             var balance = this.Balance(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
             var mappedBalance = this.mapper.Map<BalanceResponseModel>(balance);
-            return balance;
+            return mappedBalance;
         }
 
         // Property passed by BalanceIdModelBinder

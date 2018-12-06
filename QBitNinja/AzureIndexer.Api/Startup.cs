@@ -78,7 +78,6 @@ namespace AzureIndexer.Api
                     var loggerFactory = ctx.Resolve<ILoggerFactory>();
                     var config = new QBitNinjaConfiguration(this.Configuration, loggerFactory);
                     config.Indexer.EnsureSetup();
-                    //config.EnsureSetup();
                     return config;
                 }).As<QBitNinjaConfiguration>().SingleInstance();
             builder.Register(

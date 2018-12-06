@@ -308,7 +308,7 @@
     public class BalanceResponseModel
     {
         [JsonProperty("continuation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public object Continuation { get; set; }
+        public string Continuation { get; set; }
 
         [JsonProperty("operations", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<BalanceOperationModel> Operations { get; set; }
@@ -439,8 +439,8 @@
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
 
-        [JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public NetworkModel Network { get; set; }
+        //[JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        //public NetworkModel Network { get; set; }
     }
 
     public class KeyPathModel
@@ -460,8 +460,8 @@
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
 
-        [JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public NetworkModel Network { get; set; }
+        //[JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        //public NetworkModel Network { get; set; }
     }
 
     public class ExtPubKeyModel
@@ -952,8 +952,8 @@
         [JsonProperty("type", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public Base58Type? Type { get; set; }
 
-        [JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public NetworkModel Network { get; set; }
+        //[JsonProperty("network", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        //public NetworkModel Network { get; set; }
     }
 
     public class WhatIsBlockHeaderModel
