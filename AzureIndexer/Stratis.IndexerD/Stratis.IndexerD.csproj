@@ -20,9 +20,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.2.5-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="1.2.5-beta" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="1.2.5-beta" />	
+    <PackageReference Include="Stratis.Bitcoin" Version="1.2.6-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="1.2.6-beta" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="1.2.6-beta" />	
   </ItemGroup>
 
   <ItemGroup>
