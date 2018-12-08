@@ -20,6 +20,7 @@ import { storeFreeze } from 'ngrx-store-freeze';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UiLayoutModule } from '@blockexplorer/ui/layout';
 import { FormsModule } from '@angular/forms';
+import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent } from '@blockexplorer/ui/transactions';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,8 +29,18 @@ import { FormsModule } from '@angular/forms';
     NgbModule,
     FormsModule,
     UiLayoutModule,
+    UiTransactionsModule,
     NxModule.forRoot(),
-    RouterModule.forRoot([], { initialNavigation: 'enabled' }),
+    RouterModule.forRoot(
+      [
+        { path: '', component: TransactionsPageComponent },
+        { path: 'transactions', children: uiTransactionsRoutes }
+      ],
+      {
+        initialNavigation: 'enabled',
+        onSameUrlNavigation: 'reload'
+      }
+    ),
     StoreModule.forRoot(
       { app: appReducer },
       {
