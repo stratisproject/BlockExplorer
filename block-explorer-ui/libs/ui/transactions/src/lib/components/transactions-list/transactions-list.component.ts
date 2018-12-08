@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { TransactionModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-transactions-list',
@@ -6,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./transactions-list.component.css']
 })
 export class TransactionsListComponent implements OnInit {
+  @Input() transactions: TransactionModel[] = [];
+  @Output() selected = new EventEmitter<string>();
+
   constructor() {}
 
   ngOnInit() {}

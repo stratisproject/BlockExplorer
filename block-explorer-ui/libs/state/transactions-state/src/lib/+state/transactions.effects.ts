@@ -9,6 +9,8 @@ import {
   TransactionsLoadError,
   TransactionsActionTypes
 } from './transactions.actions';
+import { TransactionsService } from '../services/transactions.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TransactionsEffects {
@@ -16,8 +18,11 @@ export class TransactionsEffects {
     TransactionsActionTypes.LoadTransactions,
     {
       run: (action: LoadTransactions, state: TransactionsPartialState) => {
-        // Your custom REST 'load' logic goes here. For now just return an empty list...
-        return new TransactionsLoaded([]);
+        this.transactionsService.transactions().pipe(
+          map((transactions) => {
+            return new TransactionsLoaded(transactions);
+          })
+        );
       },
 
       onError: (action: LoadTransactions, error) => {
@@ -29,6 +34,7 @@ export class TransactionsEffects {
 
   constructor(
     private actions$: Actions,
-    private dataPersistence: DataPersistence<TransactionsPartialState>
+    private dataPersistence: DataPersistence<TransactionsPartialState>,
+    private transactionsService: TransactionsService
   ) {}
 }

@@ -21,6 +21,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { UiLayoutModule } from '@blockexplorer/ui/layout';
 import { FormsModule } from '@angular/forms';
 import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent } from '@blockexplorer/ui/transactions';
+import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
+import { SharedModelsModule, API_BASE_URL } from '@blockexplorer/shared/models';
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,6 +32,8 @@ import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent }
     FormsModule,
     UiLayoutModule,
     UiTransactionsModule,
+    SharedModelsModule,
+    StateTransactionsStateModule.forRoot(),
     NxModule.forRoot(),
     RouterModule.forRoot(
       [
@@ -52,7 +56,10 @@ import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent }
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     StoreRouterConnectingModule
   ],
-  providers: [AppFacade],
+  providers: [
+    AppFacade,
+    { provide: API_BASE_URL, useValue: environment.apiBaseUrl }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

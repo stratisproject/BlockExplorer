@@ -64,7 +64,8 @@ namespace AzureIndexer.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Azure Indexer API", Version = "v1" });
-                c.DocInclusionPredicate((value, description) => description.ActionDescriptor.DisplayName.Contains("AzureIndexer.Api"));
+                c.DocInclusionPredicate((value, description) => 
+                    description.ActionDescriptor.DisplayName.Contains("AzureIndexer.Api") && !description.ActionDescriptor.DisplayName.Contains("Main"));
             });
 
             // Create the container builder.

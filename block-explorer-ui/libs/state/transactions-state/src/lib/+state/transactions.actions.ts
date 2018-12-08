@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store';
 import { Entity } from './transactions.reducer';
+import { TransactionModel } from 'gen/nswag';
 
 export enum TransactionsActionTypes {
   LoadTransactions = '[Transactions] Load Transactions',
@@ -18,7 +19,7 @@ export class TransactionsLoadError implements Action {
 
 export class TransactionsLoaded implements Action {
   readonly type = TransactionsActionTypes.TransactionsLoaded;
-  constructor(public payload: Entity[]) {}
+  constructor(public payload: TransactionModel[]) {}
 }
 
 export type TransactionsAction =

@@ -2,6 +2,7 @@ import {
   TransactionsAction,
   TransactionsActionTypes
 } from './transactions.actions';
+import { TransactionModel } from 'gen/nswag';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
@@ -17,7 +18,7 @@ export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 export interface Entity {}
 
 export interface TransactionsState {
-  list: Entity[]; // list of Transactions; analogous to a sql normalized table
+  list: TransactionModel[]; // list of Transactions; analogous to a sql normalized table
   selectedId?: string | number; // which Transactions record has been selected
   loaded: boolean; // has the Transactions list been loaded
   error?: any; // last none error (if any)
