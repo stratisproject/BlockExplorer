@@ -61,16 +61,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Displays statistics in the console.
         /// </summary>
-        /// <param name="benchLogs">The sring builder to add the statistics to.</param>
+        /// <param name="benchLogs">The string builder to add the statistics to.</param>
         public void AddNodeStats(StringBuilder benchLogs)
         {
-            var highestBlock = this.indexerLoop.StoreTip;
+            ChainedHeader highestBlock = this.indexerLoop.StoreTip;
 
             if (highestBlock != null)
+            {
                 benchLogs.AppendLine($"{this.name}.Height: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
                     highestBlock.Height.ToString().PadRight(8) +
                     $" {this.name}.Hash: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
                     highestBlock.HashBlock);
+            }
         }
 
         /// <summary>
