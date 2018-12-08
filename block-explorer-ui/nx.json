@@ -34,6 +34,9 @@
     },
     "shared-utils": {
       "tags": []
+    },
+    "shared-models": {
+      "tags": []
     }
   }
 }

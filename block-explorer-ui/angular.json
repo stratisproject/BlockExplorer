@@ -26,7 +26,9 @@
               "apps/explorer/src/favicon.ico",
               "apps/explorer/src/assets"
             ],
-            "styles": ["apps/explorer/src/styles.scss"],
+            "styles": [
+              "apps/explorer/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -80,7 +82,9 @@
             "polyfills": "apps/explorer/src/polyfills.ts",
             "tsConfig": "apps/explorer/tsconfig.spec.json",
             "karmaConfig": "apps/explorer/karma.conf.js",
-            "styles": ["apps/explorer/src/styles.scss"],
+            "styles": [
+              "apps/explorer/src/styles.scss"
+            ],
             "scripts": [],
             "assets": [
               "apps/explorer/src/favicon.ico",
@@ -95,7 +99,9 @@
               "apps/explorer/tsconfig.app.json",
               "apps/explorer/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -121,7 +127,9 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": "apps/explorer-e2e/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -147,7 +155,9 @@
               "libs/state/transactions-state/tsconfig.lib.json",
               "libs/state/transactions-state/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -173,7 +183,9 @@
               "libs/state/global-state/tsconfig.lib.json",
               "libs/state/global-state/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -199,7 +211,9 @@
               "libs/ui/layout/tsconfig.lib.json",
               "libs/ui/layout/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -225,7 +239,9 @@
               "libs/ui/transactions/tsconfig.lib.json",
               "libs/ui/transactions/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -251,7 +267,9 @@
               "libs/ui/smart-contracts/tsconfig.lib.json",
               "libs/ui/smart-contracts/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -277,7 +295,9 @@
               "libs/state/smart-contracts-state/tsconfig.lib.json",
               "libs/state/smart-contracts-state/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -303,7 +323,37 @@
               "libs/shared/utils/tsconfig.lib.json",
               "libs/shared/utils/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "shared-models": {
+      "root": "libs/shared/models",
+      "sourceRoot": "libs/shared/models/src",
+      "projectType": "library",
+      "prefix": "blockexplorer",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/shared/models/src/test.ts",
+            "tsConfig": "libs/shared/models/tsconfig.spec.json",
+            "karmaConfig": "libs/shared/models/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/shared/models/tsconfig.lib.json",
+              "libs/shared/models/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
