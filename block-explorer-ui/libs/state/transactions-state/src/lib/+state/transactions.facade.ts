@@ -4,11 +4,12 @@ import { select, Store } from '@ngrx/store';
 
 import { TransactionsPartialState } from './transactions.reducer';
 import { transactionsQuery } from './transactions.selectors';
-import { LoadTransactions } from './transactions.actions';
+import { LoadTransactions, GetAddress } from './transactions.actions';
 
 @Injectable()
 export class TransactionsFacade {
   loaded$ = this.store.pipe(select(transactionsQuery.getLoaded));
+  selectedAddress$ = this.store.pipe(select(transactionsQuery.getSelectedAddress));
   allTransactions$ = this.store.pipe(
     select(transactionsQuery.getAllTransactions)
   );
@@ -20,5 +21,9 @@ export class TransactionsFacade {
 
   loadAll() {
     this.store.dispatch(new LoadTransactions());
+  }
+
+  getAddress(hash: string) {
+    this.store.dispatch(new GetAddress(hash));
   }
 }

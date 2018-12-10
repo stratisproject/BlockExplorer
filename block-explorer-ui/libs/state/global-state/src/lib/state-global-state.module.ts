@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -9,6 +9,7 @@ import {
 } from './+state/global.reducer';
 import { GlobalEffects } from './+state/global.effects';
 import { GlobalFacade } from './+state/global.facade';
+import { FinderService } from './services/finder.service';
 
 @NgModule({
   imports: [
@@ -20,4 +21,11 @@ import { GlobalFacade } from './+state/global.facade';
   ],
   providers: [GlobalFacade]
 })
-export class StateGlobalStateModule {}
+export class StateGlobalStateModule  {
+  static forRoot(): ModuleWithProviders {
+      return {
+          ngModule: StateGlobalStateModule,
+          providers: [FinderService]
+      };
+  }
+}

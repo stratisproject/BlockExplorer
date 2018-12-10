@@ -14,30 +14,14 @@ namespace AzureIndexer.Api.Infrastructure
     {
         public WhatIsIt(MainController controller)
         {
-            Controller = controller;
+            this.Controller = controller;
         }
 
-        public MainController Controller
-        {
-            get;
-            set;
-        }
+        public MainController Controller { get; set; }
 
-        public Network Network
-        {
-            get
-            {
-                return Controller.Network;
-            }
-        }
+        public Network Network => this.Controller.Network;
 
-        public QBitNinjaConfiguration Configuration
-        {
-            get
-            {
-                return Controller.Configuration;
-            }
-        }
+        public QBitNinjaConfiguration Configuration => this.Controller.Configuration;
 
 
         public async Task<object> Find(string data, IMapper mapper)

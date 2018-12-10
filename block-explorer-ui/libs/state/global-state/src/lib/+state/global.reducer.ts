@@ -18,6 +18,7 @@ export interface GlobalState {
   selectedId?: string | number; // which Global record has been selected
   loaded: boolean; // has the Global list been loaded
   error?: any; // last none error (if any)
+  identifiedType: 'ADDRESS' | 'TRANSACTION';
 }
 
 export interface GlobalPartialState {
@@ -26,7 +27,8 @@ export interface GlobalPartialState {
 
 export const initialState: GlobalState = {
   list: [],
-  loaded: false
+  loaded: false,
+  identifiedType: null
 };
 
 export function globalReducer(

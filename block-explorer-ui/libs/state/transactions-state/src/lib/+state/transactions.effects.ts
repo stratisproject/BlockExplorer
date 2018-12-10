@@ -7,10 +7,14 @@ import {
   LoadTransactions,
   TransactionsLoaded,
   TransactionsLoadError,
-  TransactionsActionTypes
+  TransactionsActionTypes,
+  GetAddress,
+  AddressLoaded,
+  AddressLoadError
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
+import { BalancesService } from '../services/balances.service';
 
 @Injectable()
 export class TransactionsEffects {
@@ -32,9 +36,28 @@ export class TransactionsEffects {
     }
   );
 
+  @Effect() getAddress$ = this.dataPersistence.fetch(
+    TransactionsActionTypes.GetAddress,
+    {
+      run: (action: GetAddress, state: TransactionsPartialState) => {
+        this.balancesService.addressBalanceSummary(action.addressHash, null, false, false).pipe(
+          map((balance) => {
+            return new AddressLoaded(balance);
+          })
+        );
+      },
+
+      onError: (action: GetAddress, error) => {
+        console.error('Error', error);
+        return new AddressLoadError(error);
+      }
+    }
+  );
+
   constructor(
     private actions$: Actions,
     private dataPersistence: DataPersistence<TransactionsPartialState>,
-    private transactionsService: TransactionsService
+    private transactionsService: TransactionsService,
+    private balancesService: BalancesService
   ) {}
 }

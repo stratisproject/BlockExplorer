@@ -124,6 +124,7 @@ namespace AzureIndexer.Api
                 return chain;
             }).As<ConcurrentChain>().SingleInstance();
 
+            builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();
 
             var csl = new AutofacServiceLocator(this.ApplicationContainer);
