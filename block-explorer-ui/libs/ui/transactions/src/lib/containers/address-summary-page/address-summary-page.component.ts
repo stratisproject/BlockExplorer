@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ReplaySubject, Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
-import { BalanceSummaryModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel } from '@blockexplorer/shared/models';
 import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
 
 @Component({
@@ -19,15 +19,21 @@ export class AddressSummaryPageComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade) { }
 
   ngOnInit() {
-    this.route.queryParams
+    this.route.paramMap
         .pipe(takeUntil(this.destroyed$))
-        .subscribe((queryParams: any) => {
-          if (!!queryParams.addressHash) {
-              this.addressHash = queryParams.addressHash;
+        .subscribe((map: any) => {
+          if (!!map.params.addressHash) {
+              this.addressHash = map.params.addressHash;
               this.transactionsFacade.getAddress(this.addressHash);
           }
         });
     this.address$ = this.transactionsFacade.selectedAddress$;
+    this.address$.pipe(takeUntil(this.destroyed$))
+        .subscribe(address => {
+          if (!address) return;
+
+          console.log('Found address', address);
+        });
   }
 
   ngOnDestroy(): void {

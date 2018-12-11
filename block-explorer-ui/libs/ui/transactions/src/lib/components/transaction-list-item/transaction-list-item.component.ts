@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { TransactionModel } from 'gen/nswag';
 
 @Component({
   selector: 'blockexplorer-transaction-list-item',
@@ -6,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./transaction-list-item.component.css']
 })
 export class TransactionListItemComponent implements OnInit {
+  @Input() transaction: TransactionModel = new TransactionModel();
 
   constructor() { }
 

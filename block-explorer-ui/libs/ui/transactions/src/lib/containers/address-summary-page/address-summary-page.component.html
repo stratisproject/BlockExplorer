@@ -1,4 +1,4 @@
 <div>
-  <blockexplorer-address-summary></blockexplorer-address-summary>
+  <blockexplorer-address-summary [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
   <blockexplorer-transactions-list></blockexplorer-transactions-list>
 </div>

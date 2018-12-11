@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 import { Entity } from './transactions.reducer';
 import { TransactionModel } from 'gen/nswag';
-import { BalanceSummaryModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel } from '@blockexplorer/shared/models';
 
 export enum TransactionsActionTypes {
   LoadTransactions = '[Transactions] Load Transactions',

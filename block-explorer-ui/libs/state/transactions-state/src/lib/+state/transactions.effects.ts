@@ -40,7 +40,7 @@ export class TransactionsEffects {
     TransactionsActionTypes.GetAddress,
     {
       run: (action: GetAddress, state: TransactionsPartialState) => {
-        return this.balancesService.addressBalanceSummary(action.addressHash, null, false, false).pipe(
+        return this.balancesService.addressBalanceSummary(action.addressHash, undefined, false, false).pipe(
           map((balance) => {
             return new AddressLoaded(balance);
           })

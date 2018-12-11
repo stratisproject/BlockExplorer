@@ -3,7 +3,7 @@ import {
   TransactionsActionTypes
 } from './transactions.actions';
 import { TransactionModel } from 'gen/nswag';
-import { BalanceSummaryModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel } from '@blockexplorer/shared/models';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
