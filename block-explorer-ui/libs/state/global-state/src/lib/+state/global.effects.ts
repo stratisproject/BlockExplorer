@@ -4,31 +4,40 @@ import { DataPersistence } from '@nrwl/nx';
 
 import { GlobalPartialState } from './global.reducer';
 import {
-  LoadGlobal,
-  GlobalLoaded,
-  GlobalLoadError,
+  IndentifyEntity,
+  Identified,
+  IdentificationError,
   GlobalActionTypes
 } from './global.actions';
+import { FinderService } from '../services/finder.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class GlobalEffects {
   @Effect() loadGlobal$ = this.dataPersistence.fetch(
-    GlobalActionTypes.LoadGlobal,
+    GlobalActionTypes.IndentifyEntity,
     {
-      run: (action: LoadGlobal, state: GlobalPartialState) => {
-        // Your custom REST 'load' logic goes here. For now just return an empty list...
-        return new GlobalLoaded([]);
+      run: (action: IndentifyEntity, state: GlobalPartialState) => {
+        return this.finderService.whatIsIt(action.id).pipe(map(entity => {
+          if (!!entity) {
+            return new Identified(entity);
+          }
+
+          return new IdentificationError('Not found');
+        }));
+
       },
 
-      onError: (action: LoadGlobal, error) => {
+      onError: (action: IndentifyEntity, error) => {
         console.error('Error', error);
-        return new GlobalLoadError(error);
+        return new IdentificationError(error);
       }
     }
   );
 
   constructor(
     private actions$: Actions,
-    private dataPersistence: DataPersistence<GlobalPartialState>
+    private dataPersistence: DataPersistence<GlobalPartialState>,
+    private finderService: FinderService
   ) {}
 }

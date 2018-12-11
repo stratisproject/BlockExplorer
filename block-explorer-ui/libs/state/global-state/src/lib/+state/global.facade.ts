@@ -4,17 +4,18 @@ import { select, Store } from '@ngrx/store';
 
 import { GlobalPartialState } from './global.reducer';
 import { globalQuery } from './global.selectors';
-import { LoadGlobal } from './global.actions';
+import { IndentifyEntity } from './global.actions';
 
 @Injectable()
 export class GlobalFacade {
+  identifiedEntity$ = this.store.pipe(select(globalQuery.getIdentifiedEntity));
+  identifiedEntityType$ = this.store.pipe(select(globalQuery.getIdentifiedType));
   loaded$ = this.store.pipe(select(globalQuery.getLoaded));
-  allGlobal$ = this.store.pipe(select(globalQuery.getAllGlobal));
-  selectedGlobal$ = this.store.pipe(select(globalQuery.getSelectedGlobal));
+  error$ = this.store.pipe(select(globalQuery.getError));
 
   constructor(private store: Store<GlobalPartialState>) {}
 
-  loadAll() {
-    this.store.dispatch(new LoadGlobal());
+  identify(id: string) {
+    this.store.dispatch(new IndentifyEntity(id));
   }
 }

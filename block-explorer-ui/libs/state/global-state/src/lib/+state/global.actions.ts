@@ -2,29 +2,30 @@ import { Action } from '@ngrx/store';
 import { Entity } from './global.reducer';
 
 export enum GlobalActionTypes {
-  LoadGlobal = '[Global] Load Global',
-  GlobalLoaded = '[Global] Global Loaded',
-  GlobalLoadError = '[Global] Global Load Error'
+  IndentifyEntity = '[Global] Indentify Entity',
+  Identified = '[Global] Identified',
+  IdentificationError = '[Global] Identification Error'
 }
 
-export class LoadGlobal implements Action {
-  readonly type = GlobalActionTypes.LoadGlobal;
+export class IndentifyEntity implements Action {
+  readonly type = GlobalActionTypes.IndentifyEntity;
+  constructor(public id: string) {}
 }
 
-export class GlobalLoadError implements Action {
-  readonly type = GlobalActionTypes.GlobalLoadError;
+export class IdentificationError implements Action {
+  readonly type = GlobalActionTypes.IdentificationError;
   constructor(public payload: any) {}
 }
 
-export class GlobalLoaded implements Action {
-  readonly type = GlobalActionTypes.GlobalLoaded;
-  constructor(public payload: Entity[]) {}
+export class Identified implements Action {
+  readonly type = GlobalActionTypes.Identified;
+  constructor(public payload: any) {}
 }
 
-export type GlobalAction = LoadGlobal | GlobalLoaded | GlobalLoadError;
+export type GlobalAction = IndentifyEntity | Identified | IdentificationError;
 
 export const fromGlobalActions = {
-  LoadGlobal,
-  GlobalLoaded,
-  GlobalLoadError
+  IndentifyEntity,
+  Identified,
+  IdentificationError
 };

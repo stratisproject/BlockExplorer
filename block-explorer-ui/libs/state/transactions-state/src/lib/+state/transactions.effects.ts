@@ -22,7 +22,7 @@ export class TransactionsEffects {
     TransactionsActionTypes.LoadTransactions,
     {
       run: (action: LoadTransactions, state: TransactionsPartialState) => {
-        this.transactionsService.transactions().pipe(
+        return this.transactionsService.transactions().pipe(
           map((transactions) => {
             return new TransactionsLoaded(transactions);
           })
@@ -40,7 +40,7 @@ export class TransactionsEffects {
     TransactionsActionTypes.GetAddress,
     {
       run: (action: GetAddress, state: TransactionsPartialState) => {
-        this.balancesService.addressBalanceSummary(action.addressHash, null, false, false).pipe(
+        return this.balancesService.addressBalanceSummary(action.addressHash, null, false, false).pipe(
           map((balance) => {
             return new AddressLoaded(balance);
           })

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading;
+using AzureIndexer.Api.Controllers;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.IoC;
 using AzureIndexer.Api.JsonConverters;
@@ -60,7 +61,7 @@ namespace AzureIndexer.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSingleton<IHostedService, UpdateChainListener>();
-
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Azure Indexer API", Version = "v1" });
@@ -124,6 +125,7 @@ namespace AzureIndexer.Api
                 return chain;
             }).As<ConcurrentChain>().SingleInstance();
 
+            builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();
 
@@ -156,6 +158,7 @@ namespace AzureIndexer.Api
                 app.UseHsts();
             }
 
+            app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseHttpsRedirection();
             app.UseMvc();
         }

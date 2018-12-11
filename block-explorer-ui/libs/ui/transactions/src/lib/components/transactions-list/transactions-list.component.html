@@ -2,12 +2,15 @@
   <div class="col-12">
     <div class="row">
       <div class="card-header col-xs-12 col-md-4 text-center text-md-left">
-        All Contracts
+        Transactions <span [hidden]="noTransactions">({{transactions.length}})</span>
       </div>
-      <blockexplorer-pager></blockexplorer-pager>
+      <blockexplorer-pager [hidden]="noTransactions"></blockexplorer-pager>
     </div>
   </div>
-  <ul class="list-group">
+  <div *ngIf="noTransactions">
+    <i>No transactions to show</i>
+  </div>
+  <ul class="list-group" [hidden]="noTransactions">
     <li class="list-group-item" *ngFor="let transaction of transactions">
       <div class="row">
         <div class="order-0 col-xs-12 col-sm-6 order-sm-0 col-md-5 order-md-0">
@@ -28,7 +31,7 @@
   </ul>
 </div>
 <!-- pagination -->
-<div class="row mt-4">
+<div class="row mt-4" [hidden]="noTransactions">
     <blockexplorer-pager></blockexplorer-pager>
 </div>
 <!-- /pagination -->

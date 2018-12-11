@@ -8,7 +8,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 export class MenuBarComponent implements OnInit {
 
   @Input() searchText = '';
-  @Output() search = new EventEmitter<string>();
+  @Output() find = new EventEmitter<string>();
 
   constructor() { }
 
@@ -17,6 +17,6 @@ export class MenuBarComponent implements OnInit {
 
   enterPressed() {
     console.log("search for", this.searchText);
-    this.search.emit(this.searchText);
+    this.find.emit(this.searchText);
   }
 }

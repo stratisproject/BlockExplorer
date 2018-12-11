@@ -13,29 +13,24 @@ const getError = createSelector(
   (state: GlobalState) => state.error
 );
 
-const getAllGlobal = createSelector(
+const getIdentifiedEntity = createSelector(
   getGlobalState,
   getLoaded,
   (state: GlobalState, isLoaded) => {
-    return isLoaded ? state.list : [];
+    return isLoaded ? state.identifiedEntity : null;
   }
 );
-const getSelectedId = createSelector(
+const getIdentifiedType = createSelector(
   getGlobalState,
-  (state: GlobalState) => state.selectedId
-);
-const getSelectedGlobal = createSelector(
-  getAllGlobal,
-  getSelectedId,
-  (global, id) => {
-    const result = global.find(it => it['id'] === id);
-    return result ? Object.assign({}, result) : undefined;
+  getLoaded,
+  (state: GlobalState, isLoaded) => {
+    return isLoaded ? state.identifiedType : null;
   }
 );
 
 export const globalQuery = {
   getLoaded,
   getError,
-  getAllGlobal,
-  getSelectedGlobal
+  getIdentifiedEntity,
+  getIdentifiedType
 };

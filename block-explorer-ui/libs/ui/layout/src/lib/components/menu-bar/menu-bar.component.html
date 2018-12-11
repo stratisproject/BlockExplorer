@@ -19,15 +19,15 @@
   <a class="navbar-brand mr-0 mx-md-auto order-sm-0 col-sm-1 mr-sm-auto order-0 col-2" href="#">
       <img src="/assets/images/logo.svg" width="36" height="36" alt="Stratis">
   </a>
-  <form class="form-inline col-8 col-sm-8 col-md-5 order-sm-2 order-1">
+  <div class="form-inline col-8 col-sm-8 col-md-5 order-sm-2 order-1" novalidate>
       <div class="input-group col-lg-8 col-sm-12 ml-lg-auto">
           <div class="input-group-prepend">
               <span class="input-group-text">
                   <i class="material-icons md-18">search</i>
               </span>
           </div>
-          <input [(ngModel)]="searchText" type="search" class="form-control" placeholder="Search by Address, TxHash, ..."
-              aria-label="" [ngModelOptions]="{standalone: true}" (keyup.enter)="enterPressed()" aria-describedby="">
+          <input [(ngModel)]="searchText" id="search-text" type="search" (keyup.enter)="enterPressed()" class="form-control" placeholder="Search by Address, TxHash, ..."
+              aria-label="" [ngModelOptions]="{standalone: true}" aria-describedby="">
       </div>
-  </form>
+    </div>
 </nav>

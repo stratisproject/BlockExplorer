@@ -1,4 +1,4 @@
 <section class="col-xl-9 col-lg-10 col-sm-12 mx-auto my-5">
-  <blockexplorer-transactions-list [transactions]="transactions$" (selected)="selected($event)">
+  <blockexplorer-transactions-list [transactions]="transactions$ | async" (selected)="selected($event)">
   </blockexplorer-transactions-list>
 </section>

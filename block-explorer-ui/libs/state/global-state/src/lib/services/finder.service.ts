@@ -55,13 +55,13 @@ export class FinderService {
       const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
       if (status === 200) {
           return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-          return _observableOf<void>(<any>null);
+            return _observableOf<any>(<any>JSON.parse(_responseText));
           }));
       } else if (status !== 200 && status !== 204) {
           return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-          return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
           }));
       }
-      return _observableOf<any>(<any>null);
+      return _observableOf<any>(<any>responseBlob);
   }
 }

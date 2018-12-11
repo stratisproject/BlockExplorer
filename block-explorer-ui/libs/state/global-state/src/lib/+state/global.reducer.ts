@@ -14,11 +14,10 @@ export const GLOBAL_FEATURE_KEY = 'global';
 export interface Entity {}
 
 export interface GlobalState {
-  list: Entity[]; // list of Global; analogous to a sql normalized table
-  selectedId?: string | number; // which Global record has been selected
-  loaded: boolean; // has the Global list been loaded
-  error?: any; // last none error (if any)
-  identifiedType: 'ADDRESS' | 'TRANSACTION';
+  loaded: boolean;
+  error?: any;
+  identifiedType: 'PUBKEY_ADDRESS' | 'TRANSACTION';
+  identifiedEntity: any;
 }
 
 export interface GlobalPartialState {
@@ -26,9 +25,9 @@ export interface GlobalPartialState {
 }
 
 export const initialState: GlobalState = {
-  list: [],
   loaded: false,
-  identifiedType: null
+  identifiedType: null,
+  identifiedEntity: null
 };
 
 export function globalReducer(
@@ -36,10 +35,11 @@ export function globalReducer(
   action: GlobalAction
 ): GlobalState {
   switch (action.type) {
-    case GlobalActionTypes.GlobalLoaded: {
+    case GlobalActionTypes.Identified: {
       state = {
         ...state,
-        list: action.payload,
+        identifiedEntity: action.payload,
+        identifiedType: !!action.payload ? action.payload.type : null,
         loaded: true
       };
       break;

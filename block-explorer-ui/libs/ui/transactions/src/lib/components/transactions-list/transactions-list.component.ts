@@ -13,4 +13,8 @@ export class TransactionsListComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
+
+  get noTransactions() {
+    return  !this.transactions || this.transactions.length === 0;
+  }
 }
