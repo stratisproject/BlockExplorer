@@ -1,4 +1,36 @@
-<div>
-  <blockexplorer-address-summary [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
-  <blockexplorer-transactions-list></blockexplorer-transactions-list>
-</div>
+<section class="col-lg-11 col-xl-9 col-12 mx-auto my-5">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 col-md-5">
+          <div class="nav nav-pills fill-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Overview</a>
+            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Transactions</a>
+            <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Code</a>
+          </div>
+        </div>
+        <div class="col-12 col-md-7 d-none d-sm-none d-md-block">
+          <div class="col-12">
+            <div class="row d-flex align-items-center justify-content-end">
+              <p class="lead">{{addressHash}}</p>
+              <button type="button" class="btn btn-light btn-sm rounded ml-3" data-toggle="tooltip" data-placement="top" title="Copy to clipboard">
+                <i class="material-icons md-18">file_copy</i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- overview -->
+        <div class="col-12 mt-4">
+          <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+              <blockexplorer-address-summary [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
+              <div class="list-group-item mb-4">
+                <blockexplorer-transactions-list></blockexplorer-transactions-list>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
