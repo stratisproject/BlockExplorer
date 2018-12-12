@@ -8,6 +8,8 @@ import { AddressSummaryComponent } from './components/address-summary/address-su
 import { TransactionListItemComponent } from './components/transaction-list-item/transaction-list-item.component';
 import { TransactionSummaryPageComponent } from './containers/transaction-summary-page/transaction-summary-page.component';
 import { AddressSummaryPageComponent } from './containers/address-summary-page/address-summary-page.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PrismModule } from '@ngx-prism/core';
 
 export { TransactionsPageComponent } from './containers/transactions-page/transactions-page.component';
 
@@ -21,7 +23,7 @@ export const uiAddressesRoutes: Route[] = [
 ];
 
 @NgModule({
-  imports: [CommonModule, RouterModule, UiLayoutModule],
+  imports: [CommonModule, RouterModule, UiLayoutModule, NgbModule, PrismModule],
   declarations: [TransactionsPageComponent, TransactionsListComponent, AddressSummaryComponent, TransactionListItemComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent],
   exports: [TransactionsPageComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent]
 })

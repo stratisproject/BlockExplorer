@@ -15,6 +15,22 @@ export class AddressSummaryPageComponent implements OnInit, OnDestroy {
   destroyed$ = new ReplaySubject<any>();
   addressHash = '';
   address$: Observable<BalanceSummaryModel>;
+  code = `
+using OpenQA.Selenium;
+
+namespace Stratis.Tests.UI.NetCore.Pages
+{
+    public class BasePage
+    {
+        public IWebDriver Driver { get; }
+
+        public BasePage(IWebDriver driver)
+        {
+            this.Driver = driver;
+        }
+
+    }
+}`;
 
   constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade) { }
 

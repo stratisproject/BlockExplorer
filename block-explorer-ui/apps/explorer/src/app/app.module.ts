@@ -19,6 +19,7 @@ import { environment } from '../environments/environment';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { storeFreeze } from 'ngrx-store-freeze';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { PrismModule } from '@ngx-prism/core';
 import { UiLayoutModule } from '@blockexplorer/ui/layout';
 import { FormsModule } from '@angular/forms';
 import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, uiAddressesRoutes } from '@blockexplorer/ui/transactions';
@@ -34,6 +35,7 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
     HttpClientModule,
     FormsModule,
     UiLayoutModule,
+    PrismModule,
     UiTransactionsModule,
     SharedModelsModule,
     StateGlobalStateModule.forRoot(),
