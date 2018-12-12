@@ -3,7 +3,8 @@
   <PropertyGroup>
     <Description>Stratis Bitcoin Features Azure Indexer</Description>
     <AssemblyTitle>Stratis.Bitcoin.Features.AzureIndexer</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Stratis.Bitcoin.Features.AzureIndexer</AssemblyName>
     <PackageId>Stratis.Bitcoin.Features.AzureIndexer</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
