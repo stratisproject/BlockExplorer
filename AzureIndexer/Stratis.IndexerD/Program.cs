@@ -28,18 +28,17 @@ namespace Stratis.Bitcoin.Indexer.Console
         {
             try
             {
-                // NodeSettings nodeSettings =
-                 NodeSettings nodeSettings = new NodeSettings(new SmartContractsPoATest(), ProtocolVersion.ALT_PROTOCOL_VERSION, "StratisSC", args: args); //new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, "StratisSC", args: args);
-
+                // NodeSettings nodeSettings = new NodeSettings(new SmartContractsPoATest(), ProtocolVersion.ALT_PROTOCOL_VERSION, "StratisSC", args: args); 
+                NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
                 IFullNode node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
                     .UsePosConsensus()
-                    .AddSmartContracts()
-                    .UseSmartContractPoAConsensus()
+                    //.AddSmartContracts()
+                    //.UseSmartContractPoAConsensus()
                     //.UseSmartContractPoAMining()
-                    //.UseSmartContractWallet()
-                    .UseReflectionExecutor()
-                    //.UseApi()
+                   //.UseSmartContractWallet()
+                   // .UseReflectionExecutor()
+                   // .UseApi()
                     .UseBlockStore()
                     .UseAzureIndexer()
                     .Build();
