@@ -2,7 +2,7 @@
   "profiles": {
     "Stratis.IndexerD": {
       "commandName": "Project",
-      "commandLineArgs": "stratis -testnet "
+      "commandLineArgs": "stratis -addnode=52.189.213.175 "
     }
   }
 }
