@@ -9,7 +9,7 @@ import { first } from 'rxjs/operators';
 export class PagerComponent implements OnInit {
 
   @Input() currentPage = 1;
-  @Input() totalPages = 2000;
+  @Input() totalPages = 1;
 
   @Output() first = new EventEmitter();
   @Output() last = new EventEmitter();

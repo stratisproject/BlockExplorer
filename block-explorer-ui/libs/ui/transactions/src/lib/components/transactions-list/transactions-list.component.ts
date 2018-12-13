@@ -20,4 +20,11 @@ export class TransactionsListComponent implements OnInit {
   get noTransactions() {
     return  !this.transactions || this.transactions.length === 0;
   }
+
+  get totalPages() {
+    if (!this.transactions || this.transactions.length <= 20) return 1;
+    const pages = Math.trunc(this.transactions.length / 20);
+    if (this.transactions.length % 20 === 0) return pages;
+    return pages + 1;
+  }
 }

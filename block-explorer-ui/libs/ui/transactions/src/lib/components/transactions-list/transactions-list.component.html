@@ -2,9 +2,9 @@
   <div class="col-12">
     <div class="row">
       <div class="card-header col-xs-12 col-md-4 text-center text-md-left">
-        {{title}} <span [hidden]="noTransactions" *ngIf="showCount">({{transactions.length}})</span>
+        {{title}} <span [hidden]="noTransactions || !showCount">({{!!transactions ? transactions.length : 0}})</span>
       </div>
-      <blockexplorer-pager *ngIf="showPaging" class="col-xs-12 col-md-8" [hidden]="noTransactions"></blockexplorer-pager>
+      <blockexplorer-pager *ngIf="showPaging" [totalPages]="totalPages" class="col-xs-12 col-md-8" [hidden]="noTransactions"></blockexplorer-pager>
     </div>
   </div>
   <div *ngIf="noTransactions">
@@ -12,12 +12,12 @@
   </div>
   <ul class="list-group" [hidden]="noTransactions">
     <li class="list-group-item" *ngFor="let transaction of transactions">
-        <blockexplorer-transaction-list-item class="row" [transaction]="transaction"></blockexplorer-transaction-list-item>
+      <blockexplorer-transaction-list-item class="row" [transaction]="transaction"></blockexplorer-transaction-list-item>
     </li>
   </ul>
 </div>
 <!-- pagination -->
 <div class="row mt-4">
-  <blockexplorer-pager *ngIf="showPaging" class="col-xs-12 col-md-8" [totalPages]="transactions.length / 10" [hidden]="noTransactions"></blockexplorer-pager>
+  <blockexplorer-pager *ngIf="showPaging" class="col-xs-12 col-md-8" [totalPages]="totalPages" [hidden]="noTransactions"></blockexplorer-pager>
 </div>
 <!-- /pagination -->
