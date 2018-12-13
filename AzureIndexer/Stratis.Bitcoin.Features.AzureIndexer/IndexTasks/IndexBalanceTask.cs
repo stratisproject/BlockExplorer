@@ -15,6 +15,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             _WalletRules = walletRules;
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
+
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
             return Configuration.GetBalanceTable();

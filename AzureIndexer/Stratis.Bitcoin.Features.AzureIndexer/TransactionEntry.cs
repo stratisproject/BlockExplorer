@@ -4,7 +4,10 @@ using NBitcoin.OpenAsset;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Stratis.Bitcoin.Networks;
+using Stratis.SmartContracts.CLR;
+using Stratis.SmartContracts.CLR.Serialization;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -32,6 +35,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.Transaction = tx;
                 this.BlockId = blockId;
                 this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
+                this.HasSmartContract = this.IsTransactionContainsSmartContract(tx);
             }
 
             public Entity(uint256 txId)
@@ -47,6 +51,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             public Entity(DynamicTableEntity entity, Network network)
             {
+                this.Network = network;
                 string[] splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.None);
                 this._PartitionKey = entity.PartitionKey;
                 this.Timestamp = entity.Timestamp;
@@ -77,6 +82,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     this.Timestamp = new DateTimeOffset((long)ToUInt64(timestamp, 0), TimeSpan.Zero);
                 }
+
+                this.HasSmartContract = Convert.ToBoolean(Helper.GetEntityProperty(entity, "HasSmartContract"));
             }
 
             public static ulong ToUInt64(byte[] value, int index)
@@ -95,7 +102,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 var entity = new DynamicTableEntity
                 {
-                    ETag = "*", PartitionKey = PartitionKey, RowKey = TxId + "-" + TypeLetter + "-" + BlockId
+                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.TxId + "-" + this.TypeLetter+ "-" + this.BlockId
                 };
                 if (this.Transaction != null)
                 {
@@ -104,23 +111,37 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                 if (this.ColoredTransaction != null)
                 {
-                    Helper.SetEntityProperty(entity, "b", ColoredTransaction.ToBytes());
+                    Helper.SetEntityProperty(entity, "b", this.ColoredTransaction.ToBytes());
                 }
 
-                Helper.SetEntityProperty(entity, "c", Helper.SerializeList(PreviousTxOuts));
-                Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)Timestamp.UtcTicks, true));
+                Helper.SetEntityProperty(entity, "c", Helper.SerializeList(this.PreviousTxOuts));
+                Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)this.Timestamp.UtcTicks, true));
+
+                this.CheckForSmartContract(this.Transaction);
+
+                entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(this.HasSmartContract));
+
                 return entity;
             }
 
-            public string TypeLetter
+            private void CheckForSmartContract(Transaction transaction)
             {
-                get
+                var smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
+
+                foreach (TxOut transactionOutput in transaction.Outputs)
                 {
-                    return Type == TransactionEntryType.Colored ? "c" :
-                        Type == TransactionEntryType.ConfirmedTransaction ? "b" :
-                        Type == TransactionEntryType.Mempool ? "m" : "?";
+                    Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
+                    if (contractTxDataResult.IsSuccess)
+                    {
+                        this.HasSmartContract = true;
+                        this.ContractTxData = contractTxDataResult.Value;
+                    }
                 }
             }
+
+            public string TypeLetter => this.Type == TransactionEntryType.Colored ? "c" :
+                    this.Type == TransactionEntryType.ConfirmedTransaction ? "b" :
+                    this.Type == TransactionEntryType.Mempool ? "m" : "?";
 
             public TransactionEntryType GetType(string letter)
             {
@@ -143,12 +164,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 get
                 {
-                    if(_PartitionKey == null && TxId != null)
+                    if(this._PartitionKey == null && this.TxId != null)
                     {
-                        var b = TxId.ToBytes();
-                        _PartitionKey = Helper.GetPartitionKey(10, new[] { b[0], b[1] }, 0, 2);
+                        var b = this.TxId.ToBytes();
+                        this._PartitionKey = Helper.GetPartitionKey(10, new[] { b[0], b[1] }, 0, 2);
                     }
-                    return _PartitionKey;
+                    return this._PartitionKey;
                 }
             }
 
@@ -162,17 +183,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 if (txId == null)
                     throw new ArgumentNullException("txId");
-                TxId = txId;
-                ColoredTransaction = colored;
-                Type = TransactionEntryType.Colored;
+                this.TxId = txId;
+                this.ColoredTransaction = colored;
+                this.Type = TransactionEntryType.Colored;
             }
 
             public bool IsLoaded
             {
                 get
                 {
-                    return Transaction != null &&
-                        (Transaction.IsCoinBase || (PreviousTxOuts.Count == Transaction.Inputs.Count));
+                    return this.Transaction != null &&
+                        (this.Transaction.IsCoinBase || (this.PreviousTxOuts.Count == this.Transaction.Inputs.Count));
                 }
             }
 
@@ -206,7 +227,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 get
                 {
-                    return _PreviousTxOuts;
+                    return this._PreviousTxOuts;
                 }
             }
 
@@ -215,16 +236,23 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 get;
                 set;
             }
+
+            public bool HasSmartContract { get; set; }
+
+            public Network Network { get; set; }
+
+            public ContractTxData ContractTxData { get; set; }
+
         }
 
         internal TransactionEntry(Entity[] entities)
         {
-            TransactionId = entities[0].TxId;
-            BlockIds = entities.Select(e => e.BlockId).Where(b => b != null).ToArray();
-            MempoolDate = entities.Where(e => e.Type == Entity.TransactionEntryType.Mempool)
+            this.TransactionId = entities[0].TxId;
+            this.BlockIds = entities.Select(e => e.BlockId).Where(b => b != null).ToArray();
+            this.MempoolDate = entities.Where(e => e.Type == Entity.TransactionEntryType.Mempool)
                                   .Select(e => new DateTimeOffset?(e.Timestamp))
                                   .Min();
-            FirstSeen = MempoolDate != null ?  MempoolDate.Value : 
+            this.FirstSeen = this.MempoolDate != null ?  this.MempoolDate.Value : 
                                     entities.Where(e => e.Type == Entity.TransactionEntryType.ConfirmedTransaction)
                                   .Select(e => new DateTimeOffset?(e.Timestamp))
                                   .Min().Value;
@@ -234,17 +262,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 loadedEntity = entities.FirstOrDefault(e => e.Transaction != null);
             if(loadedEntity != null)
             {
-                Transaction = loadedEntity.Transaction;
+                this.Transaction = loadedEntity.Transaction;
                 if(loadedEntity.Transaction.IsCoinBase)
                 {
-                    SpentCoins = new List<Spendable>();
+                    this.SpentCoins = new List<Spendable>();
                 }
                 else if(loadedEntity.IsLoaded)
                 {
-                    SpentCoins = new List<Spendable>();
-                    for(int i = 0; i < Transaction.Inputs.Count; i++)
+                    this.SpentCoins = new List<Spendable>();
+                    for(int i = 0; i < this.Transaction.Inputs.Count; i++)
                     {
-                        SpentCoins.Add(new Spendable(Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
+                        this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
                     }
                 }
             }
@@ -252,7 +280,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
             if(coloredLoadedEntity != null)
             {
-                ColoredTransaction = coloredLoadedEntity.ColoredTransaction;
+                this.ColoredTransaction = coloredLoadedEntity.ColoredTransaction;
             }
         }
 
@@ -272,11 +300,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             get
             {
-                if(SpentCoins == null || Transaction == null)
+                if(this.SpentCoins == null || this.Transaction == null)
                     return null;
-                if(Transaction.IsCoinBase)
+                if(this.Transaction.IsCoinBase)
                     return Money.Zero;
-                return SpentCoins.Select(o => o.TxOut.Value).Sum() - Transaction.TotalOut;
+                return this.SpentCoins.Select(o => o.TxOut.Value).Sum() - this.Transaction.TotalOut;
             }
         }
 
@@ -312,5 +340,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             get;
             set;
         }
+
+        public Network Network { get; set; }
     }
 }
