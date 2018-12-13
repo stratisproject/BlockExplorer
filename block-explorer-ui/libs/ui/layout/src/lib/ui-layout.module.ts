@@ -6,9 +6,10 @@ import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.componen
 import { PagerComponent } from './components/pager/pager.component';
 import { BalanceComponent } from './components/balance/balance.component';
 import { BusyIndicatorComponent } from './components/busy-indicator/busy-indicator.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   declarations: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent, BusyIndicatorComponent],
   exports: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent, BusyIndicatorComponent]
 })

@@ -43,9 +43,9 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
     NxModule.forRoot(),
     RouterModule.forRoot(
       [
-        { path: '', component: TransactionsPageComponent },
-        { path: 'transactions', children: uiTransactionsRoutes },
-        { path: 'addresses', children: uiAddressesRoutes }
+        { path: '', component: TransactionsPageComponent, data: { breadcrumb: 'Home' } },
+        { path: 'transactions', children: uiTransactionsRoutes, data: { breadcrumb: 'Transactions' } },
+        { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } }
       ],
       {
         initialNavigation: 'enabled',
