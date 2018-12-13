@@ -24,7 +24,7 @@ export class BalancesService {
      * @param colored (optional)
      * @return Success
      */
-    addressBalance(balanceId: string, continuation: string | null | undefined, until: string | null | undefined, from: string | null | undefined, includeImmature: boolean | null | undefined, unspentOnly: boolean | null | undefined, colored: boolean | null | undefined): Observable<BalanceResponseModel> {
+    addressBalance(balanceId: string, continuation: string | null | undefined, until: string | null | undefined, from: string | null | undefined, includeImmature: boolean | null | undefined, unspentOnly: boolean | null | undefined, colored: boolean | null | undefined, loadTransactionDetails: boolean | null | undefined): Observable<BalanceResponseModel> {
         let url_ = this.baseUrl + "/api/v1/balances/{balanceId}?";
         if (balanceId === undefined || balanceId === null)
             throw new Error("The parameter 'balanceId' must be defined.");
@@ -41,6 +41,8 @@ export class BalancesService {
             url_ += "unspentOnly=" + encodeURIComponent("" + unspentOnly) + "&";
         if (colored !== undefined)
             url_ += "colored=" + encodeURIComponent("" + colored) + "&";
+        if (loadTransactionDetails !== undefined)
+          url_ += "loadTransactionDetails=" + encodeURIComponent("" + loadTransactionDetails) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const options_ : any = {

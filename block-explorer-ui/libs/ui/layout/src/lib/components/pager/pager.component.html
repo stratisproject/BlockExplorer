@@ -1,4 +1,4 @@
-<div class="col-xs-12 col-md-8" *ngIf="totalPages > 0">
+<div *ngIf="totalPages > 0">
     <nav class="d-flex justify-content-center justify-content-md-end row">
       <ul class="pagination float-right">
         <li class="page-item d-none d-sm-block" (click)="first.emit()" [ngClass]="{ 'disabled': currentPage <= 1 }">

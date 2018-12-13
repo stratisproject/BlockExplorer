@@ -10,7 +10,10 @@ import {
   TransactionsActionTypes,
   GetAddress,
   AddressLoaded,
-  AddressLoadError
+  AddressLoadError,
+  GetAddressDetails,
+  AddressDetailsLoaded,
+  AddressDetailsLoadError
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
@@ -18,41 +21,50 @@ import { BalancesService } from '../services/balances.service';
 
 @Injectable()
 export class TransactionsEffects {
-  @Effect() loadTransactions$ = this.dataPersistence.fetch(
-    TransactionsActionTypes.LoadTransactions,
-    {
-      run: (action: LoadTransactions, state: TransactionsPartialState) => {
-        return this.transactionsService.transactions().pipe(
-          map((transactions) => {
-            return new TransactionsLoaded(transactions);
-          })
-        );
-      },
+  @Effect() loadTransactions$ = this.dataPersistence.fetch(TransactionsActionTypes.LoadTransactions, {
+    run: (action: LoadTransactions, state: TransactionsPartialState) => {
+      return this.transactionsService.transactions().pipe(
+        map((transactions) => {
+          return new TransactionsLoaded(transactions);
+        })
+      );
+    },
 
-      onError: (action: LoadTransactions, error) => {
-        console.error('Error', error);
-        return new TransactionsLoadError(error);
-      }
+    onError: (action: LoadTransactions, error) => {
+      console.error('Error', error);
+      return new TransactionsLoadError(error);
     }
-  );
+  });
 
-  @Effect() getAddress$ = this.dataPersistence.fetch(
-    TransactionsActionTypes.GetAddress,
-    {
-      run: (action: GetAddress, state: TransactionsPartialState) => {
-        return this.balancesService.addressBalanceSummary(action.addressHash, undefined, false, false).pipe(
-          map((balance) => {
-            return new AddressLoaded(balance);
-          })
-        );
-      },
+  @Effect() getAddress$ = this.dataPersistence.fetch(TransactionsActionTypes.GetAddress, {
+    run: (action: GetAddress, state: TransactionsPartialState) => {
+      return this.balancesService.addressBalanceSummary(action.addressHash, undefined, false, false).pipe(
+        map((balance) => {
+          return new AddressLoaded(balance);
+        })
+      );
+    },
 
-      onError: (action: GetAddress, error) => {
-        console.error('Error', error);
-        return new AddressLoadError(error);
-      }
+    onError: (action: GetAddress, error) => {
+      console.error('Error', error);
+      return new AddressLoadError(error);
     }
-  );
+  });
+
+  @Effect() getAddressDetails$ = this.dataPersistence.fetch(TransactionsActionTypes.GetAddressDetails, {
+    run: (action: GetAddressDetails, state: TransactionsPartialState) => {
+      return this.balancesService.addressBalance(action.addressHash, undefined, undefined, undefined, false, false, false, true).pipe(
+        map((balance) => {
+          return new AddressDetailsLoaded(balance);
+        })
+      );
+    },
+
+    onError: (action: GetAddressDetails, error) => {
+      console.error('Error', error);
+      return new AddressDetailsLoadError(error);
+    }
+  });
 
   constructor(
     private actions$: Actions,

@@ -9,30 +9,26 @@ const getTransactionsState = createFeatureSelector<TransactionsState>(
   TRANSACTIONS_FEATURE_KEY
 );
 
-const getLoaded = createSelector(
-  getTransactionsState,
-  (state: TransactionsState) => state.loaded
-);
-const getSelectedAddress = createSelector(
-  getTransactionsState,
-  (state: TransactionsState) => state.selectedAddress
-);
-const getError = createSelector(
-  getTransactionsState,
-  (state: TransactionsState) => state.error
-);
+const getLoadedTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedTransactions);
+const getLoadedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddress);
+const getLoadedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddressDetails);
+const getSelectedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddress);
+const getSelectedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddressDetails);
+const getError = createSelector(getTransactionsState, (state: TransactionsState) => state.error);
 
 const getAllTransactions = createSelector(
   getTransactionsState,
-  getLoaded,
+  getLoadedTransactions,
   (state: TransactionsState, isLoaded) => {
     return isLoaded ? state.list : [];
   }
 );
+
 const getSelectedId = createSelector(
   getTransactionsState,
   (state: TransactionsState) => state.selectedId
 );
+
 const getSelectedTransactions = createSelector(
   getAllTransactions,
   getSelectedId,
@@ -43,9 +39,12 @@ const getSelectedTransactions = createSelector(
 );
 
 export const transactionsQuery = {
-  getLoaded,
+  getLoadedTransactions,
+  getLoadedAddress,
+  getLoadedAddressDetails,
   getError,
   getAllTransactions,
   getSelectedAddress,
+  getSelectedAddressDetails,
   getSelectedTransactions
 };

@@ -49,7 +49,7 @@
         public DateTimeOffset? FirstSeen { get; set; }
 
         [JsonProperty("fees", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public Money Fees { get; set; }
+        public MoneyModel Fees { get; set; }
     }
 
     public class TransactionModel
@@ -333,6 +333,57 @@
 
         [JsonProperty("firstSeen", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? FirstSeen { get; set; }
+
+        [JsonProperty("transactionSummary", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public TransactionSummaryModel TransactionSummary { get; set; }
+    }
+
+    public class TransactionSummaryModel
+    {
+        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash { get; set; }
+
+        [JsonProperty("isCoinbase", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsCoinbase { get; set; }
+
+        [JsonProperty("isCoinstake", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsCoinstake { get; set; }
+
+        [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel Amount { get; set; }
+
+        [JsonProperty("fee", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel Fee { get; set; }
+
+        [JsonProperty("height", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? Height { get; set; }
+
+        [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? Time { get; set; }
+
+        [JsonProperty("spent", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool Spent { get; set; }
+
+        [JsonProperty("in", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<LineItemModel> In { get; set; }
+
+        [JsonProperty("out", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<LineItemModel> Out { get; set; }
+
+        [JsonProperty("confirmations", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int Confirmations { get; set; }
+    }
+
+    public class LineItemModel
+    {
+        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash { get; set; }
+
+        [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel Amount { get; set; }
+
+        [JsonProperty("n", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int N { get; set; }
     }
 
     public class InsertWalletAddressModel

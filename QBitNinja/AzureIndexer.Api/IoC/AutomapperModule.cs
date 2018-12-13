@@ -1,11 +1,10 @@
-﻿using CommonServiceLocator;
-
-namespace AzureIndexer.Api.IoC
+﻿namespace AzureIndexer.Api.IoC
 {
     using System.Linq;
     using System.Net;
     using Autofac;
     using AutoMapper;
+    using CommonServiceLocator;
     using Infrastructure;
     using Models;
     using Models.Response;
@@ -38,6 +37,7 @@ namespace AzureIndexer.Api.IoC
                 cfg.CreateMap<WhatIsPublicKey, WhatIsPublicKeyModel>();
                 cfg.CreateMap<Sequence, SequenceModel>();
                 cfg.CreateMap<Script, ScriptModel>().ConvertUsing<ScriptTypeConverter>();
+                cfg.CreateMap<TransactionResponseModel, TransactionSummaryModel>().ConvertUsing<TransactionSummaryConverter>();
                 cfg.CreateMap<Target, TargetModel>();
                 cfg.CreateMap<ScriptId, ScriptIdModel>();
                 cfg.CreateMap<WitScriptId, WitScriptIdModel>();
@@ -90,12 +90,11 @@ namespace AzureIndexer.Api.IoC
             public ScriptModel Convert(Script source, ScriptModel destination, ResolutionContext context)
             {
                 var network = ServiceLocator.Current.GetInstance<QBitNinjaConfiguration>().Indexer.Network;
-                var addresses = source.GetDestinationPublicKeys(network);
+                var address = source.GetAddressFromScript(network);
 
-                var convertedAddresses = addresses?.Select(a => network.CreateBitcoinPubKeyAddress(a.Hash).ToString()).ToList();
                 var scriptModel = new ScriptModel
                 {
-                    Addresses = convertedAddresses,
+                    Addresses = new[] { address },
                     HasCanonicalPushes = source.HasCanonicalPushes,
                     Hash = source.ToString(),
                     IsPushOnly = source.IsPushOnly,
@@ -106,6 +105,30 @@ namespace AzureIndexer.Api.IoC
                 };
 
                 return scriptModel;
+            }
+        }
+
+        public class TransactionSummaryConverter : ITypeConverter<TransactionResponseModel, TransactionSummaryModel>
+        {
+            public TransactionSummaryModel Convert(TransactionResponseModel source, TransactionSummaryModel destination, ResolutionContext context)
+            {
+                var chain = ServiceLocator.Current.GetInstance<ConcurrentChain>();
+                var summary = new TransactionSummaryModel
+                {
+                    Hash = source.TransactionId,
+                    Time = source.Transaction.Time,
+                    Confirmations = (chain.Tip.Height - source.Block?.Height ?? 0) + 1,
+                    Fee = source.Fees,
+                    Amount = source.Transaction.TotalOut,
+                    Height = source.Block?.Height,
+                    Spent = source.Transaction.TotalOut.Satoshi < 0,
+                    IsCoinbase = source.Transaction.IsCoinBase ?? false,
+                    IsCoinstake = source.Transaction.IsCoinStake ?? false,
+                    In = source.SpentCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), N = coin.Outpoint.N ?? 0, Amount = coin.TxOut.Value }).Where(t => t.Amount.Satoshi != 0).ToList(),
+                    Out = source.ReceivedCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), Amount = coin.TxOut.Value, N = coin.Outpoint.N ?? 0 }).Where(t => t.Amount.Satoshi != 0).ToList()
+                };
+
+                return summary;
             }
         }
     }

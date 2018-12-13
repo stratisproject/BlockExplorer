@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { PagerComponent } from './components/pager/pager.component';
 import { BalanceComponent } from './components/balance/balance.component';
+import { BusyIndicatorComponent } from './components/busy-indicator/busy-indicator.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule],
-  declarations: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent],
-  exports: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent]
+  declarations: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent, BusyIndicatorComponent],
+  exports: [MenuBarComponent, BreadcrumbComponent, PagerComponent, BalanceComponent, BusyIndicatorComponent]
 })
 export class UiLayoutModule {}

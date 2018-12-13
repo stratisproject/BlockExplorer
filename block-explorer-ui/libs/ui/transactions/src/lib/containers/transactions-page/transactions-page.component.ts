@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { TransactionsState, TransactionsFacade } from '@blockexplorer/state/transactions-state';
+import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
 import { Observable } from 'rxjs';
-import { TransactionModel } from '@blockexplorer/shared/models';
+import { TransactionModel, TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-transactions-page',
@@ -10,12 +10,12 @@ import { TransactionModel } from '@blockexplorer/shared/models';
   styleUrls: ['./transactions-page.component.css']
 })
 export class TransactionsPageComponent implements OnInit {
-  transactions$: Observable<TransactionModel[]>;
+  transactions$: Observable<TransactionSummaryModel[]>;
 
   constructor(private transactionsFacade: TransactionsFacade) { }
 
   ngOnInit() {
-    this.transactions$ = this.transactionsFacade.allTransactions$;
+    // this.transactions$ = this.transactionsFacade.allTransactions$;
     this.transactionsFacade.loadAll();
   }
 

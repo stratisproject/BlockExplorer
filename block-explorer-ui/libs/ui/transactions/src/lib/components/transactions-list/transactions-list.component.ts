@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { TransactionModel } from '@blockexplorer/shared/models';
+import { TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-transactions-list',
@@ -7,7 +7,10 @@ import { TransactionModel } from '@blockexplorer/shared/models';
   styleUrls: ['./transactions-list.component.css']
 })
 export class TransactionsListComponent implements OnInit {
-  @Input() transactions: TransactionModel[] = [];
+  @Input() transactions: TransactionSummaryModel[] = [];
+  @Input() title = 'Transactions';
+  @Input() showPaging = true;
+  @Input() showCount = true;
   @Output() selected = new EventEmitter<string>();
 
   constructor() {}

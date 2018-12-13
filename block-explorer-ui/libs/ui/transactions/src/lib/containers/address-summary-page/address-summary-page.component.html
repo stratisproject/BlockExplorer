@@ -7,16 +7,17 @@
           <ngb-tabset type="pills" id="v-pills-tabContent">
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
-                <blockexplorer-address-summary [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
-                <div class="list-group-item mb-4">
-                  <blockexplorer-transactions-list></blockexplorer-transactions-list>
+                <blockexplorer-busy-indicator [hidden]="addressSummaryLoaded$ | async"></blockexplorer-busy-indicator>
+                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
+                <div class="list-group-item mb-4" *ngIf="addressDetailsLoaded$ | async">
+                  <blockexplorer-transactions-list [showCount]="false" [showPaging]="false" title="Last Transaction" [transactions]="lastTransaction"></blockexplorer-transactions-list>
                 </div>
               </ng-template>
             </ngb-tab>
             <ngb-tab title="Transactions">
               <ng-template ngbTabContent>
                 <div class="list-group-item mb-3">
-                  <blockexplorer-transactions-list></blockexplorer-transactions-list>
+                  <blockexplorer-transactions-list [transactions]="transactions"></blockexplorer-transactions-list>
                 </div>
               </ng-template>
             </ngb-tab>

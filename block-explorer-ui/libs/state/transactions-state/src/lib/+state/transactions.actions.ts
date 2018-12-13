@@ -6,10 +6,13 @@ import { BalanceSummaryModel, BalanceResponseModel } from '@blockexplorer/shared
 export enum TransactionsActionTypes {
   LoadTransactions = '[Transactions] Load Transactions',
   GetAddress = '[Transactions] Get Address',
+  GetAddressDetails = '[Transactions] Get Address Details',
   TransactionsLoaded = '[Transactions] Transactions Loaded',
   AddressLoaded = '[Transactions] Address Loaded',
+  AddressDetailsLoaded = '[Transactions] Address Details Loaded',
   TransactionsLoadError = '[Transactions] Transactions Load Error',
-  AddressLoadError = '[Transactions] Address Load Error'
+  AddressLoadError = '[Transactions] Address Load Error',
+  AddressDetailsLoadError = '[Transactions] Address Details Load Error'
 }
 
 export class LoadTransactions implements Action {
@@ -18,6 +21,11 @@ export class LoadTransactions implements Action {
 
 export class GetAddress implements Action {
   readonly type = TransactionsActionTypes.GetAddress;
+  constructor(public addressHash: string) {}
+}
+
+export class GetAddressDetails implements Action {
+  readonly type = TransactionsActionTypes.GetAddressDetails;
   constructor(public addressHash: string) {}
 }
 
@@ -31,9 +39,19 @@ export class AddressLoadError implements Action {
   constructor(public payload: any) {}
 }
 
+export class AddressDetailsLoadError implements Action {
+  readonly type = TransactionsActionTypes.AddressDetailsLoadError;
+  constructor(public payload: any) {}
+}
+
 export class AddressLoaded implements Action {
   readonly type = TransactionsActionTypes.AddressLoaded;
   constructor(public address: BalanceSummaryModel) {}
+}
+
+export class AddressDetailsLoaded implements Action {
+  readonly type = TransactionsActionTypes.AddressDetailsLoaded;
+  constructor(public address: BalanceResponseModel) {}
 }
 
 export class TransactionsLoaded implements Action {
@@ -44,16 +62,22 @@ export class TransactionsLoaded implements Action {
 export type TransactionsAction =
   | LoadTransactions
   | GetAddress
+  | GetAddressDetails
   | TransactionsLoaded
   | TransactionsLoadError
   | AddressLoaded
-  | AddressLoadError;
+  | AddressLoadError
+  | AddressDetailsLoaded
+  | AddressDetailsLoadError;
 
 export const fromTransactionsActions = {
   LoadTransactions,
   GetAddress,
+  GetAddressDetails,
   TransactionsLoaded,
   TransactionsLoadError,
   AddressLoaded,
-  AddressLoadError
+  AddressLoadError,
+  AddressDetailsLoaded,
+  AddressDetailsLoadError
 };

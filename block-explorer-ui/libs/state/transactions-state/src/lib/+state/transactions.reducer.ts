@@ -2,8 +2,7 @@ import {
   TransactionsAction,
   TransactionsActionTypes
 } from './transactions.actions';
-import { TransactionModel } from 'gen/nswag';
-import { BalanceSummaryModel, BalanceResponseModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel, TransactionModel } from '@blockexplorer/shared/models';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
@@ -22,8 +21,11 @@ export interface TransactionsState {
   list: TransactionModel[]; // list of Transactions; analogous to a sql normalized table
   selectedId?: string | number; // which Transactions record has been selected
   selectedAddress?: BalanceSummaryModel;
-  loaded: boolean; // has the Transactions list been loaded
-  error?: any; // last none error (if any)
+  selectedAddressDetails?: BalanceResponseModel;
+  loadedTransactions: boolean;
+  loadedAddress: boolean;
+  loadedAddressDetails: boolean;
+  error?: any;
 }
 
 export interface TransactionsPartialState {
@@ -33,7 +35,10 @@ export interface TransactionsPartialState {
 export const initialState: TransactionsState = {
   list: [],
   selectedAddress: null,
-  loaded: false
+  selectedAddressDetails: null,
+  loadedTransactions: false,
+  loadedAddress: false,
+  loadedAddressDetails: false
 };
 
 export function transactionsReducer(
@@ -41,11 +46,25 @@ export function transactionsReducer(
   action: TransactionsAction
 ): TransactionsState {
   switch (action.type) {
+    case TransactionsActionTypes.LoadTransactions: {
+      state = {
+        ...state,
+        loadedTransactions: false,
+      };
+      break;
+    }
     case TransactionsActionTypes.TransactionsLoaded: {
       state = {
         ...state,
         list: action.transactions,
-        loaded: true
+        loadedTransactions: true,
+      };
+      break;
+    }
+    case TransactionsActionTypes.GetAddress: {
+      state = {
+        ...state,
+        loadedAddress: false,
       };
       break;
     }
@@ -53,7 +72,22 @@ export function transactionsReducer(
       state = {
         ...state,
         selectedAddress: action.address,
-        loaded: true
+        loadedAddress: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.GetAddressDetails: {
+      state = {
+        ...state,
+        loadedAddressDetails: false,
+      };
+      break;
+    }
+    case TransactionsActionTypes.AddressDetailsLoaded: {
+      state = {
+        ...state,
+        selectedAddressDetails: action.address,
+        loadedAddressDetails: true
       };
       break;
     }

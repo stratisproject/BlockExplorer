@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.Az
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja", "QBitNinja\QBitNinja.csproj", "{DE989093-1B6D-48E6-BB13-93A799F9CF49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureIndexer.Api", "AzureIndexer.Api\AzureIndexer.Api.csproj", "{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureIndexer.Api", "AzureIndexer.Api\AzureIndexer.Api.csproj", "{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

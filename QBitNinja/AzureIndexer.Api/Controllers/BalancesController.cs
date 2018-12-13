@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.Controllers
+﻿using System.Threading.Tasks;
+
+namespace AzureIndexer.Api.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -18,11 +20,17 @@
     public class BalancesController : ControllerBase
     {
         private readonly IMapper mapper;
+        private readonly ITransactionSearchService transactionSearchService;
         private readonly TimeSpan expiration = TimeSpan.FromHours(24.0);
 
-        public BalancesController(ConcurrentChain chain, QBitNinjaConfiguration config, IMapper mapper)
+        public BalancesController(
+            ConcurrentChain chain,
+            QBitNinjaConfiguration config,
+            IMapper mapper,
+            ITransactionSearchService transactionSearchService)
         {
             this.mapper = mapper;
+            this.transactionSearchService = transactionSearchService;
             this.Configuration = config;
             this.Chain = chain;
         }
@@ -35,18 +43,32 @@
 
         [HttpGet]
         [Route("{balanceId}")]
-        public BalanceResponseModel AddressBalance(
+        public async Task<BalanceResponseModel> AddressBalance(
             string balanceId,
             string continuation = null,
             string until = null,
             string from = null,
             bool includeImmature = false,
             bool unspentOnly = false,
-            bool colored = false)
+            bool colored = false,
+            bool loadTransactionDetails = false)
         {
             colored = colored || this.IsColoredAddress();
             var balance = this.Balance(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
             var mappedBalance = this.mapper.Map<BalanceResponseModel>(balance);
+
+            if (!loadTransactionDetails)
+            {
+                return mappedBalance;
+            }
+
+            foreach (var operation in mappedBalance.Operations)
+            {
+                var transaction = await this.transactionSearchService.FindTransaction(uint256.Parse(operation.TransactionId), false);
+                operation.TransactionSummary = this.mapper.Map<TransactionSummaryModel>(transaction);
+                operation.TransactionSummary.Spent = operation.Amount?.Satoshi < 0;
+            }
+
             return mappedBalance;
         }
 
