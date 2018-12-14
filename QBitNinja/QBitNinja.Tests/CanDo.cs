@@ -180,82 +180,82 @@ namespace QBitNinja.Tests
 			}
 		}
 
-		[Fact]
-		public void CanInitialIndex()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var bob = new Key();
-				var listener = tester.CreateListenerTester(true);
-				tester.ChainBuilder.EmitBlock(); //1
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), bob);
-				tester.ChainBuilder.EmitBlock(); // 5
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock(); //10
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), bob);
-				var last = tester.ChainBuilder.EmitBlock(); //11
+		//[Fact]
+		//public void CanInitialIndex()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var bob = new Key();
+		//		var listener = tester.CreateListenerTester(true);
+		//		tester.ChainBuilder.EmitBlock(); //1
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), bob);
+		//		tester.ChainBuilder.EmitBlock(); // 5
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock(); //10
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), bob);
+		//		var last = tester.ChainBuilder.EmitBlock(); //11
 
-				InitialIndexer indexer = new InitialIndexer(tester.Configuration);
-				indexer.BlockGranularity = 5;
-				indexer.TransactionsPerWork = 11;
-				Assert.Equal(5 * 2, indexer.Run());
+		//		InitialIndexer indexer = new InitialIndexer(tester.Configuration);
+		//		indexer.BlockGranularity = 5;
+		//		indexer.TransactionsPerWork = 11;
+		//		Assert.Equal(5 * 2, indexer.Run());
 
-				var client = tester.Configuration.Indexer.CreateIndexerClient();
-				Assert.Equal(3, client.GetOrderedBalance(bob).Count());
+		//		var client = tester.Configuration.Indexer.CreateIndexerClient();
+		//		Assert.Equal(3, client.GetOrderedBalance(bob).Count());
 
-				Assert.Equal(last.GetHash(), tester.Configuration.Indexer.CreateIndexer().GetCheckpoint(IndexerCheckpoints.Balances).BlockLocator.Blocks[0]);
+		//		Assert.Equal(last.GetHash(), tester.Configuration.Indexer.CreateIndexer().GetCheckpoint(IndexerCheckpoints.Balances).BlockLocator.Blocks[0]);
 
-				indexer.Cancel();
-			}
-		}
+		//		indexer.Cancel();
+		//	}
+		//}
 
-		[Fact]
-		public void CanInitialIndexConcurrently()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var bob = new Key();
-				var listener = tester.CreateListenerTester(true);
-				tester.ChainBuilder.EmitBlock(); //1
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), bob);
-				tester.ChainBuilder.EmitBlock(); // 5
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock();
-				tester.ChainBuilder.EmitBlock(); //10
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), bob);
-				tester.ChainBuilder.EmitBlock(); //11
+		//[Fact]
+		//public void CanInitialIndexConcurrently()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var bob = new Key();
+		//		var listener = tester.CreateListenerTester(true);
+		//		tester.ChainBuilder.EmitBlock(); //1
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), bob);
+		//		tester.ChainBuilder.EmitBlock(); // 5
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock();
+		//		tester.ChainBuilder.EmitBlock(); //10
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), bob);
+		//		tester.ChainBuilder.EmitBlock(); //11
 
-				var processed = Enumerable
-					.Range(0, 10)
-					.Select(_ => Task.Run(() =>
-					{
-						InitialIndexer indexer = new InitialIndexer(tester.Configuration);
-						indexer.BlockGranularity = 5;
-						indexer.TransactionsPerWork = 11;
-						return indexer.Run();
-					}))
-					.Select(s => s.Result)
-					.Sum();
+		//		var processed = Enumerable
+		//			.Range(0, 10)
+		//			.Select(_ => Task.Run(() =>
+		//			{
+		//				InitialIndexer indexer = new InitialIndexer(tester.Configuration);
+		//				indexer.BlockGranularity = 5;
+		//				indexer.TransactionsPerWork = 11;
+		//				return indexer.Run();
+		//			}))
+		//			.Select(s => s.Result)
+		//			.Sum();
 
-				Assert.Equal(5 * 2, processed);
+		//		Assert.Equal(5 * 2, processed);
 
-				var client = tester.Configuration.Indexer.CreateIndexerClient();
-				Assert.Equal(3, client.GetOrderedBalance(bob).Count());
-			}
-		}
+		//		var client = tester.Configuration.Indexer.CreateIndexerClient();
+		//		Assert.Equal(3, client.GetOrderedBalance(bob).Count());
+		//	}
+		//}
 
 		[Fact]
 		public void Play()
@@ -314,32 +314,32 @@ namespace QBitNinja.Tests
 		}
 
 
-		[Fact]
-		public void CanBroadcastTransaction()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var tx = CreateRandomTx();
-				var bytes = Encoders.Hex.EncodeData(tx.ToBytes());
-				var listener = tester.CreateListenerTester();
-				var response = tester.Send<BroadcastResponse>(HttpMethod.Post, "transactions", bytes);
-				Assert.True(response.Success);
-				Assert.True(response.Error == null);
-				listener.AssertReceivedTransaction(tx.GetHash());
+		//[Fact]
+		//public void CanBroadcastTransaction()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var tx = CreateRandomTx();
+		//		var bytes = Encoders.Hex.EncodeData(tx.ToBytes());
+		//		var listener = tester.CreateListenerTester();
+		//		var response = tester.Send<BroadcastResponse>(HttpMethod.Post, "transactions", bytes);
+		//		Assert.True(response.Success);
+		//		Assert.True(response.Error == null);
+		//		listener.AssertReceivedTransaction(tx.GetHash());
 
-				listener.Reject(new RejectPayload()
-				{
-					Code = RejectCode.INSUFFICIENTFEE
-				});
+		//		listener.Reject(new RejectPayload()
+		//		{
+		//			Code = RejectCode.INSUFFICIENTFEE
+		//		});
 
-				tx = CreateRandomTx();
-				bytes = Encoders.Hex.EncodeData(tx.ToBytes());
-				response = tester.Send<BroadcastResponse>(HttpMethod.Post, "transactions", bytes);
+		//		tx = CreateRandomTx();
+		//		bytes = Encoders.Hex.EncodeData(tx.ToBytes());
+		//		response = tester.Send<BroadcastResponse>(HttpMethod.Post, "transactions", bytes);
 
-				Assert.False(response.Success);
-				Assert.True(response.Error.ErrorCode == RejectCode.INSUFFICIENTFEE);
-			}
-		}
+		//		Assert.False(response.Success);
+		//		Assert.True(response.Error.ErrorCode == RejectCode.INSUFFICIENTFEE);
+		//	}
+		//}
 
 		private Transaction CreateRandomTx()
 		{
@@ -366,129 +366,129 @@ namespace QBitNinja.Tests
 		}
 
 
-		[Fact]
-		public void CanReceiveNewTransactionNotification()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var notifications = tester.CreateNotificationServer();
-				tester.Send<string>(HttpMethod.Post, "subscriptions", new NewTransactionSubscription()
-				{
-					Id = "toto",
-					Url = notifications.Address
-				});
+		//[Fact]
+		//public void CanReceiveNewTransactionNotification()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var notifications = tester.CreateNotificationServer();
+		//		tester.Send<string>(HttpMethod.Post, "subscriptions", new NewTransactionSubscription()
+		//		{
+		//			Id = "toto",
+		//			Url = notifications.Address
+		//		});
 
-				var listener = tester.CreateListenerTester();
+		//		var listener = tester.CreateListenerTester();
 
-				var bob = new Key();
-				var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
+		//		var bob = new Key();
+		//		var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
 
-				var request = notifications.WaitRequest();
-				request.Complete(true);
-				var data = (NewTransactionNotificationData)request.GetBody<Notification>().Data;
-				Assert.True(data.TransactionId == tx.GetHash());
-			}
-		}
-		[Fact]
-		public void CanReceiveNewBlockNotification()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var notifications = tester.CreateNotificationServer();
-				tester.Send<string>(HttpMethod.Post, "subscriptions", new NewBlockSubscription()
-				{
-					Id = "toto",
-					Url = notifications.Address
-				});
+		//		var request = notifications.WaitRequest();
+		//		request.Complete(true);
+		//		var data = (NewTransactionNotificationData)request.GetBody<Notification>().Data;
+		//		Assert.True(data.TransactionId == tx.GetHash());
+		//	}
+		//}
+		//[Fact]
+		//public void CanReceiveNewBlockNotification()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var notifications = tester.CreateNotificationServer();
+		//		tester.Send<string>(HttpMethod.Post, "subscriptions", new NewBlockSubscription()
+		//		{
+		//			Id = "toto",
+		//			Url = notifications.Address
+		//		});
 
-				var listener = tester.CreateListenerTester();
-				var b = tester.ChainBuilder.EmitBlock();
-				var request = notifications.WaitRequest();
-				request.Complete(true);
+		//		var listener = tester.CreateListenerTester();
+		//		var b = tester.ChainBuilder.EmitBlock();
+		//		var request = notifications.WaitRequest();
+		//		request.Complete(true);
 
-				var notification = request.GetBody<Notification>();
-				var data = (NewBlockNotificationData)notification.Data;
+		//		var notification = request.GetBody<Notification>();
+		//		var data = (NewBlockNotificationData)notification.Data;
 
-				if(data.Height == 0) //Due to timing problem, sometimes the first block is not received
-				{
-					Assert.True(notification.Subscription.Id == "toto");
-					Assert.True(data.BlockId == b.Header.HashPrevBlock);
-					Assert.True(data.Height == 0);
-					Assert.True(data.Header.GetHash() == b.Header.HashPrevBlock);
+		//		if(data.Height == 0) //Due to timing problem, sometimes the first block is not received
+		//		{
+		//			Assert.True(notification.Subscription.Id == "toto");
+		//			Assert.True(data.BlockId == b.Header.HashPrevBlock);
+		//			Assert.True(data.Height == 0);
+		//			Assert.True(data.Header.GetHash() == b.Header.HashPrevBlock);
 
-					request = notifications.WaitRequest();
-					request.Complete(true);
-					notification = request.GetBody<Notification>();
-					data = (NewBlockNotificationData)notification.Data;
-				}
+		//			request = notifications.WaitRequest();
+		//			request.Complete(true);
+		//			notification = request.GetBody<Notification>();
+		//			data = (NewBlockNotificationData)notification.Data;
+		//		}
 
-				Assert.True(notification.Subscription.Id == "toto");
-				Assert.True(data.BlockId == b.Header.GetHash());
-				Assert.True(data.Height == 1);
-				Assert.True(notification.Tried == 1);
-				Assert.True(data.Header.GetHash() == b.Header.GetHash());
+		//		Assert.True(notification.Subscription.Id == "toto");
+		//		Assert.True(data.BlockId == b.Header.GetHash());
+		//		Assert.True(data.Height == 1);
+		//		Assert.True(notification.Tried == 1);
+		//		Assert.True(data.Header.GetHash() == b.Header.GetHash());
 
-				//Fail
-				b = tester.ChainBuilder.EmitBlock();
-				request = notifications.WaitRequest();
-				request.Complete(false);
-				notification = request.GetBody<Notification>();
-				data = (NewBlockNotificationData)notification.Data;
-				Assert.True(data.Header.GetHash() == b.Header.GetHash());
+		//		Fail
+		//		b = tester.ChainBuilder.EmitBlock();
+		//		request = notifications.WaitRequest();
+		//		request.Complete(false);
+		//		notification = request.GetBody<Notification>();
+		//		data = (NewBlockNotificationData)notification.Data;
+		//		Assert.True(data.Header.GetHash() == b.Header.GetHash());
 
-				//Check has retried
-				request = notifications.WaitRequest();
-				request.Complete(true);
-				notification = request.GetBody<Notification>();
-				data = (NewBlockNotificationData)notification.Data;
-				Assert.True(data.Header.GetHash() == b.Header.GetHash());
-				Assert.True(notification.Tried == 2);
-			}
-		}
+		//		Check has retried
+		//		request = notifications.WaitRequest();
+		//		request.Complete(true);
+		//		notification = request.GetBody<Notification>();
+		//		data = (NewBlockNotificationData)notification.Data;
+		//		Assert.True(data.Header.GetHash() == b.Header.GetHash());
+		//		Assert.True(notification.Tried == 2);
+		//	}
+		//}
 
-		[Fact]
-		public void CanListenBlockchain()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var listener = tester.CreateListenerTester();
-				var indexer = tester.Configuration.Indexer.CreateIndexerClient();
+		//[Fact]
+		//public void CanListenBlockchain()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var listener = tester.CreateListenerTester();
+		//		var indexer = tester.Configuration.Indexer.CreateIndexerClient();
 
-				var bob = new Key().GetBitcoinSecret(Network.RegTest);
-
-
-				var wait = listener.WaitMessageAsync(tester.Configuration.Topics.NewTransactions);
-				var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
-				wait.Wait();
-
-				var balance = tester.SendGet<BalanceModel>("balances/" + bob.GetAddress());
-				Assert.True(balance.Operations.Count == 1);
-				Assert.True(balance.Operations[0].Confirmations == 0);
-				Assert.True(balance.Operations[0].BlockId == null);
-
-				var savedTx = tester.SendGet<GetTransactionResponse>("transactions/" + tx.GetHash());
-				Assert.NotNull(savedTx);
-				Assert.True(savedTx.Block == null);
+		//		var bob = new Key().GetBitcoinSecret(Network.RegTest);
 
 
-				var waitBlock = listener.WaitMessageAsync(tester.Configuration.Topics.NewBlocks);
-				var block = tester.ChainBuilder.EmitBlock();
-				waitBlock.Wait();
+		//		var wait = listener.WaitMessageAsync(tester.Configuration.Topics.NewTransactions);
+		//		var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), bob);
+		//		wait.Wait();
 
-				Assert.NotNull(indexer.GetBlock(block.GetHash()));
-				tester.UpdateServerChain(true);
+		//		var balance = tester.SendGet<BalanceModel>("balances/" + bob.GetAddress());
+		//		Assert.True(balance.Operations.Count == 1);
+		//		Assert.True(balance.Operations[0].Confirmations == 0);
+		//		Assert.True(balance.Operations[0].BlockId == null);
 
-				balance = tester.SendGet<BalanceModel>("balances/" + bob.GetAddress());
-				Assert.True(balance.Operations.Count == 1);
-				Assert.True(balance.Operations[0].Confirmations == 1);
-				Assert.True(balance.Operations[0].BlockId == block.GetHash());
+		//		var savedTx = tester.SendGet<GetTransactionResponse>("transactions/" + tx.GetHash());
+		//		Assert.NotNull(savedTx);
+		//		Assert.True(savedTx.Block == null);
 
-				savedTx = tester.SendGet<GetTransactionResponse>("transactions/" + tx.GetHash());
-				Assert.NotNull(savedTx);
-				Assert.True(savedTx.Block.Confirmations == 1);
 
-			}
-		}
+		//		var waitBlock = listener.WaitMessageAsync(tester.Configuration.Topics.NewBlocks);
+		//		var block = tester.ChainBuilder.EmitBlock();
+		//		waitBlock.Wait();
+
+		//		Assert.NotNull(indexer.GetBlock(block.GetHash()));
+		//		tester.UpdateServerChain(true);
+
+		//		balance = tester.SendGet<BalanceModel>("balances/" + bob.GetAddress());
+		//		Assert.True(balance.Operations.Count == 1);
+		//		Assert.True(balance.Operations[0].Confirmations == 1);
+		//		Assert.True(balance.Operations[0].BlockId == block.GetHash());
+
+		//		savedTx = tester.SendGet<GetTransactionResponse>("transactions/" + tx.GetHash());
+		//		Assert.NotNull(savedTx);
+		//		Assert.True(savedTx.Block.Confirmations == 1);
+
+		//	}
+		//}
 
 		void Insist(Action act)
 		{
@@ -1734,65 +1734,65 @@ namespace QBitNinja.Tests
 			}
 		}
 
-		[Fact]
-		public void HDKeysetsAreCorrectlyTracked()
-		{
-			using(var tester = ServerTester.Create())
-			{
-				var alice = new ExtKey().GetWif(tester.Network);
-				var pubkeyAlice = alice.ExtKey.Neuter().GetWif(tester.Network);
-				var aliceName = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
+		//[Fact]
+		//public void HDKeysetsAreCorrectlyTracked()
+		//{
+		//	using(var tester = ServerTester.Create())
+		//	{
+		//		var alice = new ExtKey().GetWif(tester.Network);
+		//		var pubkeyAlice = alice.ExtKey.Neuter().GetWif(tester.Network);
+		//		var aliceName = Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10);
 
-				var listener = tester.CreateListenerTester();
-				tester.ChainBuilder.SkipIndexer = true;
+		//		var listener = tester.CreateListenerTester();
+		//		tester.ChainBuilder.SkipIndexer = true;
 
-				var alice1 = pubkeyAlice.ExtPubKey.Derive(1).PubKey.GetAddress(tester.Network);
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), alice1);
-				var alice20 = pubkeyAlice.ExtPubKey.Derive(20).PubKey.GetAddress(tester.Network);
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), alice20); //Should be found because alice1 "extend" the scan
-				var alice41 = pubkeyAlice.ExtPubKey.Derive(41).PubKey.GetAddress(tester.Network);
-				var waiter = listener.WaitMessageAsync(tester.Configuration.Topics.NewTransactions);
-				var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), alice41); //But 41 is "outside" the gap limit
-				Assert.True(waiter.Wait(10000));
+		//		var alice1 = pubkeyAlice.ExtPubKey.Derive(1).PubKey.GetAddress(tester.Network);
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.0m), alice1);
+		//		var alice20 = pubkeyAlice.ExtPubKey.Derive(20).PubKey.GetAddress(tester.Network);
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.1m), alice20); //Should be found because alice1 "extend" the scan
+		//		var alice41 = pubkeyAlice.ExtPubKey.Derive(41).PubKey.GetAddress(tester.Network);
+		//		var waiter = listener.WaitMessageAsync(tester.Configuration.Topics.NewTransactions);
+		//		var tx = tester.ChainBuilder.EmitMoney(Money.Coins(1.2m), alice41); //But 41 is "outside" the gap limit
+		//		Assert.True(waiter.Wait(10000));
 
-				var balance = tester.SendGet<BalanceModel>("balances/" + alice1);
-				Assert.Equal(1, balance.Operations.Count);
+		//		var balance = tester.SendGet<BalanceModel>("balances/" + alice1);
+		//		Assert.Equal(1, balance.Operations.Count);
 
-				tester.Send<WalletModel>(HttpMethod.Post, "wallets", new WalletModel()
-				{
-					Name = aliceName
-				});
-				tester.Send<HDKeySet>(HttpMethod.Post, "wallets/" + aliceName + "/keysets", new HDKeySet()
-				{
-					Name = "SingleNoP2SH",
-					ExtPubKeys = new BitcoinExtPubKey[] { pubkeyAlice },
-					P2SH = false
-				});
+		//		tester.Send<WalletModel>(HttpMethod.Post, "wallets", new WalletModel()
+		//		{
+		//			Name = aliceName
+		//		});
+		//		tester.Send<HDKeySet>(HttpMethod.Post, "wallets/" + aliceName + "/keysets", new HDKeySet()
+		//		{
+		//			Name = "SingleNoP2SH",
+		//			ExtPubKeys = new BitcoinExtPubKey[] { pubkeyAlice },
+		//			P2SH = false
+		//		});
 
-				balance = tester.SendGet<BalanceModel>("wallets/" + aliceName + "/balance");
-				Assert.Equal(2, balance.Operations.Count);
-				Assert.True(balance.Operations.Any(op => op.Amount == Money.Coins(1.0m)));
-				Assert.True(balance.Operations.Any(op => op.Amount == Money.Coins(1.1m)));
+		//		balance = tester.SendGet<BalanceModel>("wallets/" + aliceName + "/balance");
+		//		Assert.Equal(2, balance.Operations.Count);
+		//		Assert.True(balance.Operations.Any(op => op.Amount == Money.Coins(1.0m)));
+		//		Assert.True(balance.Operations.Any(op => op.Amount == Money.Coins(1.1m)));
 
-				var keyset = tester.Send<KeySetData>(HttpMethod.Get, "wallets/" + aliceName + "/keysets/SingleNoP2SH");
-				Assert.Equal(21, keyset.State.NextUnused);
+		//		var keyset = tester.Send<KeySetData>(HttpMethod.Get, "wallets/" + aliceName + "/keysets/SingleNoP2SH");
+		//		Assert.Equal(21, keyset.State.NextUnused);
 
-				var alice21 = pubkeyAlice.ExtPubKey.Derive(21).PubKey.GetAddress(tester.Network);
-				tester.ChainBuilder.EmitMoney(Money.Coins(1.3m), alice21); //Receiving on alice21 should fire a scan of 41
+		//		var alice21 = pubkeyAlice.ExtPubKey.Derive(21).PubKey.GetAddress(tester.Network);
+		//		tester.ChainBuilder.EmitMoney(Money.Coins(1.3m), alice21); //Receiving on alice21 should fire a scan of 41
 
-				var waiter2 = listener.WaitMessageAsync(tester.Configuration.Topics.NewBlocks);
-				tester.ChainBuilder.EmitBlock();
-				waiter2.Wait();
-				tester.UpdateServerChain();
+		//		var waiter2 = listener.WaitMessageAsync(tester.Configuration.Topics.NewBlocks);
+		//		tester.ChainBuilder.EmitBlock();
+		//		waiter2.Wait();
+		//		tester.UpdateServerChain();
 
-				balance = tester.SendGet<BalanceModel>("wallets/" + aliceName + "/balance");
-				Assert.Equal(4, balance.Operations.Count);
-				Assert.True(balance.Operations.All(o => o.Confirmations == 1));
+		//		balance = tester.SendGet<BalanceModel>("wallets/" + aliceName + "/balance");
+		//		Assert.Equal(4, balance.Operations.Count);
+		//		Assert.True(balance.Operations.All(o => o.Confirmations == 1));
 
-				keyset = tester.Send<KeySetData>(HttpMethod.Get, "wallets/" + aliceName + "/keysets/SingleNoP2SH");
-				Assert.Equal(42, keyset.State.NextUnused);
-			}
-		}
+		//		keyset = tester.Send<KeySetData>(HttpMethod.Get, "wallets/" + aliceName + "/keysets/SingleNoP2SH");
+		//		Assert.Equal(42, keyset.State.NextUnused);
+		//	}
+		//}
 
 		[Fact]
 		public void CanManageKeyGeneration()

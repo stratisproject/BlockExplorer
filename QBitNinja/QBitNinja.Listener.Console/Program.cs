@@ -74,87 +74,87 @@ namespace QBitNinja.Listener.Console
     {
         static void Main(string[] args)
         {
-            var options = new ListenerOptions();
-            if (args.Length == 0)
-                System.Console.WriteLine(options.GetUsage());
-            if (Parser.Default.ParseArguments(args, options))
-            {
-                if(options.Configuration != null)
-                {
-                    if(!File.Exists(options.Configuration))
-                    {
-                        System.Console.WriteLine("File " + new FileInfo(options.Configuration).FullName + " not found");
-                        return;
-                    }
-                    AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", new FileInfo(options.Configuration).FullName);
-                }
-                var conf = QBitNinjaConfiguration.FromConfiguration();
-                conf.EnsureSetup();
-                if (options.CancelInit)
-                {
-                    var indexer = new InitialIndexer(conf);
-                    indexer.Cancel();
-                }
-                if (options.Init)
-                {
-                    var indexer = new InitialIndexer(conf);
-                    indexer.Run();
-                }
+            //var options = new ListenerOptions();
+            //if (args.Length == 0)
+            //    System.Console.WriteLine(options.GetUsage());
+            //if (Parser.Default.ParseArguments(args, options))
+            //{
+            //    if(options.Configuration != null)
+            //    {
+            //        if(!File.Exists(options.Configuration))
+            //        {
+            //            System.Console.WriteLine("File " + new FileInfo(options.Configuration).FullName + " not found");
+            //            return;
+            //        }
+            //        AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", new FileInfo(options.Configuration).FullName);
+            //    }
+            //    var conf = QBitNinjaConfiguration.FromConfiguration();
+            //    conf.EnsureSetup();
+            //    if (options.CancelInit)
+            //    {
+            //        var indexer = new InitialIndexer(conf);
+            //        indexer.Cancel();
+            //    }
+            //    if (options.Init)
+            //    {
+            //        var indexer = new InitialIndexer(conf);
+            //        indexer.Run();
+            //    }
 
-                List<IDisposable> dispo = new List<IDisposable>();
-                List<Task> running = new List<Task>();
-                try
-                {
+            //    List<IDisposable> dispo = new List<IDisposable>();
+            //    List<Task> running = new List<Task>();
+            //    try
+            //    {
 
-                    if (options.Listen)
-                    {
-                        QBitNinjaNodeListener listener = new QBitNinjaNodeListener(conf);
-                        dispo.Add(listener);
-                        listener.Listen();
-                        running.Add(listener.Running);
-                    }
+            //        if (options.Listen)
+            //        {
+            //            QBitNinjaNodeListener listener = new QBitNinjaNodeListener(conf);
+            //            dispo.Add(listener);
+            //            listener.Listen();
+            //            running.Add(listener.Running);
+            //        }
 
-                    if (options.Web)
-                    {
-                        System.Console.WriteLine("Trying to listen on http://*:" + options.Port + "/");
-                        var server = WebApp.Start("http://*:" + options.Port, appBuilder =>
-                        {
-                            var config = new HttpConfiguration();
-                            var qbit = QBitNinjaConfiguration.FromConfiguration();
-                            qbit.EnsureSetup();
-                            WebApiConfig.Register(config, qbit);
-                            UpdateChainListener listener = new UpdateChainListener();
-                            dispo.Add(listener);
-                            listener.Listen(config);
-                            appBuilder.UseWebApi(config);
-                            running.Add(new TaskCompletionSource<int>().Task);
-                        });
-                        dispo.Add(server);
-                        System.Console.WriteLine("Server started");
-                        Process.Start("http://localhost:" + options.Port + "/blocks/tip");
-                    }
+            //        if (options.Web)
+            //        {
+            //            System.Console.WriteLine("Trying to listen on http://*:" + options.Port + "/");
+            //            var server = WebApp.Start("http://*:" + options.Port, appBuilder =>
+            //            {
+            //                var config = new HttpConfiguration();
+            //                var qbit = QBitNinjaConfiguration.FromConfiguration();
+            //                qbit.EnsureSetup();
+            //                WebApiConfig.Register(config, qbit);
+            //                UpdateChainListener listener = new UpdateChainListener();
+            //                dispo.Add(listener);
+            //                listener.Listen(config);
+            //                appBuilder.UseWebApi(config);
+            //                running.Add(new TaskCompletionSource<int>().Task);
+            //            });
+            //            dispo.Add(server);
+            //            System.Console.WriteLine("Server started");
+            //            Process.Start("http://localhost:" + options.Port + "/blocks/tip");
+            //        }
 
-                    if (running.Count != 0)
-                    {
-                        try
-                        {
-                            running.Add(WaitInput());
-                            Task.WaitAny(running.ToArray());
-                        }
-                        catch (AggregateException aex)
-                        {
-                            ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
-                            throw;
-                        }
-                    }
-                }
-                finally
-                {
-                    foreach(var d in dispo)
-                        d.Dispose();
-                }
+            //        if (running.Count != 0)
+            //        {
+            //            try
+            //            {
+            //                running.Add(WaitInput());
+            //                Task.WaitAny(running.ToArray());
+            //            }
+            //            catch (AggregateException aex)
+            //            {
+            //                ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
+            //                throw;
+            //            }
+            //        }
+            //    }
+            //    finally
+            //    {
+            //        foreach(var d in dispo)
+            //            d.Dispose();
+            //    }
 
-            }
+            //}
         }
 
         private static Task WaitInput()
