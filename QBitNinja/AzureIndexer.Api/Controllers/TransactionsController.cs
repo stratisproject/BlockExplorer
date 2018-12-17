@@ -33,10 +33,11 @@
 
         [HttpGet]
         [Route("{txId}")]
-        public async Task<TransactionResponseModel> Transaction(string txId, bool colored = false)
+        public async Task<TransactionSummaryModel> Transaction(string txId, bool colored = false)
         {
             var response = await this.transactionSearchService.FindTransaction(uint256.Parse(txId), colored);
-            return response;
+            var mappedResponse = this.mapper.Map<TransactionSummaryModel>(response);
+            return mappedResponse;
         }
     }
 }

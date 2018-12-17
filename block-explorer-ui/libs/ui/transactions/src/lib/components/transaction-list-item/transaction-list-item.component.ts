@@ -9,6 +9,7 @@ import { LineItemModel } from 'gen/nswag';
 })
 export class TransactionListItemComponent implements OnInit {
   @Input() transaction: TransactionSummaryModel;
+  @Input() showHeader = false;
 
   constructor() { }
 

@@ -1,3 +1,41 @@
-<p>
-  transaction-summary-page works!
-</p>
+<section class="col-lg-11 col-xl-9 col-12 mx-auto">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <!-- overview -->
+        <div class="col-12 mt-4">
+          <ngb-tabset type="pills" id="v-pills-tabContent">
+            <ngb-tab title="Overview">
+              <ng-template ngbTabContent>
+                <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>
+                <blockexplorer-transaction-summary *ngIf="transactionsLoaded$ | async" [transaction]="transaction$ | async"></blockexplorer-transaction-summary>
+                <div class="list-group-item mb-4" *ngIf="transactionsLoaded$ | async">
+                  <blockexplorer-transaction-list-item class="row" [showHeader]="false" [transaction]="transaction$ | async"></blockexplorer-transaction-list-item>
+                </div>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Code">
+              <ng-template ngbTabContent>
+                <div class="list-group-item mb-3">
+                  <div class="row d-flex align-items-center mb-3">
+                    <div class="col justify-content-start">
+                      StandardToken.cs
+                    </div>
+                    <div class="col d-flex justify-content-end">
+                      <button type="button" class="btn btn-outline-info btn-sm d-flex align-items-center">
+                        <i class="material-icons md-18 mr-2">select_all</i>select all
+                      </button>
+                    </div>
+                  </div>
+                  <ngx-prism [language]="'csharp'">
+                    {{code}}
+                  </ngx-prism>
+                </div>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

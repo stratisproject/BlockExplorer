@@ -1,9 +1,9 @@
 
-<div class="col-12">
+<div class="col-12" *ngIf="showHeader">
   <table class="table table-striped mb-4">
     <tbody>
       <tr>
-        <th><a href="#">{{transaction.hash}}</a></th>
+        <th><a [routerLink]="['/transactions', transaction.hash]">{{transaction.hash}}</a></th>
         <td class="text-right d-none d-sm-block">{{transactionTime}}</td>
       </tr>
     </tbody>
@@ -12,7 +12,7 @@
 <div class="col">
   <div class="row" *ngFor="let tx of transaction.in">
     <div class="col-12 col-lg-8">
-      <a href="#">{{tx.hash}}</a>
+      <a [routerLink]="['/addresses', tx.hash]">{{tx.hash}}</a>
     </div>
     <div class="col-12 col-lg-4 text-lg-right">
       <blockexplorer-balance [balance]="tx.amount.satoshi"></blockexplorer-balance>
@@ -27,7 +27,7 @@
 <div class="col">
   <div class="row" *ngFor="let tx of transaction.out">
     <div class="col-12 col-lg-8 text-sm-left text-lg-left text-xl-left text-md-right">
-      <a href="#">{{tx.hash}}</a> <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
+      <a [routerLink]="['/addresses', tx.hash]">{{tx.hash}}</a> <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
     </div>
     <div class="col-12 col-lg-4 text-left text-md-right text-lg-right text-xl-right">
       <blockexplorer-balance [balance]="tx.amount.satoshi"></blockexplorer-balance>

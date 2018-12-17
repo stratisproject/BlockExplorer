@@ -22,7 +22,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrismModule } from '@ngx-prism/core';
 import { UiLayoutModule } from '@blockexplorer/ui/layout';
 import { FormsModule } from '@angular/forms';
-import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, uiAddressesRoutes } from '@blockexplorer/ui/transactions';
+import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, uiAddressesRoutes, uiOtherRoutes } from '@blockexplorer/ui/transactions';
 import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
 import { SharedModelsModule, API_BASE_URL } from '@blockexplorer/shared/models';
 import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
@@ -45,7 +45,8 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
       [
         { path: '', component: TransactionsPageComponent, data: { breadcrumb: 'Home' } },
         { path: 'transactions', children: uiTransactionsRoutes, data: { breadcrumb: 'Transactions' } },
-        { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } }
+        { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } },
+        { path: 'search', children: uiOtherRoutes, data: { breadcrumb: 'Not Found' } }
       ],
       {
         initialNavigation: 'enabled',

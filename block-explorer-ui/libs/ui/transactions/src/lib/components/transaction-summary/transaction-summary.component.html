@@ -1,0 +1,31 @@
+<div class="list-group-item mb-4">
+  <h3 class="my-4">Summary</h3>
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Hash</label></th>
+        <td><a [routerLink]="['/transactions', hash]">{{hash}}</a></td>
+      </tr>
+      <tr>
+        <th><label>Height</label></th>
+        <td><blockexplorer-balance [balance]="height"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Amount</label></th>
+        <td><blockexplorer-balance [balance]="amount"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Fees</label></th>
+        <td><blockexplorer-balance [balance]="fees"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Date</label></th>
+        <td>{{time}}</td>
+      </tr>
+      <tr>
+        <th><label>Type</label></th>
+        <td><span class="badge badge-purple">{{type}}</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

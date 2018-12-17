@@ -126,6 +126,7 @@ namespace AzureIndexer.Api
             }).As<ConcurrentChain>().SingleInstance();
 
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
+            builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
             builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();

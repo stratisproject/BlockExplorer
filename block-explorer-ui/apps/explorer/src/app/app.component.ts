@@ -22,14 +22,24 @@ export class AppComponent implements OnDestroy {
     this.identifiedEntity$ = this.globalFacade.identifiedEntity$;
     this.identifiedEntity$.pipe(takeUntil(this.destroyed$))
         .subscribe(entity => {
-          if (!entity) return;
-          if (!entity.type) return;
+          let type = 'UNKNOWN';
+          if (!entity) {
+            this.router.navigate(['search', 'not-found']);
+            return;
+          }
 
-          switch (<string>entity.type) {
+          if (!!entity.type) type = entity.type;
+          if (!!entity.transaction) type = 'TRANSACTION';
+
+          switch (type) {
             case 'PUBKEY_ADDRESS':
               this.router.navigate(['addresses', text]);
               break;
+            case 'TRANSACTION':
+              this.router.navigate(['transactions', text]);
+              break;
             default:
+              this.router.navigate(['search', 'not-found']);
               break;
           }
         });

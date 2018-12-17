@@ -1,8 +1,8 @@
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { Observable, throwError as _observableThrow, of as _observableOf, of } from 'rxjs';
-import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
+import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { TransactionResponseModel, blobToText, throwException, TransactionModel, API_BASE_URL } from '@blockexplorer/shared/models';
+import { blobToText, throwException, TransactionModel, API_BASE_URL, TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class TransactionsService {
@@ -27,7 +27,7 @@ export class TransactionsService {
      * @param colored (optional)
      * @return Success
      */
-    transaction(txId: string, colored: boolean | null | undefined): Observable<TransactionResponseModel> {
+    transaction(txId: string, colored: boolean | null | undefined): Observable<TransactionSummaryModel> {
         let url_ = this.baseUrl + "/api/v1/transactions/{txId}?";
         if (txId === undefined || txId === null)
             throw new Error("The parameter 'txId' must be defined.");
@@ -51,14 +51,14 @@ export class TransactionsService {
                 try {
                     return this.processTransaction(<any>response_);
                 } catch (e) {
-                    return <Observable<TransactionResponseModel>><any>_observableThrow(e);
+                    return <Observable<TransactionSummaryModel>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<TransactionResponseModel>><any>_observableThrow(response_);
+                return <Observable<TransactionSummaryModel>><any>_observableThrow(response_);
         }));
     }
 
-    protected processTransaction(response: HttpResponseBase): Observable<TransactionResponseModel> {
+    protected processTransaction(response: HttpResponseBase): Observable<TransactionSummaryModel> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -69,7 +69,7 @@ export class TransactionsService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             const resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 ? TransactionResponseModel.fromJS(resultData200) : new TransactionResponseModel();
+            result200 = resultData200 ? TransactionSummaryModel.fromJS(resultData200) : new TransactionSummaryModel();
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -77,6 +77,6 @@ export class TransactionsService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<TransactionResponseModel>(<any>null);
+        return _observableOf<TransactionSummaryModel>(<any>null);
     }
 }

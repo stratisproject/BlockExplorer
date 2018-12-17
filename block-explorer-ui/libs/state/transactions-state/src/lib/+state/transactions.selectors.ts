@@ -13,6 +13,7 @@ const getLoadedTransactions = createSelector(getTransactionsState, (state: Trans
 const getLoadedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddress);
 const getLoadedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddressDetails);
 const getSelectedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddress);
+const getSelectedTransaction = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedTransaction);
 const getSelectedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddressDetails);
 const getError = createSelector(getTransactionsState, (state: TransactionsState) => state.error);
 
@@ -45,6 +46,7 @@ export const transactionsQuery = {
   getError,
   getAllTransactions,
   getSelectedAddress,
+  getSelectedTransaction,
   getSelectedAddressDetails,
   getSelectedTransactions
 };

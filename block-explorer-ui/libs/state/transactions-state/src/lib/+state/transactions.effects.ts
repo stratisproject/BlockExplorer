@@ -13,7 +13,10 @@ import {
   AddressLoadError,
   GetAddressDetails,
   AddressDetailsLoaded,
-  AddressDetailsLoadError
+  AddressDetailsLoadError,
+  TransactionLoaded,
+  TransactionLoadError,
+  GetTransaction
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
@@ -63,6 +66,21 @@ export class TransactionsEffects {
     onError: (action: GetAddressDetails, error) => {
       console.error('Error', error);
       return new AddressDetailsLoadError(error);
+    }
+  });
+
+  @Effect() getTransaction$ = this.dataPersistence.fetch(TransactionsActionTypes.GetTransaction, {
+    run: (action: GetTransaction, state: TransactionsPartialState) => {
+      return this.transactionsService.transaction(action.hash, false).pipe(
+        map((balance) => {
+          return new TransactionLoaded(balance);
+        })
+      );
+    },
+
+    onError: (action: GetTransaction, error) => {
+      console.error('Error', error);
+      return new TransactionLoadError(error);
     }
   });
 

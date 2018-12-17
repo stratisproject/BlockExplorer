@@ -2,7 +2,7 @@ import {
   TransactionsAction,
   TransactionsActionTypes
 } from './transactions.actions';
-import { BalanceSummaryModel, BalanceResponseModel, TransactionModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel, TransactionModel, TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
@@ -21,6 +21,7 @@ export interface TransactionsState {
   list: TransactionModel[]; // list of Transactions; analogous to a sql normalized table
   selectedId?: string | number; // which Transactions record has been selected
   selectedAddress?: BalanceSummaryModel;
+  selectedTransaction?: TransactionSummaryModel;
   selectedAddressDetails?: BalanceResponseModel;
   loadedTransactions: boolean;
   loadedAddress: boolean;
@@ -35,6 +36,7 @@ export interface TransactionsPartialState {
 export const initialState: TransactionsState = {
   list: [],
   selectedAddress: null,
+  selectedTransaction: null,
   selectedAddressDetails: null,
   loadedTransactions: false,
   loadedAddress: false,
@@ -68,11 +70,33 @@ export function transactionsReducer(
       };
       break;
     }
+    case TransactionsActionTypes.GetTransaction: {
+      state = {
+        ...state,
+        loadedTransactions: false,
+      };
+      break;
+    }
     case TransactionsActionTypes.AddressLoaded: {
       state = {
         ...state,
         selectedAddress: action.address,
         loadedAddress: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.TransactionLoaded: {
+      state = {
+        ...state,
+        selectedTransaction: action.transaction,
+        loadedTransactions: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.TransactionLoadError: {
+      state = {
+        ...state,
+        loadedTransactions: true
       };
       break;
     }
