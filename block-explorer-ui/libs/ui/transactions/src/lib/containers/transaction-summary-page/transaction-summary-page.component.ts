@@ -4,6 +4,7 @@ import { TransactionSummaryModel } from '@blockexplorer/shared/models';
 import { ActivatedRoute } from '@angular/router';
 import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
 import { takeUntil } from 'rxjs/operators';
+import { Log } from '@blockexplorer/shared/utils';
 
 @Component({
   selector: 'blockexplorer-transaction-summary-page',
@@ -33,7 +34,7 @@ namespace Stratis.Tests.UI.NetCore.Pages
     }
 }`;
 
-  constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade) { }
+  constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade, private log: Log) { }
 
   ngOnInit() {
     this.route.paramMap
@@ -53,7 +54,7 @@ namespace Stratis.Tests.UI.NetCore.Pages
     this.transaction$.pipe(takeUntil(this.destroyed$))
         .subscribe(transaction => {
           this.transactions.length = 0;
-          console.log('Found transaction details', transaction);
+          this.log.info('Found transaction details', transaction);
           if (!transaction) return;
 
           this.transactions = [transaction];

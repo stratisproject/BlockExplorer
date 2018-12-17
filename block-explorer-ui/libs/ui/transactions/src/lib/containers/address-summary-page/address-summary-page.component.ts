@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntil, map } from 'rxjs/operators';
 import { BalanceSummaryModel, BalanceResponseModel, TransactionSummaryModel } from '@blockexplorer/shared/models';
 import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
+import { Log } from '@blockexplorer/shared/utils';
 
 @Component({
   selector: 'blockexplorer-address-summary-page',
@@ -36,7 +37,11 @@ namespace Stratis.Tests.UI.NetCore.Pages
     }
 }`;
 
-  constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade) { }
+  constructor(
+    private route: ActivatedRoute,
+    private transactionsFacade: TransactionsFacade,
+    private log: Log
+  ) { }
 
   ngOnInit() {
     this.route.paramMap
@@ -64,7 +69,7 @@ namespace Stratis.Tests.UI.NetCore.Pages
           this.transactions = addressDetails.operations.map(op => op.transactionSummary);
           this.lastTransaction = this.transactions.length > 0 ? [this.transactions[0]] : [];
 
-          console.log('Found address details', addressDetails);
+          this.log.info('Found address details', addressDetails);
         });
   }
 
@@ -75,7 +80,7 @@ namespace Stratis.Tests.UI.NetCore.Pages
         .subscribe(address => {
           if (!address) return;
 
-          console.log('Found address', address);
+          this.log.info('Found address', address);
         });
   }
 

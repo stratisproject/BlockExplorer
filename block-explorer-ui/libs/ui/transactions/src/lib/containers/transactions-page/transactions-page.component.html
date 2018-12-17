@@ -1,4 +1,7 @@
 <section class="col-xl-9 col-lg-10 col-sm-12 mx-auto my-5">
-  <blockexplorer-transactions-list [transactions]="transactions$ | async" (selected)="selected($event)">
-  </blockexplorer-transactions-list>
+  <div class="col-12 mt-4">
+    <ngb-alert type="info" [dismissible]="false">
+      <strong>Welcome</strong> Use search box in the top right corner to search addresses, transactions and smart contracts.
+    </ngb-alert>
+  </div>
 </section>
