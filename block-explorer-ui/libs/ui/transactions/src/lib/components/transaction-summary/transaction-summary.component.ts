@@ -35,7 +35,9 @@ export class TransactionSummaryComponent implements OnInit {
     if (!this.transaction || !this.transaction.time) return 'Unknown';
     const date = new Date(1000 * this.transaction.time);
 
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return date.toString();
+    // TODO: decide which format we want to show date in.
+    // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }
 
   public get type() {
