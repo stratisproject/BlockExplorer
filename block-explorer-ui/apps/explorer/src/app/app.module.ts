@@ -26,6 +26,7 @@ import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, 
 import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
 import { SharedModelsModule, API_BASE_URL } from '@blockexplorer/shared/models';
 import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
+import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
     PrismModule,
     UiTransactionsModule,
     SharedModelsModule,
+    SharedUtilsModule.forRoot(),
     StateGlobalStateModule.forRoot(),
     StateTransactionsStateModule.forRoot(),
     NxModule.forRoot(),
@@ -66,7 +68,8 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
   ],
   providers: [
     AppFacade,
-    { provide: API_BASE_URL, useValue: environment.apiBaseUrl }
+    { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
+    { provide: ENVIRONMENT, useValue: environment.production ? 'prod' : 'dev' }
   ],
   bootstrap: [AppComponent]
 })
