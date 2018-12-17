@@ -12,7 +12,7 @@
   </div>
   <ul class="list-group" [hidden]="noTransactions">
     <li class="list-group-item" *ngFor="let transaction of transactions">
-      <blockexplorer-transaction-list-item class="row" [transaction]="transaction"></blockexplorer-transaction-list-item>
+      <blockexplorer-transaction-list-item [showHeader]="showTransactionHeader" class="row" [transaction]="transaction"></blockexplorer-transaction-list-item>
     </li>
   </ul>
 </div>

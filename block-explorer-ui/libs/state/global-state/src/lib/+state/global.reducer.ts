@@ -35,11 +35,27 @@ export function globalReducer(
   action: GlobalAction
 ): GlobalState {
   switch (action.type) {
+    case GlobalActionTypes.IndentifyEntity: {
+      state = {
+        ...state,
+        loaded: false
+      };
+      break;
+    }
     case GlobalActionTypes.Identified: {
       state = {
         ...state,
         identifiedEntity: action.payload,
         identifiedType: !!action.payload ? action.payload.type : null,
+        loaded: true
+      };
+      break;
+    }
+    case GlobalActionTypes.IdentificationError: {
+      state = {
+        ...state,
+        identifiedEntity: null,
+        identifiedType: null,
         loaded: true
       };
       break;

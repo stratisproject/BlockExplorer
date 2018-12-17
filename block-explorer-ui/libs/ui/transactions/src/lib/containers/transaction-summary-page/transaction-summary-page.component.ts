@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
   transactionsLoaded$: Observable<boolean>;
+  transactions: TransactionSummaryModel[] = [];
   destroyed$ = new ReplaySubject<any>();
   hash = '';
   transaction$: Observable<TransactionSummaryModel>;
@@ -50,8 +51,12 @@ namespace Stratis.Tests.UI.NetCore.Pages
     this.transactionsLoaded$ = this.transactionsFacade.loadedTransactions$;
     this.transaction$ = this.transactionsFacade.selectedTransaction$;
     this.transaction$.pipe(takeUntil(this.destroyed$))
-        .subscribe(addressDetails => {
-          console.log('Found transaction details', addressDetails);
+        .subscribe(transaction => {
+          this.transactions.length = 0;
+          console.log('Found transaction details', transaction);
+          if (!transaction) return;
+
+          this.transactions = [transaction];
         });
   }
 

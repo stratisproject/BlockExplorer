@@ -10,6 +10,7 @@ export class TransactionsListComponent implements OnInit {
   @Input() transactions: TransactionSummaryModel[] = [];
   @Input() title = 'Transactions';
   @Input() showPaging = true;
+  @Input() showTransactionHeader = true;
   @Input() showCount = true;
   @Output() selected = new EventEmitter<string>();
 
