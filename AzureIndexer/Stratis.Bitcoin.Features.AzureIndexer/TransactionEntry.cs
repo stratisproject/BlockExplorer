@@ -7,6 +7,7 @@ using System.Linq;
 using CSharpFunctionalExtensions;
 using Stratis.Bitcoin.Networks;
 using Stratis.SmartContracts.CLR;
+using Stratis.SmartContracts.CLR.Compilation;
 using Stratis.SmartContracts.CLR.Serialization;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
@@ -35,7 +36,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.Transaction = tx;
                 this.BlockId = blockId;
                 this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
-                this.HasSmartContract = this.IsTransactionContainsSmartContract(tx);
+
+                this.CheckForSmartContract(tx);
             }
 
             public Entity(uint256 txId)
@@ -124,9 +126,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return entity;
             }
 
-            private void CheckForSmartContract(Transaction transaction)
+            private bool CheckForSmartContract(Transaction transaction)
             {
                 var smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
+
 
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {
@@ -135,8 +138,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.HasSmartContract = true;
                         this.ContractTxData = contractTxDataResult.Value;
+                        var contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
+                        if (contractDecompileResult.IsSuccess)
+                        {
+                            this.ContractCode = contractDecompileResult.Value.
+
+                        }
                     }
                 }
+
+                return this.HasSmartContract;
             }
 
             public string TypeLetter => this.Type == TransactionEntryType.Colored ? "c" :
@@ -242,6 +253,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             public Network Network { get; set; }
 
             public ContractTxData ContractTxData { get; set; }
+
+            public string ContractCode { get; set; }
 
         }
 
