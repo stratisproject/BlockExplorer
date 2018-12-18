@@ -2,7 +2,7 @@ import {
   TransactionsAction,
   TransactionsActionTypes
 } from './transactions.actions';
-import { BalanceSummaryModel, BalanceResponseModel, TransactionModel, TransactionSummaryModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel, TransactionModel, TransactionSummaryModel, BlockResponseModel, BlockHeaderResponseModel } from '@blockexplorer/shared/models';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
@@ -18,13 +18,16 @@ export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 export interface Entity {}
 
 export interface TransactionsState {
-  list: TransactionModel[]; // list of Transactions; analogous to a sql normalized table
-  selectedId?: string | number; // which Transactions record has been selected
+  list: TransactionModel[];
+  selectedId?: string | number;
   selectedAddress?: BalanceSummaryModel;
   selectedTransaction?: TransactionSummaryModel;
+  selectedBlock?: BlockResponseModel;
+  selectedBlockHeader?: BlockHeaderResponseModel;
   selectedAddressDetails?: BalanceResponseModel;
   loadedTransactions: boolean;
   loadedAddress: boolean;
+  loadedBlockData: boolean;
   loadedAddressDetails: boolean;
   error?: any;
 }
@@ -37,10 +40,13 @@ export const initialState: TransactionsState = {
   list: [],
   selectedAddress: null,
   selectedTransaction: null,
+  selectedBlock: null,
+  selectedBlockHeader: null,
   selectedAddressDetails: null,
   loadedTransactions: false,
   loadedAddress: false,
-  loadedAddressDetails: false
+  loadedAddressDetails: false,
+  loadedBlockData: false
 };
 
 export function transactionsReducer(
@@ -77,11 +83,37 @@ export function transactionsReducer(
       };
       break;
     }
+    case TransactionsActionTypes.GetBlockHeader:
+    case TransactionsActionTypes.GetBlock: {
+      state = {
+        ...state,
+        selectedBlock: undefined,
+        selectedBlockHeader: undefined,
+        loadedBlockData: false,
+      };
+      break;
+    }
     case TransactionsActionTypes.AddressLoaded: {
       state = {
         ...state,
         selectedAddress: action.address,
         loadedAddress: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.BlockLoaded: {
+      state = {
+        ...state,
+        selectedBlock: action.block,
+        loadedBlockData: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.BlockHeaderLoaded: {
+      state = {
+        ...state,
+        selectedBlockHeader: action.block,
+        loadedBlockData: true
       };
       break;
     }
@@ -97,6 +129,14 @@ export function transactionsReducer(
       state = {
         ...state,
         loadedTransactions: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.TransactionLoadError:
+    case TransactionsActionTypes.TransactionLoadError: {
+      state = {
+        ...state,
+        loadedBlockData: true
       };
       break;
     }

@@ -12,10 +12,13 @@ const getTransactionsState = createFeatureSelector<TransactionsState>(
 const getLoadedTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedTransactions);
 const getLoadedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddress);
 const getLoadedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddressDetails);
+const getLoadedBlockData = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedBlockData);
 const getSelectedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddress);
 const getSelectedTransaction = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedTransaction);
 const getSelectedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedAddressDetails);
 const getError = createSelector(getTransactionsState, (state: TransactionsState) => state.error);
+const getSelectedBlock = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedBlock);
+const getSelectedBlockHeader = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedBlockHeader);
 
 const getAllTransactions = createSelector(
   getTransactionsState,
@@ -42,10 +45,13 @@ const getSelectedTransactions = createSelector(
 export const transactionsQuery = {
   getLoadedTransactions,
   getLoadedAddress,
+  getLoadedBlockData,
   getLoadedAddressDetails,
   getError,
   getAllTransactions,
   getSelectedAddress,
+  getSelectedBlock,
+  getSelectedBlockHeader,
   getSelectedTransaction,
   getSelectedAddressDetails,
   getSelectedTransactions

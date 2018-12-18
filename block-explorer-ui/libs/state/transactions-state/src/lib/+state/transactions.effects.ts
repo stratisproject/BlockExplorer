@@ -16,7 +16,13 @@ import {
   AddressDetailsLoadError,
   TransactionLoaded,
   TransactionLoadError,
-  GetTransaction
+  GetTransaction,
+  BlockLoaded,
+  GetBlock,
+  BlockLoadError,
+  GetBlockHeader,
+  BlockHeaderLoaded,
+  BlockHeaderLoadError
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
@@ -82,6 +88,36 @@ export class TransactionsEffects {
     onError: (action: GetTransaction, error) => {
       console.error('Error', error);
       return new TransactionLoadError(error);
+    }
+  });
+
+  @Effect() getBlock$ = this.dataPersistence.fetch(TransactionsActionTypes.GetBlock, {
+    run: (action: GetBlock, state: TransactionsPartialState) => {
+      return this.blocksService.block(action.block, false, true).pipe(
+        map((block) => {
+          return new BlockLoaded(block);
+        })
+      );
+    },
+
+    onError: (action: GetBlock, error) => {
+      console.error('Error', error);
+      return new BlockLoadError(error);
+    }
+  });
+
+  @Effect() getBlockHeader$ = this.dataPersistence.fetch(TransactionsActionTypes.GetBlockHeader, {
+    run: (action: GetBlockHeader, state: TransactionsPartialState) => {
+      return this.blocksService.blockHeader(action.block).pipe(
+        map((block) => {
+          return new BlockHeaderLoaded(block);
+        })
+      );
+    },
+
+    onError: (action: GetBlockHeader, error) => {
+      console.error('Error', error);
+      return new BlockHeaderLoadError(error);
     }
   });
 
