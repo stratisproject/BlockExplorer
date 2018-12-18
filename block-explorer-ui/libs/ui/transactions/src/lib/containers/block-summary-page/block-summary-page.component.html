@@ -4,9 +4,17 @@
         <div class="row">
           <!-- overview -->
           <div class="col-12 mt-4">
-            <ngb-alert [dismissible]="false">
-              <strong>Coming soon!</strong> Stay tuned, this feature is coming soon.
-            </ngb-alert>
+            <ngb-tabset type="pills" id="v-pills-tabContent">
+              <ngb-tab title="Overview">
+                <ng-template ngbTabContent>
+                  <blockexplorer-busy-indicator [hidden]="blockLoaded$ | async"></blockexplorer-busy-indicator>
+                  <blockexplorer-block-summary *ngIf="blockLoaded$ | async" [block]="block$ | async"></blockexplorer-block-summary>
+                  <div class="list-group-item mb-4" *ngIf="blockLoaded$ | async">
+                    <blockexplorer-transactions-list [showCount]="true" [showTransactionHeader]="true" [showPaging]="false" title="Details" [transactions]="transactions"></blockexplorer-transactions-list>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+            </ngb-tabset>
           </div>
         </div>
       </div>

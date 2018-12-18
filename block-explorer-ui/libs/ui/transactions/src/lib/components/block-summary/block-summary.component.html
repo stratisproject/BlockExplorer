@@ -1,3 +1,27 @@
-<p>
-  block-summary works!
-</p>
+<div class="list-group-item mb-4">
+  <h3 class="my-4">Summary</h3>
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Hash</label></th>
+        <td><a [routerLink]="['/blocks', hash]">{{hash}}</a></td>
+      </tr>
+      <tr>
+        <th><label>Block Reward</label></th>
+        <td><blockexplorer-balance [balance]="blockReward"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Confirmations</label></th>
+        <td>{{confirmations}}</td>
+      </tr>
+      <tr>
+        <th><label>Height</label></th>
+        <td>{{height}}</td>
+      </tr>
+      <tr>
+        <th><label>Date</label></th>
+        <td>{{time}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

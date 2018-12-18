@@ -1273,7 +1273,7 @@ export interface IExtendedBlockInformationModel {
 
 export class BlockModel implements IBlockModel {
   blockSize?: number | undefined;
-  transactions?: TransactionModel[] | undefined;
+  transactions?: TransactionSummaryModel[] | undefined;
   headerOnly?: boolean | undefined;
   header?: BlockHeaderModel | undefined;
 
@@ -1299,7 +1299,7 @@ export class BlockModel implements IBlockModel {
           if (data["transactions"] && data["transactions"].constructor === Array) {
               this.transactions = [];
               for (const item of data["transactions"])
-                  this.transactions.push(TransactionModel.fromJS(item));
+                  this.transactions.push(TransactionSummaryModel.fromJS(item));
           }
           this.headerOnly = data["headerOnly"];
           this.header = data["header"] ? BlockHeaderModel.fromJS(data["header"]) : <any>undefined;
@@ -1322,7 +1322,7 @@ export class BlockModel implements IBlockModel {
 
 export interface IBlockModel {
   blockSize?: number | undefined;
-  transactions?: TransactionModel[] | undefined;
+  transactions?: TransactionSummaryModel[] | undefined;
   headerOnly?: boolean | undefined;
   header?: BlockHeaderModel | undefined;
 }

@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { BalanceSummaryModel } from 'gen/nswag';
-import { BalanceResponseModel } from '@blockexplorer/shared/models';
+import { BalanceResponseModel, BalanceSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-address-summary',

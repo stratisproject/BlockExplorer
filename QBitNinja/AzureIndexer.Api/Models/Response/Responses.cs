@@ -1136,7 +1136,7 @@
         public BlockInformationModel AdditionalInformation { get; set; }
 
         [JsonProperty("extendedInformation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ExtendedBlockInformationModel ExtendedInformationModel { get; set; }
+        public ExtendedBlockInformationModel ExtendedInformation { get; set; }
 
         [JsonProperty("block", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BlockModel Block { get; set; }
