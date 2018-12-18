@@ -75,10 +75,14 @@
                 cfg.CreateMap<BalanceSummaryDetails, BalanceSummaryDetailsModel>();
                 cfg.CreateMap<AssetBalanceSummaryDetails, AssetBalanceSummaryDetailsModel>();
                 cfg.CreateMap<BitcoinAssetId, BitcoinAssetIdModel>();
-                cfg.CreateMap<WhatIsBlockHeader, WhatIsBlockHeaderModel>();
+                cfg.CreateMap<BlockHeaderResponse, WhatIsBlockHeaderModel>();
                 cfg.CreateMap<VersionStatsResponse, VersionStatsResponseModel>();
                 cfg.CreateMap<VersionStats, VersionStatsModel>();
                 cfg.CreateMap<VersionStatsItem, VersionStatsItemModel>();
+                cfg.CreateMap<BlockResponse, BlockResponseModel>();
+                cfg.CreateMap<ExtendedBlockInformation, ExtendedBlockInformationModel>();
+                cfg.CreateMap<Block, BlockModel>();
+                cfg.CreateMap<BlockHeaderResponse, BlockHeaderResponseModel>();
             });
 
             IMapper mapper = new Mapper(config);

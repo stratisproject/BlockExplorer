@@ -528,10 +528,10 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("blocks/{blockFeature}/header")]
-        public WhatIsBlockHeader BlockHeader(string blockFeature)
+        public BlockHeaderResponse BlockHeader(string blockFeature)
         {
             var block = this.GetBlock(blockFeature.ToBlockFeature(), true);
-            return new WhatIsBlockHeader(block.Header);
+            return new BlockHeaderResponse(block.Header);
         }
 
         [HttpGet]
@@ -1052,7 +1052,7 @@ namespace AzureIndexer.Api.Controllers
             }
         }
 
-        internal GetBlockResponse JsonBlock(BlockFeature blockFeature, bool headerOnly, bool extended)
+        internal BlockResponse JsonBlock(BlockFeature blockFeature, bool headerOnly, bool extended)
         {
             var block = this.GetBlock(blockFeature, headerOnly);
             if (block == null)
@@ -1060,7 +1060,7 @@ namespace AzureIndexer.Api.Controllers
                 throw new HttpResponseException("Block not found", HttpStatusCode.NotFound);
             }
 
-            var response = new GetBlockResponse()
+            var response = new BlockResponse()
             {
                 AdditionalInformation = this.FetchBlockInformation(new[] { block.Header.GetHash() }) ?? new BlockInformation(block.Header),
                 ExtendedInformation = extended ? this.FetchExtendedBlockInformation(blockFeature, block) : null,

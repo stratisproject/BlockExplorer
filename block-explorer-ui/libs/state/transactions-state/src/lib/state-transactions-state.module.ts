@@ -11,6 +11,7 @@ import { TransactionsEffects } from './+state/transactions.effects';
 import { TransactionsFacade } from './+state/transactions.facade';
 import { TransactionsService } from './services/transactions.service';
 import { BalancesService } from './services/balances.service';
+import { BlocksService } from './services/blocks.service';
 
 @NgModule({
   imports: [
@@ -26,7 +27,7 @@ export class StateTransactionsStateModule {
   static forRoot(): ModuleWithProviders {
       return {
           ngModule: StateTransactionsStateModule,
-          providers: [TransactionsService, BalancesService]
+          providers: [TransactionsService, BalancesService, BlocksService]
       };
   }
 }

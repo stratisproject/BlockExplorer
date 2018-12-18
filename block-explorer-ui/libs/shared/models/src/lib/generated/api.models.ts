@@ -1175,6 +1175,222 @@ export interface ITargetModel {
   difficulty?: number | undefined;
 }
 
+export class BlockResponseModel implements IBlockResponseModel {
+  additionalInformation?: BlockInformationModel | undefined;
+  extendedInformation?: ExtendedBlockInformationModel | undefined;
+  block?: BlockModel | undefined;
+
+  constructor(data?: IBlockResponseModel) {
+      if (data) {
+          for (const property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  static fromJS(data: any): BlockResponseModel {
+      data = typeof data === 'object' ? data : {};
+      const result = new BlockResponseModel();
+      result.init(data);
+      return result;
+  }
+
+  init(data?: any) {
+      if (data) {
+          this.additionalInformation = data["additionalInformation"] ? BlockInformationModel.fromJS(data["additionalInformation"]) : <any>undefined;
+          this.extendedInformation = data["extendedInformation"] ? ExtendedBlockInformationModel.fromJS(data["extendedInformation"]) : <any>undefined;
+          this.block = data["block"] ? BlockModel.fromJS(data["block"]) : <any>undefined;
+      }
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["additionalInformation"] = this.additionalInformation ? this.additionalInformation.toJSON() : <any>undefined;
+      data["extendedInformation"] = this.extendedInformation ? this.extendedInformation.toJSON() : <any>undefined;
+      data["block"] = this.block ? this.block.toJSON() : <any>undefined;
+      return data;
+  }
+}
+
+export interface IBlockResponseModel {
+  additionalInformation?: BlockInformationModel | undefined;
+  extendedInformation?: ExtendedBlockInformationModel | undefined;
+  block?: BlockModel | undefined;
+}
+
+export class ExtendedBlockInformationModel implements IExtendedBlockInformationModel {
+  size?: number | undefined;
+  strippedSize?: number | undefined;
+  transactionCount?: number | undefined;
+  blockSubsidy?: MoneyModel | undefined;
+  blockReward?: MoneyModel | undefined;
+
+  constructor(data?: IExtendedBlockInformationModel) {
+      if (data) {
+          for (const property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  static fromJS(data: any): ExtendedBlockInformationModel {
+      data = typeof data === 'object' ? data : {};
+      const result = new ExtendedBlockInformationModel();
+      result.init(data);
+      return result;
+  }
+
+  init(data?: any) {
+      if (data) {
+          this.size = data["size"];
+          this.strippedSize = data["strippedSize"];
+          this.transactionCount = data["transactionCount"];
+          this.blockSubsidy = data["blockSubsidy"] ? MoneyModel.fromJS(data["blockSubsidy"]) : <any>undefined;
+          this.blockReward = data["blockReward"] ? MoneyModel.fromJS(data["blockReward"]) : <any>undefined;
+      }
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["size"] = this.size;
+      data["strippedSize"] = this.strippedSize;
+      data["transactionCount"] = this.transactionCount;
+      data["blockSubsidy"] = this.blockSubsidy ? this.blockSubsidy.toJSON() : <any>undefined;
+      data["blockReward"] = this.blockReward ? this.blockReward.toJSON() : <any>undefined;
+      return data;
+  }
+}
+
+export interface IExtendedBlockInformationModel {
+  size?: number | undefined;
+  strippedSize?: number | undefined;
+  transactionCount?: number | undefined;
+  blockSubsidy?: MoneyModel | undefined;
+  blockReward?: MoneyModel | undefined;
+}
+
+export class BlockModel implements IBlockModel {
+  blockSize?: number | undefined;
+  transactions?: TransactionModel[] | undefined;
+  headerOnly?: boolean | undefined;
+  header?: BlockHeaderModel | undefined;
+
+  constructor(data?: IBlockModel) {
+      if (data) {
+          for (const property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  static fromJS(data: any): BlockModel {
+      data = typeof data === 'object' ? data : {};
+      const result = new BlockModel();
+      result.init(data);
+      return result;
+  }
+
+  init(data?: any) {
+      if (data) {
+          this.blockSize = data["blockSize"];
+          if (data["transactions"] && data["transactions"].constructor === Array) {
+              this.transactions = [];
+              for (const item of data["transactions"])
+                  this.transactions.push(TransactionModel.fromJS(item));
+          }
+          this.headerOnly = data["headerOnly"];
+          this.header = data["header"] ? BlockHeaderModel.fromJS(data["header"]) : <any>undefined;
+      }
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["blockSize"] = this.blockSize;
+      if (this.transactions && this.transactions.constructor === Array) {
+          data["transactions"] = [];
+          for (const item of this.transactions)
+              data["transactions"].push(item.toJSON());
+      }
+      data["headerOnly"] = this.headerOnly;
+      data["header"] = this.header ? this.header.toJSON() : <any>undefined;
+      return data;
+  }
+}
+
+export interface IBlockModel {
+  blockSize?: number | undefined;
+  transactions?: TransactionModel[] | undefined;
+  headerOnly?: boolean | undefined;
+  header?: BlockHeaderModel | undefined;
+}
+
+export class BlockHeaderResponseModel implements IBlockHeaderResponseModel {
+  version?: string | undefined;
+  hash?: string | undefined;
+  previous?: string | undefined;
+  time?: Date | undefined;
+  nonce?: number | undefined;
+  hashMerkelRoot?: string | undefined;
+  bits?: string | undefined;
+  difficulty?: number | undefined;
+
+  constructor(data?: IBlockHeaderResponseModel) {
+      if (data) {
+          for (const property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  static fromJS(data: any): BlockHeaderResponseModel {
+      data = typeof data === 'object' ? data : {};
+      const result = new BlockHeaderResponseModel();
+      result.init(data);
+      return result;
+  }
+
+  init(data?: any) {
+      if (data) {
+          this.version = data["version"];
+          this.hash = data["hash"];
+          this.previous = data["previous"];
+          this.time = data["time"] ? new Date(data["time"].toString()) : <any>undefined;
+          this.nonce = data["nonce"];
+          this.hashMerkelRoot = data["hashMerkelRoot"];
+          this.bits = data["bits"];
+          this.difficulty = data["difficulty"];
+      }
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["version"] = this.version;
+      data["hash"] = this.hash;
+      data["previous"] = this.previous;
+      data["time"] = this.time ? this.time.toISOString() : <any>undefined;
+      data["nonce"] = this.nonce;
+      data["hashMerkelRoot"] = this.hashMerkelRoot;
+      data["bits"] = this.bits;
+      data["difficulty"] = this.difficulty;
+      return data;
+  }
+}
+
+export interface IBlockHeaderResponseModel {
+  version?: string | undefined;
+  hash?: string | undefined;
+  previous?: string | undefined;
+  time?: Date | undefined;
+  nonce?: number | undefined;
+  hashMerkelRoot?: string | undefined;
+  bits?: string | undefined;
+  difficulty?: number | undefined;
+}
+
 export enum BalanceSummaryModelCacheHit {
   _0 = 0,
   _1 = 1,

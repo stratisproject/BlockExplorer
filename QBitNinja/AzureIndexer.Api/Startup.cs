@@ -65,8 +65,8 @@ namespace AzureIndexer.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Azure Indexer API", Version = "v1" });
-                c.DocInclusionPredicate((value, description) => 
-                    description.ActionDescriptor.DisplayName.Contains("AzureIndexer.Api") && !description.ActionDescriptor.DisplayName.Contains("Main"));
+                c.DocInclusionPredicate((value, description) =>
+                            description.ActionDescriptor.DisplayName.Contains("AzureIndexer.Api") && !description.ActionDescriptor.DisplayName.Contains("Main"));
             });
 
             // Create the container builder.
@@ -127,6 +127,7 @@ namespace AzureIndexer.Api
 
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
             builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
+            builder.RegisterType<BlockSearchService>().As<IBlockSearchService>();
             builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();

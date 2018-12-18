@@ -21,6 +21,7 @@ import {
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
 import { BalancesService } from '../services/balances.service';
+import { BlocksService } from '../services/blocks.service';
 
 @Injectable()
 export class TransactionsEffects {
@@ -88,6 +89,7 @@ export class TransactionsEffects {
     private actions$: Actions,
     private dataPersistence: DataPersistence<TransactionsPartialState>,
     private transactionsService: TransactionsService,
-    private balancesService: BalancesService
+    private balancesService: BalancesService,
+    private blocksService: BlocksService
   ) {}
 }

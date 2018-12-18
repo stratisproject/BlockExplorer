@@ -146,9 +146,9 @@ namespace QBitNinja.Client.Models
 		}
 	}
 
-	public class WhatIsBlockHeader
+	public class BlockHeaderResponse
 	{
-		public WhatIsBlockHeader(BlockHeader blockHeader)
+		public BlockHeaderResponse(BlockHeader blockHeader)
 		{
 			Hash = blockHeader.GetHash();
 			Previous = blockHeader.HashPrevBlock;

@@ -1129,4 +1129,76 @@
         [JsonProperty("percentage", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public double? Percentage { get; set; }
     }
+
+    public class BlockResponseModel
+    {
+        [JsonProperty("additionalInformation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public BlockInformationModel AdditionalInformation { get; set; }
+
+        [JsonProperty("extendedInformation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ExtendedBlockInformationModel ExtendedInformationModel { get; set; }
+
+        [JsonProperty("block", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public BlockModel Block { get; set; }
+    }
+
+    public class ExtendedBlockInformationModel
+    {
+        [JsonProperty("size", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? Size { get; set; }
+
+        [JsonProperty("strippedSize", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? StrippedSize { get; set; }
+
+        [JsonProperty("transactionCount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? TransactionCount { get; set; }
+
+        [JsonProperty("blockSubsidy", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel BlockSubsidy { get; set; }
+
+        [JsonProperty("blockReward", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel BlockReward { get; set; }
+    }
+
+    public class BlockModel
+    {
+        [JsonProperty("blockSize", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public long? BlockSize { get; set; }
+
+        [JsonProperty("transactions", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<TransactionModel> Transactions { get; set; }
+
+        [JsonProperty("headerOnly", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool? HeaderOnly { get; set; }
+
+        [JsonProperty("header", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public BlockHeaderModel Header { get; set; }
+    }
+
+    public class BlockHeaderResponseModel
+    {
+        [JsonProperty("version", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Version { get; set; }
+
+        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash { get; set; }
+
+        [JsonProperty("previous", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Previous { get; set; }
+
+        [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public DateTimeOffset? Time { get; set; }
+
+        [JsonProperty("nonce", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public int? Nonce { get; set; }
+
+        [JsonProperty("hashMerkelRoot", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string HashMerkelRoot { get; set; }
+
+        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Bits { get; set; }
+
+        [JsonProperty("difficulty", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public double? Difficulty { get; set; }
+    }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { TransactionSummaryModel } from 'gen/nswag';
+import { TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-transaction-summary',

@@ -6,7 +6,7 @@ namespace AzureIndexer.Api.Models
 namespace QBitNinja.Client.Models
 #endif
 {
-    public class GetBlockResponse
+    public class BlockResponse
     {
         public BlockInformation AdditionalInformation
         {

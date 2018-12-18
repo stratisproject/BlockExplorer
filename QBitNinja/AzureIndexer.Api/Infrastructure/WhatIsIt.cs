@@ -114,7 +114,7 @@ namespace AzureIndexer.Api.Infrastructure
                 });
                 if (blockHeader != null)
                 {
-                    return new WhatIsBlockHeader(blockHeader);
+                    return new BlockHeaderResponse(blockHeader);
                 }
             }
 
