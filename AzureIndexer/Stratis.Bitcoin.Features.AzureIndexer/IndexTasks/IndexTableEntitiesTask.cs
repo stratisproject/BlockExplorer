@@ -99,10 +99,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override Task EnsureSetup()
         {
-            return GetCloudTable().CreateIfNotExistsAsync();
+            return this.GetCloudTable().CreateIfNotExistsAsync();
         }
 
         protected abstract CloudTable GetCloudTable();
+
         protected abstract ITableEntity ToTableEntity(TIndexed item);
 
         protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items)
@@ -113,7 +114,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 batch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
             }
 
-            CloudTable table = GetCloudTable();
+            CloudTable table = this.GetCloudTable();
 
             var options = new TableRequestOptions()
             {

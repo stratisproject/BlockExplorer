@@ -124,18 +124,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        bool _EnsureIsSetup = true;
+        bool _ensureIsSetup = true;
 
         public bool EnsureIsSetup
         {
             get
             {
-                return this._EnsureIsSetup;
+                return this._ensureIsSetup;
             }
 
             set
             {
-                this._EnsureIsSetup = value;
+                this._ensureIsSetup = value;
             }
         }
 
@@ -189,11 +189,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        public int MaxQueued
-        {
-            get;
-            set;
-        }
+        public int MaxQueued { get; set; }
 
         Exception _Exception;
 

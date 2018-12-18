@@ -31,6 +31,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         volatile int _IndexedBlocks;
+
         public int IndexedBlocks
         {
             get
@@ -45,7 +46,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("()");
 
             if (taskScheduler == null)
+            {
                 throw new ArgumentNullException("taskScheduler");
+            }
+
             try
             {
                 this.logger.LogTrace("Indexing...");
@@ -70,19 +74,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("()");
 
             if (taskScheduler == null)
+            {
                 throw new ArgumentNullException("taskScheduler");
-            var tasks = blocks
-                .Select(b => new Task(() => IndexCore("o", new[]{new BlockInfo()
-                {
-                    Block = b,
-                    BlockId = b.GetHash()
-                }})))
+            }
+
+            Task[] tasks = blocks.Select(b =>
+                    new Task(() => this.IndexCore("o", new[] {new BlockInfo() { Block = b, BlockId = b.GetHash() } })))
                 .ToArray();
 
             this.logger.LogTrace("Tasks created");
 
             foreach (var t in tasks)
+            {
                 t.Start(taskScheduler);
+            }
 
             this.logger.LogTrace("(-)");
             return Task.WhenAll(tasks);
@@ -92,6 +97,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             await Configuration.GetBlocksContainer().CreateIfNotExistsAsync().ConfigureAwait(false);
         }
+
         protected override void ProcessBlock(BlockInfo block, BulkImport<BlockInfo> bulk, Network network)
         {
             bulk.Add("o", block);
@@ -126,17 +132,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
                 try
                 {
-                    blob.
-                        UploadFromByteArrayAsync(blockBytes, 0, blockBytes.Length, new AccessCondition()
-                        {
-                            //Will throw if already exist, save 1 call
-                            IfNotModifiedSinceTime = DateTimeOffset.MinValue
-                        }, new BlobRequestOptions()
-                        {
-                            MaximumExecutionTime = _Timeout,
-                            ServerTimeout = _Timeout
-                        }
-                    , new OperationContext()).GetAwaiter().GetResult();
+                    blob.UploadFromByteArrayAsync(blockBytes, 0, blockBytes.Length, new AccessCondition()
+                            {
+                                // Will throw if already exist, save 1 call.
+                                IfNotModifiedSinceTime = DateTimeOffset.MinValue
+                            }, new BlobRequestOptions() {MaximumExecutionTime = _Timeout, ServerTimeout = _Timeout},
+                            new OperationContext())
+                        .GetAwaiter()
+                        .GetResult();
                     watch.Stop();
                     IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
                     _IndexedBlocks++;

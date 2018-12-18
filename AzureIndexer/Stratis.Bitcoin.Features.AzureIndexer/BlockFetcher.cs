@@ -1,13 +1,13 @@
-﻿using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using Microsoft.Extensions.Logging;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
+
     public class BlockInfo
     {
         public int Height
@@ -15,21 +15,24 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             get;
             set;
         }
+
         public uint256 BlockId
         {
             get;
             set;
         }
+
         public Block Block
         {
             get;
             set;
         }
     }
+
     public class BlockFetcher : IEnumerable<BlockInfo>
     {
-
         private readonly Checkpoint _Checkpoint;
+
         public Checkpoint Checkpoint
         {
             get
@@ -39,6 +42,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         private readonly IBlocksRepository _BlocksRepository;
+
         public IBlocksRepository BlocksRepository
         {
             get
@@ -52,6 +56,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILogger logger;
 
         private readonly ChainBase _BlockHeaders;
+
         public ChainBase BlockHeaders
         {
             get
@@ -171,6 +176,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         #endregion
 
         private DateTime _LastSaved = DateTime.UtcNow;
+
         public bool NeedSave
         {
             get
@@ -183,13 +189,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            if(_LastProcessed != null)
+            if (_LastProcessed != null)
             {
                 this.logger.LogTrace("Saving checkpoints");
 
                 _Checkpoint.SaveProgress(_LastProcessed);
                 IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }
+
             _LastSaved = DateTime.UtcNow;
 
             this.logger.LogTrace("(-)");
