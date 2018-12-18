@@ -1,20 +1,21 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.OpenAsset;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
-using Stratis.Bitcoin.Networks;
-using Stratis.SmartContracts.CLR;
-using Stratis.SmartContracts.CLR.Compilation;
-using Stratis.SmartContracts.CLR.Serialization;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using CSharpFunctionalExtensions;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using NBitcoin.OpenAsset;
+    using Stratis.Bitcoin.Networks;
+    using Stratis.SmartContracts.CLR;
+    using Stratis.SmartContracts.CLR.Compilation;
+    using Stratis.SmartContracts.CLR.Decompilation;
+    using Stratis.SmartContracts.CLR.Serialization;
+    using Stratis.SmartContracts.Core;
+
     public class TransactionEntry
     {
-
         public class Entity
         {
             public enum TransactionEntryType
@@ -126,10 +127,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return entity;
             }
 
+            /// <summary>
+            /// Check Tx for containing SmartContract in it.
+            /// </summary>
+            /// <param name="transaction">Transaction</param>
+            /// <returns>True or False</returns>
             private bool CheckForSmartContract(Transaction transaction)
             {
                 var smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
-
+                var csharpDecompiler = new CSharpContractDecompiler();
 
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {
@@ -138,11 +144,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     {
                         this.HasSmartContract = true;
                         this.ContractTxData = contractTxDataResult.Value;
-                        var contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
+
+                        if (!this.ContractTxData.IsCreateContract)
+                        {
+                            continue;
+                        }
+
+                        Result<IContractModuleDefinition> contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
                         if (contractDecompileResult.IsSuccess)
                         {
-                            this.ContractCode = contractDecompileResult.Value.
-
+                            this.ContractByteCode = contractDecompileResult.Value.ToByteCode().Value;
+                            if (this.ContractByteCode.Length > 0)
+                            {
+                                Result<string> csharpDecompileResult =
+                                    csharpDecompiler.GetSource(this.ContractByteCode);
+                                if (csharpDecompileResult.IsSuccess)
+                                {
+                                    this.ContractCode = csharpDecompileResult.Value;
+                                }
+                            }
                         }
                     }
                 }
@@ -156,7 +176,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             public TransactionEntryType GetType(string letter)
             {
-                switch(letter[0])
+                switch (letter[0])
                 {
                     case 'c':
                         return TransactionEntryType.Colored;
@@ -175,11 +195,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 get
                 {
-                    if(this._PartitionKey == null && this.TxId != null)
+                    if (this._PartitionKey == null && this.TxId != null)
                     {
-                        var b = this.TxId.ToBytes();
+                        byte[] b = this.TxId.ToBytes();
                         this._PartitionKey = Helper.GetPartitionKey(10, new[] { b[0], b[1] }, 0, 2);
                     }
+
                     return this._PartitionKey;
                 }
             }
@@ -193,7 +214,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             public Entity(uint256 txId, ColoredTransaction colored)
             {
                 if (txId == null)
+                {
                     throw new ArgumentNullException("txId");
+                }
+
                 this.TxId = txId;
                 this.ColoredTransaction = colored;
                 this.Type = TransactionEntryType.Colored;
@@ -254,8 +278,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             public ContractTxData ContractTxData { get; set; }
 
-            public string ContractCode { get; set; }
+            public byte[] ContractByteCode { get; set; }
 
+            public string ContractCode { get; set; }
         }
 
         internal TransactionEntry(Entity[] entities)
@@ -265,33 +290,36 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.MempoolDate = entities.Where(e => e.Type == Entity.TransactionEntryType.Mempool)
                                   .Select(e => new DateTimeOffset?(e.Timestamp))
                                   .Min();
-            this.FirstSeen = this.MempoolDate != null ?  this.MempoolDate.Value : 
+            this.FirstSeen = this.MempoolDate != null ? this.MempoolDate.Value :
                                     entities.Where(e => e.Type == Entity.TransactionEntryType.ConfirmedTransaction)
                                   .Select(e => new DateTimeOffset?(e.Timestamp))
                                   .Min().Value;
 
-            var loadedEntity = entities.FirstOrDefault(e => e.Transaction != null && e.IsLoaded);
-            if(loadedEntity == null)
+            Entity loadedEntity = entities.FirstOrDefault(e => e.Transaction != null && e.IsLoaded);
+            if (loadedEntity == null)
+            {
                 loadedEntity = entities.FirstOrDefault(e => e.Transaction != null);
-            if(loadedEntity != null)
+            }
+
+            if (loadedEntity != null)
             {
                 this.Transaction = loadedEntity.Transaction;
-                if(loadedEntity.Transaction.IsCoinBase)
+                if (loadedEntity.Transaction.IsCoinBase)
                 {
                     this.SpentCoins = new List<Spendable>();
                 }
-                else if(loadedEntity.IsLoaded)
+                else if (loadedEntity.IsLoaded)
                 {
                     this.SpentCoins = new List<Spendable>();
-                    for(int i = 0; i < this.Transaction.Inputs.Count; i++)
+                    for (var i = 0; i < this.Transaction.Inputs.Count; i++)
                     {
                         this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
                     }
                 }
             }
 
-            var coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
-            if(coloredLoadedEntity != null)
+            Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
+            if (coloredLoadedEntity != null)
             {
                 this.ColoredTransaction = coloredLoadedEntity.ColoredTransaction;
             }
@@ -313,10 +341,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             get
             {
-                if(this.SpentCoins == null || this.Transaction == null)
+                if (this.SpentCoins == null || this.Transaction == null)
+                {
                     return null;
-                if(this.Transaction.IsCoinBase)
+                }
+
+                if (this.Transaction.IsCoinBase)
+                {
                     return Money.Zero;
+                }
+
                 return this.SpentCoins.Select(o => o.TxOut.Value).Sum() - this.Transaction.TotalOut;
             }
         }

@@ -14,11 +14,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     public interface IIndexTask
     {
         void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network);
+
         bool SaveProgression
         {
             get;
             set;
         }
+
         bool EnsureIsSetup
         {
             get;
@@ -35,9 +37,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
             this.Configuration = configuration;
-            SaveProgression = true;
-            MaxQueued = 100;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this.SaveProgression = true;
+            this.MaxQueued = 100;
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
         /// <summary>
@@ -57,40 +59,46 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             ConcurrentDictionary<Task, Task> tasks = new ConcurrentDictionary<Task, Task>();
             try
-            {               
-                SetThrottling();
-                if(EnsureIsSetup)
-                    EnsureSetup().Wait();
+            {
+                this.SetThrottling();
+                if (this.EnsureIsSetup)
+                {
+                    this.EnsureSetup().Wait();
+                }
 
-                BulkImport<TIndexed> bulk = new BulkImport<TIndexed>(PartitionSize);
-                if(!SkipToEnd)
+                BulkImport<TIndexed> bulk = new BulkImport<TIndexed>(this.PartitionSize);
+                if (!this.SkipToEnd)
                 {
                     try
                     {
 
-                        foreach(var block in blockFetcher)
+                        foreach (var block in blockFetcher)
                         {
-                            ThrowIfException();
-                            if(blockFetcher.NeedSave)
+                            this.ThrowIfException();
+                            if (blockFetcher.NeedSave)
                             {
-                                if(SaveProgression)
+                                if (this.SaveProgression)
                                 {
-                                    EnqueueTasks(tasks, bulk, true, scheduler);
-                                    Save(tasks, blockFetcher, bulk);
+                                    this.EnqueueTasks(tasks, bulk, true, scheduler);
+                                    this.Save(tasks, blockFetcher, bulk);
                                 }
                             }
-                            ProcessBlock(block, bulk, network);
-                            if(bulk.HasFullPartition)
+
+                            this.ProcessBlock(block, bulk, network);
+                            if (bulk.HasFullPartition)
                             {
-                                EnqueueTasks(tasks, bulk, false, scheduler);
+                                this.EnqueueTasks(tasks, bulk, false, scheduler);
                             }
                         }
-                        EnqueueTasks(tasks, bulk, true, scheduler);
+
+                        this.EnqueueTasks(tasks, bulk, true, scheduler);
                     }
-                    catch(OperationCanceledException ex)
+                    catch (OperationCanceledException ex)
                     {
-                        if(ex.CancellationToken != blockFetcher.CancellationToken)
+                        if (ex.CancellationToken != blockFetcher.CancellationToken)
+                        {
                             throw;
+                        }
                     }
                 }
                 else
@@ -99,12 +107,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     blockFetcher.SkipToEnd();
                 }
 
-                if(SaveProgression)
-                    Save(tasks, blockFetcher, bulk);
-                WaitFinished(tasks);
-                ThrowIfException();
+                if (this.SaveProgression)
+                {
+                    this.Save(tasks, blockFetcher, bulk);
+                }
+
+                this.WaitFinished(tasks);
+                this.ThrowIfException();
             }
-            catch(AggregateException aex)
+            catch (AggregateException aex)
             {
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
                 throw;
@@ -114,15 +125,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         bool _EnsureIsSetup = true;
+
         public bool EnsureIsSetup
         {
             get
             {
-                return _EnsureIsSetup;
+                return this._EnsureIsSetup;
             }
+
             set
             {
-                _EnsureIsSetup = value;
+                this._EnsureIsSetup = value;
             }
         }
 
@@ -131,14 +144,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("()");
 
             Helper.SetThrottling();
-            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(Configuration.TableClient.BaseUri);
+            ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
 
             this.logger.LogTrace("(-)");
         }
+
         ExponentialBackoff retry = new ExponentialBackoff(15, TimeSpan.FromMilliseconds(100),
                                                               TimeSpan.FromSeconds(10),
                                                               TimeSpan.FromMilliseconds(200));
+
         private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler)
         {
             this.logger.LogTrace("()");
@@ -149,23 +164,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 return;
             }
 
-            if(uncompletePartitions)
-                bulk.FlushUncompletePartitions();
-
-            while(bulk._ReadyPartitions.Count != 0)
+            if (uncompletePartitions)
             {
-                var item = bulk._ReadyPartitions.Dequeue();
-                var task = retry.Do(() => IndexCore(item.Item1, item.Item2), scheduler);
+                bulk.FlushUncompletePartitions();
+            }
+
+            while (bulk._ReadyPartitions.Count != 0)
+            {
+                Tuple<string, TIndexed[]> item = bulk._ReadyPartitions.Dequeue();
+                Task task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>
                 {
-                    _Exception = prev.Exception ?? _Exception;
+                    this._Exception = prev.Exception ?? this._Exception;
                     tasks.TryRemove(prev, out prev);
                 });
 
-                if(tasks.Count > MaxQueued)
+                if (tasks.Count > this.MaxQueued)
                 {
-                    WaitFinished(tasks, MaxQueued / 2);
+                    this.WaitFinished(tasks, this.MaxQueued / 2);
                 }
             }
 
@@ -184,14 +201,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             this.logger.LogTrace("()");
 
-            WaitFinished(tasks);
-            ThrowIfException();
+            this.WaitFinished(tasks);
+            this.ThrowIfException();
             fetcher.SaveCheckpoint();
 
             this.logger.LogTrace("(-)");
         }
 
         int[] wait = new int[] { 100, 200, 400, 800, 1600 };
+
         private void WaitFinished(ConcurrentDictionary<Task, Task> tasks, int queuedTarget = 0)
         {
             this.logger.LogTrace("()");
@@ -208,18 +226,22 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             this.logger.LogTrace("()");
 
-            if (_Exception != null)
-                ExceptionDispatchInfo.Capture(_Exception).Throw();
+            if (this._Exception != null)
+            {
+                ExceptionDispatchInfo.Capture(this._Exception).Throw();
+            }
 
             this.logger.LogTrace("(-)");
         }
 
         protected TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
+
         public IndexerConfiguration Configuration
         {
             get;
             private set;
         }
+
         public bool SaveProgression
         {
             get;
@@ -232,7 +254,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         }
 
         protected abstract Task EnsureSetup();
+
         protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk, Network network);
+
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
     }
 }

@@ -7,6 +7,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     public class IndexerTransactionRepository : ITransactionRepository
     {
         private readonly IndexerConfiguration _Configuration;
+
         public IndexerConfiguration Configuration
         {
             get
@@ -14,28 +15,29 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return _Configuration;
             }
         }
+
         public IndexerTransactionRepository(IndexerConfiguration config)
         {
             if (config == null)
+            {
                 throw new ArgumentNullException("config");
-            _Configuration = config;
+            }
+
+            this._Configuration = config;
         }
-        #region ITransactionRepository Members
 
         public async Task<Transaction> GetAsync(uint256 txId)
         {
-            var tx = await _Configuration.CreateIndexerClient().GetTransactionAsync(false, txId).ConfigureAwait(false);
-            if (tx == null)
-                return null;
-            return tx.Transaction;
+            TransactionEntry tx = await _Configuration.CreateIndexerClient().GetTransactionAsync(false, txId).ConfigureAwait(false);
+
+            return tx?.Transaction;
         }
 
         public Task PutAsync(uint256 txId, Transaction tx)
         {
-            _Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null));
+            this._Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null));
             return Task.FromResult(false);
         }
 
-        #endregion
     }
 }

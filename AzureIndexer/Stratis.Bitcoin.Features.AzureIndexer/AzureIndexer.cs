@@ -228,6 +228,7 @@
             this._logger.LogTrace("(-)");
         }
 
+        // TODO: Is it in use?
         public void IndexTransactions(int height, Block block)
         {
             this._logger.LogTrace("()");

@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public class IndexTransactionsTask : IndexTableEntitiesTaskBase<TransactionEntry.Entity>
     {
         private readonly ILogger logger;

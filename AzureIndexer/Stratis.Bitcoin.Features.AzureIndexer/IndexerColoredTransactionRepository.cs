@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using NBitcoin.OpenAsset;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using NBitcoin;
+    using NBitcoin.OpenAsset;
+
     internal class ReadOnlyTransactionRepository : ITransactionRepository
     {
         private NoSqlTransactionRepository cache;
@@ -14,7 +14,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.cache = cache;
         }
-        #region ITransactionRepository Members
 
         public Task<Transaction> GetAsync(uint256 txId)
         {
@@ -25,42 +24,44 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             return Task.FromResult(false);
         }
-
-        #endregion
     }
+
     internal class CompositeTransactionRepository : ITransactionRepository
     {
         public CompositeTransactionRepository(ITransactionRepository[] repositories)
         {
             _Repositories = repositories.ToArray();
         }
+
         ITransactionRepository[] _Repositories;
-        #region ITransactionRepository Members
 
         public async Task<Transaction> GetAsync(uint256 txId)
         {
-            foreach(var repo in _Repositories)
+            foreach (var repo in _Repositories)
             {
-                var result = await repo.GetAsync(txId).ConfigureAwait(false);
-                if(result != null)
+                Transaction result = await repo.GetAsync(txId).ConfigureAwait(false);
+                if (result != null)
+                {
                     return result;
+                }
             }
+
             return null;
         }
 
         public async Task PutAsync(uint256 txId, Transaction tx)
         {
-            foreach(var repo in _Repositories)
+            foreach (ITransactionRepository repo in _Repositories)
             {
                 await repo.PutAsync(txId, tx).ConfigureAwait(false);
             }
         }
-
-        #endregion
     }
+
     public class IndexerColoredTransactionRepository : IColoredTransactionRepository
     {
         private readonly IndexerConfiguration _Configuration;
+
         public IndexerConfiguration Configuration
         {
             get
@@ -72,7 +73,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IndexerColoredTransactionRepository(IndexerConfiguration config)
         {
             if (config == null)
+            {
                 throw new ArgumentNullException("config");
+            }
+
             _Configuration = config;
             _Transactions = new IndexerTransactionRepository(config);
         }
