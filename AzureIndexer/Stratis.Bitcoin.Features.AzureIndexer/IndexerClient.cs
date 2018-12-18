@@ -38,7 +38,7 @@
             {
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
                 ms.Position = 0;
-                Block b = new Block();
+                var b = this.Configuration.Network.CreateBlock();
                 b.ReadWrite(ms, false);
                 return b;
             }

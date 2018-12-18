@@ -30,6 +30,7 @@ export class AppComponent implements OnDestroy {
 
           if (!!entity.type) type = entity.type;
           if (!!entity.transaction) type = 'TRANSACTION';
+          if (!!entity.additionalInformation) type = 'BLOCK';
 
           switch (type) {
             case 'PUBKEY_ADDRESS':
@@ -37,6 +38,9 @@ export class AppComponent implements OnDestroy {
               break;
             case 'TRANSACTION':
               this.router.navigate(['transactions', text]);
+              break;
+            case 'BLOCK':
+              this.router.navigate(['blocks', text]);
               break;
             default:
               this.router.navigate(['search', 'not-found']);

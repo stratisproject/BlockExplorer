@@ -12,6 +12,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrismModule } from '@ngx-prism/core';
 import { TransactionSummaryComponent } from './components/transaction-summary/transaction-summary.component';
 import { NotFoundPageComponent } from './containers/not-found-page/not-found-page.component';
+import { BlockSummaryComponent } from './components/block-summary/block-summary.component';
+import { BlockSummaryPageComponent } from './containers/block-summary-page/block-summary-page.component';
 
 export { TransactionsPageComponent } from './containers/transactions-page/transactions-page.component';
 
@@ -24,13 +26,17 @@ export const uiAddressesRoutes: Route[] = [
   { path: ':addressHash', component: AddressSummaryPageComponent }
 ];
 
+export const uiBlockRoutes: Route[] = [
+  { path: ':blockHeight', component: BlockSummaryPageComponent }
+];
+
 export const uiOtherRoutes: Route[] = [
   { path: 'not-found', component: NotFoundPageComponent }
 ];
 
 @NgModule({
   imports: [CommonModule, RouterModule, UiLayoutModule, NgbModule, PrismModule],
-  declarations: [TransactionsPageComponent, TransactionsListComponent, AddressSummaryComponent, TransactionListItemComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, TransactionSummaryComponent, NotFoundPageComponent],
-  exports: [TransactionsPageComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, NotFoundPageComponent]
+  declarations: [TransactionsPageComponent, TransactionsListComponent, AddressSummaryComponent, TransactionListItemComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, TransactionSummaryComponent, NotFoundPageComponent, BlockSummaryComponent, BlockSummaryPageComponent],
+  exports: [TransactionsPageComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, NotFoundPageComponent, BlockSummaryPageComponent]
 })
 export class UiTransactionsModule {}
