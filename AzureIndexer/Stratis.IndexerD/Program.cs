@@ -1,4 +1,9 @@
-﻿namespace Stratis.Bitcoin.Indexer.Console
+﻿using Stratis.Bitcoin.Features.SmartContracts;
+using Stratis.Bitcoin.Features.SmartContracts.PoA;
+using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+using Stratis.SmartContracts.Networks;
+
+namespace Stratis.Bitcoin.Indexer.Console
 {
     using System;
     using System.Linq;
@@ -23,11 +28,17 @@
         {
             try
             {
+                // NodeSettings nodeSettings = new NodeSettings(new SmartContractsPoATest(), ProtocolVersion.ALT_PROTOCOL_VERSION, "StratisSC", args: args); 
                 NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
-
                 IFullNode node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
                     .UsePosConsensus()
+                    //.AddSmartContracts()
+                    //.UseSmartContractPoAConsensus()
+                    //.UseSmartContractPoAMining()
+                   //.UseSmartContractWallet()
+                   // .UseReflectionExecutor()
+                   // .UseApi()
                     .UseBlockStore()
                     .UseAzureIndexer()
                     .Build();

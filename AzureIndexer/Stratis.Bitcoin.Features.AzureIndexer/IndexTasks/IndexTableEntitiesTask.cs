@@ -99,25 +99,28 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override Task EnsureSetup()
         {
-            return GetCloudTable().CreateIfNotExistsAsync();
+            return this.GetCloudTable().CreateIfNotExistsAsync();
         }
 
         protected abstract CloudTable GetCloudTable();
+
         protected abstract ITableEntity ToTableEntity(TIndexed item);
 
         protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items)
         {
             var batch = new TableBatchOperation();
             foreach (var item in items)
-                batch.Add(TableOperation.InsertOrReplace(ToTableEntity(item)));
+            {
+                batch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
+            }
 
-            var table = GetCloudTable();
+            CloudTable table = this.GetCloudTable();
 
             var options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
-                MaximumExecutionTime = _Timeout,
-                ServerTimeout = _Timeout,
+                MaximumExecutionTime = this._Timeout,
+                ServerTimeout = this._Timeout,
             };
 
             var context = new OperationContext();
@@ -134,11 +137,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     watch.Start();
 
                     if (batch.Count > 1)
+                    {
                         table.ExecuteBatchAsync(batch, options, context).GetAwaiter().GetResult();
+                    }
                     else
                     {
                         if (batch.Count == 1)
+                        {
                             table.ExecuteAsync(batch[0], options, context).GetAwaiter().GetResult();
+                        }
                     }
 
                     Interlocked.Add(ref _IndexedEntities, batch.Count);

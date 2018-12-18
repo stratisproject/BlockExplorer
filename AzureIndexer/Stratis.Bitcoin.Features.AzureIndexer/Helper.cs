@@ -65,6 +65,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         const int ColumnMaxSize = 63000;
+
         internal static void SetEntityProperty(DynamicTableEntity entity, string property, byte[] data)
         {
             if (data == null || data.Length == 0)
@@ -127,6 +128,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         static JsonSerializerSettings _Settings;
+
         internal static JsonSerializerSettings Settings
         {
             get

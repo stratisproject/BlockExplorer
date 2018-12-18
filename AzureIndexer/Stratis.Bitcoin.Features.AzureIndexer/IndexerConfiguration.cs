@@ -22,6 +22,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         private const string IndexerBlobContainerName = "indexer";
         private const string TransactionsTableName = "transactions";
+        private const string SmartContractsTableName = "smartcontracts";
+        private const string SmartContractDetailsTableName = "smartcontractdetails";
         private const string BalancesTableName = "balances";
         private const string ChainTableName = "chain";
         private const string WalletsTableName = "wallets";
@@ -153,6 +155,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IEnumerable<CloudTable> EnumerateTables()
         {
             yield return this.GetTransactionTable();
+            yield return this.GetSmartContactTable();
+            yield return this.GetSmartContactDetailTable();
             yield return this.GetBalanceTable();
             yield return this.GetChainTable();
             yield return this.GetWalletRulesTable();
@@ -171,6 +175,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public CloudTable GetTransactionTable()
         {
             return this.TableClient.GetTableReference(this.GetFullName(TransactionsTableName));
+        }
+
+        public CloudTable GetSmartContactTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(SmartContractsTableName));
+        }
+
+        public CloudTable GetSmartContactDetailTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(SmartContractDetailsTableName));
         }
 
         public CloudTable GetWalletRulesTable()
