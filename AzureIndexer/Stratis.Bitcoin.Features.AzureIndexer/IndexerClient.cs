@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using NBitcoin.Protocol;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -39,7 +41,9 @@
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
                 ms.Position = 0;
                 var b = this.Configuration.Network.CreateBlock();
-                b.ReadWrite(ms, false);
+                var stream = new BitcoinStream(ms.ToArray());
+                stream.ConsensusFactory = this.Configuration.Network.Consensus.ConsensusFactory;
+                b.ReadWrite(stream);
                 return b;
             }
             catch (StorageException ex)

@@ -208,7 +208,7 @@
         public string Hash { get; set; }
 
         [JsonProperty("n", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public int? N { get; set; }
+        public long? N { get; set; }
     }
 
     public class SequenceModel
@@ -383,7 +383,7 @@
         public MoneyModel Amount { get; set; }
 
         [JsonProperty("n", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public int N { get; set; }
+        public long N { get; set; }
     }
 
     public class InsertWalletAddressModel
@@ -1166,7 +1166,10 @@
         public long? BlockSize { get; set; }
 
         [JsonProperty("transactions", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<TransactionModel> Transactions { get; set; }
+        public ICollection<TransactionSummaryModel> Transactions { get; set; }
+
+        [JsonProperty("transactionIds", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ICollection<string> TransactionIds { get; set; }
 
         [JsonProperty("headerOnly", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? HeaderOnly { get; set; }

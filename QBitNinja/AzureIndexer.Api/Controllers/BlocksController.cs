@@ -1,4 +1,6 @@
-﻿using AzureIndexer.Api.Models.Response;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AzureIndexer.Api.Models.Response;
 
 namespace AzureIndexer.Api.Controllers
 {
@@ -13,15 +15,18 @@ namespace AzureIndexer.Api.Controllers
     {
         private readonly IMapper mapper;
         private readonly IBlockSearchService blockSearchService;
+        private readonly ITransactionSearchService transactionSearchService;
 
         public BlocksController(
             ConcurrentChain chain,
             QBitNinjaConfiguration config,
             IMapper mapper,
-            IBlockSearchService blockSearchService)
+            IBlockSearchService blockSearchService,
+            ITransactionSearchService transactionSearchService)
         {
             this.mapper = mapper;
             this.blockSearchService = blockSearchService;
+            this.transactionSearchService = transactionSearchService;
             this.Configuration = config;
             this.Chain = chain;
         }
@@ -34,10 +39,21 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("blocks/{block}")]
-        public BlockResponseModel Block(string block, bool headerOnly = false, bool extended = false)
+        public async Task<BlockResponseModel> Block(string block, bool headerOnly = false, bool extended = false)
         {
             var blockData = this.blockSearchService.GetBlock(block.ToBlockFeature(), headerOnly, extended);
-            return this.mapper.Map<BlockResponseModel>(blockData);
+
+            var mappedBlock =  this.mapper.Map<BlockResponseModel>(blockData);
+            mappedBlock.Block.Transactions = new List<TransactionSummaryModel>();
+            foreach (var transactionId in mappedBlock.Block.TransactionIds)
+            {
+                var transaction = await this.transactionSearchService.FindTransaction(uint256.Parse(transactionId), false);
+                var transactionSummary = this.mapper.Map<TransactionSummaryModel>(transaction);
+                transactionSummary.Spent = false;
+                mappedBlock.Block.Transactions.Add(transactionSummary);
+            }
+
+            return mappedBlock;
         }
 
         [HttpGet]

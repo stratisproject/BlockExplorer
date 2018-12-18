@@ -37,7 +37,7 @@
                 cfg.CreateMap<WhatIsPublicKey, WhatIsPublicKeyModel>();
                 cfg.CreateMap<Sequence, SequenceModel>();
                 cfg.CreateMap<Script, ScriptModel>().ConvertUsing<ScriptTypeConverter>();
-                cfg.CreateMap<TransactionResponseModel, TransactionSummaryModel>().ConvertUsing<TransactionSummaryConverter>();
+                cfg.CreateMap<TransactionResponseModel, TransactionSummaryModel>().ConvertUsing<TransactionResponseSummaryConverter>();
                 cfg.CreateMap<Target, TargetModel>();
                 cfg.CreateMap<ScriptId, ScriptIdModel>();
                 cfg.CreateMap<WitScriptId, WitScriptIdModel>();
@@ -81,7 +81,7 @@
                 cfg.CreateMap<VersionStatsItem, VersionStatsItemModel>();
                 cfg.CreateMap<BlockResponse, BlockResponseModel>();
                 cfg.CreateMap<ExtendedBlockInformation, ExtendedBlockInformationModel>();
-                cfg.CreateMap<Block, BlockModel>();
+                cfg.CreateMap<Block, BlockModel>().ForMember(m => m.Transactions, d => d.Ignore()).ForMember(m => m.TransactionIds, d => d.MapFrom(m => m.Transactions.Select(t => t.GetHash().ToString())));
                 cfg.CreateMap<BlockHeaderResponse, BlockHeaderResponseModel>();
             });
 
@@ -112,7 +112,7 @@
             }
         }
 
-        public class TransactionSummaryConverter : ITypeConverter<TransactionResponseModel, TransactionSummaryModel>
+        public class TransactionResponseSummaryConverter : ITypeConverter<TransactionResponseModel, TransactionSummaryModel>
         {
             public TransactionSummaryModel Convert(TransactionResponseModel source, TransactionSummaryModel destination, ResolutionContext context)
             {
@@ -131,6 +131,17 @@
                     In = source.SpentCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), N = coin.Outpoint.N ?? 0, Amount = coin.TxOut.Value }).Where(t => t.Amount.Satoshi != 0).ToList(),
                     Out = source.ReceivedCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), Amount = coin.TxOut.Value, N = coin.Outpoint.N ?? 0 }).Where(t => t.Amount.Satoshi != 0).ToList()
                 };
+
+                return summary;
+            }
+        }
+
+        public class TransactionIdConverter : ITypeConverter<Transaction, string>
+        {
+            public string Convert(Transaction source, string destination, ResolutionContext context)
+            {
+                var chain = ServiceLocator.Current.GetInstance<ConcurrentChain>();
+                var summary = source.GetHash().ToString();
 
                 return summary;
             }
