@@ -65,8 +65,9 @@
     <Reference Include="DBreeze, Version=1.89.2017.829, Culture=neutral, PublicKeyToken=174b57f1c155f3c6, processorArchitecture=MSIL">
       <HintPath>..\packages\DBreeze.1.89.0\lib\net462\DBreeze.dll</HintPath>
     </Reference>
-    <Reference Include="FodyNlogAdapter, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.FodyNlogAdapter.1.2.6-beta\lib\netstandard2.0\FodyNlogAdapter.dll</HintPath>
+    <Reference Include="FodyNlogAdapter, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stratis.FodyNlogAdapter.3.0.0\lib\netstandard2.0\FodyNlogAdapter.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="HashLib, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NStratis.HashLib.1.0.0.1\lib\netstandard1.3\HashLib.dll</HintPath>
@@ -309,8 +310,9 @@
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=8.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAzure.Storage.8.7.0\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="NBitcoin, Version=4.0.0.69, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NStratis.4.0.0.69\lib\netstandard2.0\NBitcoin.dll</HintPath>
+    <Reference Include="NBitcoin, Version=4.0.0.71, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NStratis.4.0.0.71\lib\netstandard2.0\NBitcoin.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -324,8 +326,9 @@
     <Reference Include="NLog.Extensions.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.Extensions.Logging.1.0.0-rtm-beta5\lib\net451\NLog.Extensions.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Stratis.Bitcoin, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Stratis.Bitcoin.1.2.6-beta\lib\netstandard2.0\Stratis.Bitcoin.dll</HintPath>
+    <Reference Include="Stratis.Bitcoin, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stratis.Bitcoin.3.0.0\lib\netstandard2.0\Stratis.Bitcoin.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
