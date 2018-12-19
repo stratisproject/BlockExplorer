@@ -7,7 +7,7 @@
 
     public class SmartContactEntry
     {
-        public class Entity
+        public class Entity : IIndexed
         {
             private readonly TransactionEntry.Entity transactionEntity;
 

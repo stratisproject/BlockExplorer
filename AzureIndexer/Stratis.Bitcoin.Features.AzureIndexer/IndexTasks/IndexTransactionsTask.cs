@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿using System.Collections.Generic;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Table;
@@ -8,6 +10,7 @@
     {
         private readonly ILogger logger;
         private readonly IndexerConfiguration config;
+        private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
         public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
@@ -16,7 +19,7 @@
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
@@ -26,13 +29,23 @@
                 if (indexed.HasSmartContract)
                 {
                     var scEntity = new SmartContactEntry.Entity(indexed);
-
+                    smartContractBulk.Add(scEntity.PartitionKey, scEntity);
                 }
 
                 bulk.Add(indexed.PartitionKey, indexed);
             }
 
             this.logger.LogTrace("(-)");
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<TransactionEntry.Entity> items)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<TransactionEntry.Entity> items, string partitionName2, IEnumerable<IIndexed> item2)
+        {
+            throw new System.NotImplementedException();
         }
 
         protected CloudTable GetSmartContractCloudTable()
