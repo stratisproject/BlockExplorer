@@ -75,6 +75,12 @@ namespace QBitNinja.Client.Models
             set;
         }
 
+        public bool IsSmartContract
+        {
+            get;
+            set;
+        }
+
         public bool IsCoinbase
         {
             get;

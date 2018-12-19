@@ -35,14 +35,15 @@
                 });
             }
 
-            var response = new TransactionResponse()
+            var response = new TransactionResponse
             {
                 TransactionId = tx.TransactionId,
                 Transaction = tx.Transaction,
                 IsCoinbase = tx.Transaction.IsCoinBase,
                 Fees = tx.Fees,
                 Block = this.FetchBlockInformation(tx.BlockIds),
-                FirstSeen = tx.FirstSeen
+                FirstSeen = tx.FirstSeen,
+                IsSmartContract = tx.HasSmartContract
             };
 
             for (int i = 0; i < tx.Transaction.Outputs.Count; i++)

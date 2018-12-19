@@ -316,6 +316,8 @@
                         this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
                     }
                 }
+                
+                this.HasSmartContract = loadedEntity.HasSmartContract;
             }
 
             Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
@@ -336,6 +338,8 @@
             get;
             set;
         }
+
+        public bool HasSmartContract { get; set; }
 
         public Money Fees
         {

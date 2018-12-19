@@ -128,6 +128,7 @@
                     Spent = source.Transaction.TotalOut.Satoshi < 0,
                     IsCoinbase = source.Transaction.IsCoinBase ?? false,
                     IsCoinstake = source.Transaction.IsCoinStake ?? false,
+                    IsSmartContract = source.IsSmartContract,
                     In = source.SpentCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), N = coin.Outpoint.N ?? 0, Amount = coin.TxOut.Value }).Where(t => t.Amount.Satoshi != 0).ToList(),
                     Out = source.ReceivedCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), Amount = coin.TxOut.Value, N = coin.Outpoint.N ?? 0 }).Where(t => t.Amount.Satoshi != 0).ToList()
                 };

@@ -231,6 +231,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
   hash?: string | undefined;
   isCoinbase?: boolean | undefined;
   isCoinstake?: boolean | undefined;
+  isSmartContract: boolean;
   amount?: MoneyModel | undefined;
   fee?: MoneyModel | undefined;
   height?: number | undefined;
@@ -261,6 +262,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
       this.hash = data["hash"];
       this.isCoinbase = data["isCoinbase"];
       this.isCoinstake = data["isCoinstake"];
+      this.isSmartContract = data["isSmartContract"];
       this.amount = data["amount"] ? MoneyModel.fromJS(data["amount"]) : <any>undefined;
       this.fee = data["fee"] ? MoneyModel.fromJS(data["fee"]) : <any>undefined;
       this.height = data["height"];
@@ -285,6 +287,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
       data["hash"] = this.hash;
       data["isCoinbase"] = this.isCoinbase;
       data["isCoinstake"] = this.isCoinstake;
+      data["isSmartContract"] = this.isSmartContract;
       data["amount"] = this.amount ? this.amount.toJSON() : <any>undefined;
       data["fee"] = this.fee ? this.fee.toJSON() : <any>undefined;
       data["height"] = this.height;
@@ -309,6 +312,7 @@ export interface ITransactionSummaryModel {
   hash?: string | undefined;
   isCoinbase?: boolean | undefined;
   isCoinstake?: boolean | undefined;
+  isSmartContract: boolean;
   amount?: MoneyModel | undefined;
   fee?: MoneyModel | undefined;
   height?: number | undefined;
