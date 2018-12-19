@@ -91,7 +91,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                             }
                         }
 
-                        this.EnqueueTasks(tasks, bulk, true, scheduler);
+                        if (bulk.GetType() == typeof(BulkImport<TransactionEntry.Entity>))
+                        {
+                            // Do Tx and SC
+                            this.EnqueueTasks(tasks, bulk, true, scheduler);
+                            var scBulk = new BulkImport<TIndexed>(this.PartitionSize);
+
+                            this.EnqueueTasks(tasks, scBulk, true, scheduler);
+                        }
+                        else
+                        {
+                            this.EnqueueTasks(tasks, bulk, true, scheduler);
+                        }
                     }
                     catch (OperationCanceledException ex)
                     {
