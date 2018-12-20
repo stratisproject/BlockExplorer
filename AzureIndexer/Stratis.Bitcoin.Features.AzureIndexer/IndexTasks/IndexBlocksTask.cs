@@ -136,13 +136,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                             {
                                 // Will throw if already exist, save 1 call.
                                 IfNotModifiedSinceTime = DateTimeOffset.MinValue
-                            }, new BlobRequestOptions() {MaximumExecutionTime = _Timeout, ServerTimeout = _Timeout},
+                            }, 
+                            new BlobRequestOptions()
+                            {
+                                MaximumExecutionTime = _Timeout,
+                                ServerTimeout = _Timeout
+                            },
                             new OperationContext())
                         .GetAwaiter()
                         .GetResult();
                     watch.Stop();
                     IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
-                    _IndexedBlocks++;
+                    this._IndexedBlocks++;
 
                     this.logger.LogTrace("Indexed");
                     break;
@@ -174,9 +179,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        protected override void IndexCore(string partitionName, IEnumerable<BlockInfo> items, string partitionName2, IEnumerable<IIndexed> item2)
-        {
-            throw new NotImplementedException();
-        }
+        //protected override void IndexCore(string partitionName, IEnumerable<BlockInfo> items, string partitionName2, IEnumerable<IIndexed> item2)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

@@ -16,16 +16,91 @@
 
     public partial class TransactionEntry
     {
+        public ColoredTransaction ColoredTransaction { get; set; }
+
+        public DateTimeOffset? MempoolDate { get; set; }
+
+        public bool HasSmartContract { get; set; }
+
+        public Money Fees
+        {
+            get
+            {
+                if (this.SpentCoins == null || this.Transaction == null)
+                {
+                    return null;
+                }
+
+                if (this.Transaction.IsCoinBase)
+                {
+                    return Money.Zero;
+                }
+
+                return this.SpentCoins.Select(o => o.TxOut.Value).Sum() - this.Transaction.TotalOut;
+            }
+        }
+
+        public uint256[] BlockIds { get; internal set; }
+
+        public uint256 TransactionId { get; internal set; }
+
+        public Transaction Transaction { get; internal set; }
+
+        /// <summary>
+        /// Coins spent during the transaction, can be null if the indexer miss parent transactions
+        /// </summary>
+        public List<Spendable> SpentCoins { get; set; }
+
+        public DateTimeOffset FirstSeen { get; set; }
+
+        public Network Network { get; set; }
+
+        internal TransactionEntry(Entity[] entities)
+        {
+            this.TransactionId = entities[0].TxId;
+            this.BlockIds = entities.Select(e => e.BlockId).Where(b => b != null).ToArray();
+            this.MempoolDate = entities.Where(e => e.Type == Entity.TransactionEntryType.Mempool)
+                                  .Select(e => new DateTimeOffset?(e.Timestamp))
+                                  .Min();
+            this.FirstSeen = this.MempoolDate != null ? this.MempoolDate.Value :
+                                    entities.Where(e => e.Type == Entity.TransactionEntryType.ConfirmedTransaction)
+                                  .Select(e => new DateTimeOffset?(e.Timestamp))
+                                  .Min().Value;
+
+            Entity loadedEntity = entities.FirstOrDefault(e => e.Transaction != null && e.IsLoaded);
+            if (loadedEntity == null)
+            {
+                loadedEntity = entities.FirstOrDefault(e => e.Transaction != null);
+            }
+
+            if (loadedEntity != null)
+            {
+                this.Transaction = loadedEntity.Transaction;
+                if (loadedEntity.Transaction.IsCoinBase)
+                {
+                    this.SpentCoins = new List<Spendable>();
+                }
+                else if (loadedEntity.IsLoaded)
+                {
+                    this.SpentCoins = new List<Spendable>();
+                    for (var i = 0; i < this.Transaction.Inputs.Count; i++)
+                    {
+                        this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
+                    }
+                }
+
+                this.HasSmartContract = loadedEntity.HasSmartContract;
+            }
+
+            Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
+            if (coloredLoadedEntity != null)
+            {
+                this.ColoredTransaction = coloredLoadedEntity.ColoredTransaction;
+            }
+        }
 
         public class Entity : IIndexed
         {
-            public enum TransactionEntryType
-            {
-                Mempool,
-                ConfirmedTransaction,
-                Colored
-            }
-
             public Entity(uint256 txId, Transaction tx, uint256 blockId)
             {
                 if (txId == null)
@@ -40,6 +115,8 @@
                 this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
 
                 this.CheckForSmartContract(tx);
+
+                this.Child = new SmartContactEntry.Entity(this);
             }
 
             public Entity(uint256 txId)
@@ -97,6 +174,20 @@
                 }
             }
 
+            public Entity(uint256 txId, ColoredTransaction colored)
+            {
+                if (txId == null)
+                {
+                    throw new ArgumentNullException("txId");
+                }
+
+                this.TxId = txId;
+                this.ColoredTransaction = colored;
+                this.Type = TransactionEntryType.Colored;
+            }
+
+            public SmartContactEntry.Entity Child { get; set; }
+
             public static ulong ToUInt64(byte[] value, int index)
             {
                 return value[index]
@@ -109,10 +200,58 @@
                        + ((ulong)value[index + 7] << 56);
             }
 
-            public ITableEntity CreateTableEntity()
+            public Transaction Transaction { get; set; }
+
+            readonly List<TxOut> _PreviousTxOuts = new List<TxOut>();
+
+            public List<TxOut> PreviousTxOuts => this._PreviousTxOuts;
+
+            public TransactionEntryType Type { get; set; }
+
+            public bool HasSmartContract { get; set; }
+
+            public Network Network { get; set; }
+
+            public ContractTxData ContractTxData { get; set; }
+
+            public byte[] ContractByteCode { get; set; }
+
+            public string ContractCode { get; set; }
+
+            public enum TransactionEntryType
             {
-                throw new NotImplementedException();
+                Mempool,
+                ConfirmedTransaction,
+                Colored
             }
+
+            string _PartitionKey;
+
+            public string PartitionKey
+            {
+                get
+                {
+                    if (this._PartitionKey == null && this.TxId != null)
+                    {
+                        byte[] b = this.TxId.ToBytes();
+                        this._PartitionKey = Helper.GetPartitionKey(10, new[] { b[0], b[1] }, 0, 2);
+                    }
+
+                    return this._PartitionKey;
+                }
+            }
+
+            public DateTimeOffset Timestamp { get; set; }
+
+            public uint256 BlockId { get; set; }
+
+            public uint256 TxId { get; set; }
+
+            public ColoredTransaction ColoredTransaction { get; set; }
+
+            public string TypeLetter => this.Type == TransactionEntryType.Colored ? "c" :
+                this.Type == TransactionEntryType.ConfirmedTransaction ? "b" :
+                this.Type == TransactionEntryType.Mempool ? "m" : "?";
 
             public DynamicTableEntity CreateTableEntity(Network network)
             {
@@ -138,6 +277,16 @@
                 entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(this.HasSmartContract));
 
                 return entity;
+            }
+
+            public ITableEntity GetChildTableEntity()
+            {
+                return this.Child.CreateTableEntity(this.Network);
+            }
+
+            public IIndexed GetChild()
+            {
+                return this.Child;
             }
 
             /// <summary>
@@ -183,10 +332,6 @@
                 return this.HasSmartContract;
             }
 
-            public string TypeLetter => this.Type == TransactionEntryType.Colored ? "c" :
-                    this.Type == TransactionEntryType.ConfirmedTransaction ? "b" :
-                    this.Type == TransactionEntryType.Mempool ? "m" : "?";
-
             public TransactionEntryType GetType(string letter)
             {
                 switch (letter[0])
@@ -202,209 +347,13 @@
                 }
             }
 
-            string _PartitionKey;
+            public bool IsLoaded => this.Transaction != null &&
+                                    (this.Transaction.IsCoinBase || (this.PreviousTxOuts.Count == this.Transaction.Inputs.Count));
 
-            public string PartitionKey
+            public ITableEntity CreateTableEntity()
             {
-                get
-                {
-                    if (this._PartitionKey == null && this.TxId != null)
-                    {
-                        byte[] b = this.TxId.ToBytes();
-                        this._PartitionKey = Helper.GetPartitionKey(10, new[] { b[0], b[1] }, 0, 2);
-                    }
-
-                    return this._PartitionKey;
-                }
-            }
-
-            public DateTimeOffset Timestamp
-            {
-                get;
-                set;
-            }
-
-            public Entity(uint256 txId, ColoredTransaction colored)
-            {
-                if (txId == null)
-                {
-                    throw new ArgumentNullException("txId");
-                }
-
-                this.TxId = txId;
-                this.ColoredTransaction = colored;
-                this.Type = TransactionEntryType.Colored;
-            }
-
-            public bool IsLoaded
-            {
-                get
-                {
-                    return this.Transaction != null &&
-                        (this.Transaction.IsCoinBase || (this.PreviousTxOuts.Count == this.Transaction.Inputs.Count));
-                }
-            }
-
-            public uint256 BlockId
-            {
-                get;
-                set;
-            }
-
-            public uint256 TxId
-            {
-                get;
-                set;
-            }
-
-            public ColoredTransaction ColoredTransaction
-            {
-                get;
-                set;
-            }
-
-            public Transaction Transaction
-            {
-                get;
-                set;
-            }
-
-            readonly List<TxOut> _PreviousTxOuts = new List<TxOut>();
-
-            public List<TxOut> PreviousTxOuts
-            {
-                get
-                {
-                    return this._PreviousTxOuts;
-                }
-            }
-
-            public TransactionEntryType Type
-            {
-                get;
-                set;
-            }
-
-            public bool HasSmartContract { get; set; }
-
-            public Network Network { get; set; }
-
-            public ContractTxData ContractTxData { get; set; }
-
-            public byte[] ContractByteCode { get; set; }
-
-            public string ContractCode { get; set; }
-        }
-
-        internal TransactionEntry(Entity[] entities)
-        {
-            this.TransactionId = entities[0].TxId;
-            this.BlockIds = entities.Select(e => e.BlockId).Where(b => b != null).ToArray();
-            this.MempoolDate = entities.Where(e => e.Type == Entity.TransactionEntryType.Mempool)
-                                  .Select(e => new DateTimeOffset?(e.Timestamp))
-                                  .Min();
-            this.FirstSeen = this.MempoolDate != null ? this.MempoolDate.Value :
-                                    entities.Where(e => e.Type == Entity.TransactionEntryType.ConfirmedTransaction)
-                                  .Select(e => new DateTimeOffset?(e.Timestamp))
-                                  .Min().Value;
-
-            Entity loadedEntity = entities.FirstOrDefault(e => e.Transaction != null && e.IsLoaded);
-            if (loadedEntity == null)
-            {
-                loadedEntity = entities.FirstOrDefault(e => e.Transaction != null);
-            }
-
-            if (loadedEntity != null)
-            {
-                this.Transaction = loadedEntity.Transaction;
-                if (loadedEntity.Transaction.IsCoinBase)
-                {
-                    this.SpentCoins = new List<Spendable>();
-                }
-                else if (loadedEntity.IsLoaded)
-                {
-                    this.SpentCoins = new List<Spendable>();
-                    for (var i = 0; i < this.Transaction.Inputs.Count; i++)
-                    {
-                        this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
-                    }
-                }
-
-                this.HasSmartContract = loadedEntity.HasSmartContract;
-            }
-
-            Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
-            if (coloredLoadedEntity != null)
-            {
-                this.ColoredTransaction = coloredLoadedEntity.ColoredTransaction;
+                throw new NotImplementedException();
             }
         }
-
-        public ColoredTransaction ColoredTransaction
-        {
-            get;
-            set;
-        }
-
-        public DateTimeOffset? MempoolDate
-        {
-            get;
-            set;
-        }
-
-        public bool HasSmartContract { get; set; }
-
-        public Money Fees
-        {
-            get
-            {
-                if (this.SpentCoins == null || this.Transaction == null)
-                {
-                    return null;
-                }
-
-                if (this.Transaction.IsCoinBase)
-                {
-                    return Money.Zero;
-                }
-
-                return this.SpentCoins.Select(o => o.TxOut.Value).Sum() - this.Transaction.TotalOut;
-            }
-        }
-
-        public uint256[] BlockIds
-        {
-            get;
-            internal set;
-        }
-
-        public uint256 TransactionId
-        {
-            get;
-            internal set;
-        }
-
-        public Transaction Transaction
-        {
-            get;
-            internal set;
-        }
-
-        /// <summary>
-        /// Coins spent during the transaction, can be null if the indexer miss parent transactions
-        /// </summary>
-        public List<Spendable> SpentCoins
-        {
-            get;
-            set;
-        }
-
-        public DateTimeOffset FirstSeen
-        {
-            get;
-            set;
-        }
-
-        public Network Network { get; set; }
     }
 }

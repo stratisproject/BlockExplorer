@@ -63,14 +63,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             return result;
         }
 
+        public bool HasFullPartition => _ReadyPartitions.Count > 0;
 
-
-        public bool HasFullPartition
-        {
-            get
-            {
-                return _ReadyPartitions.Count > 0;
-            }
-        }
+        public bool IsEmpty => _CurrentPartitions.Count == 0;
     }
 }

@@ -9,9 +9,22 @@
     {
         public class Entity : IIndexed
         {
+            public Entity(TransactionEntry.Entity transactionEntity)
+            {
+                this.transactionEntity = transactionEntity;
+                this.ContractTxData = this.transactionEntity.ContractTxData;
+                this.ContractCode = this.transactionEntity.ContractCode;
+                this.ContractByteCode = this.transactionEntity.ContractByteCode;
+                this.Child = new SmartContactDetailsEntry.Entity(this);
+            }
+
             private readonly TransactionEntry.Entity transactionEntity;
 
             private string _partitionKey;
+
+            private string _rowKey;
+
+            public SmartContactDetailsEntry.Entity Child { get; set; }
 
             public string PartitionKey
             {
@@ -25,8 +38,6 @@
                     return this._partitionKey;
                 }
             }
-
-            private string _rowKey;
 
             public string RowKey
             {
@@ -51,15 +62,9 @@
 
             public string ContractCode { get; set; }
 
-            public Entity(TransactionEntry.Entity transactionEntity)
-            {
-                this.transactionEntity = transactionEntity;
-                this.ContractTxData = this.transactionEntity.ContractTxData;
-            }
-
             public ITableEntity CreateTableEntity()
             {
-                throw new NotImplementedException();
+                return this.CreateTableEntity(null);
             }
 
             public DynamicTableEntity CreateTableEntity(Network network = null)
@@ -73,6 +78,16 @@
                 entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType)); // TODO Convert to proper string name
 
                 return entity;
+            }
+
+            public ITableEntity GetChildTableEntity()
+            {
+                return this.Child.CreateTableEntity();
+            }
+
+            public IIndexed GetChild()
+            {
+                return this.Child;
             }
         }
     }

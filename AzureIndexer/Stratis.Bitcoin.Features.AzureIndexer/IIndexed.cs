@@ -8,5 +8,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         ITableEntity CreateTableEntity();
 
         DynamicTableEntity CreateTableEntity(Network network);
+
+        ITableEntity GetChildTableEntity();
+
+        IIndexed GetChild();
     }
 }

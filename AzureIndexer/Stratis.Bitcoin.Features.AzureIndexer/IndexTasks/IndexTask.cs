@@ -162,7 +162,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             Task task;
             this.logger.LogTrace("()");
             var IsSmartContract = false;
-            if (scBulk != null)
+            if (scBulk != null && !scBulk.IsEmpty)
             {
                 IsSmartContract = true;
             }
@@ -184,12 +184,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (IsSmartContract)
                 {
                     var scItem = scBulk._ReadyPartitions.Dequeue();
-                    task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2, scItem.Item1, scItem.Item2), scheduler);
+                    task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
                 }
                 else
                 {
                     task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
                 }
+
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>
                 {
@@ -273,6 +274,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
 
-        protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items, string partitionName2, IEnumerable<IIndexed> item2);
+        //protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
     }
 }

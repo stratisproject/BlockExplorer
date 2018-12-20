@@ -34,10 +34,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             throw new NotSupportedException();
         }
 
-        protected override void IndexCore(string partitionName, IEnumerable<ITableEntity> items)
-        {
-            throw new NotImplementedException();
-        }
+        //protected override void IndexCore(string partitionName, IEnumerable<ITableEntity> items, string partitionName2, IEnumerable<IIndexed> item2)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //protected override void IndexCore(string partitionName, IEnumerable<ITableEntity> items)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public void Index(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
