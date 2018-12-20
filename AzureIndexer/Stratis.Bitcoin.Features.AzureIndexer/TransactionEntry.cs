@@ -14,9 +14,10 @@
     using Stratis.SmartContracts.CLR.Serialization;
     using Stratis.SmartContracts.Core;
 
-    public class TransactionEntry
+    public partial class TransactionEntry
     {
-        public class Entity
+
+        public class Entity : IIndexed
         {
             public enum TransactionEntryType
             {

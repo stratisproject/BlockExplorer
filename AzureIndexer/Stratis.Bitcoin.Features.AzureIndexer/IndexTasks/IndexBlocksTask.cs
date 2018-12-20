@@ -98,7 +98,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             await Configuration.GetBlocksContainer().CreateIfNotExistsAsync().ConfigureAwait(false);
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<BlockInfo> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<BlockInfo> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             bulk.Add("o", block);
         }
@@ -172,6 +172,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
 
             this.logger.LogTrace("(-)");
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<BlockInfo> items, string partitionName2, IEnumerable<IIndexed> item2)
+        {
+            throw new NotImplementedException();
         }
     }
 }

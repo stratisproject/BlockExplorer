@@ -34,7 +34,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
@@ -50,6 +50,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
 
             this.logger.LogTrace("(-)");
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<OrderedBalanceChange> items)
+        {
+            throw new System.NotImplementedException();
         }
 
         private IEnumerable<OrderedBalanceChange> extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)

@@ -1,5 +1,4 @@
-﻿using System;
-using Stratis.SmartContracts.CLR;
+﻿using System.Collections.Generic;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
@@ -11,6 +10,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     {
         private readonly ILogger logger;
         private readonly IndexerConfiguration config;
+        private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
         public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
@@ -19,7 +19,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger = loggerFactory.CreateLogger(GetType().FullName);
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
@@ -29,13 +29,23 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (indexed.HasSmartContract)
                 {
                     var scEntity = new SmartContactEntry.Entity(indexed);
-
+                    smartContractBulk.Add(scEntity.PartitionKey, scEntity);
                 }
 
                 bulk.Add(indexed.PartitionKey, indexed);
             }
 
             this.logger.LogTrace("(-)");
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<TransactionEntry.Entity> items)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override void IndexCore(string partitionName, IEnumerable<TransactionEntry.Entity> items, string partitionName2, IEnumerable<IIndexed> item2)
+        {
+            throw new System.NotImplementedException();
         }
 
         protected CloudTable GetSmartContractCloudTable()
@@ -61,72 +71,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         protected ITableEntity ToTableEntity(SmartContactEntry.Entity indexed)
         {
             return indexed.CreateTableEntity(config.Network);
-        }
-    }
-
-    public class SmartContactEntry
-    {
-        public class Entity
-        {
-            private readonly TransactionEntry.Entity transactionEntity;
-
-            private string _partitionKey;
-
-            public string PartitionKey
-            {
-                get
-                {
-                    if (this._partitionKey == null && this.TxId != null)
-                    {
-                        this._partitionKey = this.TxId.ToString();
-                    }
-
-                    return this._partitionKey;
-                }
-            }
-
-            private string _rowKey;
-
-            public string RowKey
-            {
-                get
-                {
-                    if (this._rowKey == null && this.TxId != null)
-                    {
-                        this._rowKey = this.ContractTxData.ContractAddress.ToString();
-                    }
-
-                    return this._rowKey;
-                }
-            }
-
-            public DateTimeOffset Timestamp { get; set; }
-
-            public uint256 TxId { get; set; }
-
-            public ContractTxData ContractTxData { get; set; }
-
-            public byte[] ContractByteCode { get; set; }
-
-            public string ContractCode { get; set; }
-
-            public Entity(TransactionEntry.Entity transactionEntity)
-            {
-                this.transactionEntity = transactionEntity;
-            }
-
-            public DynamicTableEntity CreateTableEntity(Network configNetwork)
-            {
-                var entity = new DynamicTableEntity
-                {
-                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
-                };
-                entity.Properties.AddOrReplace("GasPrice", new EntityProperty(this.ContractTxData.GasPrice.ToString()));
-                entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
-                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType)); // TODO Convert to proper string name
-
-                return entity;
-            }
         }
     }
 }

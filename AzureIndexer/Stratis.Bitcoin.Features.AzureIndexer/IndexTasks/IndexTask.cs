@@ -7,27 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
+// ReSharper disable All
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
-    public interface IIndexTask
-    {
-        void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network);
-
-        bool SaveProgression
-        {
-            get;
-            set;
-        }
-
-        bool EnsureIsSetup
-        {
-            get;
-            set;
-        }
-    }
-
     public abstract class IndexTask<TIndexed> : IIndexTask
     {
         private readonly ILogger logger;
@@ -35,7 +20,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public IndexTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
         {
             if (configuration == null)
+            {
                 throw new ArgumentNullException("configuration");
+            }
+
             this.Configuration = configuration;
             this.SaveProgression = true;
             this.MaxQueued = 100;
@@ -66,7 +54,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     this.EnsureSetup().Wait();
                 }
 
-                BulkImport<TIndexed> bulk = new BulkImport<TIndexed>(this.PartitionSize);
+                var bulk = new BulkImport<TIndexed>(this.PartitionSize);
+                var scBulk = new BulkImport<SmartContactEntry.Entity>(this.PartitionSize);
                 if (!this.SkipToEnd)
                 {
                     try
@@ -84,14 +73,30 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                                 }
                             }
 
-                            this.ProcessBlock(block, bulk, network);
+                            if (typeof(TIndexed) == typeof(TransactionEntry.Entity))
+                            {
+                                this.ProcessBlock(block, bulk, network, scBulk);
+                            }
+                            else
+                            {
+                                this.ProcessBlock(block, bulk, network);
+                            }
+
                             if (bulk.HasFullPartition)
                             {
                                 this.EnqueueTasks(tasks, bulk, false, scheduler);
                             }
                         }
 
-                        this.EnqueueTasks(tasks, bulk, true, scheduler);
+                        if (typeof(TIndexed) == typeof(TransactionEntry.Entity))
+                        {
+                            this.EnqueueTasks(tasks, bulk, true, scheduler, scBulk);
+                            //this.EnqueueTasks(tasks, scBulk, true, scheduler);
+                        }
+                        else
+                        {
+                            this.EnqueueTasks(tasks, bulk, true, scheduler);
+                        }
                     }
                     catch (OperationCanceledException ex)
                     {
@@ -139,6 +144,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
+        private ExponentialBackoff retry = new ExponentialBackoff(15, TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(200));
+
         private void SetThrottling()
         {
             this.logger.LogTrace("()");
@@ -150,13 +157,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        ExponentialBackoff retry = new ExponentialBackoff(15, TimeSpan.FromMilliseconds(100),
-                                                              TimeSpan.FromSeconds(10),
-                                                              TimeSpan.FromMilliseconds(200));
-
-        private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler)
+        private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler, BulkImport<SmartContactEntry.Entity> scBulk = null)
         {
             this.logger.LogTrace("()");
+            var IsSmartContract = false;
+            if (scBulk != null)
+            {
+                IsSmartContract = true;
+            }
 
             if (!uncompletePartitions && !bulk.HasFullPartition)
             {
@@ -172,7 +180,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             while (bulk._ReadyPartitions.Count != 0)
             {
                 Tuple<string, TIndexed[]> item = bulk._ReadyPartitions.Dequeue();
-                Task task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
+                if (IsSmartContract)
+                {
+                    Task task = IsSmartContract : this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler) ? this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
+                }
+                else
+                {
+                    Task task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
+                }
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>
                 {
@@ -188,6 +203,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             this.logger.LogTrace("(-)");
         }
+
 
         public int MaxQueued { get; set; }
 
@@ -251,8 +267,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected abstract Task EnsureSetup();
 
-        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulk, Network network);
+        protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulkImport, Network network, BulkImport<SmartContactEntry.Entity> SmartContractBulk = null);
 
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
+
+        protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items, string partitionName2, IEnumerable<IIndexed> item2);
     }
 }
