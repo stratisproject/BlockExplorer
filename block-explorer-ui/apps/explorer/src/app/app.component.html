@@ -3,6 +3,6 @@
   <blockexplorer-breadcrumb></blockexplorer-breadcrumb>
   <div class="main-content">
     <blockexplorer-busy-indicator [hidden]="found$ | async"></blockexplorer-busy-indicator>
-    <router-outlet></router-outlet>
+    <router-outlet [hidden]="!found"></router-outlet>
   </div>
 </div>

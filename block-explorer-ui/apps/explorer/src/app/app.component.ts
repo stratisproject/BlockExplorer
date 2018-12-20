@@ -13,11 +13,16 @@ export class AppComponent implements OnDestroy {
   title = 'explorer';
   identifiedEntity$: Observable<any>;
   found$: Observable<boolean>;
+  found: boolean;
   destroyed$ = new ReplaySubject<any>();
   text = '';
 
   constructor(private globalFacade: GlobalFacade, private router: Router) {
     this.found$ = this.globalFacade.loaded$;
+    this.found$.pipe(takeUntil(this.destroyed$))
+        .subscribe(data => {
+          this.found = data;
+        });
     this.identifiedEntity$ = this.globalFacade.identifiedEntity$;
     this.identifiedEntity$.pipe(takeUntil(this.destroyed$))
         .subscribe(entity => {
@@ -26,6 +31,8 @@ export class AppComponent implements OnDestroy {
             this.router.navigate(['search', 'not-found']);
             return;
           }
+
+          if (entity === undefined) return;
 
           if (!!entity.type) type = entity.type;
           if (!!entity.transaction) type = 'TRANSACTION';
