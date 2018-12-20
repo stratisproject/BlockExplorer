@@ -159,6 +159,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         private void EnqueueTasks(ConcurrentDictionary<Task, Task> tasks, BulkImport<TIndexed> bulk, bool uncompletePartitions, TaskScheduler scheduler, BulkImport<SmartContactEntry.Entity> scBulk = null)
         {
+            Task task;
             this.logger.LogTrace("()");
             var IsSmartContract = false;
             if (scBulk != null)
@@ -182,11 +183,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 Tuple<string, TIndexed[]> item = bulk._ReadyPartitions.Dequeue();
                 if (IsSmartContract)
                 {
-                    Task task = IsSmartContract : this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler) ? this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
+                    var scItem = scBulk._ReadyPartitions.Dequeue();
+                    task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2, scItem.Item1, scItem.Item2), scheduler);
                 }
                 else
                 {
-                    Task task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
+                    task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);
                 }
                 tasks.TryAdd(task, task);
                 task.ContinueWith(prev =>

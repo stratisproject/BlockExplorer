@@ -22,21 +22,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         int _IndexedEntities = 0;
 
-        public int IndexedEntities
-        {
-            get
-            {
-                return _IndexedEntities;
-            }
-        }
+        public int IndexedEntities => _IndexedEntities;
 
-        protected override int PartitionSize
-        {
-            get
-            {
-                return 100;
-            }
-        }
+        protected override int PartitionSize => 100;
 
         protected override Task EnsureSetup()
         {
@@ -47,16 +35,22 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected abstract ITableEntity ToTableEntity(TIndexed item);
 
-        protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items, string partitionName2, IEnumerable<IIndexed> items2)
+        protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items, string partitionName2, IEnumerable<IIndexed> scItems)
         {
-            var batch = new TableBatchOperation();
+            var transactionsBatch = new TableBatchOperation();
+            var smartContractsBatch = new TableBatchOperation();
             foreach (var item in items)
             {
-                batch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
+                transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
+            }
+
+            foreach (var scItem in scItems)
+            {
+                smartContractsBatch.Add(TableOperation.InsertOrReplace(scItem.CreateTableEntity()));
             }
 
             CloudTable table = this.GetCloudTable();
-
+            CloudTable scTable = 
             var options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
@@ -66,51 +60,51 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             var context = new OperationContext();
             Queue<TableBatchOperation> batches = new Queue<TableBatchOperation>();
-            batches.Enqueue(batch);
+            batches.Enqueue(transactionsBatch);
 
             while (batches.Count > 0)
             {
-                batch = batches.Dequeue();
+                transactionsBatch = batches.Dequeue();
 
                 try
                 {
                     Stopwatch watch = new Stopwatch();
                     watch.Start();
 
-                    if (batch.Count > 1)
+                    if (transactionsBatch.Count > 1)
                     {
-                        table.ExecuteBatchAsync(batch, options, context).GetAwaiter().GetResult();
+                        table.ExecuteBatchAsync(transactionsBatch, options, context).GetAwaiter().GetResult();
                     }
                     else
                     {
-                        if (batch.Count == 1)
+                        if (transactionsBatch.Count == 1)
                         {
-                            table.ExecuteAsync(batch[0], options, context).GetAwaiter().GetResult();
+                            table.ExecuteAsync(transactionsBatch[0], options, context).GetAwaiter().GetResult();
                         }
                     }
 
-                    Interlocked.Add(ref _IndexedEntities, batch.Count);
+                    Interlocked.Add(ref _IndexedEntities, transactionsBatch.Count);
                 }
                 catch (Exception ex)
                 {
                     if (IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
                     {
                         // Reduce the size of all batches to half the size of the offending batch.
-                        int maxSize = Math.Max(1, batch.Count / 2);
+                        int maxSize = Math.Max(1, transactionsBatch.Count / 2);
                         bool workDone = false;
                         Queue<TableBatchOperation> newBatches = new Queue<TableBatchOperation>();
 
-                        for (/* starting with the current batch */; ; batch = batches.Dequeue())
+                        for (/* starting with the current batch */; ; transactionsBatch = batches.Dequeue())
                         {
-                            for (; batch.Count > maxSize; )
+                            for (; transactionsBatch.Count > maxSize; )
                             {
-                                newBatches.Enqueue(ToBatch(batch.Take(maxSize).ToList()));
-                                batch = ToBatch(batch.Skip(maxSize).ToList());
+                                newBatches.Enqueue(ToBatch(transactionsBatch.Take(maxSize).ToList()));
+                                transactionsBatch = ToBatch(transactionsBatch.Skip(maxSize).ToList());
                                 workDone = true;
                             }
 
-                            if (batch.Count > 0)
-                                newBatches.Enqueue(batch);
+                            if (transactionsBatch.Count > 0)
+                                newBatches.Enqueue(transactionsBatch);
 
                             if (batches.Count == 0)
                                 break;
@@ -123,7 +117,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     }
                     else if (Helper.IsError(ex, "EntityTooLarge"))
                     {
-                        var op = GetFaultyOperation(ex, batch);
+                        var op = GetFaultyOperation(ex, transactionsBatch);
                         var entity = (DynamicTableEntity)GetEntity(op);
                         var serialized = entity.Serialize();
 
@@ -133,12 +127,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                             .UploadFromByteArrayAsync(serialized, 0, serialized.Length).GetAwaiter().GetResult();
 
                         entity.MakeFat(serialized.Length);
-                        batches.Enqueue(batch);
+                        batches.Enqueue(transactionsBatch);
                     }
                     else
                     {
-                        IndexerTrace.ErrorWhileImportingEntitiesToAzure(batch.Select(b => GetEntity(b)).ToArray(), ex);
-                        batches.Enqueue(batch);
+                        IndexerTrace.ErrorWhileImportingEntitiesToAzure(transactionsBatch.Select(b => GetEntity(b)).ToArray(), ex);
+                        batches.Enqueue(transactionsBatch);
                         throw;
                     }
                 }

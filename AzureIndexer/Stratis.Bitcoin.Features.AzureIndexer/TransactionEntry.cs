@@ -109,6 +109,11 @@
                        + ((ulong)value[index + 7] << 56);
             }
 
+            public ITableEntity CreateTableEntity()
+            {
+                throw new NotImplementedException();
+            }
+
             public DynamicTableEntity CreateTableEntity(Network network)
             {
                 var entity = new DynamicTableEntity
@@ -324,7 +329,7 @@
                         this.SpentCoins.Add(new Spendable(this.Transaction.Inputs[i].PrevOut, loadedEntity.PreviousTxOuts[i]));
                     }
                 }
-                
+
                 this.HasSmartContract = loadedEntity.HasSmartContract;
             }
 

@@ -57,7 +57,12 @@
                 this.ContractTxData = this.transactionEntity.ContractTxData;
             }
 
-            public DynamicTableEntity CreateTableEntity(Network configNetwork)
+            public ITableEntity CreateTableEntity()
+            {
+                throw new NotImplementedException();
+            }
+
+            public DynamicTableEntity CreateTableEntity(Network network = null)
             {
                 var entity = new DynamicTableEntity
                 {
