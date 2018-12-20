@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://qbitninja-api.azurewebsites.net'
+  apiBaseUrl: 'https://stratisinttestindx.azurewebsites.net'
 };

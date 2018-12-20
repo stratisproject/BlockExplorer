@@ -36,6 +36,9 @@
         [JsonProperty("isCoinbase", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsCoinbase { get; set; }
 
+        [JsonProperty("isSmartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsSmartContract { get; set; }
+
         [JsonProperty("block", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BlockInformationModel Block { get; set; }
 
@@ -348,6 +351,9 @@
 
         [JsonProperty("isCoinstake", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool IsCoinstake { get; set; }
+
+        [JsonProperty("isSmartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsSmartContract { get; set; }
 
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public MoneyModel Amount { get; set; }

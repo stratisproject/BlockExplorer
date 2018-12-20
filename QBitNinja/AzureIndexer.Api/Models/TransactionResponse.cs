@@ -63,6 +63,7 @@ namespace QBitNinja.Client.Models
             ReceivedCoins = new List<ICoin>();
             SpentCoins = new List<ICoin>();
         }
+
         public Transaction Transaction
         {
             get;
