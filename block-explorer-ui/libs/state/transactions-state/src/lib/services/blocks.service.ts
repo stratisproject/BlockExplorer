@@ -21,7 +21,7 @@ export class BlocksService {
      * @return Success
      */
     block(block: string, headerOnly: boolean | null | undefined, extended: boolean | null | undefined): Observable<BlockResponseModel> {
-        let url_ = this.baseUrl + "/api/v1/blocks/blocks/{block}?";
+        let url_ = this.baseUrl + "/api/v1/blocks/{block}?";
         if (block === undefined || block === null)
             throw new Error("The parameter 'block' must be defined.");
         url_ = url_.replace("{block}", encodeURIComponent("" + block));
@@ -79,7 +79,7 @@ export class BlocksService {
      * @return Success
      */
     blockHeader(block: string): Observable<BlockHeaderResponseModel> {
-        let url_ = this.baseUrl + "/api/v1/blocks/blocks/{block}/header";
+        let url_ = this.baseUrl + "/api/v1/blocks/{block}/header";
         if (block === undefined || block === null)
             throw new Error("The parameter 'block' must be defined.");
         url_ = url_.replace("{block}", encodeURIComponent("" + block));

@@ -38,7 +38,7 @@ namespace AzureIndexer.Api.Controllers
         public Network Network => this.Configuration.Indexer.Network;
 
         [HttpGet]
-        [Route("blocks/{block}")]
+        [Route("{block}")]
         public async Task<BlockResponseModel> Block(string block, bool headerOnly = false, bool extended = false)
         {
             var blockData = this.blockSearchService.GetBlock(block.ToBlockFeature(), headerOnly, extended);
@@ -57,7 +57,7 @@ namespace AzureIndexer.Api.Controllers
         }
 
         [HttpGet]
-        [Route("blocks/{block}/header")]
+        [Route("{block}/header")]
         public BlockHeaderResponseModel BlockHeader(string block)
         {
             var blockData = this.blockSearchService.GetBlock(block.ToBlockFeature(), true);
