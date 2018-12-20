@@ -31,7 +31,7 @@ export class BreadcrumbComponent implements OnInit {
       url: string = '',
       breadcrumbs: Array<BreadCrumb> = []
   ): Array<BreadCrumb> {
-    //If no routeConfig is avalailable we are on the root path
+    // If no routeConfig is avalailable we are on the root path
     const label = route.routeConfig ? this.getBreadcrumbLabel(route) : 'Home';
     const path = route.routeConfig ? route.routeConfig.path : '';
     //In the routeConfig the complete path is not available,
