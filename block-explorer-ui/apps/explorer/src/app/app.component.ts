@@ -12,13 +12,12 @@ import { Router } from '@angular/router';
 export class AppComponent implements OnDestroy {
   title = 'explorer';
   identifiedEntity$: Observable<any>;
+  found$: Observable<boolean>;
   destroyed$ = new ReplaySubject<any>();
+  text = '';
 
   constructor(private globalFacade: GlobalFacade, private router: Router) {
-
-  }
-
-  find(text: string){
+    this.found$ = this.globalFacade.loaded$;
     this.identifiedEntity$ = this.globalFacade.identifiedEntity$;
     this.identifiedEntity$.pipe(takeUntil(this.destroyed$))
         .subscribe(entity => {
@@ -34,20 +33,23 @@ export class AppComponent implements OnDestroy {
 
           switch (type) {
             case 'PUBKEY_ADDRESS':
-              this.router.navigate(['addresses', text]);
+              this.router.navigate(['addresses', this.text]);
               break;
             case 'TRANSACTION':
-              this.router.navigate(['transactions', text]);
+              this.router.navigate(['transactions', this.text]);
               break;
             case 'BLOCK':
-              this.router.navigate(['blocks', text]);
+              this.router.navigate(['blocks', this.text]);
               break;
             default:
               this.router.navigate(['search', 'not-found']);
               break;
           }
         });
+  }
 
+  find(text: string){
+    this.text = text;
     this.globalFacade.identify(text);
   }
 

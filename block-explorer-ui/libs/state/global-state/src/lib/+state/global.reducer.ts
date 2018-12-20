@@ -25,7 +25,7 @@ export interface GlobalPartialState {
 }
 
 export const initialState: GlobalState = {
-  loaded: false,
+  loaded: true,
   identifiedType: undefined,
   identifiedEntity: undefined
 };
