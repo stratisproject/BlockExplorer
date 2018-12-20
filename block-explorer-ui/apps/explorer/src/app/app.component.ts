@@ -23,7 +23,7 @@ export class AppComponent implements OnDestroy {
     this.identifiedEntity$.pipe(takeUntil(this.destroyed$))
         .subscribe(entity => {
           let type = 'UNKNOWN';
-          if (!entity) {
+          if (entity === null) {
             this.router.navigate(['search', 'not-found']);
             return;
           }

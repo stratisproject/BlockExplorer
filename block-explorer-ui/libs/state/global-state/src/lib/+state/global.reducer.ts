@@ -26,8 +26,8 @@ export interface GlobalPartialState {
 
 export const initialState: GlobalState = {
   loaded: false,
-  identifiedType: null,
-  identifiedEntity: null
+  identifiedType: undefined,
+  identifiedEntity: undefined
 };
 
 export function globalReducer(
@@ -38,7 +38,8 @@ export function globalReducer(
     case GlobalActionTypes.IndentifyEntity: {
       state = {
         ...state,
-        loaded: false
+        loaded: false,
+        identifiedEntity: undefined,
       };
       break;
     }
