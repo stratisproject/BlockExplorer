@@ -86,7 +86,14 @@
                     this.Timestamp = new DateTimeOffset((long)ToUInt64(timestamp, 0), TimeSpan.Zero);
                 }
 
-                this.HasSmartContract = Convert.ToBoolean(Helper.GetEntityProperty(entity, "HasSmartContract"));
+                try
+                {
+                    this.HasSmartContract = Convert.ToBoolean(Helper.GetEntityProperty(entity, "HasSmartContract"));
+                }
+                catch
+                {
+                    this.HasSmartContract = false;
+                }
             }
 
             public static ulong ToUInt64(byte[] value, int index)

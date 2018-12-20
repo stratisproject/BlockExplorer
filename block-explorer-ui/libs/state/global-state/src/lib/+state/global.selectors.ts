@@ -17,7 +17,7 @@ const getIdentifiedEntity = createSelector(
   getGlobalState,
   getLoaded,
   (state: GlobalState, isLoaded) => {
-    return isLoaded ? state.identifiedEntity : null;
+    return isLoaded ? state.identifiedEntity : undefined;
   }
 );
 const getIdentifiedType = createSelector(

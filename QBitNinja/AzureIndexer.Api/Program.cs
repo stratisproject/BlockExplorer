@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -11,13 +12,24 @@ namespace AzureIndexer.Api
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
+            var logConfigurations = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Verbose)
                 .Enrich.FromLogContext()
                 .WriteTo.ColoredConsole()
-                // .WriteTo.RollingFile("log-{Date}.txt")
-                .CreateLogger();
+                .WriteTo.Trace();
+
+            if (Directory.Exists(@"D:\home\LogFiles\Application"))
+            {
+                logConfigurations
+                    .WriteTo.File(
+                        @"D:\home\LogFiles\Application\blockexplorerapi.txt",
+                        fileSizeLimitBytes: 1_000_000,
+                        shared: true,
+                        flushToDiskInterval: TimeSpan.FromSeconds(1));
+            }
+
+            Log.Logger = logConfigurations.CreateLogger();
 
             try
             {

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Log } from '@blockexplorer/shared/utils';
 
 @Component({
   selector: 'blockexplorer-menu-bar',
@@ -10,13 +11,13 @@ export class MenuBarComponent implements OnInit {
   @Input() searchText = '';
   @Output() find = new EventEmitter<string>();
 
-  constructor() { }
+  constructor(private log: Log) { }
 
   ngOnInit(): void {
   }
 
   enterPressed() {
-    console.log("search for", this.searchText);
+    this.log.info("search for", this.searchText);
     this.find.emit(this.searchText);
   }
 }

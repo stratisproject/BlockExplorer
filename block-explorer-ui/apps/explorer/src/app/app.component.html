@@ -2,7 +2,7 @@
   <blockexplorer-menu-bar (find)="find($event)"></blockexplorer-menu-bar>
   <blockexplorer-breadcrumb></blockexplorer-breadcrumb>
   <div class="main-content">
-    <blockexplorer-busy-indicator [hidden]="found$ | async"></blockexplorer-busy-indicator>
     <router-outlet [hidden]="!found"></router-outlet>
+    <blockexplorer-busy-indicator [hidden]="found$ | async"></blockexplorer-busy-indicator>
   </div>
 </div>
