@@ -41,7 +41,7 @@
             var response = await this.transactionSearchService.FindTransaction(uint256.Parse(txId), colored);
             var mappedResponse = this.mapper.Map<TransactionSummaryModel>(response);
 
-            if (loadSmartContractIfExists)
+            if (loadSmartContractIfExists) // TODO: put this in once we have real data && mappedResponse.IsSmartContract)
             {
                 mappedResponse.SmartContract =
                     await this.smartContractSearchService.FindSmartContract(uint256.Parse(response.TransactionId));

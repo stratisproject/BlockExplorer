@@ -91,5 +91,37 @@
                 return this.Child;
             }
         }
+
+        public SmartContactEntry()
+        {
+        }
+
+        public SmartContactEntry(DynamicTableEntity entity)
+        {
+            this.Id = entity.PartitionKey;
+
+            if (entity.Properties.ContainsKey(nameof(this.OpCode)))
+            {
+                this.OpCode = entity.Properties[nameof(this.OpCode)].StringValue;
+            }
+
+            if (entity.Properties.ContainsKey(nameof(this.MethodName)))
+            {
+                this.MethodName = entity.Properties[nameof(this.MethodName)].StringValue;
+            }
+
+            if (entity.Properties.ContainsKey(nameof(this.GasPrice)))
+            {
+                this.GasPrice = entity.Properties[nameof(this.GasPrice)].Int64Value ?? 0;
+            }
+        }
+
+        public string Id { get; set; }
+
+        public string OpCode { get; set; }
+
+        public string MethodName { get; set; }
+
+        public long GasPrice { get; set; }
     }
 }

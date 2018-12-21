@@ -44,7 +44,7 @@ export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
           if (!transaction) return;
 
           this.transactions = [transaction];
-          if (transaction.isSmartContract && !!transaction.smartContract) {
+          if (!!transaction.smartContract) {
             this.smartContract = transaction.smartContract;
           }
         });

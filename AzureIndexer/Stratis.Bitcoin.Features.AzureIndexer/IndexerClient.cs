@@ -237,7 +237,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             };
         }
 
-        public async Task<object> GetSmartContractAsync(uint256 txId)
+        public async Task<SmartContactEntry> GetSmartContractAsync(uint256 txId)
         {
             Guard.NotNull(txId, nameof(txId));
 
@@ -246,21 +246,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             query.TakeCount = 1;
 
             var result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
-            var tableEntity = result.Results.FirstOrDefault();
-            return tableEntity;
+            var entity = result.Results.Select(r => new SmartContactEntry(r)).FirstOrDefault();
+            return entity;
         }
 
-        public async Task<object> GetSmartContractDetailsAsync(uint256 smartContractId)
+        public async Task<SmartContactDetailsEntry> GetSmartContractDetailsAsync(string smartContractId)
         {
             Guard.NotNull(smartContractId, nameof(smartContractId));
 
             var table = this.Configuration.GetSmartContactDetailTable();
-            var query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, smartContractId.ToString()));
+            var query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, smartContractId));
             query.TakeCount = 1;
 
             var result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
-            var tableEntity = result.Results.FirstOrDefault();
-            return new SmartContactEntry.Entity(); tableEntity;
+            var entity = result.Results.Select(r => new SmartContactDetailsEntry(r)).FirstOrDefault();
+            return entity;
         }
 
         public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedHeader currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))

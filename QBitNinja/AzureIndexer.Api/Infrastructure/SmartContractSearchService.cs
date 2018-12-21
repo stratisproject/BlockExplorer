@@ -1,33 +1,42 @@
 ﻿namespace AzureIndexer.Api.Infrastructure
 {
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
     using System.Threading.Tasks;
-    using AutoMapper;
-    using Models;
     using Models.Response;
     using NBitcoin;
 
     public class SmartContractSearchService : ISmartContractSearchService
     {
-        private readonly ConcurrentChain chain;
         private readonly QBitNinjaConfiguration configuration;
-        private readonly IMapper mapper;
 
-        public SmartContractSearchService(ConcurrentChain chain, QBitNinjaConfiguration configuration, IMapper mapper)
+        public SmartContractSearchService(QBitNinjaConfiguration configuration)
         {
-            this.chain = chain;
             this.configuration = configuration;
-            this.mapper = mapper;
         }
 
         public async Task<SmartContractModel> FindSmartContract(uint256 txId)
         {
             var client = this.configuration.Indexer.CreateIndexerClient();
             var smartContract = await client.GetSmartContractAsync(txId);
+            if (smartContract == null)
+            {
+                return null;
+            }
 
-            return (SmartContractModel) smartContract;
+            var smartContractModel = new SmartContractModel
+            {
+                Hash = smartContract.Id,
+                OpCode = smartContract.OpCode,
+                MethodName = smartContract.MethodName,
+                GasPrice = new MoneyModel { Satoshi = smartContract.GasPrice }
+            };
+
+            var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);
+            if (smartContractDetails != null)
+            {
+                smartContractModel.Code = smartContractDetails.Code;
+            }
+
+            return smartContractModel;
         }
     }
 }

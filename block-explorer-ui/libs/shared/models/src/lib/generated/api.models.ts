@@ -280,7 +280,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
               this.out.push(LineItemModel.fromJS(item));
       }
       this.confirmations = data["confirmations"];
-      this.smartContract = data["smartContract"] ? MoneyModel.fromJS(data["smartContract"]) : <any>undefined;
+      this.smartContract = data["smartContract"] ? SmartContractModel.fromJS(data["smartContract"]) : <any>undefined;
     }
   }
 

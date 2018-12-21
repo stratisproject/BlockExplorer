@@ -49,5 +49,19 @@
                 return null;
             }
         }
+
+        public SmartContactDetailsEntry()
+        {
+        }
+
+        public SmartContactDetailsEntry(DynamicTableEntity entity)
+        {
+            if (entity.Properties.ContainsKey("CSharpCode"))
+            {
+                this.Code = entity.Properties["CSharpCode"].StringValue;
+            }
+        }
+
+        public string Code { get; set; }
     }
 }
