@@ -1,5 +1,9 @@
 ﻿using System;
-using Stratis.SmartContracts.CLR;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using Microsoft.WindowsAzure.Storage;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
@@ -11,15 +15,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     {
         private readonly ILogger logger;
         private readonly IndexerConfiguration config;
+        private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
         public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
         {
             this.config = configuration;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> bulk, Network network)
+
+        protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> transactionsBulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
@@ -29,13 +35,151 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (indexed.HasSmartContract)
                 {
                     var scEntity = new SmartContactEntry.Entity(indexed);
-
+                    smartContractBulk.Add(scEntity.PartitionKey, scEntity);
                 }
 
-                bulk.Add(indexed.PartitionKey, indexed);
+                transactionsBulk.Add(indexed.PartitionKey, indexed);
             }
 
             this.logger.LogTrace("(-)");
+        }
+
+        protected override void IndexCore(string txPartitionName, IEnumerable<TransactionEntry.Entity> txItems)
+        {
+            var transactionsBatch = new TableBatchOperation();
+            var smartContractsBatch = new TableBatchOperation();
+            var smartContractDetailsBatch = new TableBatchOperation();
+            foreach (var item in txItems)
+            {
+                transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
+                if (item.HasSmartContract)
+                {
+                    smartContractsBatch.Add(TableOperation.InsertOrReplace(item.GetChildTableEntity()));
+
+                    if (item.GetChild().GetChild() != null)
+                    {
+                        smartContractDetailsBatch.Add(TableOperation.InsertOrReplace(item.GetChild().GetChildTableEntity()));
+                    }
+                }
+            }
+
+            CloudTable txTable = this.GetCloudTable();
+            CloudTable scTable = this.GetSmartContractCloudTable();
+            CloudTable scdTable = this.GetSmartContractCloudDetailTable();
+
+            var options = new TableRequestOptions()
+            {
+                PayloadFormat = TablePayloadFormat.Json,
+                MaximumExecutionTime = this._Timeout,
+                ServerTimeout = this._Timeout,
+            };
+
+            var context = new OperationContext();
+            Queue<TableBatchOperation> txBatches = new Queue<TableBatchOperation>();
+            txBatches.Enqueue(transactionsBatch);
+
+            Queue<TableBatchOperation> scBatches = new Queue<TableBatchOperation>();
+            scBatches.Enqueue(smartContractsBatch);
+
+            this.SendEntities(ref transactionsBatch, txTable, options, context, ref txBatches);
+
+            if (smartContractDetailsBatch.Count > 0)
+            {
+                this.SendEntities(ref smartContractsBatch, scTable, options, context, ref scBatches);
+                if (smartContractDetailsBatch.Count > 0)
+                {
+                    Queue<TableBatchOperation> scdBatches = new Queue<TableBatchOperation>();
+                    scdBatches.Enqueue(smartContractDetailsBatch);
+                    this.SendEntities(ref smartContractDetailsBatch, scdTable, options, context, ref scdBatches);
+                }
+            }
+        }
+
+        private void SendEntities(ref TableBatchOperation transactionsBatch, CloudTable txTable, TableRequestOptions options, OperationContext context, ref Queue<TableBatchOperation> txBatches)
+        {
+            while (txBatches.Count > 0)
+            {
+                transactionsBatch = txBatches.Dequeue();
+
+                try
+                {
+                    Stopwatch watch = new Stopwatch();
+                    watch.Start();
+
+                    if (transactionsBatch.Count > 1)
+                    {
+                        txTable.ExecuteBatchAsync(transactionsBatch, options, context).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        if (transactionsBatch.Count == 1)
+                        {
+                            txTable.ExecuteAsync(transactionsBatch[0], options, context).GetAwaiter().GetResult();
+                        }
+                    }
+
+                    var indexedEntities = this.IndexedEntities;
+                    Interlocked.Add(ref indexedEntities, transactionsBatch.Count);
+                }
+                catch (Exception ex)
+                {
+                    this.ExceptionHandler(ex, ref transactionsBatch, ref txBatches);
+                }
+            }
+        }
+
+        private void ExceptionHandler(Exception ex, ref TableBatchOperation transactionsBatch, ref Queue<TableBatchOperation> txBatches)
+        {
+            if (this.IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
+            {
+                // Reduce the size of all batches to half the size of the offending batch.
+                var maxSize = Math.Max(1, transactionsBatch.Count / 2);
+                var workDone = false;
+                var newBatches = new Queue<TableBatchOperation>();
+
+                for ( /* starting with the current batch */;; transactionsBatch = txBatches.Dequeue())
+                {
+                    for (; transactionsBatch.Count > maxSize;)
+                    {
+                        newBatches.Enqueue(this.ToBatch(transactionsBatch.Take(maxSize).ToList()));
+                        transactionsBatch = this.ToBatch(transactionsBatch.Skip(maxSize).ToList());
+                        workDone = true;
+                    }
+
+                    if (transactionsBatch.Count > 0) newBatches.Enqueue(transactionsBatch);
+
+                    if (txBatches.Count == 0) break;
+                }
+
+                txBatches = newBatches;
+
+                // Nothing could be done?
+                if (!workDone)
+                {
+                    throw new NotSupportedException();
+                }
+            }
+            else if (Helper.IsError(ex, "EntityTooLarge"))
+            {
+                TableOperation op = this.GetFaultyOperation(ex, transactionsBatch);
+                DynamicTableEntity entity = (DynamicTableEntity) this.GetEntity(op);
+                byte[] serialized = entity.Serialize();
+
+                this.Configuration.GetBlocksContainer()
+                    .GetBlockBlobReference(entity.GetFatBlobName())
+                    .UploadFromByteArrayAsync(serialized, 0, serialized.Length)
+                    .GetAwaiter()
+                    .GetResult();
+
+                entity.MakeFat(serialized.Length);
+                txBatches.Enqueue(transactionsBatch);
+            }
+            else
+            {
+                IndexerTrace.ErrorWhileImportingEntitiesToAzure(transactionsBatch.Select(b => this.GetEntity(b)).ToArray(), ex);
+                txBatches.Enqueue(transactionsBatch);
+                throw new NotSupportedException();
+            }
         }
 
         protected CloudTable GetSmartContractCloudTable()
@@ -55,78 +199,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override ITableEntity ToTableEntity(TransactionEntry.Entity indexed)
         {
-            return indexed.CreateTableEntity(config.Network);
+            return indexed.CreateTableEntity(this.config.Network);
         }
 
         protected ITableEntity ToTableEntity(SmartContactEntry.Entity indexed)
         {
-            return indexed.CreateTableEntity(config.Network);
-        }
-    }
-
-    public class SmartContactEntry
-    {
-        public class Entity
-        {
-            private readonly TransactionEntry.Entity transactionEntity;
-
-            private string _partitionKey;
-
-            public string PartitionKey
-            {
-                get
-                {
-                    if (this._partitionKey == null && this.TxId != null)
-                    {
-                        this._partitionKey = this.TxId.ToString();
-                    }
-
-                    return this._partitionKey;
-                }
-            }
-
-            private string _rowKey;
-
-            public string RowKey
-            {
-                get
-                {
-                    if (this._rowKey == null && this.TxId != null)
-                    {
-                        this._rowKey = this.ContractTxData.ContractAddress.ToString();
-                    }
-
-                    return this._rowKey;
-                }
-            }
-
-            public DateTimeOffset Timestamp { get; set; }
-
-            public uint256 TxId { get; set; }
-
-            public ContractTxData ContractTxData { get; set; }
-
-            public byte[] ContractByteCode { get; set; }
-
-            public string ContractCode { get; set; }
-
-            public Entity(TransactionEntry.Entity transactionEntity)
-            {
-                this.transactionEntity = transactionEntity;
-            }
-
-            public DynamicTableEntity CreateTableEntity(Network configNetwork)
-            {
-                var entity = new DynamicTableEntity
-                {
-                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
-                };
-                entity.Properties.AddOrReplace("GasPrice", new EntityProperty(this.ContractTxData.GasPrice.ToString()));
-                entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
-                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType)); // TODO Convert to proper string name
-
-                return entity;
-            }
+            return indexed.CreateTableEntity(this.config.Network);
         }
     }
 }
