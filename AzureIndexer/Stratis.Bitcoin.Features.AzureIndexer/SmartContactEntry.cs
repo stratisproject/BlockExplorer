@@ -32,7 +32,7 @@
                 {
                     if (this._partitionKey == null && this.TxId != null)
                     {
-                        this._partitionKey = this.TxId.ToString();
+                        this._partitionKey = this.ContractTxData.ContractAddress.ToString();
                     }
 
                     return this._partitionKey;
@@ -45,7 +45,7 @@
                 {
                     if (this._rowKey == null && this.TxId != null)
                     {
-                        this._rowKey = this.ContractTxData.ContractAddress.ToString();
+                        this._rowKey = this.TxId.ToString();
                     }
 
                     return this._rowKey;
