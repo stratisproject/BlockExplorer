@@ -9,6 +9,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         private readonly ILogger logger;
 
         WalletRuleEntryCollection _WalletRules;
+
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
             : base(conf, loggerFactory)
         {
@@ -34,7 +35,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             }
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
@@ -42,7 +43,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             {
                 var txId = tx.GetHash();
 
-                var entries = extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
+                var entries = Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
                 foreach (var entry in entries)
                 {
                     bulk.Add(entry.PartitionKey, entry);
@@ -52,7 +53,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        private IEnumerable<OrderedBalanceChange> extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
+        //protected override void IndexCore(string partitionName, IEnumerable<OrderedBalanceChange> items)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //protected override void IndexCore(string partitionName, IEnumerable<OrderedBalanceChange> items, string partitionName2, IEnumerable<IIndexed> item2)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        private IEnumerable<OrderedBalanceChange> Extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
             if (_WalletRules != null)
                 return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, _WalletRules, network);
