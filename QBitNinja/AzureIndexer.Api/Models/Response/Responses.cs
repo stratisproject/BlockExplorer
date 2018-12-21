@@ -378,6 +378,9 @@
 
         [JsonProperty("confirmations", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int Confirmations { get; set; }
+
+        [JsonProperty("smartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public SmartContractModel SmartContract { get; set; }
     }
 
     public class LineItemModel
@@ -1209,5 +1212,23 @@
 
         [JsonProperty("difficulty", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public double? Difficulty { get; set; }
+    }
+
+    public class SmartContractModel
+    {
+        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Hash { get; set; }
+
+        [JsonProperty("gasPrice", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public MoneyModel GasPrice { get; set; }
+
+        [JsonProperty("opCode", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string OpCode { get; set; }
+
+        [JsonProperty("methodName", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string MethodName { get; set; }
+
+        [JsonProperty("code", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Code { get; set; }
     }
 }

@@ -73,6 +73,7 @@
                 {
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
                 };
+
                 entity.Properties.AddOrReplace("GasPrice", new EntityProperty(this.ContractTxData.GasPrice));
                 entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
                 entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType)); // TODO Convert to proper string name

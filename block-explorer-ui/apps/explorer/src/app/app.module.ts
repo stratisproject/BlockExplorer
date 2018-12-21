@@ -27,6 +27,7 @@ import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-
 import { SharedModelsModule, API_BASE_URL } from '@blockexplorer/shared/models';
 import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
 import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
+import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
     UiLayoutModule,
     PrismModule,
     UiTransactionsModule,
+    UiSmartContractsModule,
     SharedModelsModule,
     SharedUtilsModule.forRoot(),
     StateGlobalStateModule.forRoot(),

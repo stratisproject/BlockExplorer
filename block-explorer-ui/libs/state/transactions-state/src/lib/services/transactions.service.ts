@@ -27,13 +27,15 @@ export class TransactionsService {
      * @param colored (optional)
      * @return Success
      */
-    transaction(txId: string, colored: boolean | null | undefined): Observable<TransactionSummaryModel> {
+    transaction(txId: string, colored: boolean | null | undefined, loadSmartContractIfExists: boolean | null | undefined): Observable<TransactionSummaryModel> {
         let url_ = this.baseUrl + "/api/v1/transactions/{txId}?";
         if (txId === undefined || txId === null)
             throw new Error("The parameter 'txId' must be defined.");
         url_ = url_.replace("{txId}", encodeURIComponent("" + txId));
         if (colored !== undefined)
             url_ += "colored=" + encodeURIComponent("" + colored) + "&";
+        if (loadSmartContractIfExists !== undefined)
+            url_ += "loadSmartContractIfExists=" + encodeURIComponent("" + loadSmartContractIfExists) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const options_ : any = {

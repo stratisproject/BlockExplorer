@@ -128,6 +128,7 @@ namespace AzureIndexer.Api
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
             builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
             builder.RegisterType<BlockSearchService>().As<IBlockSearchService>();
+            builder.RegisterType<SmartContractSearchService>().As<ISmartContractSearchService>();
             builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();

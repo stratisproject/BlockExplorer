@@ -260,7 +260,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             var result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
             var tableEntity = result.Results.FirstOrDefault();
-            return tableEntity;
+            return new SmartContactEntry.Entity(); tableEntity;
         }
 
         public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedHeader currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))

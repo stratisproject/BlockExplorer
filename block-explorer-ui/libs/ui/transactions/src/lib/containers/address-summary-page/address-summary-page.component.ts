@@ -20,22 +20,6 @@ export class AddressSummaryPageComponent implements OnInit, OnDestroy {
   addressHash = '';
   address$: Observable<BalanceSummaryModel>;
   addressDetails$: Observable<BalanceResponseModel>;
-  code = `
-using OpenQA.Selenium;
-
-namespace Stratis.Tests.UI.NetCore.Pages
-{
-    public class BasePage
-    {
-        public IWebDriver Driver { get; }
-
-        public BasePage(IWebDriver driver)
-        {
-            this.Driver = driver;
-        }
-
-    }
-}`;
 
   constructor(
     private route: ActivatedRoute,

@@ -12,15 +12,18 @@
     {
         private readonly IMapper mapper;
         private readonly ITransactionSearchService transactionSearchService;
+        private readonly ISmartContractSearchService smartContractSearchService;
 
         public TransactionsController(
             ConcurrentChain chain,
             QBitNinjaConfiguration config,
             IMapper mapper,
-            ITransactionSearchService transactionSearchService)
+            ITransactionSearchService transactionSearchService,
+            ISmartContractSearchService smartContractSearchService)
         {
             this.mapper = mapper;
             this.transactionSearchService = transactionSearchService;
+            this.smartContractSearchService = smartContractSearchService;
             this.Configuration = config;
             this.Chain = chain;
         }
@@ -33,10 +36,17 @@
 
         [HttpGet]
         [Route("{txId}")]
-        public async Task<TransactionSummaryModel> Transaction(string txId, bool colored = false)
+        public async Task<TransactionSummaryModel> Transaction(string txId, bool colored = false, bool loadSmartContractIfExists = false)
         {
             var response = await this.transactionSearchService.FindTransaction(uint256.Parse(txId), colored);
             var mappedResponse = this.mapper.Map<TransactionSummaryModel>(response);
+
+            if (loadSmartContractIfExists)
+            {
+                mappedResponse.SmartContract =
+                    await this.smartContractSearchService.FindSmartContract(uint256.Parse(response.TransactionId));
+            }
+
             return mappedResponse;
         }
     }

@@ -78,7 +78,7 @@ export class TransactionsEffects {
 
   @Effect() getTransaction$ = this.dataPersistence.fetch(TransactionsActionTypes.GetTransaction, {
     run: (action: GetTransaction, state: TransactionsPartialState) => {
-      return this.transactionsService.transaction(action.hash, false).pipe(
+      return this.transactionsService.transaction(action.hash, false, true).pipe(
         map((balance) => {
           return new TransactionLoaded(balance);
         })

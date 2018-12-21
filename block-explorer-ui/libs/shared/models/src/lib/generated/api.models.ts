@@ -240,6 +240,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
   in?: LineItemModel[] | undefined;
   out?: LineItemModel[] | undefined;
   confirmations?: number | undefined;
+  smartContract?: SmartContractModel | undefined;
 
   constructor(data?: ITransactionSummaryModel) {
     if (data) {
@@ -279,6 +280,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
               this.out.push(LineItemModel.fromJS(item));
       }
       this.confirmations = data["confirmations"];
+      this.smartContract = data["smartContract"] ? MoneyModel.fromJS(data["smartContract"]) : <any>undefined;
     }
   }
 
@@ -304,6 +306,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
               data["out"].push(item.toJSON());
       }
       data["confirmations"] = this.confirmations;
+      data["smartContract"] = this.smartContract ? this.smartContract.toJSON() : <any>undefined;
       return data;
   }
 }
@@ -321,6 +324,7 @@ export interface ITransactionSummaryModel {
   in?: LineItemModel[] | undefined;
   out?: LineItemModel[] | undefined;
   confirmations?: number | undefined;
+  smartContract?: SmartContractModel | undefined;
 }
 
 export class LineItemModel implements ILineItemModel {
@@ -1393,6 +1397,58 @@ export interface IBlockHeaderResponseModel {
   hashMerkelRoot?: string | undefined;
   bits?: string | undefined;
   difficulty?: number | undefined;
+}
+
+export class SmartContractModel implements ISmartContractModel {
+  hash?: string | undefined;
+  gasPrice?: MoneyModel | undefined;
+  opCode?: string | undefined;
+  methodName?: string | undefined;
+  code?: string | undefined;
+
+  constructor(data?: ISmartContractModel) {
+      if (data) {
+          for (const property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  static fromJS(data: any): SmartContractModel {
+      data = typeof data === 'object' ? data : {};
+      const result = new SmartContractModel();
+      result.init(data);
+      return result;
+  }
+
+  init(data?: any) {
+      if (data) {
+          this.gasPrice = data["gasPrice"] ? MoneyModel.fromJS(data["gasPrice"]) : <any>undefined;
+          this.hash = data["hash"];
+          this.code = data["code"];
+          this.opCode = data["opCode"];
+          this.methodName = data["methodName"];
+      }
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["gasPrice"] = this.gasPrice ? this.gasPrice.toJSON() : <any>undefined;
+      data["hash"] = this.hash;
+      data["code"] = this.code;
+      data["opCode"] = this.opCode;
+      data["methodName"] = this.methodName;
+      return data;
+  }
+}
+
+export interface ISmartContractModel {
+  hash?: string | undefined;
+  gasPrice?: MoneyModel | undefined;
+  opCode?: string | undefined;
+  methodName?: string | undefined;
+  code?: string | undefined;
 }
 
 export enum BalanceSummaryModelCacheHit {

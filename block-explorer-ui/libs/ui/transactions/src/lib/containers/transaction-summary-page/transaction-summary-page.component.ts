@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
-import { TransactionSummaryModel } from '@blockexplorer/shared/models';
+import { TransactionSummaryModel, SmartContractModel } from '@blockexplorer/shared/models';
 import { ActivatedRoute } from '@angular/router';
 import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
 import { takeUntil } from 'rxjs/operators';
@@ -14,25 +14,10 @@ import { Log } from '@blockexplorer/shared/utils';
 export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
   transactionsLoaded$: Observable<boolean>;
   transactions: TransactionSummaryModel[] = [];
+  smartContract: SmartContractModel = null;
   destroyed$ = new ReplaySubject<any>();
   hash = '';
   transaction$: Observable<TransactionSummaryModel>;
-  code = `
-using OpenQA.Selenium;
-
-namespace Stratis.Tests.UI.NetCore.Pages
-{
-    public class BasePage
-    {
-        public IWebDriver Driver { get; }
-
-        public BasePage(IWebDriver driver)
-        {
-            this.Driver = driver;
-        }
-
-    }
-}`;
 
   constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade, private log: Log) { }
 
@@ -53,11 +38,15 @@ namespace Stratis.Tests.UI.NetCore.Pages
     this.transaction$ = this.transactionsFacade.selectedTransaction$;
     this.transaction$.pipe(takeUntil(this.destroyed$))
         .subscribe(transaction => {
+          this.smartContract = null;
           this.transactions.length = 0;
           this.log.info('Found transaction details', transaction);
           if (!transaction) return;
 
           this.transactions = [transaction];
+          if (transaction.isSmartContract && !!transaction.smartContract) {
+            this.smartContract = transaction.smartContract;
+          }
         });
   }
 
