@@ -54,6 +54,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
                 if (item.HasSmartContract)
                 {
+                    this.logger.LogInformation($"SmartContract detected in Tx: {item.TxId}");
                     smartContractsBatch.Add(TableOperation.InsertOrReplace(item.GetChildTableEntity()));
 
                     if (item.GetChild().GetChild() != null)
@@ -85,6 +86,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             if (smartContractDetailsBatch.Count > 0)
             {
+               
                 this.SendEntities(ref smartContractsBatch, scTable, options, context, ref scBatches);
                 if (smartContractDetailsBatch.Count > 0)
                 {

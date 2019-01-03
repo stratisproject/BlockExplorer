@@ -35,21 +35,11 @@
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Stratis.Bitcoin.Features.PoA">
-      <HintPath>..\..\..\StratisBitcoinFullNode\src\Stratis.Bitcoin.Features.PoA\bin\Release\netstandard2.0\Stratis.Bitcoin.Features.PoA.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Networks">
-      <HintPath>C:\Users\aleksei.kogtev\.nuget\packages\stratis.bitcoin.networks\1.2.4-beta\lib\netstandard2.0\Stratis.Bitcoin.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
     <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\..\..\FederatedSidechains\src\Stratis.Sidechains.Networks\bin\Release\netcoreapp2.1\Stratis.Sidechains.Networks.dll</HintPath>
-      <Private>true</Private>
+      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
     </Reference>
     <Reference Include="Stratis.SmartContracts.Networks">
-      <HintPath>..\..\..\StratisBitcoinFullNode\src\Stratis.SmartContracts.Networks\bin\Release\netcoreapp2.1\Stratis.SmartContracts.Networks.dll</HintPath>
-      <Private>true</Private>
+      <HintPath>..\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
     </Reference>
   </ItemGroup>
 
