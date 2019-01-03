@@ -20,10 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.0" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="0.0.2-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.0" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.SmartContracts.CLR" Version="0.0.2-beta" />
     <PackageReference Include="Stratis.SmartContracts.Standards" Version="0.0.2-beta" />	
   </ItemGroup>
@@ -39,12 +39,15 @@
   <ItemGroup>
     <Reference Include="Stratis.Bitcoin.Features.PoA">
       <HintPath>..\..\..\StratisBitcoinFullNode\src\Stratis.Bitcoin.Features.PoA\bin\Release\netstandard2.0\Stratis.Bitcoin.Features.PoA.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Stratis.Sidechains.Networks">
       <HintPath>..\..\..\FederatedSidechains\src\Stratis.Sidechains.Networks\bin\Release\netcoreapp2.1\Stratis.Sidechains.Networks.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Stratis.SmartContracts.Networks">
       <HintPath>..\..\..\StratisBitcoinFullNode\src\Stratis.SmartContracts.Networks\bin\Release\netcoreapp2.1\Stratis.SmartContracts.Networks.dll</HintPath>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
 
