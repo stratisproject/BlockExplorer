@@ -1,7 +1,8 @@
-﻿using Stratis.Bitcoin.Features.SmartContracts;
+﻿using Stratis.Bitcoin.Features.MemoryPool;
+using Stratis.Bitcoin.Features.SmartContracts;
 using Stratis.Bitcoin.Features.SmartContracts.PoA;
 using Stratis.Bitcoin.Features.SmartContracts.Wallet;
-using Stratis.SmartContracts.Networks;
+using Stratis.Sidechains.Networks;
 
 namespace Stratis.Bitcoin.Indexer.Console
 {
@@ -28,11 +29,17 @@ namespace Stratis.Bitcoin.Indexer.Console
         {
             try
             {
-                NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                //NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                var nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
                 IFullNode node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
-                    .UsePosConsensus()
                     .UseBlockStore()
+                    .UseMempool()
+                    .AddSmartContracts()
+                    .UseSmartContractPoAConsensus()
+                    .UseSmartContractPoAMining()
+                    .UseSmartContractWallet()
+                    .UseReflectionExecutor()
                     .UseAzureIndexer()
                     .Build();
 

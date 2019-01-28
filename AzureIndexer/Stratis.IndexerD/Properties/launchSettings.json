@@ -2,7 +2,7 @@
   "profiles": {
     "Stratis.IndexerD": {
       "commandName": "Project",
-      "commandLineArgs": "stratis -testnet -azemu=0 -azureacc=blockexplorertestnetdev -azurekey=VFWBbeYRfbt85XXKloQkT0dZ1zupk3I4CBEmJcjq/0PaFpMUuDOz4FRVgWWpOjepOqQIMfnkAPDAK83eaQ/6rw== -addnode=109.150.17.24 -addnode=80.200.67.186 -addnode=104.211.178.243 -addnode=13.70.81.5 -addnode=51.145.3.121"
+      "commandLineArgs": "stratis -azemu=0 -azureacc=blockexplorertestnetdev -azurekey=VFWBbeYRfbt85XXKloQkT0dZ1zupk3I4CBEmJcjq/0PaFpMUuDOz4FRVgWWpOjepOqQIMfnkAPDAK83eaQ/6rw== "
     }
   }
 }

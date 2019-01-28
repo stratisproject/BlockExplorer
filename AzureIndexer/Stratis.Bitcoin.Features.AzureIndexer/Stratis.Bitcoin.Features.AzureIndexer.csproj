@@ -29,17 +29,18 @@
     <PackageReference Include="Stratis.Bitcoin" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.0.4-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="0.0.2-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="0.0.6-beta" />
     <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="0.0.6-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
+    <Reference Include="Stratis.SidechainD">
+      <HintPath>..\..\..\FederatedSidechains\src\Stratis.SidechainD\bin\Release\netcoreapp2.1\Stratis.SidechainD.dll</HintPath>
     </Reference>
-    <Reference Include="Stratis.SmartContracts.Networks">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
+    <Reference Include="Stratis.Sidechains.Networks">
+      <HintPath>..\..\..\FederatedSidechains\src\Stratis.SidechainD\bin\Release\netcoreapp2.1\Stratis.Sidechains.Networks.dll</HintPath>
     </Reference>
   </ItemGroup>
 
