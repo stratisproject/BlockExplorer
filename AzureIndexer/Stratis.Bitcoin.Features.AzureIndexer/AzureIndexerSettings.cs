@@ -52,12 +52,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.StorageNamespace = "";
             this.CheckpointsetName = "default";
             this.CheckpointInterval = TimeSpan.Parse("00:15:00");
-
-
-            // temp
-            this.AzureAccountName = "blockexplorertestnetdev";
-            this.AzureKey = "VFWBbeYRfbt85XXKloQkT0dZ1zupk3I4CBEmJcjq/0PaFpMUuDOz4FRVgWWpOjepOqQIMfnkAPDAK83eaQ/6rw==";
-
         }
 
         /// <summary>
