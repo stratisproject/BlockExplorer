@@ -22,11 +22,14 @@
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
     <PackageReference Include="Stratis.Bitcoin" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="0.0.6-beta" />
     <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.SmartContracts.CLR.Validation" Version="0.0.3-beta" />
+    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="0.0.1-beta" />
     <PackageReference Include="Stratis.SmartContracts.Standards" Version="1.0.0" />	
   </ItemGroup>
 
@@ -41,6 +44,7 @@
   <ItemGroup>
     <Reference Include="Stratis.Sidechains.Networks">
       <HintPath>..\..\..\FederatedSidechains\src\Stratis.Sidechains.Networks\bin\Release\netcoreapp2.1\Stratis.Sidechains.Networks.dll</HintPath>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
 

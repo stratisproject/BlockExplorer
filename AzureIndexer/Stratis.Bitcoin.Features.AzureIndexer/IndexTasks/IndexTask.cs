@@ -55,7 +55,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }
 
                 var bulk = new BulkImport<TIndexed>(this.PartitionSize);
-                var scBulk = new BulkImport<SmartContactEntry.Entity>(this.PartitionSize);
+                var scBulk = new BulkImport<SmartContactEntry.Entity>(1);
                 if (!this.SkipToEnd)
                 {
                     try
@@ -181,7 +181,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             while (bulk._ReadyPartitions.Count != 0)
             {
                 Tuple<string, TIndexed[]> item = bulk._ReadyPartitions.Dequeue();
-                if (IsSmartContract)
+                if (IsSmartContract && scBulk.HasFullPartition)
                 {
                     var scItem = scBulk._ReadyPartitions.Dequeue();
                     task = this.retry.Do(() => this.IndexCore(item.Item1, item.Item2), scheduler);

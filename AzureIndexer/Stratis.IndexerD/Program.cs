@@ -1,24 +1,21 @@
-﻿using Stratis.Bitcoin.Features.Api;
-using Stratis.Bitcoin.Features.MemoryPool;
-using Stratis.Bitcoin.Features.RPC;
-using Stratis.Bitcoin.Features.SmartContracts;
-using Stratis.Bitcoin.Features.SmartContracts.PoA;
-using Stratis.Bitcoin.Features.SmartContracts.Wallet;
-using Stratis.Sidechains.Networks;
-
-namespace Stratis.Bitcoin.Indexer.Console
+﻿namespace Stratis.IndexerD
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
-    using NBitcoin;
     using NBitcoin.Protocol;
+    using Stratis.Bitcoin;
     using Stratis.Bitcoin.Builder;
     using Stratis.Bitcoin.Configuration;
+    using Stratis.Bitcoin.Features.Api;
     using Stratis.Bitcoin.Features.AzureIndexer;
     using Stratis.Bitcoin.Features.BlockStore;
-    using Stratis.Bitcoin.Features.Consensus;
+    using Stratis.Bitcoin.Features.MemoryPool;
+    using Stratis.Bitcoin.Features.RPC;
+    using Stratis.Bitcoin.Features.SmartContracts;
+    using Stratis.Bitcoin.Features.SmartContracts.PoA;
+    using Stratis.Bitcoin.Features.SmartContracts.Wallet;
     using Stratis.Bitcoin.Utilities;
+    using Stratis.Sidechains.Networks;
 
     public class Program
     {
@@ -31,7 +28,6 @@ namespace Stratis.Bitcoin.Indexer.Console
         {
             try
             {
-                //NodeSettings nodeSettings = new NodeSettings(networksSelector: Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
                 var nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
                 IFullNode node = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
@@ -45,7 +41,7 @@ namespace Stratis.Bitcoin.Indexer.Console
                     .UseApi()
                     .AddRPC()
                   //  .UsePosConsensus()
-                  //   .UseAzureIndexer()
+                    .UseAzureIndexer()
                     .Build();
 
                 // Run node.
