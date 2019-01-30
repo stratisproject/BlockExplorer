@@ -109,7 +109,7 @@
 
             this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory);
 
-            var indexer = this.IndexerConfig.CreateIndexer();
+            AzureIndexer indexer = this.IndexerConfig.CreateIndexer();
             indexer.Configuration.EnsureSetup();
             indexer.TaskScheduler = new CustomThreadPoolTaskScheduler(30, 100);
             indexer.CheckpointInterval = this.indexerSettings.CheckpointInterval;
@@ -137,10 +137,14 @@
         /// </summary>
         private void UpdateStoreTip()
         {
-            var minHeight = LastProcessed(IndexerCheckpoints.Blocks).Height;
-            minHeight = Math.Min(minHeight, LastProcessed(IndexerCheckpoints.Transactions).Height);
-            minHeight = Math.Min(minHeight, LastProcessed(IndexerCheckpoints.Balances).Height);
-            minHeight = Math.Min(minHeight, LastProcessed(IndexerCheckpoints.Wallets).Height);
+            ChainedHeader lastBlocks = this.LastProcessed(IndexerCheckpoints.Blocks);
+            ChainedHeader lastTransactions = this.LastProcessed(IndexerCheckpoints.Transactions);
+            ChainedHeader lastBalances = this.LastProcessed(IndexerCheckpoints.Balances);
+            ChainedHeader lastWallets = this.LastProcessed(IndexerCheckpoints.Wallets);
+            var minHeight = lastBlocks?.Height ?? 0;
+            minHeight = Math.Min(minHeight, lastTransactions?.Height ?? 0);
+            minHeight = Math.Min(minHeight, lastBalances?.Height ?? 0);
+            minHeight = Math.Min(minHeight, lastWallets?.Height ?? 0);
             this.SetStoreTip(this.Chain.GetBlock(minHeight));
         }
 
@@ -217,7 +221,7 @@
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
 
-            var fetcher = new BlockFetcher(checkpoint, repo, this.Chain, this.Chain.FindFork(checkpoint.BlockLocator), this.loggerFactory)
+            BlockFetcher fetcher = new BlockFetcher(checkpoint, repo, this.Chain, this.Chain.FindFork(checkpoint.BlockLocator), this.loggerFactory)
             {
                 NeedSaveInterval = this.indexerSettings.CheckpointInterval,
                 FromHeight = this.StoreTip.Height + 1,
@@ -269,7 +273,9 @@
         /// <returns>The last processed block.</returns>
         private ChainedHeader LastProcessed(IndexerCheckpoints type)
         {
-            return this.Chain.FindFork(this.AzureIndexer.GetCheckpointInternal(type).BlockLocator);
+            Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(type);
+            BlockLocator blockLocator = checkpoint.BlockLocator;
+            return this.Chain.FindFork(blockLocator);
         }
 
         /// <summary>
@@ -284,9 +290,9 @@
             {
                 // Index a batch of blocks/transactions/balances/wallets
                 BlockFetcher fetcher = this.GetBlockFetcher(type);
-                if (toHeight > fetcher._LastProcessed.Height)
+                if (toHeight > (fetcher._LastProcessed?.Height ?? 0))
                 {
-                    fetcher.FromHeight = Math.Max(fetcher._LastProcessed.Height + 1, fromHeight);
+                    fetcher.FromHeight = Math.Max(fetcher._LastProcessed?.Height ?? 0 + 1, fromHeight);
                     fetcher.ToHeight = toHeight;
                     IIndexTask task = null;
                     switch (type)
@@ -331,19 +337,19 @@
                     this.logger.LogTrace("Starting indexing from {0}, to {1}", fromHeight, toHeight);
 
                     // Index a batch of blocks
-                    PerformIndexing(IndexerCheckpoints.Blocks, fromHeight, toHeight);
+                    this.PerformIndexing(IndexerCheckpoints.Blocks, fromHeight, toHeight);
 
                     // Index a batch of transactions
-                    PerformIndexing(IndexerCheckpoints.Transactions, fromHeight, toHeight);
+                    this.PerformIndexing(IndexerCheckpoints.Transactions, fromHeight, toHeight);
 
                     // Index a batch of balances
-                    PerformIndexing(IndexerCheckpoints.Balances, fromHeight, toHeight);
+                    this.PerformIndexing(IndexerCheckpoints.Balances, fromHeight, toHeight);
 
                     // Index a batch of wallets
-                    PerformIndexing(IndexerCheckpoints.Wallets, fromHeight, toHeight);
+                    this.PerformIndexing(IndexerCheckpoints.Wallets, fromHeight, toHeight);
 
-                    // Update the StoreTip 
-                    UpdateStoreTip();
+                    // Update the StoreTip
+                    this.UpdateStoreTip();
                     this.logger.LogTrace("Indexing iteration finished");
                 }
                 catch (OperationCanceledException)

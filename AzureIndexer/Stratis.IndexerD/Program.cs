@@ -1,4 +1,6 @@
-﻿using Stratis.Bitcoin.Features.MemoryPool;
+﻿using Stratis.Bitcoin.Features.Api;
+using Stratis.Bitcoin.Features.MemoryPool;
+using Stratis.Bitcoin.Features.RPC;
 using Stratis.Bitcoin.Features.SmartContracts;
 using Stratis.Bitcoin.Features.SmartContracts.PoA;
 using Stratis.Bitcoin.Features.SmartContracts.Wallet;
@@ -40,7 +42,10 @@ namespace Stratis.Bitcoin.Indexer.Console
                     .UseSmartContractPoAMining()
                     .UseSmartContractWallet()
                     .UseReflectionExecutor()
-                    .UseAzureIndexer()
+                    .UseApi()
+                    .AddRPC()
+                  //  .UsePosConsensus()
+                  //   .UseAzureIndexer()
                     .Build();
 
                 // Run node.

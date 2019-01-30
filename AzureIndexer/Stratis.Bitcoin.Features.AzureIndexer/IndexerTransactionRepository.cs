@@ -35,7 +35,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public Task PutAsync(uint256 txId, Transaction tx)
         {
-            this._Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null));
+            this._Configuration.CreateIndexer().Index(new TransactionEntry.Entity(txId, tx, null, Configuration.Network));
             return Task.FromResult(false);
         }
 

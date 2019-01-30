@@ -101,13 +101,14 @@
 
         public class Entity : IIndexed
         {
-            public Entity(uint256 txId, Transaction tx, uint256 blockId)
+            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network)
             {
                 if (txId == null)
                 {
                     txId = tx.GetHash();
                 }
 
+                this.Network = network;
                 this.Timestamp = DateTimeOffset.UtcNow;
                 this.TxId = txId;
                 this.Transaction = tx;
