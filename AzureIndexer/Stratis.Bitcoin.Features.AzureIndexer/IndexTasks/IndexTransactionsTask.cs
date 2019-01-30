@@ -31,7 +31,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             foreach (var transaction in block.Block.Transactions)
             {
-                var indexed = new TransactionEntry.Entity(null, transaction, block.BlockId);
+                var indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network);
                 if (indexed.HasSmartContract)
                 {
                     var scEntity = new SmartContactEntry.Entity(indexed);

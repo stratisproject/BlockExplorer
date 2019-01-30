@@ -229,25 +229,25 @@
         }
 
         // TODO: Is it in use?
-        public void IndexTransactions(int height, Block block)
-        {
-            this._logger.LogTrace("()");
+        //public void IndexTransactions(int height, Block block)
+        //{
+        //    this._logger.LogTrace("()");
 
-            CloudTable table = this.Configuration.GetTransactionTable();
-            uint256 blockId = block?.GetHash();
-            IEnumerable<DynamicTableEntity> entities =
-                        block
-                        .Transactions
-                        .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
-                        .Select(c => c.CreateTableEntity(this.Configuration.Network))
-                        .AsEnumerable();
+        //    CloudTable table = this.Configuration.GetTransactionTable();
+        //    uint256 blockId = block?.GetHash();
+        //    IEnumerable<DynamicTableEntity> entities =
+        //                block
+        //                .Transactions
+        //                .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
+        //                .Select(c => c.CreateTableEntity(this.Configuration.Network))
+        //                .AsEnumerable();
 
-            this._logger.LogTrace("Indexing transactions");
+        //    this._logger.LogTrace("Indexing transactions");
 
-            this.Index(entities, table);
+        //    this.Index(entities, table);
 
-            this._logger.LogTrace("(-)");
-        }
+        //    this._logger.LogTrace("(-)");
+        //}
 
         public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {

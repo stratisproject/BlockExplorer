@@ -114,26 +114,29 @@
             Queue<DateTime> lastLogs = new Queue<DateTime>();
             Queue<int> lastHeights = new Queue<int>();
 
-            var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            var headers = _BlockHeaders.EnumerateAfter(fork);
+            ChainedHeader fork = this._BlockHeaders.FindFork(this._Checkpoint.BlockLocator);
+            IEnumerable<ChainedHeader> headers = this._BlockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height <= ToHeight);
-            var first = headers.FirstOrDefault();
-            if(first == null)
+            ChainedHeader first = headers.FirstOrDefault();
+            if (first == null)
+            {
                 yield break;
+            }
+
             var height = first.Height;
-            if(first.Height == 1)
+            if (first.Height == 1)
             {
                 headers = new[] { fork }.Concat(headers);
                 height = 0;
             }
 
-            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
+            foreach(Block block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
-                var header = _BlockHeaders.GetBlock(height);
+                ChainedHeader header = _BlockHeaders.GetBlock(height);
 
                 if (block == null)
                 {
-                    var storeTip = _BlocksRepository.GetStoreTip();
+                    Block storeTip = _BlocksRepository.GetStoreTip();
                     if (storeTip != null)
                     {
                         // Store is caught up with Chain but the block is missing from the store.

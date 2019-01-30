@@ -12,6 +12,7 @@
             public Entity(TransactionEntry.Entity transactionEntity)
             {
                 this.transactionEntity = transactionEntity;
+                this.TxId = this.transactionEntity.TxId;
                 this.ContractTxData = this.transactionEntity.ContractTxData;
                 this.ContractCode = this.transactionEntity.ContractCode;
                 this.ContractByteCode = this.transactionEntity.ContractByteCode;
