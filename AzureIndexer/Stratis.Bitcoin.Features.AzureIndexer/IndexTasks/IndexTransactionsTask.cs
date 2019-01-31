@@ -86,7 +86,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
             if (smartContractDetailsBatch.Count > 0)
             {
-               
                 this.SendEntities(ref smartContractsBatch, scTable, options, context, ref scBatches);
                 if (smartContractDetailsBatch.Count > 0)
                 {
