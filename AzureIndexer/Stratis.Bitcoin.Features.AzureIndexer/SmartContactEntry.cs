@@ -25,6 +25,8 @@
 
             private string _rowKey;
 
+            private AddressGenerator addressGenerator { get; } = new AddressGenerator();
+
             public SmartContactDetailsEntry.Entity Child { get; set; }
 
             public string PartitionKey
@@ -33,7 +35,14 @@
                 {
                     if (this._partitionKey == null && this.TxId != null)
                     {
-                        this._partitionKey = this.ContractTxData.ContractAddress.ToString();
+                        if (this.ContractTxData.IsCreateContract)
+                        {
+                            this._partitionKey = this.addressGenerator.GenerateAddress(this.TxId, 0).ToString();
+                        }
+                        else
+                        {
+                            this._partitionKey = this.ContractTxData.ContractAddress.ToString();
+                        }
                     }
 
                     return this._partitionKey;

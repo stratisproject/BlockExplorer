@@ -2,7 +2,7 @@
   "profiles": {
     "Stratis.IndexerD": {
       "commandName": "Project",
-      "commandLineArgs": "-azemu=0 -azureacc=blockexplorertestnetdev -azurekey=VFWBbeYRfbt85XXKloQkT0dZ1zupk3I4CBEmJcjq/0PaFpMUuDOz4FRVgWWpOjepOqQIMfnkAPDAK83eaQ/6rw== "
+      "commandLineArgs": "-azemu=0 -azureacc=blockexplorerstgmaindev -azurekey=D7gpV1Ezoec/O13omjzFG62t7s0GqU/wJzq8UB8Byf/cyFKa6IqtmOwv11hFZcVXQBnaW4nKIsmrQPwfLF/hcw=="
     }
   }
 }

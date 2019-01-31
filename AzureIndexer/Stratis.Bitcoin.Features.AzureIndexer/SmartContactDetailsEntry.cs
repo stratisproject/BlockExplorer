@@ -17,9 +17,9 @@
 
             public string PartitionKey => "SmartContract";
 
-            public string RowKey => this.ContractAddress.ToString();
+            public string RowKey => this.entity.PartitionKey;
 
-            public uint160 ContractAddress => this.entity.ContractTxData.ContractAddress;
+            //public uint160 ContractAddress => Convert.this.entity.PartitionKey;
 
             public string CShartCode => this.entity.ContractCode;
 
