@@ -84,9 +84,9 @@
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
                 };
 
-                entity.Properties.AddOrReplace("GasPrice", new EntityProperty(this.ContractTxData.GasPrice));
+                entity.Properties.AddOrReplace("GasPrice", new EntityProperty(Convert.ToInt64(this.ContractTxData.GasPrice)));
                 entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
-                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType)); // TODO Convert to proper string name
+                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType.ToString())); // TODO Convert to proper string name
 
                 return entity;
             }

@@ -258,7 +258,7 @@
             {
                 var entity = new DynamicTableEntity
                 {
-                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.TxId + "-" + this.TypeLetter+ "-" + this.BlockId
+                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.TxId + "-" + this.TypeLetter + "-" + this.BlockId
                 };
                 if (this.Transaction != null)
                 {
@@ -275,7 +275,7 @@
 
                 this.CheckForSmartContract(this.Transaction);
 
-                entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(this.HasSmartContract));
+                entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(Convert.ToBoolean(this.HasSmartContract)));
 
                 return entity;
             }
