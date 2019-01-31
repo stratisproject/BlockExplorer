@@ -103,7 +103,14 @@
 
             if (entity.Properties.ContainsKey(nameof(this.OpCode)))
             {
-                this.OpCode = entity.Properties[nameof(this.OpCode)].StringValue;
+                try
+                {
+                    this.OpCode = entity.Properties[nameof(this.OpCode)].StringValue;
+                }
+                catch
+                {
+                    this.OpCode = entity.Properties[nameof(this.OpCode)].Int32Value?.ToString();
+                }
             }
 
             if (entity.Properties.ContainsKey(nameof(this.MethodName)))
@@ -113,7 +120,14 @@
 
             if (entity.Properties.ContainsKey(nameof(this.GasPrice)))
             {
-                this.GasPrice = entity.Properties[nameof(this.GasPrice)].Int64Value ?? 0;
+                try
+                {
+                    this.GasPrice = entity.Properties[nameof(this.GasPrice)].DoubleValue ?? 0;
+                }
+                catch
+                {
+                    this.GasPrice = entity.Properties[nameof(this.GasPrice)].Int64Value ?? 0;
+                }
             }
         }
 
@@ -123,6 +137,6 @@
 
         public string MethodName { get; set; }
 
-        public long GasPrice { get; set; }
+        public double GasPrice { get; set; }
     }
 }

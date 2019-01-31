@@ -27,7 +27,7 @@
                 Hash = smartContract.Id,
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
-                GasPrice = new MoneyModel { Satoshi = smartContract.GasPrice }
+                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice }
             };
 
             var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);

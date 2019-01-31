@@ -437,7 +437,7 @@ namespace AzureIndexer.Api.Notifications
             {
                 var tx = ((TxPayload)message.Message.Payload).Obj;
                 ListenerTrace.Verbose("Received Transaction " + tx.GetHash());
-                _Indexer.IndexAsync(new TransactionEntry.Entity(tx.GetHash(), tx, null))
+                _Indexer.IndexAsync(new TransactionEntry.Entity(tx.GetHash(), tx, null, _Configuration.Indexer.Network))
                         .ContinueWith(HandleException);
                 _Indexer.IndexOrderedBalanceAsync(tx)
                     .ContinueWith(HandleException);
