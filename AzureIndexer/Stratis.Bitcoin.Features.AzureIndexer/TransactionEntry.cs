@@ -314,12 +314,12 @@
                     {
                         this.HasSmartContract = true;
                         this.ContractTxData = contractTxDataResult.Value;
-
                         if (!this.ContractTxData.IsCreateContract)
                         {
                             continue;
                         }
 
+                        // Get & Save Contract details just on Op_Create
                         Result<IContractModuleDefinition> contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
                         if (contractDecompileResult.IsSuccess)
                         {
