@@ -26,8 +26,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja", "QBitNinja\QBit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureIndexer.Api", "AzureIndexer.Api\AzureIndexer.Api.csproj", "{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Sidechains.Networks", "..\..\FederatedSidechains\src\Stratis.Sidechains.Networks\Stratis.Sidechains.Networks.csproj", "{1A5C6296-E508-41C4-8CB0-55E80963C136}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,14 +98,6 @@ Global
 		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
 		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.QA|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.QA|Any CPU.Build.0 = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A5C6296-E508-41C4-8CB0-55E80963C136}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
