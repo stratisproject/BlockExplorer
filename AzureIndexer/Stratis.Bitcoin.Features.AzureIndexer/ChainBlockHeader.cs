@@ -9,8 +9,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 		{
 			Stack<ChainBlockHeader> toApply = new Stack<ChainBlockHeader>();
 			foreach(var entry in entries)
-			{
-				var prev = chain.GetBlock(entry.Header.HashPrevBlock);
+            {
+                var prev = chain.GetBlock(entry.Header.HashPrevBlock);
 				if(prev == null)
 					toApply.Push(entry);
 				else

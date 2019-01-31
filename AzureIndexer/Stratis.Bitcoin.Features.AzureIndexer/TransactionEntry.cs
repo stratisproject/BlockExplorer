@@ -171,7 +171,14 @@
                 }
                 catch
                 {
-                    this.HasSmartContract = false;
+                    try
+                    {
+                        this.HasSmartContract = entity.Properties.ContainsKey("HasSmartContract") && (entity.Properties["HasSmartContract"].BooleanValue ?? false);
+                    }
+                    catch
+                    {
+                        this.HasSmartContract = false;
+                    }
                 }
             }
 
