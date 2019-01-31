@@ -29,8 +29,6 @@ import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
 import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
 import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
 
-import 'prismjs/components/prism-csharp';
-
 @NgModule({
   declarations: [AppComponent],
   imports: [
