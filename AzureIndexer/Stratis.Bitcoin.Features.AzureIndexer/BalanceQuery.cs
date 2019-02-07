@@ -1,23 +1,26 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using System;
-using System.Collections.Generic;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using NBitcoin.DataEncoders;
+
     public class UnconfirmedBalanceLocator : BalanceLocator
     {
         internal const int UnconfHeight = (int.MaxValue - 1);
+
         public UnconfirmedBalanceLocator()
         {
             SeenDate = Utils.UnixTimeToDateTime(0);
         }
+
         public UnconfirmedBalanceLocator(DateTimeOffset seenDate, uint256 transactionId = null)
         {
             SeenDate = seenDate;
             TransactionId = transactionId;
         }
+
         public new static UnconfirmedBalanceLocator Parse(string str)
         {
             var result = BalanceLocator.Parse(str);

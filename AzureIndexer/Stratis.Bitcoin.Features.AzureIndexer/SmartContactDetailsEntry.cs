@@ -19,9 +19,7 @@
 
             public string RowKey => this.entity.PartitionKey;
 
-            //public uint160 ContractAddress => Convert.this.entity.PartitionKey;
-
-            public string CShartCode => this.entity.ContractCode;
+            public string CSharpCode => this.entity.ContractCode;
 
             public ITableEntity CreateTableEntity()
             {
@@ -34,7 +32,7 @@
                 {
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
                 };
-                entity.Properties.AddOrReplace(nameof(CShartCode), new EntityProperty(this.CShartCode));
+                entity.Properties.AddOrReplace(nameof(CSharpCode), new EntityProperty(this.CSharpCode));
 
                 return entity;
             }
