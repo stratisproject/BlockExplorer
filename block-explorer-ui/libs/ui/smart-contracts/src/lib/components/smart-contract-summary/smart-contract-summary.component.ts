@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { SmartContractModel } from '@blockexplorer/shared/models';
+import 'prismjs/components/prism-csharp';
 
 @Component({
   selector: 'blockexplorer-smart-contract-summary',

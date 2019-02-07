@@ -10,6 +10,7 @@ using NBitcoin.Networks;
 using Newtonsoft.Json;
 using Serilog;
 using Stratis.Bitcoin.Networks;
+using Stratis.Sidechains.Networks;
 using Swashbuckle.AspNetCore.Swagger;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -46,7 +47,8 @@ namespace AzureIndexer.Api
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            NetworkRegistration.Register(new StratisTest());
+            var network = this.GetNetwork();
+            NetworkRegistration.Register(network);
 
             services
                 .AddMvc(options =>
@@ -93,35 +95,46 @@ namespace AzureIndexer.Api
                 var config = ctx.Resolve<QBitNinjaConfiguration>();
                 var client = ctx.Resolve<IndexerClient>();
                 var chain = new ConcurrentChain(config.Indexer.Network);
-                LoadCache(chain, config.LocalChain);
-                var changes = client.GetChainChangesUntilFork(chain.Tip, false);
                 try
                 {
-                    changes.UpdateChain(chain);
-                }
-                catch (ArgumentException) // Happen when chain in table is corrupted
-                {
-                    client.Configuration.GetChainTable().DeleteIfExistsAsync().GetAwaiter().GetResult();
-                    for (var i = 0; i < 20; i++)
+                    LoadCache(chain, config.LocalChain);
+
+                    var changes = client.GetChainChangesUntilFork(chain.Tip, false);
+                    try
                     {
-                        try
+                        changes.UpdateChain(chain);
+                    }
+                    catch (ArgumentException) // Happen when chain in table is corrupted
+                    {
+                        client.Configuration.GetChainTable().DeleteIfExistsAsync().GetAwaiter().GetResult();
+                        for (var i = 0; i < 20; i++)
                         {
-                            if (client.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult())
+                            try
                             {
-                                break;
+                                if (client.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter()
+                                    .GetResult())
+                                {
+                                    break;
+                                }
                             }
-                        }
-                        catch
-                        {
-                            // ignored
+                            catch
+                            {
+                                // ignored
+                            }
+
+                            Thread.Sleep(10000);
                         }
 
-                        Thread.Sleep(10000);
+                        client.Configuration.CreateIndexer().IndexChain(chain);
                     }
-                    client.Configuration.CreateIndexer().IndexChain(chain);
+
+                    SaveChainCache(chain, config.LocalChain);
+                }
+                catch
+                {
+                    // ignore
                 }
 
-                SaveChainCache(chain, config.LocalChain);
                 return chain;
             }).As<ConcurrentChain>().SingleInstance();
 
@@ -138,6 +151,29 @@ namespace AzureIndexer.Api
 
             // Create the IServiceProvider based on the container.
             return new AutofacServiceProvider(this.ApplicationContainer);
+        }
+
+        private Network GetNetwork()
+        {
+            var networkName = this.Configuration["Bitcoin.Network"];
+
+            switch (networkName)
+            {
+                case "CirrusMain":
+                    return FederatedPegNetwork.NetworksSelector.Mainnet();
+                case "FederatedPegTest":
+                    return FederatedPegNetwork.NetworksSelector.Testnet();
+                case "StratisMain":
+                    return new StratisMain();
+                case "StratisTest":
+                    return new StratisTest();
+                case "Main":
+                    return new BitcoinMain();
+                case "TestNet":
+                    return new BitcoinTest();
+                default:
+                    return new StratisMain();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

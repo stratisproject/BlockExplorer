@@ -58,6 +58,12 @@
             {
                 this.Code = entity.Properties["CSharpCode"].StringValue;
             }
+
+            // TODO: remove once typo is fixed
+            if (entity.Properties.ContainsKey("CShartCode"))
+            {
+                this.Code = entity.Properties["CShartCode"].StringValue;
+            }
         }
 
         public string Code { get; set; }
