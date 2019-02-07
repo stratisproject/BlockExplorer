@@ -1,4 +1,5 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿// ReSharper disable ArrangeThisQualifier
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -20,13 +21,13 @@
     public partial class IndexerClient
     {
         private Dictionary<string, Func<WalletRule>> rules = new Dictionary<string, Func<WalletRule>>();
-        private Network network;
+        private readonly Network network;
 
         public IndexerClient(IndexerConfiguration configuration)
         {
             this.Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.BalancePartitionSize = 50;
-            this.network = Configuration.Network;
+            this.network = this.Configuration.Network;
         }
 
         public IndexerConfiguration Configuration { get; }
@@ -121,8 +122,8 @@
                     e.IsFat()
                         ? new TransactionEntry.Entity(
                             await this.FetchFatEntity(e).ConfigureAwait(false),
-                            this.Configuration.Network)
-                        : new TransactionEntry.Entity(e, this.Configuration.Network));
+                            this.network)
+                        : new TransactionEntry.Entity(e, this.network));
             }
 
             if (entities.Count > 0)
@@ -136,7 +137,7 @@
                         entities[0].Transaction = result.Transaction;
                         if (entities[0].Transaction != null)
                         {
-                            await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                            await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                         }
 
                         break;
@@ -149,7 +150,7 @@
                     entities[0].ColoredTransaction = result.ColoredTransaction;
                     if (entities[0].ColoredTransaction != null)
                     {
-                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                     }
                 }
 
@@ -181,7 +182,7 @@
                     entities[0].PreviousTxOuts.AddRange(outputs);
                     if (entities[0].IsLoaded)
                     {
-                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                     }
                 }
             }
@@ -193,7 +194,7 @@
         /// <param name="lazyLoadPreviousOutput">Whether to lazy load previous output.</param>
         /// <param name="fetchColor">Fetch color.</param>
         /// <param name="txIds">Transaction ids.</param>
-        /// <returns>All transactions (with null entries for unfound transactions)</returns>
+        /// <returns>All transactions (with null entries for unfounded transactions)</returns>
         public async Task<TransactionEntry[]> GetTransactionsAsync(bool lazyLoadPreviousOutput, bool fetchColor, uint256[] txIds)
         {
             var result = new TransactionEntry[txIds.Length];
@@ -459,7 +460,7 @@
             TransactionEntry[] parents =
                 await this.GetTransactionsAsync(false, this.ColoredBalance, parentIds).ConfigureAwait(false);
 
-            NoSqlTransactionRepository cache = new NoSqlTransactionRepository(this.Configuration.Network);
+            NoSqlTransactionRepository cache = new NoSqlTransactionRepository(this.network);
             foreach (TransactionEntry parent in parents.Where(p => p != null))
             {
                 cache.Put(parent.TransactionId, parent.Transaction);
@@ -528,14 +529,14 @@
 
         public void SynchronizeChain(ChainBase chain)
         {
-            if (chain.Tip != null && chain.Genesis.HashBlock != this.Configuration.Network.GetGenesis().GetHash())
+            if (chain.Tip != null && chain.Genesis.HashBlock != this.network.GetGenesis().GetHash())
             {
                 throw new ArgumentException("Incompatible Network between the indexer and the chain", nameof(chain));
             }
 
             if (chain.Tip == null)
             {
-                Block genesis = this.Configuration.Network.GetGenesis();
+                Block genesis = this.network.GetGenesis();
                 chain.SetTip(new ChainedHeader(genesis.Header, genesis.GetHash(), 0));
             }
 
