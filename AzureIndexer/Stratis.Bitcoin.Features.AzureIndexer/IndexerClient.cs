@@ -1,7 +1,4 @@
-﻿using NBitcoin.Protocol;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using Stratis.Bitcoin.Utilities;
-
+﻿// ReSharper disable ArrangeThisQualifier
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
@@ -12,20 +9,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
     using NBitcoin.OpenAsset;
+    using Stratis.Bitcoin.Utilities;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "<Pending>")]
+
     // ReSharper disable once PartialTypeWithSinglePart
     public partial class IndexerClient
     {
         private Dictionary<string, Func<WalletRule>> rules = new Dictionary<string, Func<WalletRule>>();
+        private readonly Network network;
 
         public IndexerClient(IndexerConfiguration configuration)
         {
             this.Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.BalancePartitionSize = 50;
+            this.network = this.Configuration.Network;
         }
 
         public IndexerConfiguration Configuration { get; }
@@ -36,15 +38,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public Block GetBlock(uint256 blockId)
         {
-            var ms = new MemoryStream();
-            var container = this.Configuration.GetBlocksContainer();
+            MemoryStream ms = new MemoryStream();
+            CloudBlobContainer container = this.Configuration.GetBlocksContainer();
             try
             {
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
                 ms.Position = 0;
-                var b = this.Configuration.Network.CreateBlock();
-                var stream = new BitcoinStream(ms.ToArray());
-                stream.ConsensusFactory = this.Configuration.Network.Consensus.ConsensusFactory;
+                Block b = this.network.Consensus.ConsensusFactory.CreateBlock();
+                BitcoinStream stream = new BitcoinStream(ms.ToArray());
+                stream.ConsensusFactory = this.network.Consensus.ConsensusFactory;
                 b.ReadWrite(stream);
                 return b;
             }
@@ -100,9 +102,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             TransactionEntry result = null;
 
-            var table = this.Configuration.GetTransactionTable();
-            var searchedEntity = new TransactionEntry.Entity(txId);
-            var query = new TableQuery()
+            CloudTable table = this.Configuration.GetTransactionTable();
+            TransactionEntry.Entity searchedEntity = new TransactionEntry.Entity(txId);
+            TableQuery query = new TableQuery()
                             .Where(
                                     TableQuery.CombineFilters(
                                         TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, searchedEntity.PartitionKey),
@@ -114,14 +116,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             query.TakeCount = 10; // Should not have more
             List<TransactionEntry.Entity> entities = new List<TransactionEntry.Entity>();
-            foreach (var e in await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false))
+            foreach (DynamicTableEntity e in await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false))
             {
                 entities.Add(
                     e.IsFat()
                         ? new TransactionEntry.Entity(
                             await this.FetchFatEntity(e).ConfigureAwait(false),
-                            this.Configuration.Network)
-                        : new TransactionEntry.Entity(e, this.Configuration.Network));
+                            this.network)
+                        : new TransactionEntry.Entity(e, this.network));
             }
 
             if (entities.Count > 0)
@@ -129,13 +131,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 result = new TransactionEntry(entities.ToArray());
                 if (result.Transaction == null)
                 {
-                    foreach (var block in result.BlockIds.Select(this.GetBlock).Where(b => b != null))
+                    foreach (Block block in result.BlockIds.Select(this.GetBlock).Where(b => b != null))
                     {
                         result.Transaction = block.Transactions.FirstOrDefault(t => t.GetHash() == txId);
                         entities[0].Transaction = result.Transaction;
                         if (entities[0].Transaction != null)
                         {
-                            await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                            await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                         }
 
                         break;
@@ -148,15 +150,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     entities[0].ColoredTransaction = result.ColoredTransaction;
                     if (entities[0].ColoredTransaction != null)
                     {
-                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                     }
                 }
 
                 var needTxOut = result.SpentCoins == null && loadPreviousOutput && result.Transaction != null;
                 if (needTxOut)
                 {
-                    var inputs = result.Transaction.Inputs.Select(o => o.PrevOut).ToArray();
-                    var parents = await
+                    OutPoint[] inputs = result.Transaction.Inputs.Select(o => o.PrevOut).ToArray();
+                    TransactionEntry[] parents = await
                         this.GetTransactionsAsync(false, false, inputs
                              .Select(i => i.Hash)
                              .ToArray()).ConfigureAwait(false);
@@ -170,7 +172,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         }
                     }
 
-                    var outputs = parents.Select((p, i) => p.Transaction.Outputs[inputs[i].N]).ToArray();
+                    TxOut[] outputs = parents.Select((p, i) => p.Transaction.Outputs[inputs[i].N]).ToArray();
 
                     result.SpentCoins = Enumerable
                                             .Range(0, inputs.Length)
@@ -180,7 +182,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     entities[0].PreviousTxOuts.AddRange(outputs);
                     if (entities[0].IsLoaded)
                     {
-                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.Configuration.Network)).ConfigureAwait(false);
+                        await this.UpdateEntity(table, entities[0].CreateTableEntity(this.network)).ConfigureAwait(false);
                     }
                 }
             }
@@ -192,11 +194,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="lazyLoadPreviousOutput">Whether to lazy load previous output.</param>
         /// <param name="fetchColor">Fetch color.</param>
         /// <param name="txIds">Transaction ids.</param>
-        /// <returns>All transactions (with null entries for unfound transactions)</returns>
+        /// <returns>All transactions (with null entries for unfounded transactions)</returns>
         public async Task<TransactionEntry[]> GetTransactionsAsync(bool lazyLoadPreviousOutput, bool fetchColor, uint256[] txIds)
         {
             var result = new TransactionEntry[txIds.Length];
-            var tasks = Enumerable.Range(0, txIds.Length)
+            Task[] tasks = Enumerable.Range(0, txIds.Length)
                         .Select(i => new
                         {
                             TxId = txIds[i],
@@ -205,7 +207,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         .GroupBy(o => o.TxId, o => o.Index)
                         .Select(async (o) =>
                         {
-                            var transaction = await this.GetTransactionAsync(lazyLoadPreviousOutput, fetchColor, o.Key).ConfigureAwait(false);
+                            TransactionEntry transaction = await this.GetTransactionAsync(lazyLoadPreviousOutput, fetchColor, o.Key).ConfigureAwait(false);
                             foreach (var index in o)
                             {
                                 result[index] = transaction;
@@ -218,8 +220,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public ChainBlockHeader GetBestBlock()
         {
-            var table = this.Configuration.GetChainTable();
-            var part = table.ExecuteQuery(new TableQuery()
+            CloudTable table = this.Configuration.GetChainTable();
+            ChainPartEntry part = table.ExecuteQuery(new TableQuery()
             {
                 TakeCount = 1
             }).Select(e => new ChainPartEntry(e)).FirstOrDefault();
@@ -228,7 +230,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return null;
             }
 
-            var block = part.BlockHeaders[part.BlockHeaders.Count - 1];
+            BlockHeader block = part.BlockHeaders[part.BlockHeaders.Count - 1];
             return new ChainBlockHeader()
             {
                 BlockId = block.GetHash(),
@@ -241,12 +243,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             Guard.NotNull(txId, nameof(txId));
 
-            var table = this.Configuration.GetSmartContactTable();
-            var query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, txId.ToString()));
+            CloudTable table = this.Configuration.GetSmartContactTable();
+            TableQuery query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, txId.ToString()));
             query.TakeCount = 1;
 
-            var result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
-            var entity = result.Results.Select(r => new SmartContactEntry(r)).FirstOrDefault();
+            TableQuerySegment result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
+            SmartContactEntry entity = result.Results.Select(r => new SmartContactEntry(r)).FirstOrDefault();
             return entity;
         }
 
@@ -254,27 +256,27 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             Guard.NotNull(smartContractId, nameof(smartContractId));
 
-            var table = this.Configuration.GetSmartContactDetailTable();
-            var query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, smartContractId));
+            CloudTable table = this.Configuration.GetSmartContactDetailTable();
+            TableQuery query = new TableQuery().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, smartContractId));
             query.TakeCount = 1;
 
-            var result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
-            var entity = result.Results.Select(r => new SmartContactDetailsEntry(r)).FirstOrDefault();
+            TableQuerySegment result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
+            SmartContactDetailsEntry entity = result.Results.Select(r => new SmartContactDetailsEntry(r)).FirstOrDefault();
             return entity;
         }
 
         public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedHeader currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))
         {
-            var oldTip = currentTip;
-            var table = this.Configuration.GetChainTable();
-            foreach (var chainPart in this.ExecuteBalanceQuery(table, new TableQuery(), new[] { 1, 2, 10 })
+            ChainedHeader oldTip = currentTip;
+            CloudTable table = this.Configuration.GetChainTable();
+            foreach (ChainPartEntry chainPart in this.ExecuteBalanceQuery(table, new TableQuery(), new[] { 1, 2, 10 })
                                           .Concat(table.ExecuteQuery(new TableQuery()).Skip(2))
                                           .Select(e => new ChainPartEntry(e)))
             {
                 cancellation.ThrowIfCancellationRequested();
 
                 int height = chainPart.ChainOffset + chainPart.BlockHeaders.Count - 1;
-                foreach (var block in chainPart.BlockHeaders.Reverse<BlockHeader>())
+                foreach (BlockHeader block in chainPart.BlockHeaders.Reverse<BlockHeader>())
                 {
                     if (currentTip == null && oldTip != null)
                     {
@@ -298,7 +300,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                             throw new InvalidOperationException("Ancestor block not found in chain.");
                         }
 
-                        var chainChange = this.CreateChainChange(height, block);
+                        ChainBlockHeader chainChange = this.CreateChainChange(height, block);
                         if (chainChange.BlockId == currentTip.HashBlock)
                         {
                             if (forkIncluded)
@@ -320,9 +322,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public WalletRuleEntry[] GetWalletRules(string walletId)
         {
-            var table = this.Configuration.GetWalletRulesTable();
-            var searchedEntity = new WalletRuleEntry(walletId, null).CreateTableEntity();
-            var query = new TableQuery()
+            CloudTable table = this.Configuration.GetWalletRulesTable();
+            DynamicTableEntity searchedEntity = new WalletRuleEntry(walletId, null).CreateTableEntity();
+            TableQuery query = new TableQuery()
                                     .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, searchedEntity.PartitionKey));
             return
                 table.ExecuteQuery(query)
@@ -332,9 +334,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public WalletRuleEntry AddWalletRule(string walletId, WalletRule walletRule)
         {
-            var table = this.Configuration.GetWalletRulesTable();
-            var entry = new WalletRuleEntry(walletId, walletRule);
-            var entity = entry.CreateTableEntity();
+            CloudTable table = this.Configuration.GetWalletRulesTable();
+            WalletRuleEntry entry = new WalletRuleEntry(walletId, walletRule);
+            DynamicTableEntity entity = entry.CreateTableEntity();
             table.ExecuteAsync(TableOperation.InsertOrReplace(entity)).GetAwaiter().GetResult();
             return entry;
         }
@@ -407,12 +409,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void CleanUnconfirmedChanges(Script scriptPubKey, TimeSpan olderThan)
         {
-            var table = this.Configuration.GetBalanceTable();
+            CloudTable table = this.Configuration.GetBalanceTable();
             List<DynamicTableEntity> unconfirmed = new List<DynamicTableEntity>();
 
-            foreach (var c in table.ExecuteQuery(new BalanceQuery().CreateTableQuery(new BalanceId(scriptPubKey))))
+            foreach (DynamicTableEntity c in table.ExecuteQuery(new BalanceQuery().CreateTableQuery(new BalanceId(scriptPubKey))))
             {
-                var change = new OrderedBalanceChange(c);
+                OrderedBalanceChange change = new OrderedBalanceChange(c);
                 if (change.BlockId != null)
                 {
                     break;
@@ -428,7 +430,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             Parallel.ForEach(unconfirmed, c =>
             {
-                var t = this.Configuration.GetBalanceTable();
+                CloudTable t = this.Configuration.GetBalanceTable();
                 c.ETag = "*";
                 t.ExecuteAsync(TableOperation.Delete(c)).GetAwaiter().GetResult();
             });
@@ -454,12 +456,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return true;
             }
 
-            var parentIds = change.SpentOutpoints.Select(s => s.Hash).ToArray();
-            var parents =
+            uint256[] parentIds = change.SpentOutpoints.Select(s => s.Hash).ToArray();
+            TransactionEntry[] parents =
                 await this.GetTransactionsAsync(false, this.ColoredBalance, parentIds).ConfigureAwait(false);
 
-            var cache = new NoSqlTransactionRepository(this.Configuration.Network);
-            foreach (var parent in parents.Where(p => p != null))
+            NoSqlTransactionRepository cache = new NoSqlTransactionRepository(this.network);
+            foreach (TransactionEntry parent in parents.Where(p => p != null))
             {
                 cache.Put(parent.TransactionId, parent.Transaction);
             }
@@ -475,7 +477,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if (this.ColoredBalance && change.ColoredTransaction == null)
             {
-                var indexerRepo = new IndexerColoredTransactionRepository(this.Configuration);
+                IndexerColoredTransactionRepository indexerRepo = new IndexerColoredTransactionRepository(this.Configuration);
                 indexerRepo.Transactions = new CompositeTransactionRepository(new[] { new ReadOnlyTransactionRepository(cache), indexerRepo.Transactions });
                 var success = await change.EnsureColoredTransactionLoadedAsync(indexerRepo).ConfigureAwait(false);
                 if (!success)
@@ -484,7 +486,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
             }
 
-            var entity = change.ToEntity();
+            DynamicTableEntity entity = change.ToEntity();
             if (!change.IsEmpty)
             {
                 await this.Configuration.GetBalanceTable().ExecuteAsync(TableOperation.Merge(entity)).ConfigureAwait(false);
@@ -511,7 +513,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             Parallel.ForEach(balances, b =>
             {
-                var table = this.Configuration.GetBalanceTable();
+                CloudTable table = this.Configuration.GetBalanceTable();
                 table.ExecuteAsync(TableOperation.Delete(b.ToEntity())).GetAwaiter().GetResult();
             });
         }
@@ -519,7 +521,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public ConcurrentChain GetMainChain()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            var chain = new ConcurrentChain();
+            ConcurrentChain chain = new ConcurrentChain();
 #pragma warning restore CS0618 // Type or member is obsolete
             this.SynchronizeChain(chain);
             return chain;
@@ -527,14 +529,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void SynchronizeChain(ChainBase chain)
         {
-            if (chain.Tip != null && chain.Genesis.HashBlock != this.Configuration.Network.GetGenesis().GetHash())
+            if (chain.Tip != null && chain.Genesis.HashBlock != this.network.GetGenesis().GetHash())
             {
                 throw new ArgumentException("Incompatible Network between the indexer and the chain", nameof(chain));
             }
 
             if (chain.Tip == null)
             {
-                Block genesis = this.Configuration.Network.GetGenesis();
+                Block genesis = this.network.GetGenesis();
                 chain.SetTip(new ChainedHeader(genesis.Header, genesis.GetHash(), 0));
             }
 
@@ -567,9 +569,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private IEnumerable<OrderedBalanceChange> GetOrderedBalanceCore(BalanceId balanceId, BalanceQuery query, CancellationToken cancel)
         {
-            foreach (var partition in this.GetOrderedBalanceCoreAsync(balanceId, query, cancel))
+            foreach (Task<List<OrderedBalanceChange>> partition in this.GetOrderedBalanceCoreAsync(balanceId, query, cancel))
             {
-                foreach (var change in partition.Result)
+                foreach (OrderedBalanceChange change in partition.Result)
                 {
                     yield return change;
                 }
@@ -583,10 +585,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 query = new BalanceQuery();
             }
 
-            var table = this.Configuration.GetBalanceTable();
-            var tableQuery = this.ExecuteBalanceQuery(table, query.CreateTableQuery(balanceId), query.PageSizes);
+            CloudTable table = this.Configuration.GetBalanceTable();
+            IEnumerable<DynamicTableEntity> tableQuery = this.ExecuteBalanceQuery(table, query.CreateTableQuery(balanceId), query.PageSizes);
 
-            var partitions =
+            IEnumerable<List<LoadingTransactionTask>> partitions =
                   tableQuery
                  .Select(c => new OrderedBalanceChange(c))
                  .Select(c => new LoadingTransactionTask
@@ -607,11 +609,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private IEnumerable<Task<List<OrderedBalanceChange>>> GetOrderedBalanceCoreAsyncRaw(IEnumerable<List<LoadingTransactionTask>> partitions, CancellationToken cancel)
         {
             List<OrderedBalanceChange> result = new List<OrderedBalanceChange>();
-            foreach (var partition in partitions)
+            foreach (List<LoadingTransactionTask> partition in partitions)
             {
                 cancel.ThrowIfCancellationRequested();
-                var partitionLoading = Task.WhenAll(partition.Select(_ => _.Loaded));
-                foreach (var change in partition.Select(p => p.Change))
+                Task<bool[]> partitionLoading = Task.WhenAll(partition.Select(_ => _.Loaded));
+                foreach (OrderedBalanceChange change in partition.Select(p => p.Change))
                 {
                     result.Add(change);
                 }
@@ -653,11 +655,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             List<OrderedBalanceChange> unconfirmedList = new List<OrderedBalanceChange>();
 
             List<OrderedBalanceChange> result = new List<OrderedBalanceChange>();
-            foreach (var partition in partitions)
+            foreach (List<LoadingTransactionTask> partition in partitions)
             {
                 cancel.ThrowIfCancellationRequested();
-                var partitionLoading = Task.WhenAll(partition.Select(_ => _.Loaded));
-                foreach (var change in partition.Select(p => p.Change))
+                Task<bool[]> partitionLoading = Task.WhenAll(partition.Select(_ => _.Loaded));
+                foreach (OrderedBalanceChange change in partition.Select(p => p.Change))
                 {
                     if (change.BlockId == null)
                     {
@@ -673,7 +675,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                         while (unconfirmed.Count != 0 && change.SeenUtc < unconfirmed.Peek().SeenUtc)
                         {
-                            var unconfirmedChange = unconfirmed.Dequeue();
+                            OrderedBalanceChange unconfirmedChange = unconfirmed.Dequeue();
                             result.Add(unconfirmedChange);
                         }
 
@@ -692,7 +694,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             while (unconfirmed.Count != 0)
             {
-                var change = unconfirmed.Dequeue();
+                OrderedBalanceChange change = unconfirmed.Dequeue();
                 result.Add(change);
             }
 
@@ -706,15 +708,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             pages = pages ?? Array.Empty<int>();
             TableContinuationToken continuation = null;
-            using (var pagesEnumerator = pages.GetEnumerator())
+            using (IEnumerator<int> pagesEnumerator = pages.GetEnumerator())
             {
                 do
                 {
                     tableQuery.TakeCount = pagesEnumerator.MoveNext() ? (int?)pagesEnumerator.Current : null;
 
-                    var segment = table.ExecuteQuerySegmentedAsync(tableQuery, continuation).GetAwaiter().GetResult();
+                    TableQuerySegment segment = table.ExecuteQuerySegmentedAsync(tableQuery, continuation).GetAwaiter().GetResult();
                     continuation = segment.ContinuationToken;
-                    foreach (var entity in segment)
+                    foreach (DynamicTableEntity entity in segment)
                     {
                         yield return entity;
                     }
@@ -731,7 +733,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
 
             List<OrderedBalanceChange> toDelete = new List<OrderedBalanceChange>();
-            foreach (var entity in result)
+            foreach (OrderedBalanceChange entity in result)
             {
                 if (!this.Prepare(entity))
                 {
@@ -739,7 +741,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
             }
 
-            foreach (var deletion in toDelete)
+            foreach (OrderedBalanceChange deletion in toDelete)
             {
                 result.Remove(deletion);
             }
@@ -762,7 +764,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
             }
 
-            var serialized = entity.Serialize();
+            byte[] serialized = entity.Serialize();
             this.Configuration
                 .GetBlocksContainer()
                 .GetBlockBlobReference(entity.GetFatBlobName())
@@ -783,7 +785,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private async Task<DynamicTableEntity> FetchFatEntity(DynamicTableEntity e)
         {
-            var fatValue = e.Properties["fat"].Int32Value;
+            int? fatValue = e.Properties["fat"].Int32Value;
             if (fatValue == null)
             {
                 return e;
@@ -803,29 +805,29 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private bool MergeIntoWalletCore(string walletId, BalanceId balanceId, WalletRule rule, CancellationToken cancel)
         {
-            var indexer = this.Configuration.CreateIndexer();
+            AzureIndexer indexer = this.Configuration.CreateIndexer();
 
-            var query = new BalanceQuery()
+            BalanceQuery query = new BalanceQuery()
             {
                 From = new UnconfirmedBalanceLocator().Floor(),
                 RawOrdering = true
             };
-            var sourcesByKey = this.GetOrderedBalanceCore(balanceId, query, cancel)
+            Dictionary<string, OrderedBalanceChange> sourcesByKey = this.GetOrderedBalanceCore(balanceId, query, cancel)
                 .ToDictionary(this.GetKey);
             if (sourcesByKey.Count == 0)
             {
                 return false;
             }
 
-            var destByKey =
+            Dictionary<string, OrderedBalanceChange> destByKey =
                 this.GetOrderedBalance(walletId, query, cancel)
                 .ToDictionary(this.GetKey);
 
             List<OrderedBalanceChange> entities = new List<OrderedBalanceChange>();
-            foreach (var kv in sourcesByKey)
+            foreach (KeyValuePair<string, OrderedBalanceChange> kv in sourcesByKey)
             {
-                var source = kv.Value;
-                var existing = destByKey.TryGet(kv.Key) ?? new OrderedBalanceChange(walletId, source);
+                OrderedBalanceChange source = kv.Value;
+                OrderedBalanceChange existing = destByKey.TryGet(kv.Key) ?? new OrderedBalanceChange(walletId, source);
 
                 existing.Merge(kv.Value, rule);
                 entities.Add(existing);
