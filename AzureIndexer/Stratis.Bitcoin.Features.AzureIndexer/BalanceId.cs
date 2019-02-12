@@ -29,6 +29,23 @@
         string _balanceId;
 
         /// <summary>
+        /// Returns the partition key.
+        /// </summary>
+        public string PartitionKey
+        {
+            get
+            {
+                // Calculate the partition key if not calculated yet.
+                return this._partitionKey ?? (this._partitionKey = Helper.GetPartitionKey(10, Crc32.Compute(this._balanceId)));
+            }
+        }
+
+        /// <summary>
+        /// Gets determines if this object was constructed from a wallet id or a script.
+        /// </summary>
+        public BalanceType Type => this._balanceId.StartsWith(WalletPrefix) ? BalanceType.Wallet : BalanceType.Address;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BalanceId"/> class.
         /// Constructor for constructing a balance id from a wallet id.
         /// </summary>
@@ -93,29 +110,6 @@
         }
 
         /// <summary>
-        /// Determines if this object was constructed from a wallet id or a script.
-        /// </summary>
-        public BalanceType Type
-        {
-            get
-            {
-                return this._balanceId.StartsWith(WalletPrefix) ? BalanceType.Wallet : BalanceType.Address;
-            }
-        }
-
-        /// <summary>
-        /// Returns the partition key.
-        /// </summary>
-        public string PartitionKey
-        {
-            get
-            {
-                // Calculate the partition key if not calculated yet.
-                return this._partitionKey ?? (this._partitionKey = Helper.GetPartitionKey(10, Crc32.Compute(this._balanceId)));
-            }
-        }
-
-        /// <summary>
         /// Extracts the script that was used to construct this object, if any, and only if the script size does not exceed MaxScriptSize.
         /// </summary>
         /// <returns>The script that was used to construct this object - otherwise returns null.</returns>
@@ -132,6 +126,7 @@
         /// <summary>
         /// Returns the balance id.
         /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return this._balanceId;
@@ -141,12 +136,11 @@
         /// Sets the balance id directly.
         /// </summary>
         /// <param name="balanceId">The balance id to set.</param>
-        public static BalanceId Parse(string balanceId)
-        {
-            return new BalanceId()
+        /// <returns> Instance of BalanceId class</returns>
+        public static BalanceId Parse(string balanceId) =>
+            new BalanceId()
             {
                 _balanceId = balanceId
             };
-        }
     }
 }

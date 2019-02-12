@@ -13,13 +13,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
             : base(conf, loggerFactory)
         {
-            _WalletRules = walletRules;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this._WalletRules = walletRules;
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
-            return Configuration.GetBalanceTable();
+            return this.Configuration.GetBalanceTable();
         }
 
         protected override Microsoft.WindowsAzure.Storage.Table.ITableEntity ToTableEntity(OrderedBalanceChange item)
@@ -31,7 +31,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             get
             {
-                return _WalletRules != null && _WalletRules.Count == 0;
+                return this._WalletRules != null && this._WalletRules.Count == 0;
             }
         }
 
@@ -43,7 +43,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             {
                 var txId = tx.GetHash();
 
-                var entries = Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
+                var entries = this.Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
                 foreach (var entry in entries)
                 {
                     bulk.Add(entry.PartitionKey, entry);
@@ -53,23 +53,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        //protected override void IndexCore(string partitionName, IEnumerable<OrderedBalanceChange> items)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
-
-        //protected override void IndexCore(string partitionName, IEnumerable<OrderedBalanceChange> items, string partitionName2, IEnumerable<IIndexed> item2)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
-
         private IEnumerable<OrderedBalanceChange> Extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
-            if (_WalletRules != null)
-                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, _WalletRules, network);
+            if (this._WalletRules != null)
+            {
+                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, this._WalletRules, network);
+            }
             else
+            {
                 return OrderedBalanceChange.ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
+            }
         }
     }
 }
-
