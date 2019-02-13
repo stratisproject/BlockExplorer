@@ -11,13 +11,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             BlockHeaders = new List<BlockHeader>();
         }
 
-        public ChainPartEntry(DynamicTableEntity entity)
+        public ChainPartEntry(DynamicTableEntity entity, Network network)
         {
             ChainOffset = Helper.StringToHeight(entity.RowKey);
             BlockHeaders = new List<BlockHeader>();         
             foreach (var prop in entity.Properties)
             {
-                var header = new BlockHeader();
+                var header = network.Consensus.ConsensusFactory.CreateBlockHeader();
                 header.FromBytes(prop.Value.BinaryValue);
                 BlockHeaders.Add(header);
             }
