@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using Microsoft.WindowsAzure.Storage;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
     using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
 
@@ -29,12 +28,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             this.logger.LogTrace("()");
 
-            foreach (var transaction in block.Block.Transactions)
+            foreach (Transaction transaction in block.Block.Transactions)
             {
-                var indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network);
-                if (indexed.HasSmartContract)
+                TransactionEntry.Entity indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network);
+                if (indexed.HasSmartContract && smartContractBulk!= null)
                 {
-                    var scEntity = new SmartContactEntry.Entity(indexed);
+                    SmartContactEntry.Entity scEntity = new SmartContactEntry.Entity(indexed);
                     smartContractBulk.Add(scEntity.PartitionKey, scEntity);
                 }
 
@@ -46,10 +45,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override void IndexCore(string txPartitionName, IEnumerable<TransactionEntry.Entity> txItems)
         {
-            var transactionsBatch = new TableBatchOperation();
-            var smartContractsBatch = new TableBatchOperation();
-            var smartContractDetailsBatch = new TableBatchOperation();
-            foreach (var item in txItems)
+            TableBatchOperation transactionsBatch = new TableBatchOperation();
+            TableBatchOperation smartContractsBatch = new TableBatchOperation();
+            TableBatchOperation smartContractDetailsBatch = new TableBatchOperation();
+            foreach (TransactionEntry.Entity item in txItems)
             {
                 transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
                 if (item.HasSmartContract)
@@ -68,14 +67,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             CloudTable scTable = this.GetSmartContractCloudTable();
             CloudTable scdTable = this.GetSmartContractCloudDetailTable();
 
-            var options = new TableRequestOptions()
+            TableRequestOptions options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
                 MaximumExecutionTime = this._Timeout,
                 ServerTimeout = this._Timeout,
             };
 
-            var context = new OperationContext();
+            OperationContext context = new OperationContext();
             Queue<TableBatchOperation> txBatches = new Queue<TableBatchOperation>();
             txBatches.Enqueue(transactionsBatch);
 
@@ -147,9 +146,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                         workDone = true;
                     }
 
-                    if (transactionsBatch.Count > 0) newBatches.Enqueue(transactionsBatch);
+                    if (transactionsBatch.Count > 0)
+                    {
+                        newBatches.Enqueue(transactionsBatch);
+                    }
 
-                    if (txBatches.Count == 0) break;
+                    if (txBatches.Count == 0)
+                    {
+                        break;
+                    }
                 }
 
                 txBatches = newBatches;

@@ -1,25 +1,25 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using System.Collections.Generic;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System.Collections.Generic;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public class ChainPartEntry
     {
         public ChainPartEntry()
         {
-            BlockHeaders = new List<BlockHeader>();
+            this.BlockHeaders = new List<BlockHeader>();
         }
 
         public ChainPartEntry(DynamicTableEntity entity, Network network)
         {
-            ChainOffset = Helper.StringToHeight(entity.RowKey);
-            BlockHeaders = new List<BlockHeader>();         
+            this.ChainOffset = Helper.StringToHeight(entity.RowKey);
+            this.BlockHeaders = new List<BlockHeader>();
             foreach (var prop in entity.Properties)
             {
                 var header = network.Consensus.ConsensusFactory.CreateBlockHeader();
                 header.FromBytes(prop.Value.BinaryValue);
-                BlockHeaders.Add(header);
+                this.BlockHeaders.Add(header);
             }
         }
 
@@ -37,25 +37,32 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public BlockHeader GetHeader(int height)
         {
-            if (height < ChainOffset)
+            if (height < this.ChainOffset)
+            {
                 return null;
-            height = height - ChainOffset;
-            if (height >= BlockHeaders.Count)
+            }
+
+            height = height - this.ChainOffset;
+            if (height >= this.BlockHeaders.Count)
+            {
                 return null;
-            return BlockHeaders[height];
+            }
+
+            return this.BlockHeaders[height];
         }
 
         public DynamicTableEntity ToEntity()
         {
             DynamicTableEntity entity = new DynamicTableEntity();
             entity.PartitionKey = "a";
-            entity.RowKey = Helper.HeightToString(ChainOffset);
+            entity.RowKey = Helper.HeightToString(this.ChainOffset);
             int i = 0;
-            foreach (var header in BlockHeaders)
+            foreach (var header in this.BlockHeaders)
             {
                 entity.Properties.Add("a" + i, new EntityProperty(header.ToBytes()));
                 i++;
             }
+
             return entity;
         }
     }
