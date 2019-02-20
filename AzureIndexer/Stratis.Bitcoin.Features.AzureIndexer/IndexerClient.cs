@@ -224,7 +224,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ChainPartEntry part = table.ExecuteQuery(new TableQuery()
             {
                 TakeCount = 1
-            }).Select(e => new ChainPartEntry(e)).FirstOrDefault();
+            }).Select(e => new ChainPartEntry(e, this.Configuration.Network)).FirstOrDefault();
             if (part == null)
             {
                 return null;
@@ -271,7 +271,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             CloudTable table = this.Configuration.GetChainTable();
             foreach (ChainPartEntry chainPart in this.ExecuteBalanceQuery(table, new TableQuery(), new[] { 1, 2, 10 })
                                           .Concat(table.ExecuteQuery(new TableQuery()).Skip(2))
-                                          .Select(e => new ChainPartEntry(e)))
+                                          .Select(e => new ChainPartEntry(e, this.network)))
             {
                 cancellation.ThrowIfCancellationRequested();
 
@@ -521,7 +521,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public ConcurrentChain GetMainChain()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            ConcurrentChain chain = new ConcurrentChain();
+            ConcurrentChain chain = new ConcurrentChain(this.Configuration.Network);
 #pragma warning restore CS0618 // Type or member is obsolete
             this.SynchronizeChain(chain);
             return chain;

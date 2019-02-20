@@ -11,13 +11,13 @@
             this.BlockHeaders = new List<BlockHeader>();
         }
 
-        public ChainPartEntry(DynamicTableEntity entity)
+        public ChainPartEntry(DynamicTableEntity entity, Network network)
         {
             this.ChainOffset = Helper.StringToHeight(entity.RowKey);
             this.BlockHeaders = new List<BlockHeader>();
             foreach (var prop in entity.Properties)
             {
-                var header = new BlockHeader();
+                var header = network.Consensus.ConsensusFactory.CreateBlockHeader();
                 header.FromBytes(prop.Value.BinaryValue);
                 this.BlockHeaders.Add(header);
             }
