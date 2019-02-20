@@ -1,17 +1,17 @@
-﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Internal
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Internal
 {
+    using System;
+    using System.CodeDom.Compiler;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
+    using System.Resources;
+    using System.Runtime.CompilerServices;
+
     /// <summary>
     /// Indicates to Code Analysis that a method validates a particular parameter.
     /// </summary>

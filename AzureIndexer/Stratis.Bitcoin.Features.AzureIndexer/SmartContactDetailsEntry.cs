@@ -28,7 +28,7 @@
 
             public DynamicTableEntity CreateTableEntity(Network network)
             {
-                var entity = new DynamicTableEntity
+                DynamicTableEntity entity = new DynamicTableEntity
                 {
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
                 };

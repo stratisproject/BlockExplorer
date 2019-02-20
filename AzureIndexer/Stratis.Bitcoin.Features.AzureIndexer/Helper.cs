@@ -36,7 +36,7 @@
         public static byte[] SerializeList<T>(IEnumerable<T> items) where T : IBitcoinSerializable
         {
             MemoryStream ms = new MemoryStream();
-            foreach (var item in items)
+            foreach (T item in items)
             {
                 item.ReadWrite(ms, true);
             }
@@ -48,7 +48,7 @@
         {
             if (stream.Length == 0)
                 return null;
-            var buffer = stream.GetBuffer();
+            byte[] buffer = stream.GetBuffer();
             Array.Resize(ref buffer, (int)stream.Length);
             return buffer;
         }
@@ -102,7 +102,7 @@
             {
                 if (!entity.Properties.ContainsKey(property + i))
                     break;
-                var chunk = entity.Properties[property + i].BinaryValue;
+                byte[] chunk = entity.Properties[property + i].BinaryValue;
                 if (chunk == null || chunk.Length == 0)
                     break;
                 chunks.Add(chunk);
@@ -111,7 +111,7 @@
 
             byte[] data = new byte[chunks.Sum(o => o.Length)];
             int offset = 0;
-            foreach (var chunk in chunks)
+            foreach (byte[] chunk in chunks)
             {
                 Array.Copy(chunk, 0, data, offset, chunk.Length);
                 offset += chunk.Length;
@@ -200,7 +200,7 @@
 
         public static string GetPartitionKey(int bits, uint nbr)
         {
-            var bytes = BitConverter.GetBytes(nbr);
+            byte[] bytes = BitConverter.GetBytes(nbr);
             return GetPartitionKey(bits, bytes, 0, 4);
         }
     }

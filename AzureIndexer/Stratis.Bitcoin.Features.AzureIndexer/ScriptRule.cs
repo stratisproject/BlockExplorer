@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using NBitcoin;
+    using Newtonsoft.Json;
+
     public class ScriptRule : WalletRule
     {
         public ScriptRule(Script destination, Script redeemScript = null)

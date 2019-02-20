@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using System.Collections.Generic;
+    using Microsoft.Extensions.Logging;
+    using NBitcoin;
+
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {
         private readonly ILogger logger;
@@ -39,12 +39,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             this.logger.LogTrace("()");
 
-            foreach (var tx in block.Block.Transactions)
+            foreach (Transaction tx in block.Block.Transactions)
             {
-                var txId = tx.GetHash();
+                uint256 txId = tx.GetHash();
 
-                var entries = this.Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
-                foreach (var entry in entries)
+                IEnumerable<OrderedBalanceChange> entries = this.Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
+                foreach (OrderedBalanceChange entry in entries)
                 {
                     bulk.Add(entry.PartitionKey, entry);
                 }

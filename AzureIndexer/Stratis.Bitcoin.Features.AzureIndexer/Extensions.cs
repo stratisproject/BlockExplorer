@@ -1,16 +1,16 @@
-﻿using Microsoft.Data.OData;
-using Microsoft.WindowsAzure.Storage.Table;
-using Microsoft.WindowsAzure.Storage.Table.Protocol;
-using NBitcoin;
-using NBitcoin.Crypto;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using Microsoft.Data.OData;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using Microsoft.WindowsAzure.Storage.Table.Protocol;
+    using NBitcoin;
+    using NBitcoin.Crypto;
+
     public static class Extensions
     {
         public static IEnumerable<T> Distinct<T, TComparer>(this IEnumerable<T> input, Func<T, TComparer> comparer)
@@ -34,16 +34,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             CoinCollection result = new CoinCollection();
             Dictionary<OutPoint, ICoin> spentCoins = new Dictionary<OutPoint, ICoin>();
             Dictionary<OutPoint, ICoin> receivedCoins = new Dictionary<OutPoint, ICoin>();
-            foreach(var entry in entries)
+            foreach(OrderedBalanceChange entry in entries)
             {
                 if(entry.SpentCoins != null)
                 {
-                    foreach(var c in entry.SpentCoins)
+                    foreach(ICoin c in entry.SpentCoins)
                     {
                         spentCoins.AddOrReplace(c.Outpoint, c);
                     }
                 }
-                foreach(var c in entry.ReceivedCoins)
+                foreach(ICoin c in entry.ReceivedCoins)
                 {
                     receivedCoins.AddOrReplace(c.Outpoint, c);
                 }
@@ -104,7 +104,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             if(e.BlockId == null)
                 return minConfirmation == 0;
 
-            var b = chain.GetBlock(e.BlockId);
+            ChainedHeader b = chain.GetBlock(e.BlockId);
             if(b == null)
                 return false;
             return (chain.Height - b.Height) + 1 >= minConfirmation;
@@ -128,7 +128,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 		public static byte[] Serialize(this ITableEntity entity)
         {
             MemoryStream ms = new MemoryStream();
-            using(var messageWriter = new ODataMessageWriter(new Message(ms), new ODataMessageWriterSettings()))
+            using(ODataMessageWriter messageWriter = new ODataMessageWriter(new Message(ms), new ODataMessageWriterSettings()))
             {
                 // Create an entry writer to write a top-level entry to the message.
                 ODataWriter entryWriter = messageWriter.CreateODataEntryWriter();

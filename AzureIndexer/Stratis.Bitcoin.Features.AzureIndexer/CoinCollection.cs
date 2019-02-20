@@ -1,10 +1,10 @@
-﻿using NBitcoin;
-using NBitcoin.OpenAsset;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using NBitcoin;
+    using NBitcoin.OpenAsset;
+
     public class CoinCollection : List<ICoin>
     {
         public CoinCollection()

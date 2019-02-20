@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public class IndexerTrace
     {
 		static ILogger _Logger = NullLogger.Instance;
@@ -56,7 +56,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             StringBuilder builder = new StringBuilder();
             int i = 0;
-            foreach (var entity in entities)
+            foreach (ITableEntity entity in entities)
             {
                 builder.AppendLine("[" + i + "] " + entity.RowKey);
                 i++;
@@ -74,7 +74,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             if (span == TimeSpan.Zero)
                 return "0m";
 
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             if (span.Days > 0)
                 sb.AppendFormat("{0}d ", span.Days);
             if (span.Hours > 0)
@@ -161,17 +161,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public static void Processed(int height, int totalHeight, Queue<DateTime> lastLogs, Queue<int> lastHeights)
         {
-            var lastLog = lastLogs.LastOrDefault();
+            DateTime lastLog = lastLogs.LastOrDefault();
             if (DateTime.UtcNow - lastLog > TimeSpan.FromSeconds(10))
             {
                 if (lastHeights.Count > 0)
                 {
                     var lastHeight = lastHeights.Peek();
-                    var time = DateTimeOffset.UtcNow - lastLogs.Peek();
+                    TimeSpan time = DateTimeOffset.UtcNow - lastLogs.Peek();
 
                     var downloadedSize = GetSize(lastHeight, height);
                     var remainingSize = GetSize(height, totalHeight);
-                    var estimatedTime = downloadedSize < 1.0m ? TimeSpan.FromDays(999.0)
+                    TimeSpan estimatedTime = downloadedSize < 1.0m ? TimeSpan.FromDays(999.0)
                         : TimeSpan.FromTicks((long)((remainingSize / downloadedSize) * time.Ticks));
 					_Logger.LogInformation("Blocks {0}/{1} (estimate : {2})", height, totalHeight, Pretty(estimatedTime));
                 }

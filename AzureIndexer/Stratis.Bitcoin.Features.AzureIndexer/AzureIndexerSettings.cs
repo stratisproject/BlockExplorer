@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using NBitcoin;
-using Stratis.Bitcoin.Configuration;
-using System;
-using System.Text;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Text;
+    using Microsoft.Extensions.Logging;
+    using NBitcoin;
+    using Stratis.Bitcoin.Configuration;
+
     /// <summary>
     /// Configuration related to Azure Indexer feature.
     /// </summary>
@@ -71,7 +71,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="nodeSettings">Application configuration.</param>
         private void LoadSettingsFromConfig(NodeSettings nodeSettings)
         {
-            var config = nodeSettings.ConfigReader;
+            TextFileConfiguration config = nodeSettings.ConfigReader;
             this.AzureEmulatorUsed = config.GetOrDefault<bool>("azemu", false);
             if (!this.AzureEmulatorUsed)
             {
@@ -110,8 +110,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="mainNet">Used for network-specific help (if any).</param>
         public static void PrintHelp(Network mainNet)
         {
-            var defaults = NodeSettings.Default(mainNet);
-            var builder = new StringBuilder();
+            NodeSettings defaults = NodeSettings.Default(mainNet);
+            StringBuilder builder = new StringBuilder();
 
             builder.AppendLine($"-azureacc=<string>        Azure account name.");
             builder.AppendLine($"-azurekey=<string>        Azure account key.");

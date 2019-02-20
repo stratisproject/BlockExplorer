@@ -15,25 +15,17 @@
         {
             this.ChainOffset = Helper.StringToHeight(entity.RowKey);
             this.BlockHeaders = new List<BlockHeader>();
-            foreach (var prop in entity.Properties)
+            foreach (KeyValuePair<string, EntityProperty> prop in entity.Properties)
             {
-                var header = network.Consensus.ConsensusFactory.CreateBlockHeader();
+                BlockHeader header = network.Consensus.ConsensusFactory.CreateBlockHeader();
                 header.FromBytes(prop.Value.BinaryValue);
                 this.BlockHeaders.Add(header);
             }
         }
 
-        public int ChainOffset
-        {
-            get;
-            set;
-        }
+        public int ChainOffset { get; set; }
 
-        public List<BlockHeader> BlockHeaders
-        {
-            get;
-            private set;
-        }
+        public List<BlockHeader> BlockHeaders { get; private set; }
 
         public BlockHeader GetHeader(int height)
         {
@@ -57,7 +49,7 @@
             entity.PartitionKey = "a";
             entity.RowKey = Helper.HeightToString(this.ChainOffset);
             int i = 0;
-            foreach (var header in this.BlockHeaders)
+            foreach (BlockHeader header in this.BlockHeaders)
             {
                 entity.Properties.Add("a" + i, new EntityProperty(header.ToBytes()));
                 i++;

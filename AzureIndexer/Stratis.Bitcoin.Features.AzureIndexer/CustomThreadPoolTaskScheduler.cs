@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class CustomThreadPoolTaskScheduler : TaskScheduler, IDisposable
     {
         int _ThreadCount;
@@ -39,7 +39,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             try
             {
-                foreach (var task in _Tasks.GetConsumingEnumerable(_Cancel.Token))
+                foreach (Task task in _Tasks.GetConsumingEnumerable(_Cancel.Token))
                 {
                     Interlocked.Decrement(ref _AvailableThreads);
                     TryExecuteTask(task);

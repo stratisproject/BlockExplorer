@@ -36,22 +36,22 @@
 
          protected override void IndexCore(string partitionName, IEnumerable<TIndexed> items)
         {
-            var transactionsBatch = new TableBatchOperation();
-            foreach (var item in items)
+            TableBatchOperation transactionsBatch = new TableBatchOperation();
+            foreach (TIndexed item in items)
             {
                 transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
             }
 
             CloudTable table = this.GetCloudTable();
 
-            var options = new TableRequestOptions()
+            TableRequestOptions options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
                 MaximumExecutionTime = this._Timeout,
                 ServerTimeout = this._Timeout,
             };
 
-            var context = new OperationContext();
+            OperationContext context = new OperationContext();
             Queue<TableBatchOperation> batches = new Queue<TableBatchOperation>();
             batches.Enqueue(transactionsBatch);
 
@@ -117,9 +117,9 @@
                     }
                     else if (Helper.IsError(ex, "EntityTooLarge"))
                     {
-                        var op = GetFaultyOperation(ex, transactionsBatch);
-                        var entity = (DynamicTableEntity)GetEntity(op);
-                        var serialized = entity.Serialize();
+                        TableOperation op = GetFaultyOperation(ex, transactionsBatch);
+                        DynamicTableEntity entity = (DynamicTableEntity)GetEntity(op);
+                        byte[] serialized = entity.Serialize();
 
                         Configuration
                             .GetBlocksContainer()
@@ -248,15 +248,13 @@
 
         protected ITableEntity GetEntity(TableOperation op)
         {
-            return (ITableEntity)typeof(TableOperation).GetProperty("Entity", BindingFlags.Instance |
-                                                                              BindingFlags.NonPublic |
-                                                                              BindingFlags.Public)
+            return (ITableEntity)typeof(TableOperation).GetProperty("Entity", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
                 .GetValue(op);
         }
 
         protected bool IsError413(Exception ex)
         {
-            var storage = ex as StorageException;
+            StorageException storage = ex as StorageException;
             if (storage == null)
             {
                 return false;
@@ -272,7 +270,7 @@
                 return batch[0];
             }
 
-            var storage = ex as StorageException;
+            StorageException storage = ex as StorageException;
             if (storage == null)
             {
                 return null;
@@ -281,7 +279,7 @@
             if (storage.RequestInformation != null
                 && storage.RequestInformation.ExtendedErrorInformation != null)
             {
-                var match = Regex.Match(storage.RequestInformation.ExtendedErrorInformation.ErrorMessage, "[0-9]*");
+                Match match = Regex.Match(storage.RequestInformation.ExtendedErrorInformation.ErrorMessage, "[0-9]*");
                 if (match.Success)
                 {
                     return batch[int.Parse(match.Value)];
@@ -293,8 +291,8 @@
 
         protected TableBatchOperation ToBatch(List<TableOperation> ops)
         {
-            var op = new TableBatchOperation();
-            foreach (var operation in ops)
+            TableBatchOperation op = new TableBatchOperation();
+            foreach (TableOperation operation in ops)
             {
                 op.Add(operation);
             }

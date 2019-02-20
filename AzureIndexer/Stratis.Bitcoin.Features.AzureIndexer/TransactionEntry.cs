@@ -263,7 +263,7 @@
 
             public DynamicTableEntity CreateTableEntity(Network network)
             {
-                var entity = new DynamicTableEntity
+                DynamicTableEntity entity = new DynamicTableEntity
                 {
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.TxId + "-" + this.TypeLetter + "-" + this.BlockId
                 };
@@ -304,8 +304,8 @@
             /// <returns>True or False</returns>
             private bool CheckForSmartContract(Transaction transaction)
             {
-                var smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
-                var csharpDecompiler = new CSharpContractDecompiler();
+                CallDataSerializer smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
+                CSharpContractDecompiler csharpDecompiler = new CSharpContractDecompiler();
 
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {

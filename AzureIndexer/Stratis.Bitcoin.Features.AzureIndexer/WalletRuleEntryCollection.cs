@@ -1,11 +1,11 @@
-﻿using NBitcoin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Stratis.Bitcoin.Features.AzureIndexer.Internal;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Internal;
+
     public class WalletRuleEntryCollection : IEnumerable<WalletRuleEntry>
     {
         readonly List<WalletRuleEntry> _WalletRules;
@@ -29,7 +29,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             _EntriesByAddress = new MultiValueDictionary<Script, WalletRuleEntry>();
             _EntriesByAddressLookup = _EntriesByAddress.AsLookup();
-            foreach(var rule in walletRules)
+            foreach(WalletRuleEntry rule in walletRules)
             {
                 Add(rule);
             }
@@ -49,7 +49,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return false;
             _WalletRules.Add(entry);
             _EntriesByWallet.Add(entry.WalletId, entry);
-            var rule = entry.Rule as ScriptRule;
+            ScriptRule rule = entry.Rule as ScriptRule;
             if(rule != null)
                 _EntriesByAddress.Add(rule.ScriptPubKey, entry);
             return true;
@@ -61,7 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
         public void AddRange(IEnumerable<WalletRuleEntry> entries)
         {
-            foreach(var entry in entries)
+            foreach(WalletRuleEntry entry in entries)
                 Add(entry);
         }
 

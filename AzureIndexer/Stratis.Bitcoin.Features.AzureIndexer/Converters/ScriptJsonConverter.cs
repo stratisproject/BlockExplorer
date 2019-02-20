@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Converters
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Converters
 {
+    using System;
+    using NBitcoin;
+    using Newtonsoft.Json;
+
     public class ScriptJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

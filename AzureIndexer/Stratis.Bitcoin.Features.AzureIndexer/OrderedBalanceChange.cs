@@ -1,15 +1,15 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.OpenAsset;
-using NBitcoin.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using NBitcoin.OpenAsset;
+    using NBitcoin.Protocol;
+
     public class OrderedBalanceChange
     {
         public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(uint256 txId, Transaction transaction, uint256 blockId, BlockHeader blockHeader, int height, Network network)
@@ -31,7 +31,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             Dictionary<Script, OrderedBalanceChange> changeByScriptPubKey = new Dictionary<Script, OrderedBalanceChange>();
             uint i = 0;
-            foreach(var input in transaction.Inputs)
+            foreach(TxIn input in transaction.Inputs)
             {
                 if(transaction.IsCoinBase)
                 {
@@ -63,9 +63,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             i = 0;
             bool hasOpReturn = false;
-            foreach(var output in transaction.Outputs)
+            foreach(TxOut output in transaction.Outputs)
             {
-                var bytes = output.ScriptPubKey.ToBytes(true);
+                byte[] bytes = output.ScriptPubKey.ToBytes(true);
                 if(bytes.Length != 0 && bytes[0] == (byte)OpcodeType.OP_RETURN)
                 {
                     hasOpReturn = true;
@@ -87,7 +87,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 i++;
             }
 
-            foreach(var entity in changeByScriptPubKey)
+            foreach(KeyValuePair<Script, OrderedBalanceChange> entity in changeByScriptPubKey)
             {
                 entity.Value.HasOpReturn = hasOpReturn;
                 entity.Value.IsCoinbase = transaction.IsCoinBase;
@@ -103,7 +103,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return null;
             }
 
-            var parameters = PayToWitPubKeyHashTemplate.Instance.ExtractWitScriptParameters(network, witScript);
+            PayToWitPubkeyHashScriptSigParameters parameters = PayToWitPubKeyHashTemplate.Instance.ExtractWitScriptParameters(network, witScript);
             if(parameters != null)
             {
                 return parameters.PublicKey.WitHash;
@@ -122,10 +122,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                                                                             Network network)
         {
             Dictionary<string, OrderedBalanceChange> entitiesByWallet = new Dictionary<string, OrderedBalanceChange>();
-            var scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
-            foreach(var scriptBalance in scriptBalances)
+            IEnumerable<OrderedBalanceChange> scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
+            foreach(OrderedBalanceChange scriptBalance in scriptBalances)
             {
-                foreach(var walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
+                foreach(WalletRuleEntry walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
                 {
                     OrderedBalanceChange walletEntity = null;
                     if(!entitiesByWallet.TryGetValue(walletRuleEntry.WalletId, out walletEntity))
@@ -136,7 +136,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     walletEntity.Merge(scriptBalance, walletRuleEntry.Rule);
                 }
             }
-            foreach(var b in entitiesByWallet.Values)
+            foreach(OrderedBalanceChange b in entitiesByWallet.Values)
             {
                 b.UpdateToScriptCoins();
             }
@@ -160,7 +160,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         internal Task<bool> EnsureSpentCoinsLoadedAsync(uint256[] parentIds, Transaction[] transactions, IndexerConfiguration configuration)
         {
-            var repo = new NoSqlTransactionRepository(configuration.Network);
+            NoSqlTransactionRepository repo = new NoSqlTransactionRepository(configuration.Network);
             for(int i = 0; i < parentIds.Length; i++)
             {
                 if(transactions[i] == null)
@@ -184,19 +184,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             CoinCollection result = new CoinCollection();
             for(int i = 0; i < SpentOutpoints.Count; i++)
             {
-                var outpoint = SpentOutpoints[i];
+                OutPoint outpoint = SpentOutpoints[i];
                 if(outpoint.IsNull)
                 {
                     continue;
                 }
 
-                var prev = await transactions.GetAsync(outpoint.Hash).ConfigureAwait(false);
+                Transaction prev = await transactions.GetAsync(outpoint.Hash).ConfigureAwait(false);
                 if(prev == null)
                 {
                     return false;
                 }
 
-                var coin = new Coin(outpoint, prev.Outputs[SpentOutpoints[i].N]);
+                Coin coin = new Coin(outpoint, prev.Outputs[SpentOutpoints[i].N]);
                 if(coin.ScriptPubKey != GetScriptPubkey(i))
                 {
                     cleanSpent = true;
@@ -250,7 +250,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 ReceivedCoins.AddRange(other.ReceivedCoins);
                 ReceivedCoins = new CoinCollection(ReceivedCoins.Distinct<ICoin, OutPoint>(c => c.Outpoint));
                 if(walletRule != null)
-                    foreach(var c in other.ReceivedCoins)
+                    foreach(ICoin c in other.ReceivedCoins)
                     {
                         this.MatchedRules.Add(new MatchedRule()
                         {
@@ -290,15 +290,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public void UpdateToScriptCoins()
         {
-            foreach(var match in MatchedRules)
+            foreach(MatchedRule match in MatchedRules)
             {
-                var scriptRule = match.Rule as ScriptRule;
+                ScriptRule scriptRule = match.Rule as ScriptRule;
                 if(scriptRule != null && scriptRule.RedeemScript != null)
                 {
                     if(match.MatchType == MatchLocation.Output)
                     {
-                        var outpoint = new OutPoint(TransactionId, match.Index);
-                        var coin = ReceivedCoins[outpoint] as Coin;
+                        OutPoint outpoint = new OutPoint(TransactionId, match.Index);
+                        Coin coin = ReceivedCoins[outpoint] as Coin;
                         if(coin != null)
                         {
                             ReceivedCoins[outpoint] = coin.ToScriptCoin(scriptRule.RedeemScript);
@@ -312,7 +312,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         }
 
                         var n = this.SpentIndices.IndexOf(match.Index);
-                        var coin = SpentCoins[n] as Coin;
+                        Coin coin = SpentCoins[n] as Coin;
                         if(coin != null)
                         {
                             this.SpentCoins[n] = coin.ToScriptCoin(scriptRule.RedeemScript);
@@ -454,12 +454,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         internal OrderedBalanceChange(DynamicTableEntity entity)
         {
-            var splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
             Height = Helper.StringToHeight(splitted[1]);
             BalanceId = BalanceId.Parse(splitted[0]);
 
-            var locator = BalanceLocator.Parse(string.Join("-", splitted.Skip(1).ToArray()), true);
-            var confLocator = locator as ConfirmedBalanceLocator;
+            BalanceLocator locator = BalanceLocator.Parse(string.Join("-", splitted.Skip(1).ToArray()), true);
+            ConfirmedBalanceLocator confLocator = locator as ConfirmedBalanceLocator;
             if(confLocator != null)
             {
                 Height = confLocator.Height;
@@ -467,7 +467,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 BlockId = confLocator.BlockHash;
             }
 
-            var unconfLocator = locator as UnconfirmedBalanceLocator;
+            UnconfirmedBalanceLocator unconfLocator = locator as UnconfirmedBalanceLocator;
             if(unconfLocator != null)
             {
                 TransactionId = unconfLocator.TransactionId;
@@ -490,8 +490,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             _SpentIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "ss")).Select(i => (uint)i.ToLong()).ToList();
 
-            var receivedIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "c")).Select(i => (uint)i.ToLong()).ToList();
-            var receivedTxOuts = Helper.DeserializeList<TxOut>(Helper.GetEntityProperty(entity, "d"));
+            List<uint> receivedIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "c")).Select(i => (uint)i.ToLong()).ToList();
+            List<TxOut> receivedTxOuts = Helper.DeserializeList<TxOut>(Helper.GetEntityProperty(entity, "d"));
 
             _ReceivedCoins = new CoinCollection();
             for(int i = 0; i < receivedIndices.Count; i++)
@@ -511,7 +511,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if(entity.Properties.ContainsKey("g"))
             {
-                var ctx = new ColoredTransaction();
+                ColoredTransaction ctx = new ColoredTransaction();
                 ctx.FromBytes(entity.Properties["g"].BinaryValue);
                 ColoredTransaction = ctx;
             }
@@ -521,7 +521,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 _ScriptPubKey = new Script(entity.Properties["h"].BinaryValue);
             }
 
-            var data = Helper.GetEntityProperty(entity, "cu");
+            byte[] data = Helper.GetEntityProperty(entity, "cu");
             if(data != null)
             {
                 CustomData = Encoding.UTF8.GetString(data);
@@ -553,13 +553,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             for (int i = 0; i < collection.Count; i++)
             {
-                var coin = collection[i] as Coin;
+                Coin coin = collection[i] as Coin;
                 if(coin != null)
                 {
                     if(input)
                     {
                         var txinIndex = SpentIndices[i];
-                        var asset = ColoredTransaction
+                        AssetMoney asset = ColoredTransaction
                                         .Inputs
                                         .Where(_ => _.Index == (uint)txinIndex)
                                         .Select(_ => _.Asset)
@@ -571,7 +571,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     }
                     else
                     {
-                        var asset = ColoredTransaction.GetColoredEntry(coin.Outpoint.N);
+                        ColoredEntry asset = ColoredTransaction.GetColoredEntry(coin.Outpoint.N);
                         if(asset != null)
                         {
                             collection[i] = coin.ToColoredCoin(asset.Asset);
@@ -598,7 +598,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             for (int i = 0; i < collection.Count; i++)
             {
-                var coin = collection[i] as ColoredCoin;
+                ColoredCoin coin = collection[i] as ColoredCoin;
                 if(coin != null)
                 {
                     collection[i] = coin.Bearer;
@@ -609,7 +609,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         internal OrderedBalanceChange(uint256 txId, Script scriptPubKey, uint256 blockId, BlockHeader blockHeader, int height)
             : this()
         {
-            var balanceId = new BalanceId(scriptPubKey);
+            BalanceId balanceId = new BalanceId(scriptPubKey);
             Init(txId, balanceId, blockId, blockHeader, height);
             if(!balanceId.ContainsScript)
             {
@@ -671,7 +671,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             entity.ETag = "*";
             entity.PartitionKey = PartitionKey;
 
-            var locator = CreateBalanceLocator();
+            BalanceLocator locator = CreateBalanceLocator();
             entity.RowKey = BalanceId + "-" + locator.ToString(true);
 
             entity.Properties.Add("s", new EntityProperty(SeenUtc));
@@ -694,7 +694,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
             if(ScriptPubKey != null && !BalanceId.ContainsScript)
             {
-                var bytes = ScriptPubKey.ToBytes(true);
+                byte[] bytes = ScriptPubKey.ToBytes(true);
                 if(bytes.Length < 63000)
                 {
                     entity.Properties.Add("h", new EntityProperty(bytes));
@@ -786,7 +786,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 repository = new CachedColoredTransactionRepository(repository);
             }
 
-            var tx = await repository.Transactions.GetAsync(TransactionId).ConfigureAwait(false);
+            Transaction tx = await repository.Transactions.GetAsync(TransactionId).ConfigureAwait(false);
             if(tx == null)
             {
                 return false;
@@ -794,7 +794,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             try
             {
-                var color = await tx.GetColoredTransactionAsync(repository).ConfigureAwait(false);
+                ColoredTransaction color = await tx.GetColoredTransactionAsync(repository).ConfigureAwait(false);
                 if(color == null)
                 {
                     return false;
@@ -836,7 +836,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 return Amount;
             }
 
-            var amount = _ReceivedCoins.WhereColored(assetId)
+            AssetMoney amount = _ReceivedCoins.WhereColored(assetId)
                 .Select(c => c.Amount).Sum(assetId) - _SpentCoins.WhereColored(assetId).Select(c => c.Amount).Sum(assetId);
             return amount;
         }

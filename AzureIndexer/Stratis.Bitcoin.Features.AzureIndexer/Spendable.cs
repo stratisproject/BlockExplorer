@@ -1,8 +1,8 @@
-﻿using NBitcoin;
-using System;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using NBitcoin;
+
     public class Spendable : IBitcoinSerializable
     {
         public Spendable()
