@@ -63,7 +63,7 @@
         /// <remarks>The MaxScriptSize determines the maximum script size that can be used as-is in the id - otherwise the script hash is used.</remarks>
         public BalanceId(Script scriptPubKey)
         {
-            var pubKey = scriptPubKey.ToBytes(true);
+            byte[] pubKey = scriptPubKey.ToBytes(true);
 
             if (pubKey.Length > MaxScriptSize)
             {

@@ -10,23 +10,11 @@
 
     public class BlockInfo
     {
-        public int Height
-        {
-            get;
-            set;
-        }
+        public int Height { get; set; }
 
-        public uint256 BlockId
-        {
-            get;
-            set;
-        }
+        public uint256 BlockId { get; set; }
 
-        public Block Block
-        {
-            get;
-            set;
-        }
+        public Block Block { get; set; }
     }
 
     public class BlockFetcher : IEnumerable<BlockInfo>
@@ -93,17 +81,9 @@
             InitDefault();
         }
 
-        public TimeSpan NeedSaveInterval
-        {
-            get;
-            set;
-        }
+        public TimeSpan NeedSaveInterval { get; set; }
 
-        public CancellationToken CancellationToken
-        {
-            get;
-            set;
-        }
+        public CancellationToken CancellationToken { get; set; }
 
         #region IEnumerable<BlockInfo> Members
 
@@ -205,16 +185,8 @@
             this.logger.LogTrace("(-)");
         }
 
-        public int FromHeight
-        {
-            get;
-            set;
-        }
+        public int FromHeight { get; set; }
 
-        public int ToHeight
-        {
-            get;
-            set;
-        }
+        public int ToHeight { get; set; }
     }
 }

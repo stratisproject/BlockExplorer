@@ -1,9 +1,9 @@
-﻿using NBitcoin;
-using System;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Threading.Tasks;
+    using NBitcoin;
+
     public class IndexerTransactionRepository : ITransactionRepository
     {
         private readonly IndexerConfiguration _Configuration;

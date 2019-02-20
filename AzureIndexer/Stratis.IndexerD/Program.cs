@@ -40,7 +40,6 @@
                     .UseReflectionExecutor()
                     .UseApi()
                     .AddRPC()
-                  //  .UsePosConsensus()
                     .UseAzureIndexer()
                     .Build();
 

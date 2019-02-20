@@ -75,7 +75,7 @@
             };
 
             OperationContext context = new OperationContext();
-            Queue<TableBatchOperation> txBatches = new Queue<TableBatchOperation>();
+            var txBatches = new Queue<TableBatchOperation>();
             txBatches.Enqueue(transactionsBatch);
 
             Queue<TableBatchOperation> scBatches = new Queue<TableBatchOperation>();

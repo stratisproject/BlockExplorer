@@ -1,8 +1,4 @@
-﻿using NBitcoin.Protocol;
-using Stratis.Bitcoin.P2P.Peer;
-using Stratis.Bitcoin.P2P.Protocol.Payloads;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -16,6 +12,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.WindowsAzure.Storage.Blob;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using NBitcoin.Protocol;
+    using Stratis.Bitcoin.P2P.Peer;
+    using Stratis.Bitcoin.P2P.Protocol.Payloads;
     using Utilities;
 
     public class IndexerConfiguration

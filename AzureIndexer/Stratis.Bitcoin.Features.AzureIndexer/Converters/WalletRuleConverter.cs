@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Converters
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Converters
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Newtonsoft.Json;
+
     public class WalletRuleConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

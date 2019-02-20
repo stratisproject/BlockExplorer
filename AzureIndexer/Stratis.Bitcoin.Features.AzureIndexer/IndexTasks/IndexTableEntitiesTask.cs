@@ -1,14 +1,14 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.ExceptionServices;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public class IndexTableEntitiesTask : IndexTableEntitiesTaskBase<ITableEntity>
     {
         CloudTable _Table;
@@ -34,16 +34,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             throw new NotSupportedException();
         }
 
-        //protected override void IndexCore(string partitionName, IEnumerable<ITableEntity> items, string partitionName2, IEnumerable<IIndexed> item2)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //protected override void IndexCore(string partitionName, IEnumerable<ITableEntity> items)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         public void Index(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
             try
@@ -60,14 +50,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public Task IndexAsync(IEnumerable<ITableEntity> entities, TaskScheduler taskScheduler)
         {
             taskScheduler = taskScheduler ?? TaskScheduler.Default;
-            var tasks = entities
+            Task[] tasks = entities
                 .GroupBy(e => e.PartitionKey)
                 .SelectMany(group => group
                                     .Partition(PartitionSize)
                                     .Select(batch => new Task(() => IndexCore(group.Key, batch))))
                 .ToArray();
 
-            foreach (var t in tasks)
+            foreach (Task t in tasks)
             {
                 t.Start(taskScheduler);
             }

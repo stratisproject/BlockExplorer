@@ -1,26 +1,23 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using NBitcoin;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.ExceptionServices;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
+    using NBitcoin;
+
     public class Checkpoint
     {
         private readonly string _CheckpointName;
 
         public string CheckpointName
         {
-            get
-            {
-                return this._CheckpointName;
-            }
+            get { return this._CheckpointName; }
         }
 
         CloudBlockBlob _Blob;
@@ -28,7 +25,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILoggerFactory loggerFactory;
         private readonly ILogger logger;
 
-        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob, ILoggerFactory loggerFactory)
+        public Checkpoint(string checkpointName, Network network, Stream data, CloudBlockBlob blob,
+            ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
@@ -61,20 +59,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public uint256 Genesis
         {
-            get
-            {
-                return this.BlockLocator.Blocks[this.BlockLocator.Blocks.Count - 1];
-            }
+            get { return this.BlockLocator.Blocks[this.BlockLocator.Blocks.Count - 1]; }
         }
 
         BlockLocator _BlockLocator;
 
         public BlockLocator BlockLocator
         {
-            get
-            {
-                return this._BlockLocator;
-            }
+            get { return this._BlockLocator; }
         }
 
         public bool SaveProgress(ChainedHeader tip)
@@ -98,8 +90,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     this.logger.LogTrace("()");
 
-                    var saving = this.SaveProgressAsync();
-                    var timeout = Task.Delay(50000);
+                    Task<bool> saving = this.SaveProgressAsync();
+                    Task timeout = Task.Delay(50000);
 
                     await Task.WhenAny(saving, timeout).ConfigureAwait(false);
 
@@ -150,14 +142,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            var bytes = this.BlockLocator.ToBytes();
+            byte[] bytes = this.BlockLocator.ToBytes();
             try
             {
                 this.logger.LogTrace("Uploading block locator bytes");
-                await this._Blob.UploadFromByteArrayAsync(bytes, 0, bytes.Length, new AccessCondition()
-                {
-                    IfMatchETag = this._Blob.Properties.ETag
-                }, null, null).ConfigureAwait(false);
+                await this._Blob.UploadFromByteArrayAsync(bytes, 0, bytes.Length,
+                        new AccessCondition() {IfMatchETag = this._Blob.Properties.ETag}, null, null)
+                    .ConfigureAwait(false);
             }
             catch (StorageException ex)
             {
@@ -183,7 +174,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return true;
         }
 
-        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network, ILoggerFactory loggerFactory)
+        public static async Task<Checkpoint> LoadBlobAsync(CloudBlockBlob blob, Network network,
+            ILoggerFactory loggerFactory)
         {
             var checkpointName = string.Join("/", blob.Name.Split('/').Skip(1).ToArray());
             MemoryStream ms = new MemoryStream();
@@ -199,7 +191,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     throw;
                 }
             }
-            var checkpoint = new Checkpoint(checkpointName, network, ms, blob, loggerFactory);
+
+            Checkpoint checkpoint = new Checkpoint(checkpointName, network, ms, blob, loggerFactory);
             return checkpoint;
         }
 
@@ -208,5 +201,4 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.CheckpointName;
         }
     }
-
 }

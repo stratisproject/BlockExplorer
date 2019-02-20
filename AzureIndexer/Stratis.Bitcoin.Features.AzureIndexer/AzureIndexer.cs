@@ -372,23 +372,11 @@
             this._logger.LogTrace("(-)");
         }
 
-        public TimeSpan CheckpointInterval
-        {
-            get;
-            set;
-        }
+        public TimeSpan CheckpointInterval { get; set; }
 
-        public int FromHeight
-        {
-            get;
-            set;
-        }
+        public int FromHeight { get; set; }
 
-        public bool IgnoreCheckpoints
-        {
-            get;
-            set;
-        }
+        public bool IgnoreCheckpoints { get; set; }
 
         public void IndexChain(ChainBase chain, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -444,10 +432,6 @@
             this._logger.LogTrace("(-)");
         }
 
-        public int ToHeight
-        {
-            get;
-            set;
-        }
+        public int ToHeight { get; set; }
     }
 }

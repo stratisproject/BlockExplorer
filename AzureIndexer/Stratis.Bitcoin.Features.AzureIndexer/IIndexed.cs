@@ -1,8 +1,8 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public interface IIndexed
     {
         ITableEntity CreateTableEntity();

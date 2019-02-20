@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-// ReSharper disable All
+﻿// ReSharper disable All
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Runtime.ExceptionServices;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public abstract class IndexTask<TIndexed> : IIndexTask
     {
         private readonly ILogger logger;
@@ -60,7 +61,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 {
                     try
                     {
-
                         foreach (var block in blockFetcher)
                         {
                             this.ThrowIfException();
@@ -207,7 +207,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-
         public int MaxQueued { get; set; }
 
         Exception _Exception;
@@ -251,29 +250,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
 
-        public IndexerConfiguration Configuration
-        {
-            get;
-            private set;
-        }
+        public IndexerConfiguration Configuration { get; private set; }
 
-        public bool SaveProgression
-        {
-            get;
-            set;
-        }
+        public bool SaveProgression { get; set; }
 
-        protected abstract int PartitionSize
-        {
-            get;
-        }
+        protected abstract int PartitionSize { get; }
 
         protected abstract Task EnsureSetup();
 
         protected abstract void ProcessBlock(BlockInfo block, BulkImport<TIndexed> bulkImport, Network network, BulkImport<SmartContactEntry.Entity> SmartContractBulk = null);
 
         protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
-
-        //protected abstract void IndexCore(string partitionName, IEnumerable<TIndexed> items);
     }
 }

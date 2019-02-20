@@ -37,7 +37,7 @@
 
         public async Task<Transaction> GetAsync(uint256 txId)
         {
-            foreach (var repo in _Repositories)
+            foreach (ITransactionRepository repo in _Repositories)
             {
                 Transaction result = await repo.GetAsync(txId).ConfigureAwait(false);
                 if (result != null)
@@ -85,8 +85,8 @@
 
         public async Task<ColoredTransaction> GetAsync(uint256 txId)
         {
-            var client = _Configuration.CreateIndexerClient();
-            var tx = await client.GetTransactionAsync(false, false, txId).ConfigureAwait(false);
+            IndexerClient client = _Configuration.CreateIndexerClient();
+            TransactionEntry tx = await client.GetTransactionAsync(false, false, txId).ConfigureAwait(false);
             if (tx == null)
                 return null;
             return tx.ColoredTransaction;
