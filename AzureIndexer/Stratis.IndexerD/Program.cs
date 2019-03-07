@@ -1,4 +1,8 @@
-﻿namespace Stratis.IndexerD
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
+using Stratis.Bitcoin.Features.Consensus;
+
+namespace Stratis.IndexerD
 {
     using System;
     using System.Threading.Tasks;
@@ -26,22 +30,43 @@
 
         public static async Task MainAsync(string[] args)
         {
+            var isSideChain = false;
             try
             {
-                var nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
-                IFullNode node = new FullNodeBuilder()
-                    .UseNodeSettings(nodeSettings)
-                    .UseBlockStore()
-                    .UseMempool()
-                    .AddSmartContracts()
-                    .UseSmartContractPoAConsensus()
-                    .UseSmartContractPoAMining()
-                    .UseSmartContractWallet()
-                    .UseReflectionExecutor()
-                    .UseApi()
-                    .AddRPC()
-                    .UseAzureIndexer()
-                    .Build();
+                NodeSettings nodeSettings;
+                IFullNode node = null;
+                if (args.Length > 0)
+                {
+                    isSideChain = args.Contains("-sidechain");
+                }
+
+                if (isSideChain)
+                {
+                   nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
+                   node = new FullNodeBuilder()
+                       .UseNodeSettings(nodeSettings)
+                       .UseBlockStore()
+                       .UseMempool()
+                       .AddSmartContracts()
+                       .UseSmartContractPoAConsensus()
+                       .UseSmartContractPoAMining()
+                       .UseSmartContractWallet()
+                       .UseReflectionExecutor()
+                       .UseApi()
+                       .AddRPC()
+                       .UseAzureIndexer()
+                       .Build();
+                }
+                else
+                {
+                    nodeSettings = new NodeSettings(networksSelector: Stratis.Bitcoin.Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                    node = new FullNodeBuilder()
+                        .UseNodeSettings(nodeSettings)
+                        .UsePosConsensus()
+                        .UseBlockStore()
+                        .UseAzureIndexer()
+                        .Build();
+                }
 
                 // Run node.
                 if (node != null)
