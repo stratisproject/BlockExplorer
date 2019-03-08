@@ -37,10 +37,11 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Stratis.SidechainD">
-      <HintPath>..\..\..\FederatedSidechains\src\Stratis.SidechainD\bin\Release\netcoreapp2.1\Stratis.SidechainD.dll</HintPath>
+      <HintPath>..\StratisLibs\Stratis.SidechainD.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\..\..\FederatedSidechains\src\Stratis.SidechainD\bin\Release\netcoreapp2.1\Stratis.Sidechains.Networks.dll</HintPath>
+      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
     </Reference>
   </ItemGroup>
 
