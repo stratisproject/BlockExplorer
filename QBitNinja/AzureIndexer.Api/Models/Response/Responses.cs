@@ -364,6 +364,9 @@
         [JsonProperty("height", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Height { get; set; }
 
+        [JsonProperty("firstSeen", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public DateTimeOffset? FirstSeen { get; set; }
+
         [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Time { get; set; }
 
