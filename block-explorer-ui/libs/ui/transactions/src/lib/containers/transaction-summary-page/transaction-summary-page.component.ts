@@ -18,6 +18,7 @@ export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
   destroyed$ = new ReplaySubject<any>();
   hash = '';
   transaction$: Observable<TransactionSummaryModel>;
+  isSmartContract = false;
 
   constructor(private route: ActivatedRoute, private transactionsFacade: TransactionsFacade, private log: Log) { }
 
@@ -38,6 +39,7 @@ export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
     this.transaction$ = this.transactionsFacade.selectedTransaction$;
     this.transaction$.pipe(takeUntil(this.destroyed$))
         .subscribe(transaction => {
+          this.isSmartContract = false;
           this.smartContract = null;
           this.transactions.length = 0;
           this.log.info('Found transaction details', transaction);
@@ -45,6 +47,7 @@ export class TransactionSummaryPageComponent implements OnInit, OnDestroy {
 
           this.transactions = [transaction];
           if (!!transaction.smartContract) {
+            this.isSmartContract = true;
             this.smartContract = transaction.smartContract;
           }
         });
