@@ -240,6 +240,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
   in?: LineItemModel[] | undefined;
   out?: LineItemModel[] | undefined;
   confirmations?: number | undefined;
+  firstSeen?: Date | undefined;
   smartContract?: SmartContractModel | undefined;
 
   constructor(data?: ITransactionSummaryModel) {
@@ -281,6 +282,7 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
       }
       this.confirmations = data["confirmations"];
       this.smartContract = data["smartContract"] ? SmartContractModel.fromJS(data["smartContract"]) : <any>undefined;
+      this.firstSeen = data["firstSeen"] ? new Date(data["firstSeen"].toString()) : <any>undefined;
     }
   }
 
@@ -306,7 +308,9 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
               data["out"].push(item.toJSON());
       }
       data["confirmations"] = this.confirmations;
+      
       data["smartContract"] = this.smartContract ? this.smartContract.toJSON() : <any>undefined;
+      data["firstSeen"] = this.firstSeen ? this.firstSeen.toISOString() : <any>undefined;
       return data;
   }
 }
@@ -324,6 +328,7 @@ export interface ITransactionSummaryModel {
   in?: LineItemModel[] | undefined;
   out?: LineItemModel[] | undefined;
   confirmations?: number | undefined;
+  firstSeen?: Date | undefined;
   smartContract?: SmartContractModel | undefined;
 }
 

@@ -22,10 +22,8 @@ export class TransactionListItemComponent implements OnInit {
   }
 
   public get transactionTime() {
-    if (!this.transaction || !this.transaction.time) return 'Unknown';
-    const date = new Date(1000 * this.transaction.time);
-
-    return date.toString();
+    if (!this.transaction || !this.transaction.firstSeen) return 'Unknown';
+    return this.transaction.firstSeen.toString();
     // TODO: decide which format we want to show date in.
     // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }
