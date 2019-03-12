@@ -33,7 +33,7 @@
         public async Task<object> WhatIsIt(string identifier)
         {
             var result = await this.finder.Find(identifier, this.mapper);
-            return result ?? "Good question Holmes!";
+            return result ?? "{\"message\": \"Good question Holmes!\"}";
         }
     }
 }

@@ -11,8 +11,8 @@
 </div>
 <div class="col">
   <div class="row" *ngFor="let tx of transaction.in">
-    <div class="col-12 col-lg-8">
-      <a [routerLink]="['/addresses', tx.hash]">{{tx.hash}}</a>
+    <div class="col-12 col-lg-8 padded">
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span>
     </div>
     <div class="col-12 col-lg-4 text-lg-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>
@@ -27,7 +27,7 @@
 <div class="col">
   <div class="row" *ngFor="let tx of transaction.out">
     <div class="col-12 col-lg-8 text-sm-left text-lg-left text-xl-left text-md-right">
-      <a [routerLink]="['/addresses', tx.hash]">{{tx.hash}}</a> <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span><small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
     </div>
     <div class="col-12 col-lg-4 text-left text-md-right text-lg-right text-xl-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>
