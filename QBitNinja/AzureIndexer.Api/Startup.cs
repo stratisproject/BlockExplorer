@@ -155,7 +155,7 @@ namespace AzureIndexer.Api
 
         private Network GetNetwork()
         {
-            var networkName = this.Configuration["Bitcoin.Network"];
+            var networkName = this.Configuration["Network"];
 
             switch (networkName)
             {
