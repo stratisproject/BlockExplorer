@@ -128,4 +128,58 @@ export class BlocksService {
         }
         return _observableOf<BlockHeaderResponseModel>(<any>null);
     }
+
+    /**
+     * @param headerOnly (optional)
+     * @param extended (optional)
+     * @return Success
+     */
+    blocks(): Observable<BlockResponseModel[]> {
+        let url_ = this.baseUrl + "/api/v1/blocks/top";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBlocks(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBlocks(<any>response_);
+                } catch (e) {
+                    return <Observable<BlockResponseModel[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<BlockResponseModel[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processBlocks(response: HttpResponseBase): Observable<BlockResponseModel[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            const resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+
+            result200 = resultData200 ? resultData200.map(r => BlockResponseModel.fromJS(r)) : [];
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BlockResponseModel[]>(<any>null);
+    }
 }

@@ -22,7 +22,10 @@ import {
   BlockLoadError,
   GetBlockHeader,
   BlockHeaderLoaded,
-  BlockHeaderLoadError
+  BlockHeaderLoadError,
+  LoadLastBlocks,
+  LastBlocksLoaded,
+  LastBlocksLoadedError
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
@@ -43,6 +46,21 @@ export class TransactionsEffects {
     onError: (action: LoadTransactions, error) => {
       console.error('Error', error);
       return new TransactionsLoadError(error);
+    }
+  });
+
+  @Effect() loadLastBlocks$ = this.dataPersistence.fetch(TransactionsActionTypes.LoadLastBlocks, {
+    run: (action: LoadLastBlocks, state: TransactionsPartialState) => {
+      return this.blocksService.blocks().pipe(
+        map((blocks) => {
+          return new LastBlocksLoaded(blocks);
+        })
+      );
+    },
+
+    onError: (action: LoadLastBlocks, error) => {
+      console.error('Error', error);
+      return new LastBlocksLoadedError(error);
     }
   });
 

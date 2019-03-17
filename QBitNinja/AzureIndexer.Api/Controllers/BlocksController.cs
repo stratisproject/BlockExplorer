@@ -63,5 +63,27 @@ namespace AzureIndexer.Api.Controllers
             var blockData = this.blockSearchService.GetBlock(block.ToBlockFeature(), true);
             return this.mapper.Map<BlockHeaderResponseModel>(new BlockHeaderResponse(blockData.Header));
         }
+
+        [HttpGet]
+        [Route("top")]
+        public async Task<BlockResponseModel[]> Blocks(int top = 10)
+        {
+            var blocks = new List<BlockResponseModel>();
+            var currentTip = this.Chain.Tip;
+            for (int i = 0; i < top; i++)
+            {
+                if (currentTip == null) break;
+                var blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), true, false);
+                if (blockData != null)
+                {
+                    var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
+                    blocks.Add(mappedBlock);
+                }
+
+                currentTip = currentTip.Previous;
+            }
+
+            return blocks.ToArray();
+        }
     }
 }

@@ -10,6 +10,8 @@ const getTransactionsState = createFeatureSelector<TransactionsState>(
 );
 
 const getLoadedTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedTransactions);
+const getLastBlocks = createSelector(getTransactionsState, (state: TransactionsState) => state.lastBlocks);
+const getLoadedLastBlocks = createSelector(getTransactionsState, (state: TransactionsState) => state.lastBlocksLoaded);
 const getLoadedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddress);
 const getLoadedAddressDetails = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddressDetails);
 const getLoadedBlockData = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedBlockData);
@@ -44,6 +46,8 @@ const getSelectedTransactions = createSelector(
 
 export const transactionsQuery = {
   getLoadedTransactions,
+  getLastBlocks,
+  getLoadedLastBlocks,
   getLoadedAddress,
   getLoadedBlockData,
   getLoadedAddressDetails,

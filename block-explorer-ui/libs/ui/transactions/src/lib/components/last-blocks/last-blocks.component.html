@@ -1,0 +1,23 @@
+<div class="list-group-item mb-4">
+  <h3 class="my-4">Last 10 blocks</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Height</th>
+        <th>Age</th>
+        <th>Confirmations</th>
+        <th>Rewards</th>
+        <th>Hash</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let block of blocks">
+        <td><a [routerLink]="['/blocks', getHeight(block)]">{{getHeight(block)}}</a></td>
+        <td>{{getAge(block)}}</td>
+        <td>{{getConfirmations(block)}}</td>
+        <td><blockexplorer-balance [balance]="getBlockReward(block)"></blockexplorer-balance></td>
+        <td>{{getHash(block)}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

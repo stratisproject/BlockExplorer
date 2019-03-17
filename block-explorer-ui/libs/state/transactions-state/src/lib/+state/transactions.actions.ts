@@ -3,6 +3,8 @@ import { BalanceSummaryModel, BalanceResponseModel, TransactionSummaryModel, Tra
 
 export enum TransactionsActionTypes {
   LoadTransactions = '[Transactions] Load Transactions',
+  LoadLastBlocks = '[Transactions] Load Last Blocks',
+  LastBlocksLoadedError = '[Transactions] Load Last Blocks Error',
   GetAddress = '[Transactions] Get Address',
   GetTransaction = '[Transactions] Get Transaction',
   GetBlock = '[Transactions] Get Block',
@@ -13,6 +15,7 @@ export enum TransactionsActionTypes {
   BlockHeaderLoaded = '[Transactions] Block Header Loaded',
   AddressLoaded = '[Transactions] Address Loaded',
   TransactionLoaded = '[Transactions] Transaction Loaded',
+  LastBlocksLoaded = '[Transactions] Last Blocks Loaded',
   AddressDetailsLoaded = '[Transactions] Address Details Loaded',
   TransactionsLoadError = '[Transactions] Transactions Load Error',
   AddressLoadError = '[Transactions] Address Load Error',
@@ -24,6 +27,10 @@ export enum TransactionsActionTypes {
 
 export class LoadTransactions implements Action {
   readonly type = TransactionsActionTypes.LoadTransactions;
+}
+
+export class LoadLastBlocks implements Action {
+  readonly type = TransactionsActionTypes.LoadLastBlocks;
 }
 
 export class GetAddress implements Action {
@@ -111,8 +118,21 @@ export class TransactionsLoaded implements Action {
   constructor(public transactions: TransactionModel[]) {}
 }
 
+export class LastBlocksLoaded implements Action {
+  readonly type = TransactionsActionTypes.LastBlocksLoaded;
+  constructor(public blocks: BlockResponseModel[]) {}
+}
+
+export class LastBlocksLoadedError implements Action {
+  readonly type = TransactionsActionTypes.LastBlocksLoadedError;
+  constructor(public payload: any) {}
+}
+
 export type TransactionsAction =
   | LoadTransactions
+  | LoadLastBlocks
+  | LastBlocksLoadedError
+  | LastBlocksLoaded
   | GetAddress
   | GetTransaction
   | GetBlock
@@ -133,6 +153,9 @@ export type TransactionsAction =
 
 export const fromTransactionsActions = {
   LoadTransactions,
+  LoadLastBlocks,
+  LastBlocksLoadedError,
+  LastBlocksLoaded,
   GetAddress,
   GetTransaction,
   GetAddressDetails,

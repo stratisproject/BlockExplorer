@@ -15,6 +15,7 @@ import { NotFoundPageComponent } from './containers/not-found-page/not-found-pag
 import { BlockSummaryComponent } from './components/block-summary/block-summary.component';
 import { BlockSummaryPageComponent } from './containers/block-summary-page/block-summary-page.component';
 import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
+import { LastBlocksComponent } from './components/last-blocks/last-blocks.component';
 
 export { TransactionsPageComponent } from './containers/transactions-page/transactions-page.component';
 
@@ -37,7 +38,7 @@ export const uiOtherRoutes: Route[] = [
 
 @NgModule({
   imports: [CommonModule, RouterModule, UiLayoutModule, NgbModule, PrismModule, UiSmartContractsModule],
-  declarations: [TransactionsPageComponent, TransactionsListComponent, AddressSummaryComponent, TransactionListItemComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, TransactionSummaryComponent, NotFoundPageComponent, BlockSummaryComponent, BlockSummaryPageComponent],
-  exports: [TransactionsPageComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, NotFoundPageComponent, BlockSummaryPageComponent]
+  declarations: [TransactionsPageComponent, LastBlocksComponent, TransactionsListComponent, AddressSummaryComponent, TransactionListItemComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, TransactionSummaryComponent, NotFoundPageComponent, BlockSummaryComponent, BlockSummaryPageComponent],
+  exports: [TransactionsPageComponent, TransactionSummaryPageComponent, AddressSummaryPageComponent, NotFoundPageComponent, BlockSummaryPageComponent, LastBlocksComponent]
 })
 export class UiTransactionsModule {}

@@ -19,6 +19,8 @@ export interface Entity {}
 
 export interface TransactionsState {
   list: TransactionModel[];
+  lastBlocks: BlockResponseModel[];
+  lastBlocksLoaded: boolean;
   selectedId?: string | number;
   selectedAddress?: BalanceSummaryModel;
   selectedTransaction?: TransactionSummaryModel;
@@ -38,6 +40,8 @@ export interface TransactionsPartialState {
 
 export const initialState: TransactionsState = {
   list: [],
+  lastBlocks: [],
+  lastBlocksLoaded: false,
   selectedAddress: null,
   selectedTransaction: null,
   selectedBlock: null,
@@ -66,6 +70,21 @@ export function transactionsReducer(
         ...state,
         list: action.transactions,
         loadedTransactions: true,
+      };
+      break;
+    }
+    case TransactionsActionTypes.LoadLastBlocks: {
+      state = {
+        ...state,
+        lastBlocksLoaded: false,
+      };
+      break;
+    }
+    case TransactionsActionTypes.LastBlocksLoaded: {
+      state = {
+        ...state,
+        lastBlocks: action.blocks,
+        lastBlocksLoaded: true
       };
       break;
     }
