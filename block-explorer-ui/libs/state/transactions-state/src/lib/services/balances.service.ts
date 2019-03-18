@@ -9,7 +9,7 @@ export class BalancesService {
     private http: HttpClient;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(APP_CONFIG) configs?: AppConfig) {
+    constructor(@Inject(HttpClient) http: HttpClient) {
         this.http = http;
     }
 
