@@ -35,6 +35,9 @@ export class AppConfigService
                     APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
                 }
 
+                APP_CONFIG.symbol = envResponse.symbol;
+                APP_CONFIG.chain = envResponse.chain;
+
                 resolve(true);
             });
 

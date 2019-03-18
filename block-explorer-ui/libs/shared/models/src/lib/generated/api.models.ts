@@ -1,7 +1,7 @@
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
 import { InjectionToken } from '@angular/core';
 
-export class AppConfig { apiBaseUrl: string; }
+export class AppConfig { apiBaseUrl: string; symbol: string; chain: string; }
 
 export let APP_CONFIG: AppConfig = new AppConfig();
 

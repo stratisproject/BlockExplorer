@@ -1,9 +1,10 @@
-<section class="col-xl-9 col-lg-10 col-sm-12 mx-auto my-5">
-  <div class="col-12 mt-4">
-    <ngb-alert type="info" [dismissible]="false" *ngIf="">
+<section class="col-xl-9 col-lg-10 col-sm-12 mx-auto">
+  <div class="col-12">
+    <h3>Block Explorer for {{chain}}</h3>
+    <ngb-alert type="info" [dismissible]="false" *ngIf="blocks.length === 0">
       <strong>Welcome</strong> Use search box in the top right corner to search addresses, transactions and smart contracts.
     </ngb-alert>
-    <blockexplorer-last-blocks [blocks]="blocks">
+    <blockexplorer-last-blocks [blocks]="blocks" *ngIf="blocks && blocks.length > 0">
     </blockexplorer-last-blocks>
   </div>
 </section>

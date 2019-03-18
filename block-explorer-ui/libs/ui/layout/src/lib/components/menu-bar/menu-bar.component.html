@@ -5,14 +5,8 @@
   </button>
   <div class="collapse navbar-collapse col-12 col-md-5 order-md-0 order-sm-3 order-3" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-          <li class="nav-item text-center">
-              <a class="nav-link" href="#">Contracts</a>
-          </li>
-          <li class="nav-item text-center">
-              <a class="nav-link" href="">Transactions</a>
-          </li>
-          <li class="nav-item active text-center">
-              <a class="nav-link" href="">Hash Tx</a>
+          <li class="nav-item text-center" [ngClass]="{ active: link.title === chain }" *ngFor="let link of links">
+              <a class="nav-link" href="{{link.url}}">{{link.title}}</a>
           </li>
       </ul>
   </div>

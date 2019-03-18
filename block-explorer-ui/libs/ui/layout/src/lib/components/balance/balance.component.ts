@@ -1,3 +1,4 @@
+import { APP_CONFIG } from '@blockexplorer/shared/models';
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
@@ -8,7 +9,6 @@ import { Component, OnInit, Input } from '@angular/core';
 export class BalanceComponent implements OnInit {
 
   @Input() balance = 0;
-  @Input() symbol = 'CIRR';
   @Input() decimalPlaces = 4;
 
   constructor() { }
@@ -18,6 +18,10 @@ export class BalanceComponent implements OnInit {
 
   get value() {
     return this.balance / Math.pow(10, 8);
+  }
+
+  get symbol() {
+    return APP_CONFIG.symbol;
   }
 
   get whole() {

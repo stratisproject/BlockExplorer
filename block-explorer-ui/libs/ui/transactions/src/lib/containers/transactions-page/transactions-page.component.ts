@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TransactionsFacade } from '@blockexplorer/state/transactions-state';
 import { Observable, ReplaySubject, interval } from 'rxjs';
-import { BlockResponseModel } from '@blockexplorer/shared/models';
+import { BlockResponseModel, APP_CONFIG } from '@blockexplorer/shared/models';
 import { Log } from '@blockexplorer/shared/utils';
 import { takeUntil, startWith, switchMap } from 'rxjs/operators';
 
@@ -37,6 +37,10 @@ export class TransactionsPageComponent implements OnInit, OnDestroy {
 
   selected(value: string){
 
+  }
+
+  get chain() {
+    return APP_CONFIG.chain;
   }
 
   ngOnDestroy(): void {
