@@ -90,7 +90,7 @@
             var account = GetValue(config, "Azure.AccountName", true);
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
-            var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
+            var network = GetValue(config, "Network", false) ?? "Main";
             this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
             {
