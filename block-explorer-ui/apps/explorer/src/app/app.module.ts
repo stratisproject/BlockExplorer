@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
@@ -24,10 +24,24 @@ import { UiLayoutModule } from '@blockexplorer/ui/layout';
 import { FormsModule } from '@angular/forms';
 import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, uiAddressesRoutes, uiOtherRoutes, uiBlockRoutes } from '@blockexplorer/ui/transactions';
 import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
-import { SharedModelsModule, API_BASE_URL } from '@blockexplorer/shared/models';
+import { SharedModelsModule, AppConfig, APP_CONFIG } from '@blockexplorer/shared/models';
 import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
 import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
 import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
+import { AppConfigService } from './+state/app-config.service';
+
+/**
+* Exported function so that it works with AOT
+* @param {AppConfigService} configService
+* @returns {Function}
+*/
+export function loadConfigService(configService: AppConfigService): Function 
+
+{
+  return () => { 
+    return configService.load(); 
+  }; 
+}
 
 @NgModule({
   declarations: [AppComponent],
@@ -70,9 +84,10 @@ import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
     StoreRouterConnectingModule
   ],
   providers: [
+    AppConfigService,
     AppFacade,
-    { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
-    { provide: ENVIRONMENT, useValue: environment.production ? 'prod' : 'dev' }
+    { provide: ENVIRONMENT, useValue: environment.production ? 'prod' : 'dev' },
+    { provide: APP_INITIALIZER, useFactory: loadConfigService , deps: [AppConfigService], multi: true },
   ],
   bootstrap: [AppComponent]
 })

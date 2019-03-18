@@ -2,17 +2,15 @@ import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 
 import { Observable, throwError as _observableThrow, of as _observableOf, of } from 'rxjs';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { blobToText, throwException, API_BASE_URL, BlockResponseModel, BlockHeaderResponseModel } from '@blockexplorer/shared/models';
+import { blobToText, throwException, APP_CONFIG, BlockResponseModel, BlockHeaderResponseModel, AppConfig } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class BlocksService {
     private http: HttpClient;
-    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -21,7 +19,7 @@ export class BlocksService {
      * @return Success
      */
     block(block: string, headerOnly: boolean | null | undefined, extended: boolean | null | undefined): Observable<BlockResponseModel> {
-        let url_ = this.baseUrl + "/api/v1/blocks/{block}?";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/blocks/{block}?";
         if (block === undefined || block === null)
             throw new Error("The parameter 'block' must be defined.");
         url_ = url_.replace("{block}", encodeURIComponent("" + block));
@@ -79,7 +77,7 @@ export class BlocksService {
      * @return Success
      */
     blockHeader(block: string): Observable<BlockHeaderResponseModel> {
-        let url_ = this.baseUrl + "/api/v1/blocks/{block}/header";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/blocks/{block}/header";
         if (block === undefined || block === null)
             throw new Error("The parameter 'block' must be defined.");
         url_ = url_.replace("{block}", encodeURIComponent("" + block));
@@ -135,7 +133,7 @@ export class BlocksService {
      * @return Success
      */
     blocks(): Observable<BlockResponseModel[]> {
-        let url_ = this.baseUrl + "/api/v1/blocks/top";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/blocks/top";
         url_ = url_.replace(/[?&]$/, "");
 
         const options_ : any = {

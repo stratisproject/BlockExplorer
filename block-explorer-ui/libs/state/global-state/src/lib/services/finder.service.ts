@@ -2,24 +2,22 @@ import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 
 import { Observable, throwError as _observableThrow, of as _observableOf, of } from 'rxjs';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { blobToText, throwException, API_BASE_URL } from '@blockexplorer/shared/models';
+import { blobToText, throwException, APP_CONFIG, AppConfig } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class FinderService {
     private http: HttpClient;
-    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
      * @return Success
      */
     whatIsIt(identifier: string): Observable<any> {
-      let url_ = this.baseUrl + "/api/v1/finder/{identifier}";
+      let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/finder/{identifier}";
       if (identifier === undefined || identifier === null)
           throw new Error("The parameter 'identifier' must be defined.");
       url_ = url_.replace("{identifier}", encodeURIComponent("" + identifier));

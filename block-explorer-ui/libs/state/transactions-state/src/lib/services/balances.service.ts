@@ -2,17 +2,15 @@ import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
 import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { BalanceResponseModel, BalanceSummaryModel, blobToText, throwException, API_BASE_URL } from '@blockexplorer/shared/models';
+import { BalanceResponseModel, BalanceSummaryModel, blobToText, throwException, APP_CONFIG, AppConfig } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class BalancesService {
     private http: HttpClient;
-    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(APP_CONFIG) configs?: AppConfig) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -25,7 +23,7 @@ export class BalancesService {
      * @return Success
      */
     addressBalance(balanceId: string, continuation: string | null | undefined, until: string | null | undefined, from: string | null | undefined, includeImmature: boolean | null | undefined, unspentOnly: boolean | null | undefined, colored: boolean | null | undefined, loadTransactionDetails: boolean | null | undefined): Observable<BalanceResponseModel> {
-        let url_ = this.baseUrl + "/api/v1/balances/{balanceId}?";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/balances/{balanceId}?";
         if (balanceId === undefined || balanceId === null)
             throw new Error("The parameter 'balanceId' must be defined.");
         url_ = url_.replace("{balanceId}", encodeURIComponent("" + balanceId));
@@ -96,7 +94,7 @@ export class BalancesService {
      * @return Success
      */
     addressBalanceSummary(balanceId: string, at: string | null | undefined, debug: boolean | null | undefined, colored: boolean | null | undefined): Observable<BalanceSummaryModel> {
-        let url_ = this.baseUrl + "/api/v1/balances/{balanceId}/summary?";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/balances/{balanceId}/summary?";
         if (balanceId === undefined || balanceId === null)
             throw new Error("The parameter 'balanceId' must be defined.");
         url_ = url_.replace("{balanceId}", encodeURIComponent("" + balanceId));

@@ -2,17 +2,15 @@ import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 
 import { Observable, throwError as _observableThrow, of as _observableOf, of } from 'rxjs';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { blobToText, throwException, TransactionModel, API_BASE_URL, TransactionSummaryModel } from '@blockexplorer/shared/models';
+import { blobToText, throwException, TransactionModel, APP_CONFIG, AppConfig, TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class TransactionsService {
     private http: HttpClient;
-    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(APP_CONFIG) configs?: AppConfig) {
         this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
@@ -28,7 +26,7 @@ export class TransactionsService {
      * @return Success
      */
     transaction(txId: string, colored: boolean | null | undefined, loadSmartContractIfExists: boolean | null | undefined): Observable<TransactionSummaryModel> {
-        let url_ = this.baseUrl + "/api/v1/transactions/{txId}?";
+        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/transactions/{txId}?";
         if (txId === undefined || txId === null)
             throw new Error("The parameter 'txId' must be defined.");
         url_ = url_.replace("{txId}", encodeURIComponent("" + txId));

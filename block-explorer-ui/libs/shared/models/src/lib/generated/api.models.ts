@@ -1,7 +1,9 @@
 import { Observable, throwError as _observableThrow, of as _observableOf } from 'rxjs';
 import { InjectionToken } from '@angular/core';
 
-export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
+export class AppConfig { apiBaseUrl: string; }
+
+export let APP_CONFIG: AppConfig = new AppConfig();
 
 export class BalanceResponseModel implements IBalanceResponseModel {
   continuation?: string | undefined;
