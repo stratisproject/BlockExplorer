@@ -1,4 +1,7 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using System.Collections.Generic;
+using System.Text;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Threading;
@@ -6,6 +9,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Auth;
     using NBitcoin;
+    using Stratis.Bitcoin.Configuration.Logging;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Utilities;
 
@@ -77,7 +81,7 @@
             this.nodeLifetime = fullNode.NodeLifetime;
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.loggerFactory = loggerFactory;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
         /// <summary>
@@ -137,15 +141,22 @@
         /// </summary>
         private void UpdateStoreTip()
         {
+            var statsDictionary = new Dictionary<string, int>();
             ChainedHeader lastBlocks = this.LastProcessed(IndexerCheckpoints.Blocks);
+            statsDictionary.Add(IndexerCheckpoints.Blocks.ToString(), lastBlocks?.Height ?? 0);
             ChainedHeader lastTransactions = this.LastProcessed(IndexerCheckpoints.Transactions);
+            statsDictionary.Add(IndexerCheckpoints.Transactions.ToString(), lastTransactions?.Height ?? 0);
             ChainedHeader lastBalances = this.LastProcessed(IndexerCheckpoints.Balances);
+            statsDictionary.Add(IndexerCheckpoints.Balances.ToString(), lastBalances?.Height ?? 0);
             ChainedHeader lastWallets = this.LastProcessed(IndexerCheckpoints.Wallets);
+            statsDictionary.Add(IndexerCheckpoints.Wallets.ToString(), lastWallets?.Height ?? 0);
             var minHeight = lastBlocks?.Height ?? 0;
             minHeight = Math.Min(minHeight, lastTransactions?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastBalances?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastWallets?.Height ?? 0);
             this.SetStoreTip(this.Chain.GetBlock(minHeight));
+            statsDictionary.Add("StoreTip", minHeight);
+            this.AddNodeStats(statsDictionary);
         }
 
         /// <summary>
@@ -289,7 +300,7 @@
             if (!this.nodeLifetime.ApplicationStopping.IsCancellationRequested)
             {
                 // Index a batch of blocks/transactions/balances/wallets
-                BlockFetcher fetcher = this.GetBlockFetcher(type);
+                var fetcher = this.GetBlockFetcher(type);
                 if (toHeight > (fetcher._LastProcessed?.Height ?? 0))
                 {
                     fetcher.FromHeight = Math.Max(fetcher._LastProcessed?.Height ?? 0 + 1, fromHeight);
@@ -318,6 +329,23 @@
         }
 
         /// <summary>
+        /// Displays statistics in the console.
+        /// </summary>
+        /// <param name="statsName">Name of the stat</param>
+        private void AddNodeStats(Dictionary<string, int> statsDictionary)
+        {
+            var benchLogs = new StringBuilder();
+            benchLogs.AppendLine($"===Indexer Stats===");
+            foreach (KeyValuePair<string, int> keyVal in statsDictionary)
+            {
+                benchLogs.AppendLine($"{keyVal.Key}.Height: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
+                                     keyVal.Value.ToString().PadRight(8));
+            }
+
+            this.logger.LogInformation(benchLogs.ToString());
+        }
+
+        /// <summary>
         /// Performs indexing into Azure storage.
         /// </summary>
         /// <param name="cancellationToken">The token used for cancellation.</param>
@@ -326,13 +354,13 @@
         {
             this.logger.LogTrace("()");
 
-            while (this.StoreTip.Height < indexerSettings.To && !cancellationToken.IsCancellationRequested)
+            while (this.StoreTip.Height < this.indexerSettings.To && !cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     // All indexes will progress more or less in step
-                    int fromHeight = this.StoreTip.Height + 1;
-                    int toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
+                    var fromHeight = this.StoreTip.Height + 1;
+                    var toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
 
                     this.logger.LogTrace("Starting indexing from {0}, to {1}", fromHeight, toHeight);
 
@@ -371,13 +399,13 @@
         /// <summary>
         /// Sets the StoreTip.
         /// </summary>
-        /// <param name="ChainedHeader">The block to set the store tip to.</param>
-        internal void SetStoreTip(ChainedHeader ChainedHeader)
+        /// <param name="chainedHeader">The block to set the store tip to.</param>
+        internal void SetStoreTip(ChainedHeader chainedHeader)
         {
-            this.logger.LogTrace("({0}:'{1}')", nameof(ChainedHeader), ChainedHeader?.HashBlock);
-            Guard.NotNull(ChainedHeader, nameof(ChainedHeader));
+            this.logger.LogTrace("({0}:'{1}')", nameof(chainedHeader), chainedHeader?.HashBlock);
+            Guard.NotNull(chainedHeader, nameof(chainedHeader));
 
-            this.StoreTip = ChainedHeader;
+            this.StoreTip = chainedHeader;
 
             this.logger.LogTrace("(-)");
         }
