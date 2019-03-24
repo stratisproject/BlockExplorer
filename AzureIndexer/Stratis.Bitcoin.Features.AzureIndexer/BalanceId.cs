@@ -23,10 +23,10 @@
         public const int MaxScriptSize = 79;
 
         /// <summary>The cached partition key.</summary>
-        string _partitionKey;
+        string partitionKey;
 
         /// <summary>The balance id.</summary>
-        string _balanceId;
+        string balanceId;
 
         /// <summary>
         /// Returns the partition key.
@@ -36,14 +36,14 @@
             get
             {
                 // Calculate the partition key if not calculated yet.
-                return this._partitionKey ?? (this._partitionKey = Helper.GetPartitionKey(10, Crc32.Compute(this._balanceId)));
+                return this.partitionKey ?? (this.partitionKey = Helper.GetPartitionKey(10, Crc32.Compute(this.balanceId)));
             }
         }
 
         /// <summary>
         /// Gets determines if this object was constructed from a wallet id or a script.
         /// </summary>
-        public BalanceType Type => this._balanceId.StartsWith(WalletPrefix) ? BalanceType.Wallet : BalanceType.Address;
+        public BalanceType Type => this.balanceId.StartsWith(WalletPrefix) ? BalanceType.Wallet : BalanceType.Address;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BalanceId"/> class.
@@ -52,7 +52,7 @@
         /// <param name="walletId">The wallet id to build the balance id from.</param>
         public BalanceId(string walletId)
         {
-            this._balanceId = WalletPrefix + FastEncoder.Instance.EncodeData(Encoding.UTF8.GetBytes(walletId));
+            this.balanceId = WalletPrefix + FastEncoder.Instance.EncodeData(Encoding.UTF8.GetBytes(walletId));
         }
 
         /// <summary>
@@ -67,11 +67,11 @@
 
             if (pubKey.Length > MaxScriptSize)
             {
-                this._balanceId = HashPrefix + FastEncoder.Instance.EncodeData(scriptPubKey.Hash.ToBytes(true));
+                this.balanceId = HashPrefix + FastEncoder.Instance.EncodeData(scriptPubKey.Hash.ToBytes(true));
             }
             else
             {
-                this._balanceId = FastEncoder.Instance.EncodeData(scriptPubKey.ToBytes(true));
+                this.balanceId = FastEncoder.Instance.EncodeData(scriptPubKey.ToBytes(true));
             }
         }
 
@@ -95,7 +95,7 @@
         }
 
         /// <summary>
-        /// Recovers the wallet id from the internal id if it was constucted from a wallet id.
+        /// Recovers the wallet id from the internal id if it was constructed from a wallet id.
         /// </summary>
         /// <returns>The wallet id.</returns>
         /// <exception cref="System.InvalidOperationException">Thrown if the internal id was not constructed from a wallet id.</exception>
@@ -106,7 +106,7 @@
                 throw new InvalidOperationException("This balance id does not represent a wallet");
             }
 
-            return Encoding.UTF8.GetString(FastEncoder.Instance.DecodeData(this._balanceId.Substring(WalletPrefix.Length)));
+            return Encoding.UTF8.GetString(FastEncoder.Instance.DecodeData(this.balanceId.Substring(WalletPrefix.Length)));
         }
 
         /// <summary>
@@ -115,21 +115,21 @@
         /// <returns>The script that was used to construct this object - otherwise returns null.</returns>
         public Script ExtractScript()
         {
-            return this.ContainsScript ? Script.FromBytesUnsafe(FastEncoder.Instance.DecodeData(this._balanceId)) : null;
+            return this.ContainsScript ? Script.FromBytesUnsafe(FastEncoder.Instance.DecodeData(this.balanceId)) : null;
         }
 
         /// <summary>
         /// Gets a value indicating whether determines if a script, with a size not exceeding MaxScriptSize, was used to construct this object.
         /// </summary>
-        public bool ContainsScript => this._balanceId.Length >= 2 && this._balanceId[1] != '$';
+        public bool ContainsScript => this.balanceId.Length >= 2 && this.balanceId[1] != '$';
 
         /// <summary>
         /// Returns the balance id.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Balance ID</returns>
         public override string ToString()
         {
-            return this._balanceId;
+            return this.balanceId;
         }
 
         /// <summary>
@@ -140,7 +140,7 @@
         public static BalanceId Parse(string balanceId) =>
             new BalanceId()
             {
-                _balanceId = balanceId
+                balanceId = balanceId
             };
     }
 }
