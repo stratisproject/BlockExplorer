@@ -26,11 +26,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.0.4-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.0.4-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.2" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.2" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.2" />
     <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="0.0.6-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.0.4-beta" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.2" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.SmartContracts.CLR" Version="0.0.6-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />

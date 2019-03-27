@@ -45,7 +45,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 container.GetPageBlobReference(blockId.ToString()).DownloadToStreamAsync(ms).GetAwaiter().GetResult();
                 ms.Position = 0;
                 Block b = this.network.Consensus.ConsensusFactory.CreateBlock();
-                BitcoinStream stream = new BitcoinStream(ms.ToArray());
+                BitcoinStream stream = new BitcoinStream(ms, true);
                 stream.ConsensusFactory = this.network.Consensus.ConsensusFactory;
                 b.ReadWrite(stream);
                 return b;
