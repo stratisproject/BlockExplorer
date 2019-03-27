@@ -151,7 +151,6 @@
         {
             var height = Math.Min(ToHeight, _BlockHeaders.Tip.Height);
             _LastProcessed = _BlockHeaders.GetBlock(height);
-            IndexerTrace.Information("Skipped to the end at height " + height);
         }
 
         #region IEnumerable Members
