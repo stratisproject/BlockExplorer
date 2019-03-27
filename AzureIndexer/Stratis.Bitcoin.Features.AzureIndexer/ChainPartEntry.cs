@@ -48,7 +48,7 @@
             DynamicTableEntity entity = new DynamicTableEntity();
             entity.PartitionKey = "a";
             entity.RowKey = Helper.HeightToString(this.ChainOffset);
-            int i = 0;
+            var i = 0;
             foreach (BlockHeader header in this.BlockHeaders)
             {
                 entity.Properties.Add("a" + i, new EntityProperty(header.ToBytes()));
