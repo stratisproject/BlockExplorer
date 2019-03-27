@@ -47,12 +47,12 @@
 
         internal static void CheckpointLoaded(ChainedHeader block, string checkpointName)
         {
-            Logger.LogInformation("Checkpoint " + checkpointName + " loaded at " + ToString(block));
+            Logger.LogTrace("Checkpoint " + checkpointName + " loaded at " + ToString(block));
         }
 
         internal static void CheckpointSaved(ChainedHeader block, string checkpointName)
         {
-            Logger.LogInformation("Checkpoint " + checkpointName + " saved at " + ToString(block));
+            Logger.LogTrace("Checkpoint " + checkpointName + " saved at " + ToString(block));
         }
 
         internal static void ErrorWhileImportingEntitiesToAzure(ITableEntity[] entities, Exception ex)
@@ -106,7 +106,7 @@
 
         internal static void TaskCount(int count)
         {
-            Logger.LogInformation("Upload thread count : " + count);
+            Logger.LogTrace("Upload thread count : " + count);
         }
 
         internal static void ErrorWhileImportingBalancesToAzure(Exception ex, uint256 txid)
@@ -122,7 +122,7 @@
 
         internal static void InputChainTip(ChainedHeader block)
         {
-            Logger.LogInformation("The input chain tip is at height " + ToString(block));
+            Logger.LogTrace("The input chain tip is at height " + ToString(block));
         }
 
         private static string ToString(uint256 blockId, int height)
@@ -132,17 +132,17 @@
 
         internal static void IndexedChainTip(uint256 blockId, int height)
         {
-            Logger.LogInformation("Indexed chain is at height " + ToString(blockId, height));
+            Logger.LogTrace("Indexed chain is at height " + ToString(blockId, height));
         }
 
         internal static void InputChainIsLate()
         {
-            Logger.LogInformation("The input chain is late compared to the indexed one");
+            Logger.LogTrace("The input chain is late compared to the indexed one");
         }
 
         public static void IndexingChain(ChainedHeader from, ChainedHeader to)
         {
-            Logger.LogInformation("Indexing blocks from " + ToString(from) + " to " + ToString(to) + " (both included)");
+            Logger.LogTrace("Indexing blocks from " + ToString(from) + " to " + ToString(to) + " (both included)");
         }
 
         private static string ToString(ChainedHeader ChainedHeader)
@@ -160,13 +160,13 @@
             int remaining = height - maxHeight;
             if (remaining % 1000 == 0 && remaining != 0)
             {
-                Logger.LogInformation("Remaining chain block to index : " + remaining + " (" + height + "/" + maxHeight + ")");
+                Logger.LogTrace("Remaining chain block to index : " + remaining + " (" + height + "/" + maxHeight + ")");
             }
         }
 
         internal static void IndexedChainIsUpToDate(ChainedHeader block)
         {
-            Logger.LogInformation("Indexed chain is up to date at height " + ToString(block));
+            Logger.LogTrace("Indexed chain is up to date at height " + ToString(block));
         }
 
         public static void Information(string message)
@@ -193,7 +193,7 @@
                     var remainingSize = GetSize(height, totalHeight);
                     TimeSpan estimatedTime = downloadedSize < 1.0m ? TimeSpan.FromDays(999.0)
                         : TimeSpan.FromTicks((long)((remainingSize / downloadedSize) * time.Ticks));
-                    Logger.LogInformation("Blocks {0}/{1} (estimate : {2})", height, totalHeight, Pretty(estimatedTime));
+                    Logger.LogTrace("Blocks {0}/{1} (estimate : {2})", height, totalHeight, Pretty(estimatedTime));
                 }
 
                 lastLogs.Enqueue(DateTime.UtcNow);
