@@ -55,6 +55,7 @@
             this.FromHeight = 0;
             this.ToHeight = int.MaxValue;
             this._logger = loggerFactory.CreateLogger(this.GetType().FullName);
+            IndexerTrace.Configure(this._loggerFactory);
         }
 
         internal Checkpoint GetCheckpointInternal(IndexerCheckpoints checkpoint)

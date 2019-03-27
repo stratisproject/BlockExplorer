@@ -21,12 +21,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The number of blocks to index at a time.</summary>
         private const int IndexBatchSize = 100;
 
-        /// <summary>The async loop we need to wait upon before we can shut down this feature.</summary>
-        private IAsyncLoop asyncLoop;
-
-        /// <summary>Another async loop we need to wait upon before we can shut down this feature.</summary>
-        private IAsyncLoop asyncLoopChain;
-
         /// <summary>Factory for creating background async loop tasks.</summary>
         private readonly IAsyncLoopFactory asyncLoopFactory;
 
@@ -43,6 +37,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
+
+        /// <summary>The async loop we need to wait upon before we can shut down this feature.</summary>
+        private IAsyncLoop asyncLoop;
+
+        /// <summary>Another async loop we need to wait upon before we can shut down this feature.</summary>
+        private IAsyncLoop asyncLoopChain;
 
         /// <summary>Gets the full node that owns the block repository that we want to index.</summary>
         public FullNode FullNode { get; }
@@ -152,19 +152,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.asyncLoopChain.Dispose();
 
             this.logger.LogTrace("(-)");
-        }
-
-        public StringBuilder BuildNodeStats(Dictionary<string, int> statsDictionary)
-        {
-            var benchLogs = new StringBuilder();
-            benchLogs.AppendLine($"===Indexer Stats===");
-            foreach (KeyValuePair<string, int> keyVal in statsDictionary)
-            {
-                benchLogs.AppendLine($"{keyVal.Key}.Height: ".PadRight(LoggingConfiguration.ColumnLength + 3) +
-                                     keyVal.Value.ToString().PadRight(8));
-            }
-
-            return benchLogs;
         }
 
         /// <summary>
@@ -354,17 +341,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         /// <summary>
-        /// Displays statistics in the console.
-        /// </summary>
-        /// <param name="statsDictionary">Set of stats</param>
-        private void AddNodeStats(Dictionary<string, int> statsDictionary)
-        {
-            StringBuilder benchLogs = this.BuildNodeStats(statsDictionary);
-
-            this.logger.LogInformation(benchLogs.ToString());
-        }
-
-        /// <summary>
         /// Performs indexing into Azure storage.
         /// </summary>
         /// <param name="cancellationToken">The token used for cancellation.</param>
@@ -397,7 +373,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                     // Update the StoreTip
                     this.UpdateStoreTip();
-                    this.AddNodeStats(this.StatsDictionary);
                     this.logger.LogTrace("Indexing iteration finished");
                 }
                 catch (OperationCanceledException)
@@ -412,6 +387,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
             }
+
             this.logger.LogTrace("(-)");
         }
 

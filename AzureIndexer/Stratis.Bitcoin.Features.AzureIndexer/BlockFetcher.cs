@@ -65,13 +65,19 @@
             this.logger = this.loggerFactory.CreateLogger(GetType().FullName);
 
             if (blocksRepository == null)
+            {
                 throw new ArgumentNullException("blocksRepository");
+            }
 
             if (chain == null)
+            {
                 throw new ArgumentNullException("blockHeaders");
+            }
 
             if (checkpoint == null)
+            {
                 throw new ArgumentNullException("checkpoint");
+            }
 
             _BlockHeaders = chain;
             _BlocksRepository = blocksRepository;
@@ -84,8 +90,6 @@
         public TimeSpan NeedSaveInterval { get; set; }
 
         public CancellationToken CancellationToken { get; set; }
-
-        #region IEnumerable<BlockInfo> Members
 
         public ChainedHeader _LastProcessed { get; private set; }
 
@@ -110,7 +114,7 @@
                 height = 0;
             }
 
-            foreach(Block block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
+            foreach (Block block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
                 ChainedHeader header = _BlockHeaders.GetBlock(height);
 
@@ -121,8 +125,11 @@
                     {
                         // Store is caught up with Chain but the block is missing from the store.
                         if (header.Header.BlockTime <= storeTip.Header.BlockTime)
+                        {
                             throw new InvalidOperationException($"Chained block not found in store (height = { height }). Re-create the block store.");
+                        }
                     }
+
                     // Allow Store to catch up with Chain.
                     break;
                 }
@@ -146,8 +153,6 @@
             _LastProcessed = _BlockHeaders.GetBlock(height);
             IndexerTrace.Information("Skipped to the end at height " + height);
         }
-
-        #endregion
 
         #region IEnumerable Members
 
