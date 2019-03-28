@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
-using Stratis.Bitcoin.Features.Consensus;
-
-namespace Stratis.IndexerD
+﻿namespace Stratis.IndexerD
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using NBitcoin.Protocol;
     using Stratis.Bitcoin;
@@ -13,7 +10,9 @@ namespace Stratis.IndexerD
     using Stratis.Bitcoin.Features.Api;
     using Stratis.Bitcoin.Features.AzureIndexer;
     using Stratis.Bitcoin.Features.BlockStore;
+    using Stratis.Bitcoin.Features.Consensus;
     using Stratis.Bitcoin.Features.MemoryPool;
+    using Stratis.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
     using Stratis.Bitcoin.Features.RPC;
     using Stratis.Bitcoin.Features.SmartContracts;
     using Stratis.Bitcoin.Features.SmartContracts.PoA;
