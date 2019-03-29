@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Serilog;
-using Serilog.Events;
-
-namespace AzureIndexer.Api
+﻿namespace AzureIndexer.Api
 {
+    using System;
+    using System.IO;
+    using Autofac.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Hosting;
+    using Serilog;
+    using Serilog.Events;
+
     public class Program
     {
         public static void Main(string[] args)

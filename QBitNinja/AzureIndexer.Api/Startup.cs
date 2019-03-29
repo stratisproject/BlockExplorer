@@ -3,7 +3,6 @@ using System.Threading;
 using AzureIndexer.Api.Controllers;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.IoC;
-using AzureIndexer.Api.JsonConverters;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBitcoin.Networks;
@@ -12,7 +11,6 @@ using Serilog;
 using Stratis.Bitcoin.Networks;
 using Stratis.Sidechains.Networks;
 using Swashbuckle.AspNetCore.Swagger;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace AzureIndexer.Api
 {
