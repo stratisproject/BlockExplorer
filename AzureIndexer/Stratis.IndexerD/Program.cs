@@ -61,8 +61,11 @@
                     nodeSettings = new NodeSettings(networksSelector: Stratis.Bitcoin.Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
-                        .UsePosConsensus()
                         .UseBlockStore()
+                        .UsePosConsensus()
+                        .UseMempool()
+                        .UseApi()
+                        .AddRPC()
                         .UseAzureIndexer()
                         .Build();
                 }
