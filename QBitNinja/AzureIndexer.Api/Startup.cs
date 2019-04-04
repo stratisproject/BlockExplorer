@@ -60,6 +60,7 @@ namespace AzureIndexer.Api
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddSingleton<IHostedService, BuildChainCache>();
             services.AddSingleton<IHostedService, UpdateChainListener>();
             services.AddCors();
             services.AddSwaggerGen(c =>
@@ -91,47 +92,7 @@ namespace AzureIndexer.Api
             builder.Register(ctx =>
             {
                 var config = ctx.Resolve<QBitNinjaConfiguration>();
-                var client = ctx.Resolve<IndexerClient>();
                 var chain = new ConcurrentChain(config.Indexer.Network);
-                try
-                {
-                    LoadCache(chain, config.LocalChain);
-
-                    var changes = client.GetChainChangesUntilFork(chain.Tip, false);
-                    try
-                    {
-                        changes.UpdateChain(chain);
-                    }
-                    catch (ArgumentException) // Happen when chain in table is corrupted
-                    {
-                        client.Configuration.GetChainTable().DeleteIfExistsAsync().GetAwaiter().GetResult();
-                        for (var i = 0; i < 20; i++)
-                        {
-                            try
-                            {
-                                if (client.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter()
-                                    .GetResult())
-                                {
-                                    break;
-                                }
-                            }
-                            catch
-                            {
-                                // ignored
-                            }
-
-                            Thread.Sleep(10000);
-                        }
-
-                        client.Configuration.CreateIndexer().IndexChain(chain);
-                    }
-
-                    SaveChainCache(chain, config.LocalChain);
-                }
-                catch
-                {
-                    // ignore
-                }
 
                 return chain;
             }).As<ConcurrentChain>().SingleInstance();
@@ -141,6 +102,7 @@ namespace AzureIndexer.Api
             builder.RegisterType<BlockSearchService>().As<IBlockSearchService>();
             builder.RegisterType<SmartContractSearchService>().As<ISmartContractSearchService>();
             builder.RegisterType<MainController>().AsSelf();
+            builder.RegisterType<ChainCacheProvider>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
             this.ApplicationContainer = builder.Build();
 
@@ -181,6 +143,7 @@ namespace AzureIndexer.Api
             loggerFactory.AddDebug();
 
             app.UseSwagger();
+            app.UseMiddleware<ChainCacheCheckMiddleware>();
 
             app.UseSwaggerUI(c =>
             {
@@ -199,48 +162,6 @@ namespace AzureIndexer.Api
             app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseHttpsRedirection();
             app.UseMvc();
-        }
-
-        private static void LoadCache(ConcurrentChain chain, string cacheLocation)
-        {
-            if (string.IsNullOrEmpty(cacheLocation))
-            {
-                return;
-            }
-
-            try
-            {
-                var bytes = File.ReadAllBytes(cacheLocation);
-                chain.Load(bytes);
-            }
-            catch
-            {
-                // We don't care if it don't succeed
-            }
-        }
-
-        private static void SaveChainCache(ConcurrentChain chain, string cacheLocation)
-        {
-            if (string.IsNullOrEmpty(cacheLocation))
-            {
-                return;
-            }
-
-            try
-            {
-                var file = new FileInfo(cacheLocation);
-                if (!file.Exists || (DateTime.UtcNow - file.LastWriteTimeUtc) > TimeSpan.FromDays(1))
-                {
-                    using (var fs = File.Open(cacheLocation, FileMode.Create))
-                    {
-                        chain.WriteTo(fs);
-                    }
-                }
-            }
-            catch
-            {
-                // ignored
-            }
         }
     }
 }

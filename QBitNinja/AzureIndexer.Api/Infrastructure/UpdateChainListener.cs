@@ -13,15 +13,18 @@
         private readonly IndexerClient indexer;
         private readonly ConcurrentChain chain;
         private readonly ILogger logger;
+        private readonly ChainCacheProvider provider;
 
         public UpdateChainListener(
             IndexerClient indexer,
             ConcurrentChain chain,
-            ILogger logger)
+            ILogger logger,
+            ChainCacheProvider provider)
         {
             this.indexer = indexer;
             this.chain = chain;
             this.logger = logger;
+            this.provider = provider;
         }
 
         protected virtual TimeSpan Delay => TimeSpan.FromSeconds(10);
@@ -34,13 +37,16 @@
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
+                if (this.provider.IsCacheAvailable)
                 {
-                    this.UpdateChain();
-                }
-                catch (Exception ex)
-                {
-                    this.logger.Warning(ex, "{ErrorMessage}", ex.Message);
+                    try
+                    {
+                        this.UpdateChain();
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.Warning(ex, "{ErrorMessage}", ex.Message);
+                    }
                 }
 
                 await Task.Delay(this.Delay, stoppingToken);
