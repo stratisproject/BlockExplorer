@@ -45,14 +45,16 @@
                    node = new FullNodeBuilder()
                        .UseNodeSettings(nodeSettings)
                        .UseBlockStore()
-                       .UseMempool()
-                       .AddSmartContracts()
+                       .AddRPC()
+                       .AddSmartContracts(options =>
+                       {
+                           options.UseReflectionExecutor();
+                       })
                        .UseSmartContractPoAConsensus()
                        .UseSmartContractPoAMining()
                        .UseSmartContractWallet()
-                       .UseReflectionExecutor()
                        .UseApi()
-                       .AddRPC()
+                       .UseMempool()
                        .UseAzureIndexer()
                        .Build();
                 }
