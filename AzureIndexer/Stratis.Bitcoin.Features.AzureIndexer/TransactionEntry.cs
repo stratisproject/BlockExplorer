@@ -8,11 +8,11 @@
     using NBitcoin;
     using NBitcoin.OpenAsset;
     using Stratis.Bitcoin.Networks;
-    using Stratis.SmartContracts.CLR;
-    using Stratis.SmartContracts.CLR.Compilation;
-    using Stratis.SmartContracts.CLR.Decompilation;
-    using Stratis.SmartContracts.CLR.Serialization;
-    using Stratis.SmartContracts.Core;
+    //using Stratis.SmartContracts.CLR;
+    //using Stratis.SmartContracts.CLR.Compilation;
+    //using Stratis.SmartContracts.CLR.Decompilation;
+    //using Stratis.SmartContracts.CLR.Serialization;
+    //using Stratis.SmartContracts.Core;
 
     public partial class TransactionEntry
     {
@@ -220,7 +220,7 @@
 
             public Network Network { get; set; }
 
-            public ContractTxData ContractTxData { get; set; }
+          //  public ContractTxData ContractTxData { get; set; }
 
             public byte[] ContractByteCode { get; set; }
 
@@ -304,40 +304,40 @@
             /// <returns>True or False</returns>
             private bool CheckForSmartContract(Transaction transaction)
             {
-                CallDataSerializer smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
-                CSharpContractDecompiler csharpDecompiler = new CSharpContractDecompiler();
+                //CallDataSerializer smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
+                //CSharpContractDecompiler csharpDecompiler = new CSharpContractDecompiler();
 
-                foreach (TxOut transactionOutput in transaction.Outputs)
-                {
-                    Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
-                    if (contractTxDataResult.IsSuccess)
-                    {
-                        this.HasSmartContract = true;
-                        this.ContractTxData = contractTxDataResult.Value;
-                        if (!this.ContractTxData.IsCreateContract)
-                        {
-                            continue;
-                        }
+                //foreach (TxOut transactionOutput in transaction.Outputs)
+                //{
+                    //Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
+                    //if (contractTxDataResult.IsSuccess)
+                    //{
+                    //    this.HasSmartContract = true;
+                    //    this.ContractTxData = contractTxDataResult.Value;
+                    //    if (!this.ContractTxData.IsCreateContract)
+                    //    {
+                    //        continue;
+                    //    }
 
-                        // Get & Save Contract details just on Op_Create
-                        Result<IContractModuleDefinition> contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
-                        if (contractDecompileResult.IsSuccess)
-                        {
-                            this.ContractByteCode = contractDecompileResult.Value.ToByteCode().Value;
-                            if (this.ContractByteCode.Length > 0)
-                            {
-                                Result<string> csharpDecompileResult =
-                                    csharpDecompiler.GetSource(this.ContractByteCode);
-                                if (csharpDecompileResult.IsSuccess)
-                                {
-                                    this.ContractCode = csharpDecompileResult.Value;
-                                }
-                            }
-                        }
-                    }
-                }
+                    //    // Get & Save Contract details just on Op_Create
+                    //    Result<IContractModuleDefinition> contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
+                    //    if (contractDecompileResult.IsSuccess)
+                    //    {
+                    //        this.ContractByteCode = contractDecompileResult.Value.ToByteCode().Value;
+                    //        if (this.ContractByteCode.Length > 0)
+                    //        {
+                    //            Result<string> csharpDecompileResult =
+                    //                csharpDecompiler.GetSource(this.ContractByteCode);
+                    //            if (csharpDecompileResult.IsSuccess)
+                    //            {
+                    //                this.ContractCode = csharpDecompileResult.Value;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+               // }
 
-                return this.HasSmartContract;
+                return false;// this.HasSmartContract;
             }
 
             public TransactionEntryType GetType(string letter)

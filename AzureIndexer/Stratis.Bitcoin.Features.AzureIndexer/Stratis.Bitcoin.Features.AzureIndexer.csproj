@@ -38,32 +38,6 @@
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
-      <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR.Validation">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.Validation.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Core">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Networks">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.RuntimeObserver">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.RuntimeObserver.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>

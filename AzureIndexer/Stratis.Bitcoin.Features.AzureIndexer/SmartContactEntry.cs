@@ -3,7 +3,7 @@
     using System;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
-    using Stratis.SmartContracts.CLR;
+    //using Stratis.SmartContracts.CLR;
 
     public class SmartContactEntry
     {
@@ -13,7 +13,7 @@
             {
                 this.transactionEntity = transactionEntity;
                 this.TxId = this.transactionEntity.TxId;
-                this.ContractTxData = this.transactionEntity.ContractTxData;
+               // this.ContractTxData = this.transactionEntity.ContractTxData;
                 this.ContractCode = this.transactionEntity.ContractCode;
                 this.ContractByteCode = this.transactionEntity.ContractByteCode;
                 this.Child = new SmartContactDetailsEntry.Entity(this);
@@ -25,7 +25,7 @@
 
             private string _rowKey;
 
-            private AddressGenerator addressGenerator { get; } = new AddressGenerator();
+           // private AddressGenerator addressGenerator { get; } = new AddressGenerator();
 
             public SmartContactDetailsEntry.Entity Child { get; set; }
 
@@ -35,14 +35,14 @@
                 {
                     if (this._partitionKey == null && this.TxId != null)
                     {
-                        if (this.ContractTxData.IsCreateContract)
-                        {
-                            this._partitionKey = this.addressGenerator.GenerateAddress(this.TxId, 0).ToString();
-                        }
-                        else
-                        {
-                            this._partitionKey = this.ContractTxData.ContractAddress.ToString();
-                        }
+                        //if (this.ContractTxData.IsCreateContract)
+                        //{
+                        //   // this._partitionKey = this.addressGenerator.GenerateAddress(this.TxId, 0).ToString();
+                        //}
+                        //else
+                        //{
+                        //    this._partitionKey = this.ContractTxData.ContractAddress.ToString();
+                        //}
                     }
 
                     return this._partitionKey;
@@ -66,7 +66,7 @@
 
             public uint256 TxId { get; set; }
 
-            public ContractTxData ContractTxData { get; set; }
+          //  public ContractTxData ContractTxData { get; set; }
 
             public byte[] ContractByteCode { get; set; }
 
@@ -84,9 +84,9 @@
                     ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
                 };
 
-                entity.Properties.AddOrReplace("GasPrice", new EntityProperty(Convert.ToInt64(this.ContractTxData.GasPrice)));
-                entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
-                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType.ToString())); // TODO Convert to proper string name
+                //entity.Properties.AddOrReplace("GasPrice", new EntityProperty(Convert.ToInt64(this.ContractTxData.GasPrice)));
+                //entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
+                //entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType.ToString())); // TODO Convert to proper string name
 
                 return entity;
             }

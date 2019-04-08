@@ -14,11 +14,11 @@
     using Stratis.Bitcoin.Features.MemoryPool;
     using Stratis.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
     using Stratis.Bitcoin.Features.RPC;
-    using Stratis.Bitcoin.Features.SmartContracts;
-    using Stratis.Bitcoin.Features.SmartContracts.PoA;
-    using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+   // using Stratis.Bitcoin.Features.SmartContracts;
+   // using Stratis.Bitcoin.Features.SmartContracts.PoA;
+  //  using Stratis.Bitcoin.Features.SmartContracts.Wallet;
     using Stratis.Bitcoin.Utilities;
-    using Stratis.Sidechains.Networks;
+  // using Stratis.Sidechains.Networks;
 
     public class Program
     {
@@ -41,22 +41,22 @@
 
                 if (isSideChain)
                 {
-                   nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
-                   node = new FullNodeBuilder()
-                       .UseNodeSettings(nodeSettings)
-                       .UseBlockStore()
-                       .AddRPC()
-                       .AddSmartContracts(options =>
-                       {
-                           options.UseReflectionExecutor();
-                       })
-                       .UseSmartContractPoAConsensus()
-                       .UseSmartContractPoAMining()
-                       .UseSmartContractWallet()
-                       .UseApi()
-                       .UseMempool()
-                       .UseAzureIndexer()
-                       .Build();
+                   // nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
+                   // node = new FullNodeBuilder()
+                       // .UseNodeSettings(nodeSettings)
+                       // .UseBlockStore()
+                       // .AddRPC()
+                       // .AddSmartContracts(options =>
+                       // {
+                       //    options.UseReflectionExecutor();
+                       // })
+                       // .UseSmartContractPoAConsensus()
+                       // .UseSmartContractPoAMining()
+                       // .UseSmartContractWallet()
+                       // .UseApi()
+                       // .UseMempool()
+                       // .UseAzureIndexer()
+                       // .Build();
                 }
                 else
                 {
