@@ -6,16 +6,18 @@
 
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {
-        private readonly ILogger logger;
+        private readonly WalletRuleEntryCollection walletRules;
 
-        WalletRuleEntryCollection _WalletRules;
+        private readonly ILogger logger;
 
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
             : base(conf, loggerFactory)
         {
-            this._WalletRules = walletRules;
+            this.walletRules = walletRules;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
+
+        protected override bool SkipToEnd => this.walletRules != null && this.walletRules.Count == 0;
 
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
@@ -27,18 +29,8 @@
             return item.ToEntity();
         }
 
-        protected override bool SkipToEnd
-        {
-            get
-            {
-                return this._WalletRules != null && this._WalletRules.Count == 0;
-            }
-        }
-
         protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
-            this.logger.LogTrace("()");
-
             foreach (Transaction tx in block.Block.Transactions)
             {
                 uint256 txId = tx.GetHash();
@@ -49,15 +41,13 @@
                     bulk.Add(entry.PartitionKey, entry);
                 }
             }
-
-            this.logger.LogTrace("(-)");
         }
 
         private IEnumerable<OrderedBalanceChange> Extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
-            if (this._WalletRules != null)
+            if (this.walletRules != null)
             {
-                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, this._WalletRules, network);
+                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, this.walletRules, network);
             }
             else
             {

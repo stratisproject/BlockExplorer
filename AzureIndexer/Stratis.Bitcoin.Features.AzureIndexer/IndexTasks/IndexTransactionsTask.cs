@@ -70,8 +70,8 @@
             TableRequestOptions options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
-                MaximumExecutionTime = this._Timeout,
-                ServerTimeout = this._Timeout,
+                MaximumExecutionTime = this.Timeout,
+                ServerTimeout = this.Timeout,
             };
 
             OperationContext context = new OperationContext();
