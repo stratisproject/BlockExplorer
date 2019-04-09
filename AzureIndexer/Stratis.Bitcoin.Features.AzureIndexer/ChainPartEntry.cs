@@ -1,61 +1,60 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using System.Collections.Generic;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System.Collections.Generic;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+
     public class ChainPartEntry
     {
         public ChainPartEntry()
         {
-            BlockHeaders = new List<BlockHeader>();
+            this.BlockHeaders = new List<BlockHeader>();
         }
 
-        public ChainPartEntry(DynamicTableEntity entity)
+        public ChainPartEntry(DynamicTableEntity entity, Network network)
         {
-            ChainOffset = Helper.StringToHeight(entity.RowKey);
-            BlockHeaders = new List<BlockHeader>();         
-            foreach (var prop in entity.Properties)
+            this.ChainOffset = Helper.StringToHeight(entity.RowKey);
+            this.BlockHeaders = new List<BlockHeader>();
+            foreach (KeyValuePair<string, EntityProperty> prop in entity.Properties)
             {
-                var header = new BlockHeader();
+                BlockHeader header = network.Consensus.ConsensusFactory.CreateBlockHeader();
                 header.FromBytes(prop.Value.BinaryValue);
-                BlockHeaders.Add(header);
+                this.BlockHeaders.Add(header);
             }
         }
 
-        public int ChainOffset
-        {
-            get;
-            set;
-        }
+        public int ChainOffset { get; set; }
 
-        public List<BlockHeader> BlockHeaders
-        {
-            get;
-            private set;
-        }
+        public List<BlockHeader> BlockHeaders { get; private set; }
 
         public BlockHeader GetHeader(int height)
         {
-            if (height < ChainOffset)
+            if (height < this.ChainOffset)
+            {
                 return null;
-            height = height - ChainOffset;
-            if (height >= BlockHeaders.Count)
+            }
+
+            height = height - this.ChainOffset;
+            if (height >= this.BlockHeaders.Count)
+            {
                 return null;
-            return BlockHeaders[height];
+            }
+
+            return this.BlockHeaders[height];
         }
 
         public DynamicTableEntity ToEntity()
         {
             DynamicTableEntity entity = new DynamicTableEntity();
             entity.PartitionKey = "a";
-            entity.RowKey = Helper.HeightToString(ChainOffset);
-            int i = 0;
-            foreach (var header in BlockHeaders)
+            entity.RowKey = Helper.HeightToString(this.ChainOffset);
+            var i = 0;
+            foreach (BlockHeader header in this.BlockHeaders)
             {
                 entity.Properties.Add("a" + i, new EntityProperty(header.ToBytes()));
                 i++;
             }
+
             return entity;
         }
     }

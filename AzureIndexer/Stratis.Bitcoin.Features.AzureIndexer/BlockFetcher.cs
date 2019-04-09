@@ -1,35 +1,26 @@
-﻿using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using Microsoft.Extensions.Logging;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
+
     public class BlockInfo
     {
-        public int Height
-        {
-            get;
-            set;
-        }
-        public uint256 BlockId
-        {
-            get;
-            set;
-        }
-        public Block Block
-        {
-            get;
-            set;
-        }
+        public int Height { get; set; }
+
+        public uint256 BlockId { get; set; }
+
+        public Block Block { get; set; }
     }
+
     public class BlockFetcher : IEnumerable<BlockInfo>
     {
-
         private readonly Checkpoint _Checkpoint;
+
         public Checkpoint Checkpoint
         {
             get
@@ -39,6 +30,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         private readonly IBlocksRepository _BlocksRepository;
+
         public IBlocksRepository BlocksRepository
         {
             get
@@ -52,6 +44,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILogger logger;
 
         private readonly ChainBase _BlockHeaders;
+
         public ChainBase BlockHeaders
         {
             get
@@ -72,13 +65,19 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.logger = this.loggerFactory.CreateLogger(GetType().FullName);
 
             if (blocksRepository == null)
+            {
                 throw new ArgumentNullException("blocksRepository");
+            }
 
             if (chain == null)
+            {
                 throw new ArgumentNullException("blockHeaders");
+            }
 
             if (checkpoint == null)
+            {
                 throw new ArgumentNullException("checkpoint");
+            }
 
             _BlockHeaders = chain;
             _BlocksRepository = blocksRepository;
@@ -88,19 +87,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             InitDefault();
         }
 
-        public TimeSpan NeedSaveInterval
-        {
-            get;
-            set;
-        }
+        public TimeSpan NeedSaveInterval { get; set; }
 
-        public CancellationToken CancellationToken
-        {
-            get;
-            set;
-        }
-
-        #region IEnumerable<BlockInfo> Members
+        public CancellationToken CancellationToken { get; set; }
 
         public ChainedHeader _LastProcessed { get; private set; }
 
@@ -109,32 +98,38 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Queue<DateTime> lastLogs = new Queue<DateTime>();
             Queue<int> lastHeights = new Queue<int>();
 
-            var fork = _BlockHeaders.FindFork(_Checkpoint.BlockLocator);
-            var headers = _BlockHeaders.EnumerateAfter(fork);
+            ChainedHeader fork = this._BlockHeaders.FindFork(this._Checkpoint.BlockLocator);
+            IEnumerable<ChainedHeader> headers = this._BlockHeaders.EnumerateAfter(fork);
             headers = headers.Where(h => h.Height <= ToHeight);
-            var first = headers.FirstOrDefault();
-            if(first == null)
+            ChainedHeader first = headers.FirstOrDefault();
+            if (first == null)
+            {
                 yield break;
+            }
+
             var height = first.Height;
-            if(first.Height == 1)
+            if (first.Height == 1)
             {
                 headers = new[] { fork }.Concat(headers);
                 height = 0;
             }
 
-            foreach(var block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
+            foreach (Block block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
             {
-                var header = _BlockHeaders.GetBlock(height);
+                ChainedHeader header = _BlockHeaders.GetBlock(height);
 
                 if (block == null)
                 {
-                    var storeTip = _BlocksRepository.GetStoreTip();
+                    Block storeTip = _BlocksRepository.GetStoreTip();
                     if (storeTip != null)
                     {
                         // Store is caught up with Chain but the block is missing from the store.
                         if (header.Header.BlockTime <= storeTip.Header.BlockTime)
+                        {
                             throw new InvalidOperationException($"Chained block not found in store (height = { height }). Re-create the block store.");
+                        }
                     }
+
                     // Allow Store to catch up with Chain.
                     break;
                 }
@@ -156,10 +151,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             var height = Math.Min(ToHeight, _BlockHeaders.Tip.Height);
             _LastProcessed = _BlockHeaders.GetBlock(height);
-            IndexerTrace.Information("Skipped to the end at height " + height);
         }
-
-        #endregion
 
         #region IEnumerable Members
 
@@ -171,6 +163,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         #endregion
 
         private DateTime _LastSaved = DateTime.UtcNow;
+
         public bool NeedSave
         {
             get
@@ -183,28 +176,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogTrace("()");
 
-            if(_LastProcessed != null)
+            if (_LastProcessed != null)
             {
                 this.logger.LogTrace("Saving checkpoints");
 
                 _Checkpoint.SaveProgress(_LastProcessed);
                 IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
             }
+
             _LastSaved = DateTime.UtcNow;
 
             this.logger.LogTrace("(-)");
         }
 
-        public int FromHeight
-        {
-            get;
-            set;
-        }
+        public int FromHeight { get; set; }
 
-        public int ToHeight
-        {
-            get;
-            set;
-        }
+        public int ToHeight { get; set; }
     }
 }

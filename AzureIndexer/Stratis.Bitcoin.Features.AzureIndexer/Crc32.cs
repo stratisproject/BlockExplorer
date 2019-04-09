@@ -6,7 +6,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
     // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
     // Originally published at http://damieng.com/blog/2006/08/08/calculating_crc32_in_c_and_net
-
     using System;
     using System.Collections.Generic;
     using System.Security.Cryptography;
@@ -59,7 +58,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             protected override byte[] HashFinal()
             {
-                var hashBuffer = UInt32ToBigEndianBytes(~hash);
+                byte[] hashBuffer = UInt32ToBigEndianBytes(~hash);
                 HashValue = hashBuffer;
                 return hashBuffer;
             }
@@ -120,7 +119,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             private static byte[] UInt32ToBigEndianBytes(UInt32 uint32)
             {
-                var result = BitConverter.GetBytes(uint32);
+                byte[] result = BitConverter.GetBytes(uint32);
 
                 if (BitConverter.IsLittleEndian)
                     Array.Reverse(result);

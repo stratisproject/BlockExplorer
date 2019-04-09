@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     public class FastEncoder
     {
         private static readonly FastEncoder _Instance = new FastEncoder();
@@ -24,7 +24,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 new int[]{0x5D,0x7E},
                 new int[]{0xA0,0x148}
              };
-            var unicodes = Enumerate(ranges);
+            IEnumerable<int> unicodes = Enumerate(ranges);
             StringBuilder builder = new StringBuilder(260);
             foreach (var i in unicodes)
             {
@@ -34,7 +34,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             _BytesToChar = builder.ToString().ToCharArray();
             _CharToBytes = new byte[ranges[ranges.Length - 1][1] + 1];
 
-            var enumerator = unicodes.GetEnumerator();
+            IEnumerator<int> enumerator = unicodes.GetEnumerator();
             for (int i = 0 ; i < 256 ; i++)
             {
                 enumerator.MoveNext();
@@ -44,7 +44,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         private IEnumerable<int> Enumerate(int[][] ranges)
         {
-            foreach (var range in ranges)
+            foreach (int[] range in ranges)
             {
                 for (int i = range[0] ; i <= range[1] ; i++)
                     yield return i;

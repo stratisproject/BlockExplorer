@@ -12,10 +12,6 @@ namespace QBitNinja
         UpdateChainListener _Listener;
         protected void Application_Start()
         {
-            // load the stratis networks
-            var stratis = Network.StratisMain;
-            var stratisTest = Network.StratisTest;
-
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             _Listener = new UpdateChainListener();

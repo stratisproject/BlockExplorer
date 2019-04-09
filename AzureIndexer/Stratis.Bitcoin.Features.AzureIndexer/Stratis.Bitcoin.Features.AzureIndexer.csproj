@@ -3,7 +3,8 @@
   <PropertyGroup>
     <Description>Stratis Bitcoin Features Azure Indexer</Description>
     <AssemblyTitle>Stratis.Bitcoin.Features.AzureIndexer</AssemblyTitle>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Stratis.Bitcoin.Features.AzureIndexer</AssemblyName>
     <PackageId>Stratis.Bitcoin.Features.AzureIndexer</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -18,18 +19,25 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="1.17.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="2.10.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="Stratis.Bitcoin" Version="1.1.2-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="1.1.2-beta" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="1.1.2-beta" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.3" />
+    <PackageReference Include="NLog" Version="5.0.0-beta09" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.3" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="8.7.0" />
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>

@@ -11,7 +11,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
     public class ChainBuilder
     {
         private IndexerTester _Tester;
-        ConcurrentChain _Chain = new ConcurrentChain(Network.TestNet);
+        ConcurrentChain _Chain = new ConcurrentChain(KnownNetworks.TestNet);
 
         public ConcurrentChain Chain
         {

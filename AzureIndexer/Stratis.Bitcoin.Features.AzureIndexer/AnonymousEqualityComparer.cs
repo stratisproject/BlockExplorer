@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+
     class AnonymousEqualityComparer<T,TComparer> : IEqualityComparer<T>
     {
         Func<T, TComparer> comparer;
+
         public AnonymousEqualityComparer(Func<T,TComparer> comparer)
         {
             this.comparer = comparer;

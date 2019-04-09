@@ -1,0 +1,23 @@
+<div class="list-group-item mb-4">
+  <h3 class="my-4">Summary</h3>
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Address</label></th>
+        <td><a [routerLink]="['/addresses', hash]">{{hash}}</a></td>
+      </tr>
+      <tr>
+        <th><label>Confirmed Balance</label></th>
+        <td><blockexplorer-balance [balance]="confirmedBalance"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Unconfirmed Balance</label></th>
+        <td><blockexplorer-balance [balance]="unconfirmedBalance"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Type</label></th>
+        <td><span class="badge badge-purple">Wallet Address</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

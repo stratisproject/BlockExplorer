@@ -1,0 +1,42 @@
+{
+  "npmScope": "blockexplorer",
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.json": "*",
+    "tslint.json": "*",
+    "nx.json": "*"
+  },
+  "projects": {
+    "explorer": {
+      "tags": []
+    },
+    "explorer-e2e": {
+      "tags": []
+    },
+    "state-transactions-state": {
+      "tags": []
+    },
+    "state-global-state": {
+      "tags": []
+    },
+    "ui-layout": {
+      "tags": []
+    },
+    "ui-transactions": {
+      "tags": []
+    },
+    "ui-smart-contracts": {
+      "tags": []
+    },
+    "state-smart-contracts-state": {
+      "tags": []
+    },
+    "shared-utils": {
+      "tags": []
+    },
+    "shared-models": {
+      "tags": []
+    }
+  }
+}

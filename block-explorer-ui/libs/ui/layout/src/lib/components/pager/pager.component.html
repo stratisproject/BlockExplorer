@@ -1,0 +1,26 @@
+<div *ngIf="totalPages > 0">
+    <nav class="d-flex justify-content-center justify-content-md-end row">
+      <ul class="pagination float-right">
+        <li class="page-item d-none d-sm-block" (click)="first.emit()" [ngClass]="{ 'disabled': currentPage <= 1 }">
+          <a class="page-link" tabindex="-1">First</a>
+        </li>
+        <li class="page-item" (click)="previous.emit()" [ngClass]="{ 'disabled': currentPage <= 1 }">
+          <a class="page-link d-flex justify-content-center align-items-center">
+            <i class="material-icons md-18">keyboard_arrow_left</i>
+            Previous
+          </a>
+        </li>
+        <li class="page-item active">
+          <a class="page-link">Page <strong>{{currentPage}}</strong> of {{totalPages}}</a>
+        </li>
+        <li class="page-item" (click)="next.emit()" [ngClass]="{ 'disabled': currentPage >= totalPages }">
+          <a class="page-link d-flex justify-content-center align-items-center">Next
+            <i class="material-icons md-18">keyboard_arrow_right</i>
+          </a>
+        </li>
+        <li class="page-item d-none d-sm-block" (click)="last.emit()" [ngClass]="{ 'disabled': currentPage >= totalPages }">
+          <a class="page-link">Last</a>
+        </li>
+      </ul>
+    </nav>
+  </div>

@@ -1,12 +1,8 @@
 ﻿using Microsoft.ServiceBus.Messaging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
-using NBitcoin.DataEncoders;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using NBitcoin.Protocol;
-using NBitcoin.Protocol.Behaviors;
 using QBitNinja.Models;
 using System;
 using System.Collections.Concurrent;
@@ -17,42 +13,56 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Stratis.Bitcoin;
+using Stratis.Bitcoin.Connection;
+using Stratis.Bitcoin.Consensus;
+using Stratis.Bitcoin.Interfaces;
+using Stratis.Bitcoin.P2P.Peer;
+using Stratis.Bitcoin.P2P.Protocol;
+using Stratis.Bitcoin.P2P.Protocol.Behaviors;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
 namespace QBitNinja.Notifications
 {
     public class QBitNinjaNodeListener : IDisposable
     {
-        class Behavior : NodeBehavior
+        class Behavior : NetworkPeerBehavior
         {
             QBitNinjaNodeListener _Listener;
-            public Behavior(QBitNinjaNodeListener listener)
+            private readonly ILoggerFactory loggerFactory;
+
+            public Behavior(QBitNinjaNodeListener listener, ILoggerFactory loggerFactory)
             {
                 _Listener = listener;
+                this.loggerFactory = loggerFactory;
             }
 
             protected override void AttachCore()
             {
-                AttachedNode.StateChanged += AttachedNode_StateChanged;
+                AttachedPeer.StateChanged.Register(AttachedNode_StateChanged);
             }
 
-            void AttachedNode_StateChanged(Node node, NodeState oldState)
+            Task AttachedNode_StateChanged(INetworkPeer node, NetworkPeerState oldState)
             {
                 ListenerTrace.Info("State change " + node.State);
-                if(node.State == NodeState.HandShaked)
+                if(node.State == NetworkPeerState.HandShaked)
                 {
                     ListenerTrace.Info("Node handshaked");
-                    AttachedNode.MessageReceived += _Listener.node_MessageReceived;
-                    AttachedNode.Disconnected += AttachedNode_Disconnected;
-                    ListenerTrace.Info("Connection count : " + NodesGroup.GetNodeGroup(node).ConnectedNodes.Count);
+                    AttachedPeer.MessageReceived.Register(_Listener.node_MessageReceived);
+                    // AttachedPeer.Disconnected += AttachedNode_Disconnected; TODO: check if still needed
+                    // ListenerTrace.Info("Connection count : " + nNodesGroup.GetNodeGroup(node).ConnectedNodes.Count); TODO: fix count
                 }
+
+                return Task.CompletedTask;
             }
 
-            void AttachedNode_Disconnected(Node node)
+            void AttachedNode_Disconnected(INetworkPeer node)
             {
                 ListenerTrace.Info("Node Connection dropped : " + ToString(node.DisconnectReason));
             }
 
-            private string ToString(NodeDisconnectReason reason)
+            private string ToString(NetworkPeerDisconnectReason reason)
             {
                 if(reason == null)
                     return null;
@@ -61,16 +71,21 @@ namespace QBitNinja.Notifications
 
             protected override void DetachCore()
             {
-                AttachedNode.StateChanged -= AttachedNode_StateChanged;
-                AttachedNode.MessageReceived -= _Listener.node_MessageReceived;
+                AttachedPeer.StateChanged.Unregister(AttachedNode_StateChanged);
+                AttachedPeer.MessageReceived.Unregister(_Listener.node_MessageReceived);
             }
 
             public override object Clone()
             {
-                return new Behavior(_Listener);
+                return new Behavior(_Listener, this.loggerFactory);
             }
         }
         private readonly QBitNinjaConfiguration _Configuration;
+        private readonly IInitialBlockDownloadState initialBlockDownloadState;
+        private readonly IConsensusManager consensusManager;
+        private readonly IConnectionManager connectionManager;
+        private readonly IPeerBanning peerBanning;
+        private readonly ILoggerFactory loggerFactory;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -90,9 +105,20 @@ namespace QBitNinja.Notifications
                 return _Configuration;
             }
         }
-        public QBitNinjaNodeListener(QBitNinjaConfiguration configuration)
+        public QBitNinjaNodeListener(
+            QBitNinjaConfiguration configuration,
+            IInitialBlockDownloadState initialBlockDownloadState,
+            IConsensusManager consensusManager,
+            IConnectionManager connectionManager,
+            IPeerBanning peerBanning,
+            ILoggerFactory loggerFactory)
         {
             _Configuration = configuration;
+            this.initialBlockDownloadState = initialBlockDownloadState;
+            this.consensusManager = consensusManager;
+            this.connectionManager = connectionManager;
+            this.peerBanning = peerBanning;
+            this.loggerFactory = loggerFactory;
         }
 
         private AzureIndexer _Indexer;
@@ -124,16 +150,22 @@ namespace QBitNinja.Notifications
             _Disposables.Add(_IndexerScheduler = new CustomThreadPoolTaskScheduler(50, 100, "Indexing Threads"));
             _Indexer.TaskScheduler = _IndexerScheduler;
 
-            _Group = new NodesGroup(Configuration.Indexer.Network);
-            _Disposables.Add(_Group);
-            _Group.AllowSameGroup = true;
-            _Group.MaximumNodeConnection = 2;
-            AddressManager addrman = new AddressManager();
-            addrman.Add(new NetworkAddress(Utils.ParseIpEndpoint(_Configuration.Indexer.Node, Configuration.Indexer.Network.DefaultPort)),
-                        IPAddress.Parse("127.0.0.1"));
-            _Group.NodeConnectionParameters.TemplateBehaviors.Add(new AddressManagerBehavior(addrman));
-            _Group.NodeConnectionParameters.TemplateBehaviors.Add(new ChainBehavior(_Chain));
-            _Group.NodeConnectionParameters.TemplateBehaviors.Add(new Behavior(this));
+            // _Group = new NodesGroup(Configuration.Indexer.Network); TODO: check if this is correct
+            _Group = new NetworkPeerCollection();
+            
+            // TODO: Check if needed
+            // _Disposables.Add(_Group);
+            // _Group.AllowSameGroup = true;
+            // _Group.MaximumNodeConnection = 2;
+
+            //addrman.Add(new NetworkAddress(Utils.ParseIpEndpoint(_Configuration.Indexer.Node, Configuration.Indexer.Network.DefaultPort)),
+            //            IPAddress.Parse("127.0.0.1"));
+            this.connectionManager.AddNodeAddress(Utils.ParseIpEndpoint(_Configuration.Indexer.Node, Configuration.Indexer.Network.DefaultPort));
+
+            // TODO: Check if needed
+            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new ConnectionManagerBehavior(this.connectionManager, this.loggerFactory));
+            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new ConsensusManagerBehavior(_Chain, this.initialBlockDownloadState, this.consensusManager, this.peerBanning, this.loggerFactory));
+            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new Behavior(this, this.loggerFactory));
 
 
 
@@ -144,7 +176,9 @@ namespace QBitNinja.Notifications
             ListenerTrace.Info("Fetching wallet subscriptions...");
             _Subscriptions = new SubscriptionCollection(_Configuration.GetSubscriptionsTable().Read());
             ListenerTrace.Info("Subscriptions fetched");
-            _Group.Connect();
+
+            // TODO: Check if needed
+            // _Group.Connect();
 
             ListenerTrace.Info("Fetching transactions to broadcast...");
 
@@ -276,18 +310,18 @@ namespace QBitNinja.Notifications
             }
         }
 
-        NodesGroup _Group;
+        NetworkPeerCollection _Group;
         private async Task SendMessageAsync(Payload payload)
         {
             int[] delays = new int[] { 50, 100, 200, 300, 1000, 2000, 3000, 6000, 12000 };
             int i = 0;
-            while(_Group.ConnectedNodes.Count != 2)
+            while(_Group.Count != 2)
             {
                 i++;
                 i = Math.Min(i, delays.Length - 1);
                 await Task.Delay(delays[i]).ConfigureAwait(false);
             }
-            await _Group.ConnectedNodes.First().SendMessageAsync(payload).ConfigureAwait(false);
+            await _Group.First().SendMessageAsync(payload).ConfigureAwait(false);
         }
         private async Task SendAsync(Notify notify, MessageControl act)
         {
@@ -378,7 +412,7 @@ namespace QBitNinja.Notifications
 
         uint256 _LastChainTip;
 
-        void node_MessageReceived(Node node, IncomingMessage message)
+        Task node_MessageReceived(INetworkPeer node, IncomingMessage message)
         {
             if(_KnownInvs.Count == 1000)
                 _KnownInvs.Clear();
@@ -401,7 +435,7 @@ namespace QBitNinja.Notifications
             }
             if(message.Message.Payload is TxPayload)
             {
-                var tx = ((TxPayload)message.Message.Payload).Object;
+                var tx = ((TxPayload)message.Message.Payload).Obj;
                 ListenerTrace.Verbose("Received Transaction " + tx.GetHash());
                 _Indexer.IndexAsync(new TransactionEntry.Entity(tx.GetHash(), tx, null))
                         .ContinueWith(HandleException);
@@ -415,7 +449,7 @@ namespace QBitNinja.Notifications
                     {
                         balances =
                             OrderedBalanceChange
-                            .ExtractWalletBalances(txId, tx, null, null, int.MaxValue, _Wallets)
+                            .ExtractWalletBalances(txId, tx, null, null, int.MaxValue, _Wallets, _Configuration.Indexer.Network)
                             .AsEnumerable()
                             .ToList();
                     }
@@ -454,13 +488,13 @@ namespace QBitNinja.Notifications
 
             if(message.Message.Payload is BlockPayload)
             {
-                var block = ((BlockPayload)message.Message.Payload).Object;
+                var block = ((BlockPayload)message.Message.Payload).Obj;
                 var blockId = block.GetHash();
 
                 List<OrderedBalanceChange> balances = null;
                 using(_WalletsSlimLock.LockRead())
                 {
-                    balances = block.Transactions.SelectMany(tx => OrderedBalanceChange.ExtractWalletBalances(null, tx, null, null, 0, _Wallets)).ToList();
+                    balances = block.Transactions.SelectMany(tx => OrderedBalanceChange.ExtractWalletBalances(null, tx, null, null, 0, _Wallets, _Configuration.Indexer.Network)).ToList();
                 }
                 UpdateHDState(balances);
             }
@@ -477,65 +511,65 @@ namespace QBitNinja.Notifications
                     Async(() =>
                     {
                         CancellationTokenSource cancel = new CancellationTokenSource(TimeSpan.FromMinutes(30));
-                        var repo = new CacheBlocksRepository(new NodeBlocksRepository(node));
+                        var repo = new CacheBlocksRepository(new FullNodeBlocksRepository(new FullNode())); // TODO: check if correct
                         TryLock(_LockBlocks, () =>
                         {
-                            new IndexBlocksTask(Configuration.Indexer)
+                            new IndexBlocksTask(Configuration.Indexer, this.loggerFactory)
                             {
                                 EnsureIsSetup = false,
 
-                            }.Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Blocks), repo, _Chain)
+                            }.Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Blocks), repo, _Chain, null, this.loggerFactory) // TODO: check lastProcessed
                             {
                                 CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler);
+                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                         });
                         TryLock(_LockTransactions, () =>
                         {
-                            new IndexTransactionsTask(Configuration.Indexer)
+                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory)
                             {
                                 EnsureIsSetup = false
                             }
-                            .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Transactions), repo, _Chain)
+                            .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Transactions), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
                             {
                                 CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler);
+                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                         });
                         TryLock(_LockWallets, () =>
                         {
                             using(_WalletsSlimLock.LockRead())
                             {
-                                new IndexBalanceTask(Configuration.Indexer, _Wallets)
+                                new IndexBalanceTask(Configuration.Indexer, _Wallets, loggerFactory)
                                 {
                                     EnsureIsSetup = false
                                 }
-                                .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Wallets), repo, _Chain)
+                                .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Wallets), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
                                 {
                                     CancellationToken = cancel.Token
-                                }, _Indexer.TaskScheduler);
+                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                             }
                         });
                         TryLock(_LockBalance, () =>
                         {
-                            new IndexBalanceTask(Configuration.Indexer, null)
+                            new IndexBalanceTask(Configuration.Indexer, null, loggerFactory)
                             {
                                 EnsureIsSetup = false
-                            }.Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Balances), repo, _Chain)
+                            }.Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Balances), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
                             {
                                 CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler);
+                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                         });
                         TryLock(_LockSubscriptions, () =>
                         {
                             using(_SubscriptionSlimLock.LockRead())
                             {
-                                new IndexNotificationsTask(Configuration, _Subscriptions)
+                                new IndexNotificationsTask(Configuration, _Subscriptions, loggerFactory)
                                 {
                                     EnsureIsSetup = false,
                                 }
-                                .Index(new BlockFetcher(_Indexer.GetCheckpointRepository().GetCheckpoint("subscriptions"), repo, _Chain)
+                                .Index(new BlockFetcher(_Indexer.GetCheckpointRepository().GetCheckpoint("subscriptions"), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
                                 {
                                     CancellationToken = cancel.Token
-                                }, _Indexer.TaskScheduler);
+                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                             }
                         });
                         cancel.Dispose();
@@ -572,6 +606,8 @@ namespace QBitNinja.Notifications
                     _Broadcasting.TryRemove(txId, out tx);
                 }
             }
+
+            return Task.CompletedTask;
         }
 
         private void UpdateHDState(List<OrderedBalanceChange> balances)

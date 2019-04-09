@@ -1,26 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.Protocol;
-using Stratis.Bitcoin.P2P.Peer;
-using Stratis.Bitcoin.P2P.Protocol.Payloads;
-using Stratis.Bitcoin.Utilities;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.ExceptionServices;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Auth;
+    using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using NBitcoin.Protocol;
+    using Stratis.Bitcoin.P2P.Peer;
+    using Stratis.Bitcoin.P2P.Protocol.Payloads;
+    using Utilities;
+
     public class IndexerConfiguration
     {
         private const string IndexerBlobContainerName = "indexer";
         private const string TransactionsTableName = "transactions";
+        private const string SmartContractsTableName = "smartcontracts";
+        private const string SmartContractDetailsTableName = "smartcontractdetails";
         private const string BalancesTableName = "balances";
         private const string ChainTableName = "chain";
         private const string WalletsTableName = "wallets";
@@ -42,6 +44,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILoggerFactory loggerFactory;
 
         private CloudTableClient tableClient;
+
         public CloudTableClient TableClient
         {
             get
@@ -50,6 +53,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     return this.tableClient;
                 }
+
                 this.tableClient = this.StorageAccount.CreateCloudTableClient();
                 return this.tableClient;
             }
@@ -57,6 +61,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         private CloudBlobClient blobClient;
+
         public CloudBlobClient BlobClient
         {
             get
@@ -65,6 +70,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 {
                     return this.blobClient;
                 }
+
                 this.blobClient = this.StorageAccount.CreateCloudBlobClient();
                 return this.blobClient;
             }
@@ -74,7 +80,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public IndexerConfiguration(ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
-            Network = Network.Main;
+            this.Network = Networks.Networks.Stratis.Mainnet();
         }
 
         public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
@@ -84,29 +90,48 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             var account = GetValue(config, "Azure.AccountName", true);
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
-            var network = GetValue(config, "Bitcoin.Network", false) ?? "Main";
-            this.Network = Network.GetNetwork(network);
+            var network = GetValue(config, "Network", false) ?? "Main";
+            this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
-                throw new IndexerConfigurationErrorsException("Invalid value " + network + " in appsettings (expecting Main, Test or Seg)");
+            {
+                throw new IndexerConfigurationErrorsException($"Invalid value {network} in appSettings (expecting Main, Test or Seg)");
+            }
+
             this.Node = GetValue(config, "Node", false);
             this.CheckpointSetName = GetValue(config, "CheckpointSetName", false);
             if (string.IsNullOrWhiteSpace(this.CheckpointSetName))
-                this.CheckpointSetName = "default";
+            {
+                this.CheckpointSetName = $"default";
+            }
 
             var emulator = GetValue(config, "AzureStorageEmulatorUsed", false);
+
             if (!string.IsNullOrWhiteSpace(emulator))
+            {
                 this.AzureStorageEmulatorUsed = bool.Parse(emulator);
+            }
 
             this.StorageCredentials = this.AzureStorageEmulatorUsed ? null : new StorageCredentials(account, key);
         }
 
+        public NetworkPeer ConnectToNode(bool isRelay)
+        {
+            if (string.IsNullOrEmpty(this.Node))
+            {
+                throw new IndexerConfigurationErrorsException("Node setting is not configured");
+            }
+
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads(), null, null, null); // TODO: fix last 3 parameters
+            return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(this.Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
+        }
+
         public Task EnsureSetupAsync()
         {
-            var tasks = EnumerateTables()
+            List<Task> tasks = this.EnumerateTables()
                 .Select(t => t.CreateIfNotExistsAsync())
                 .OfType<Task>()
                 .ToList();
-            tasks.Add(GetBlocksContainer().CreateIfNotExistsAsync());
+            tasks.Add(this.GetBlocksContainer().CreateIfNotExistsAsync());
             return Task.WhenAll(tasks.ToArray());
         }
 
@@ -118,30 +143,22 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     CloudStorageAccount.Parse("UseDevelopmentStorage=true;") :
                     new CloudStorageAccount(this.StorageCredentials, true);
 
-                EnsureSetupAsync().Wait();
+                this.EnsureSetupAsync().Wait();
             }
             catch (AggregateException aex)
             {
                 ExceptionDispatchInfo.Capture(aex).Throw();
-                throw;
             }
         }
 
         public IEnumerable<CloudTable> EnumerateTables()
         {
-            yield return GetTransactionTable();
-            yield return GetBalanceTable();
-            yield return GetChainTable();
-            yield return GetWalletRulesTable();
-        }
-
-        protected static string GetValue(IConfiguration config, string setting, bool required)
-        {			
-            var result = config[setting];
-            result = String.IsNullOrWhiteSpace(result) ? null : result;
-            if (result == null && required)
-                throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
-            return result;
+            yield return this.GetTransactionTable();
+            yield return this.GetSmartContactTable();
+            yield return this.GetSmartContactDetailTable();
+            yield return this.GetBalanceTable();
+            yield return this.GetChainTable();
+            yield return this.GetWalletRulesTable();
         }
 
         public AzureIndexer CreateIndexer()
@@ -157,6 +174,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public CloudTable GetTransactionTable()
         {
             return this.TableClient.GetTableReference(this.GetFullName(TransactionsTableName));
+        }
+
+        public CloudTable GetSmartContactTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(SmartContractsTableName));
+        }
+
+        public CloudTable GetSmartContactDetailTable()
+        {
+            return this.TableClient.GetTableReference(this.GetFullName(SmartContractDetailsTableName));
         }
 
         public CloudTable GetWalletRulesTable()
@@ -184,9 +211,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.BlobClient.GetContainerReference(this.GetFullName(IndexerBlobContainerName));
         }
 
+        protected static string GetValue(IConfiguration config, string setting, bool required)
+        {
+            var result = config[setting];
+            result = string.IsNullOrWhiteSpace(result) ? null : result;
+            if (result == null && required)
+            {
+                throw new IndexerConfigurationErrorsException("AppSetting " + setting + " not found");
+            }
+
+            return result;
+        }
+
         private string GetFullName(string storageObjectName)
         {
-            return (StorageNamespace + storageObjectName).ToLowerInvariant();
+            return (this.StorageNamespace + storageObjectName).ToLowerInvariant();
         }
     }
 }

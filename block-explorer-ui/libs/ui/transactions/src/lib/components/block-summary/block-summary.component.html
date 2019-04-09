@@ -1,0 +1,27 @@
+<div class="list-group-item mb-4">
+  <h5 class="my-4">Summary</h5>
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Block Hash</label></th>
+        <td>{{hash}}</td>
+      </tr>
+      <tr>
+        <th><label>Block Reward</label></th>
+        <td><blockexplorer-balance [balance]="blockReward"></blockexplorer-balance></td>
+      </tr>
+      <tr>
+        <th><label>Confirmations</label></th>
+        <td>{{confirmations}}</td>
+      </tr>
+      <tr>
+        <th><label>Height</label></th>
+        <td>{{height}}</td>
+      </tr>
+      <tr>
+        <th><label>Date</label></th>
+        <td>{{time}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

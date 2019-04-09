@@ -1,23 +1,25 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 {
+    using System.Collections.Generic;
+    using Microsoft.Extensions.Logging;
+    using NBitcoin;
+
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {
         private readonly ILogger logger;
 
         WalletRuleEntryCollection _WalletRules;
+
         public IndexBalanceTask(IndexerConfiguration conf, WalletRuleEntryCollection walletRules, ILoggerFactory loggerFactory)
             : base(conf, loggerFactory)
         {
-            _WalletRules = walletRules;
-            this.logger = loggerFactory.CreateLogger(GetType().FullName);
+            this._WalletRules = walletRules;
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
+
         protected override Microsoft.WindowsAzure.Storage.Table.CloudTable GetCloudTable()
         {
-            return Configuration.GetBalanceTable();
+            return this.Configuration.GetBalanceTable();
         }
 
         protected override Microsoft.WindowsAzure.Storage.Table.ITableEntity ToTableEntity(OrderedBalanceChange item)
@@ -29,20 +31,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         {
             get
             {
-                return _WalletRules != null && _WalletRules.Count == 0;
+                return this._WalletRules != null && this._WalletRules.Count == 0;
             }
         }
 
-        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network)
+        protected override void ProcessBlock(BlockInfo block, BulkImport<OrderedBalanceChange> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
             this.logger.LogTrace("()");
 
-            foreach (var tx in block.Block.Transactions)
+            foreach (Transaction tx in block.Block.Transactions)
             {
-                var txId = tx.GetHash();
+                uint256 txId = tx.GetHash();
 
-                var entries = extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
-                foreach (var entry in entries)
+                IEnumerable<OrderedBalanceChange> entries = this.Extract(txId, tx, block.BlockId, block.Block.Header, block.Height, network);
+                foreach (OrderedBalanceChange entry in entries)
                 {
                     bulk.Add(entry.PartitionKey, entry);
                 }
@@ -51,13 +53,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.logger.LogTrace("(-)");
         }
 
-        private IEnumerable<OrderedBalanceChange> extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
+        private IEnumerable<OrderedBalanceChange> Extract(uint256 txId, Transaction tx, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
-            if (_WalletRules != null)
-                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, _WalletRules, network);
+            if (this._WalletRules != null)
+            {
+                return OrderedBalanceChange.ExtractWalletBalances(txId, tx, blockId, blockHeader, height, this._WalletRules, network);
+            }
             else
+            {
                 return OrderedBalanceChange.ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
+            }
         }
     }
 }
-

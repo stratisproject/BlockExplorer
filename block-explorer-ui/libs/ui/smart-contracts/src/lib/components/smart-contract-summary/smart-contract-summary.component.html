@@ -1,0 +1,26 @@
+<div class="list-group-item mb-4">
+    <h3 class="my-4">Smart Contract</h3>
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <th><label>Contract Hash</label></th>
+          <td>{{hash}}</td>
+        </tr>
+        <tr>
+          <th><label>Gas Price</label></th>
+          <td><blockexplorer-balance [balance]="gasPrice"></blockexplorer-balance></td>
+        </tr>
+        <tr>
+          <th><label>Op Code</label></th>
+          <td>{{opCode}}</td>
+        </tr>
+        <tr>
+          <th><label>Method Name</label></th>
+          <td>{{methodName}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ngx-prism [language]="'csharp'" [code]="code">
+    </ngx-prism>
+  </div>

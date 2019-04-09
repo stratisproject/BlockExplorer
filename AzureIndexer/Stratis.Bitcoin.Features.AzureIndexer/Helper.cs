@@ -1,23 +1,26 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using Newtonsoft.Json;
-using Stratis.Bitcoin.Features.AzureIndexer.Converters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using Newtonsoft.Json;
+    using Stratis.Bitcoin.Features.AzureIndexer.Converters;
+
     internal static class Helper
     {
         internal static List<T> DeserializeList<T>(byte[] bytes) where T : IBitcoinSerializable, new()
         {
-            List<T> outpoints = new List<T>();
+            var outpoints = new List<T>();
             if (bytes == null)
+            {
                 return outpoints;
+            }
+
             MemoryStream ms = new MemoryStream(bytes);
             ms.Position = 0;
             while (ms.Position != ms.Length)
@@ -26,16 +29,18 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 outpoint.ReadWrite(ms, false);
                 outpoints.Add(outpoint);
             }
+
             return outpoints;
         }
 
         public static byte[] SerializeList<T>(IEnumerable<T> items) where T : IBitcoinSerializable
         {
             MemoryStream ms = new MemoryStream();
-            foreach (var item in items)
+            foreach (T item in items)
             {
                 item.ReadWrite(ms, true);
             }
+
             return Helper.GetBytes(ms) ?? new byte[0];
         }
 
@@ -43,10 +48,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             if (stream.Length == 0)
                 return null;
-            var buffer = stream.GetBuffer();
+            byte[] buffer = stream.GetBuffer();
             Array.Resize(ref buffer, (int)stream.Length);
             return buffer;
         }
+
         internal static void SetThrottling()
         {
             ServicePointManager.UseNagleAlgorithm = false;
@@ -61,10 +67,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 dictionary.Add(key, value);
                 return true;
             }
+
             return false;
         }
 
         const int ColumnMaxSize = 63000;
+
         internal static void SetEntityProperty(DynamicTableEntity entity, string property, byte[] data)
         {
             if (data == null || data.Length == 0)
@@ -94,19 +102,21 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 if (!entity.Properties.ContainsKey(property + i))
                     break;
-                var chunk = entity.Properties[property + i].BinaryValue;
+                byte[] chunk = entity.Properties[property + i].BinaryValue;
                 if (chunk == null || chunk.Length == 0)
                     break;
                 chunks.Add(chunk);
                 i++;
             }
+
             byte[] data = new byte[chunks.Sum(o => o.Length)];
             int offset = 0;
-            foreach (var chunk in chunks)
+            foreach (byte[] chunk in chunks)
             {
                 Array.Copy(chunk, 0, data, offset, chunk.Length);
                 offset += chunk.Length;
             }
+
             return data;
         }
 
@@ -123,10 +133,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 if (remainingBits == 0)
                     break;
             }
+
             return result.ToString("X2");
         }
 
         static JsonSerializerSettings _Settings;
+
         internal static JsonSerializerSettings Settings
         {
             get
@@ -137,13 +149,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     _Settings.Converters.Add(new ScriptJsonConverter());
                     _Settings.Converters.Add(new WalletRuleConverter());
                 }
+
                 return _Settings;
             }
         }
+
         internal static string Serialize(object obj)
         {
             return JsonConvert.SerializeObject(obj, Settings);
         }
+
         internal static T DeserializeObject<T>(string str)
         {
             return JsonConvert.DeserializeObject<T>(str, Settings);
@@ -151,14 +166,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public static bool IsError(Exception ex, string code)
         {
-			var actualCode = (ex as StorageException)?.RequestInformation?.ExtendedErrorInformation?.ErrorCode;
-			return actualCode == code;
-		}
+            var actualCode = (ex as StorageException)?.RequestInformation?.ExtendedErrorInformation?.ErrorCode;
+            return actualCode == code;
+        }
 
         internal static string format = new string(Enumerable.Range(0, int.MaxValue.ToString().Length).Select(c => '0').ToArray());
         static char[] Digit = Enumerable.Range(0, 10).Select(c => c.ToString()[0]).ToArray();
 
-        //Convert '012' to '987'
+        // Convert '012' to '987'.
         internal static string HeightToString(int height)
         {
             var input = height.ToString(format);
@@ -173,10 +188,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 var index = Array.IndexOf(Digit, input[i]);
                 result[i] = Digit[Digit.Length - index - 1];
             }
+
             return new string(result);
         }
 
-        //Convert '987' to '012'
+        // Convert '987' to '012'.
         internal static int StringToHeight(string rowkey)
         {
             return int.Parse(ToggleChars(rowkey));
@@ -184,10 +200,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public static string GetPartitionKey(int bits, uint nbr)
         {
-            var bytes = BitConverter.GetBytes(nbr);
+            byte[] bytes = BitConverter.GetBytes(nbr);
             return GetPartitionKey(bits, bytes, 0, 4);
         }
-
-       
     }
 }

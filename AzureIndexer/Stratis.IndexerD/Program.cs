@@ -1,17 +1,25 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using NBitcoin;
-using NBitcoin.Protocol;
-using Stratis.Bitcoin.Builder;
-using Stratis.Bitcoin.Configuration;
-using Stratis.Bitcoin.Features.BlockStore;
-using Stratis.Bitcoin.Features.Consensus;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Utilities;
-
-namespace Stratis.Bitcoin.Indexer.Console
+﻿namespace Stratis.IndexerD
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using NBitcoin.Protocol;
+    using Stratis.Bitcoin;
+    using Stratis.Bitcoin.Builder;
+    using Stratis.Bitcoin.Configuration;
+    using Stratis.Bitcoin.Features.Api;
+    using Stratis.Bitcoin.Features.AzureIndexer;
+    using Stratis.Bitcoin.Features.BlockStore;
+    using Stratis.Bitcoin.Features.Consensus;
+    using Stratis.Bitcoin.Features.MemoryPool;
+    using Stratis.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
+    using Stratis.Bitcoin.Features.RPC;
+   // using Stratis.Bitcoin.Features.SmartContracts;
+   // using Stratis.Bitcoin.Features.SmartContracts.PoA;
+  //  using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+    using Stratis.Bitcoin.Utilities;
+  // using Stratis.Sidechains.Networks;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -21,24 +29,54 @@ namespace Stratis.Bitcoin.Indexer.Console
 
         public static async Task MainAsync(string[] args)
         {
+            var isSideChain = false;
             try
             {
-                Network network = args.Contains("-testnet") ? Network.StratisTest : Network.StratisMain;
+                NodeSettings nodeSettings;
+                IFullNode node = null;
+                if (args.Length > 0)
+                {
+                    isSideChain = args.Contains("-sidechain");
+                }
 
-                NodeSettings nodeSettings = new NodeSettings(network, ProtocolVersion.ALT_PROTOCOL_VERSION, args: args, loadConfiguration: false);
-
-                // NOTES: running BTC and STRAT side by side is not possible yet as the flags for serialization are static
-
-                var node = new FullNodeBuilder()
-                    .UseNodeSettings(nodeSettings)
-                    .UsePosConsensus()
-                    .UseBlockStore()
-                    .UseAzureIndexer()
-                    .Build();
+                if (isSideChain)
+                {
+                   // nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
+                   // node = new FullNodeBuilder()
+                       // .UseNodeSettings(nodeSettings)
+                       // .UseBlockStore()
+                       // .AddRPC()
+                       // .AddSmartContracts(options =>
+                       // {
+                       //    options.UseReflectionExecutor();
+                       // })
+                       // .UseSmartContractPoAConsensus()
+                       // .UseSmartContractPoAMining()
+                       // .UseSmartContractWallet()
+                       // .UseApi()
+                       // .UseMempool()
+                       // .UseAzureIndexer()
+                       // .Build();
+                }
+                else
+                {
+                    nodeSettings = new NodeSettings(networksSelector: Stratis.Bitcoin.Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                    node = new FullNodeBuilder()
+                        .UseNodeSettings(nodeSettings)
+                        .UseBlockStore()
+                        .UsePosConsensus()
+                        .UseMempool()
+                        .UseApi()
+                        .AddRPC()
+                        .UseAzureIndexer()
+                        .Build();
+                }
 
                 // Run node.
                 if (node != null)
+                {
                     await node.RunAsync();
+                }
             }
             catch (Exception ex)
             {
