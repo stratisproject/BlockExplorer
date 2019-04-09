@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -13,20 +14,20 @@ namespace AzureIndexer.Api.Infrastructure
 
     public class ChainCacheProvider
     {
-        private readonly QBitNinjaConfiguration config;
+        private readonly string cacheFilePath;
         private readonly ConcurrentChain chain;
         private readonly IndexerClient client;
 
-        public ChainCacheProvider(QBitNinjaConfiguration config, ConcurrentChain chain, IndexerClient client)
+        public ChainCacheProvider(IConfiguration configuration, ConcurrentChain chain, IndexerClient client)
         {
-            this.config = config;
+            this.cacheFilePath = configuration["LocalChain"];
             this.chain = chain;
             this.client = client;
         }
 
-        public bool IsCacheAvailable => 
-            File.Exists(this.config.LocalChain) && 
-            DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.config.LocalChain)).TotalHours < 24;
+        public bool IsCacheAvailable =>
+            File.Exists(this.cacheFilePath) &&
+            DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.cacheFilePath)).TotalHours < 24;
 
         public void BuildCache()
         {
@@ -74,13 +75,12 @@ namespace AzureIndexer.Api.Infrastructure
 
         private void LoadCache()
         {
-            var cacheLocation = this.config.LocalChain;
-            if (string.IsNullOrEmpty(cacheLocation))
+            if (string.IsNullOrEmpty(this.cacheFilePath))
                 return;
 
             try
             {
-                var bytes = File.ReadAllBytes(cacheLocation);
+                var bytes = File.ReadAllBytes(this.cacheFilePath);
                 this.chain.Load(bytes);
             }
             catch
@@ -91,16 +91,15 @@ namespace AzureIndexer.Api.Infrastructure
 
         private void SaveChainCache()
         {
-            var cacheLocation = this.config.LocalChain;
-            if (string.IsNullOrEmpty(cacheLocation))
+            if (string.IsNullOrEmpty(this.cacheFilePath))
                 return;
 
             try
             {
-                var file = new FileInfo(cacheLocation);
+                var file = new FileInfo(this.cacheFilePath);
                 if (!file.Exists || (DateTime.UtcNow - file.LastWriteTimeUtc) > TimeSpan.FromDays(1))
                 {
-                    using (var fs = File.Open(cacheLocation, FileMode.Create))
+                    using (var fs = File.Open(this.cacheFilePath, FileMode.Create))
                     {
                         this.chain.WriteTo(fs);
                     }

@@ -32,6 +32,7 @@
                 {
                     if (!this.provider.IsCacheAvailable || !this.loaded)
                     {
+                        this.logger.Information("Loading and building cache.");
                         this.provider.BuildCache();
                         this.loaded = true;
                     }
