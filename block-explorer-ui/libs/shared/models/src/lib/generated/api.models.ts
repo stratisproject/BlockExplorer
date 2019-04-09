@@ -1046,7 +1046,7 @@ export class BlockHeaderModel implements IBlockHeaderModel {
   currentVersion?: number | undefined;
   hashPrevBlock?: string | undefined;
   time?: number | undefined;
-  bits?: TargetModel | undefined;
+  bits?: string | undefined;
   version?: number | undefined;
   nonce?: number | undefined;
   hashMerkleRoot?: string | undefined;
@@ -1074,7 +1074,7 @@ export class BlockHeaderModel implements IBlockHeaderModel {
           this.currentVersion = data["currentVersion"];
           this.hashPrevBlock = data["hashPrevBlock"];
           this.time = data["time"];
-          this.bits = data["bits"] ? TargetModel.fromJS(data["bits"]) : <any>undefined;
+          this.bits = data["bits"];
           this.version = data["version"];
           this.nonce = data["nonce"];
           this.hashMerkleRoot = data["hashMerkleRoot"];
@@ -1088,7 +1088,7 @@ export class BlockHeaderModel implements IBlockHeaderModel {
       data["currentVersion"] = this.currentVersion;
       data["hashPrevBlock"] = this.hashPrevBlock;
       data["time"] = this.time;
-      data["bits"] = this.bits ? this.bits.toJSON() : <any>undefined;
+      data["bits"] = this.bits;
       data["version"] = this.version;
       data["nonce"] = this.nonce;
       data["hashMerkleRoot"] = this.hashMerkleRoot;
@@ -1102,7 +1102,7 @@ export interface IBlockHeaderModel {
   currentVersion?: number | undefined;
   hashPrevBlock?: string | undefined;
   time?: number | undefined;
-  bits?: TargetModel | undefined;
+  bits?: string | undefined;
   version?: number | undefined;
   nonce?: number | undefined;
   hashMerkleRoot?: string | undefined;
