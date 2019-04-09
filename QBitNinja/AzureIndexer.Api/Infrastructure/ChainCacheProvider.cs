@@ -24,7 +24,9 @@ namespace AzureIndexer.Api.Infrastructure
             this.client = client;
         }
 
-        public bool IsCacheAvailable => File.Exists(this.config.LocalChain);
+        public bool IsCacheAvailable => 
+            File.Exists(this.config.LocalChain) && 
+            DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.config.LocalChain)).TotalHours < 24;
 
         public void BuildCache()
         {
