@@ -238,6 +238,8 @@ _Pvt_Extensions
 GeneratedArtifacts/
 ModelManifest.xml
 
+*/launchSettings.json
+
 # Paket dependency manager
 .paket/paket.exe
 
