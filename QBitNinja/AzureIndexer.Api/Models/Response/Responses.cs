@@ -183,8 +183,8 @@
         [JsonProperty("time", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Time { get; set; }
 
-        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public TargetModel Bits { get; set; }
+//        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+//        public TargetModel Bits { get; set; }
 
         [JsonProperty("version", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Version { get; set; }
@@ -1027,8 +1027,8 @@
         [JsonProperty("hashMerkelRoot", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string HashMerkelRoot { get; set; }
 
-        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public string Bits { get; set; }
+//        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+//        public string Bits { get; set; }
 
         [JsonProperty("difficulty", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public double? Difficulty { get; set; }
@@ -1210,8 +1210,8 @@
         [JsonProperty("hashMerkelRoot", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string HashMerkelRoot { get; set; }
 
-        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public string Bits { get; set; }
+//        [JsonProperty("bits", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+//        public string Bits { get; set; }
 
         [JsonProperty("difficulty", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public double? Difficulty { get; set; }
