@@ -10,6 +10,7 @@
     {
         private readonly ChainCacheProvider provider;
         private readonly ILogger logger;
+        private bool loaded = false;
 
         public BuildChainCache(ChainCacheProvider provider, ILogger logger)
         {
@@ -29,8 +30,11 @@
             {
                 try
                 {
-                    if (!this.provider.IsCacheAvailable)
+                    if (!this.provider.IsCacheAvailable || !this.loaded)
+                    {
                         this.provider.BuildCache();
+                        this.loaded = true;
+                    }
                 }
                 catch (Exception ex)
                 {
