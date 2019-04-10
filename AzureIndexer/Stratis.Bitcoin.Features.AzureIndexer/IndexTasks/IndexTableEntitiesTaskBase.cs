@@ -61,8 +61,8 @@
 
                 try
                 {
-                    Stopwatch watch = new Stopwatch();
-                    watch.Start();
+                    //Stopwatch watch = new Stopwatch();
+                    //watch.Start();
 
                     if (transactionsBatch.Count > 1)
                     {
@@ -83,9 +83,9 @@
                     if (this.IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
                     {
                         // Reduce the size of all batches to half the size of the offending batch.
-                        int maxSize = Math.Max(1, transactionsBatch.Count / 2);
-                        bool workDone = false;
-                        Queue<TableBatchOperation> newBatches = new Queue<TableBatchOperation>();
+                        var maxSize = Math.Max(1, transactionsBatch.Count / 2);
+                        var workDone = false;
+                        var newBatches = new Queue<TableBatchOperation>();
 
                         for (/* starting with the current batch */; ; transactionsBatch = batches.Dequeue())
                         {
@@ -112,7 +112,7 @@
                         // Nothing could be done?
                         if (!workDone)
                         {
-                            throw;
+                           // throw;
                         }
                     }
                     else if (Helper.IsError(ex, "EntityTooLarge"))

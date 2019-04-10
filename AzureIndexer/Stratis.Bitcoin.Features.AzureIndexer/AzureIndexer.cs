@@ -75,26 +75,18 @@
 
         private void SetThrottling()
         {
-            this._logger.LogTrace("()");
-
             Helper.SetThrottling();
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
-
-            this._logger.LogTrace("(-)");
         }
 
         private void PushTransactions(MultiValueDictionary<string, TransactionEntry.Entity> buckets,
                                         IEnumerable<TransactionEntry.Entity> indexedTransactions,
                                     BlockingCollection<TransactionEntry.Entity[]> transactions)
         {
-            this._logger.LogTrace("()");
-
             TransactionEntry.Entity[] array = indexedTransactions.ToArray();
             transactions.Add(array);
             buckets.Remove(array[0].PartitionKey);
-
-            this._logger.LogTrace("(-)");
         }
 
         private TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
@@ -110,32 +102,21 @@
 
         public void Index(params Block[] blocks)
         {
-            this._logger.LogTrace("()");
-
             IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             task.Index(blocks, this.TaskScheduler);
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params Block[] blocks)
         {
-            this._logger.LogTrace("()");
-
             IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             Task indexTask = task.IndexAsync(blocks, this.TaskScheduler);
 
-            this._logger.LogTrace("()");
             return indexTask;
         }
 
         public void Index(params TransactionEntry.Entity[] entities)
         {
-            this._logger.LogTrace("()");
-
             this.Index(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
@@ -145,11 +126,7 @@
 
         public void Index(IEnumerable<OrderedBalanceChange> balances)
         {
-            this._logger.LogTrace("()");
-
             this.Index(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(IEnumerable<OrderedBalanceChange> balances)
@@ -159,22 +136,15 @@
 
         private void Index(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this._logger.LogTrace("()");
-
             IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             task.Index(entities, this.TaskScheduler);
-
-            this._logger.LogTrace("(-)");
         }
 
         private Task IndexAsync(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this._logger.LogTrace("()");
-
             IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             Task indexTask = task.IndexAsync(entities, this.TaskScheduler);
 
-            this._logger.LogTrace("(-)");
             return indexTask;
         }
 
@@ -309,8 +279,6 @@
 
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this._logger.LogTrace("({0}:{1})", nameof(startHeight), startHeight);
-
             var entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
             ChainPartEntry chainPart = null;
@@ -339,8 +307,6 @@
             }
 
             this.Index(entries, cancellationToken);
-
-            this._logger.LogTrace("(-)");
         }
 
         private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))

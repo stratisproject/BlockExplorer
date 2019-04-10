@@ -21,26 +21,27 @@
         {
             this.config = configuration;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
+            this.IsSC = this.config.IsSidechain;
         }
 
 
         protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> transactionsBulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {
-            this.logger.LogTrace("()");
-
             foreach (Transaction transaction in block.Block.Transactions)
             {
-                TransactionEntry.Entity indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network);
-                if (indexed.HasSmartContract && smartContractBulk!= null)
+                TransactionEntry.Entity indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network, this.IsSC);
+
+                if (this.IsSC)
                 {
-                    SmartContactEntry.Entity scEntity = new SmartContactEntry.Entity(indexed);
-                    smartContractBulk.Add(scEntity.PartitionKey, scEntity);
+                    if (indexed.HasSmartContract && smartContractBulk != null)
+                    {
+                        SmartContactEntry.Entity scEntity = new SmartContactEntry.Entity(indexed);
+                        smartContractBulk.Add(scEntity.PartitionKey, scEntity);
+                    }
                 }
 
                 transactionsBulk.Add(indexed.PartitionKey, indexed);
             }
-
-            this.logger.LogTrace("(-)");
         }
 
         protected override void IndexCore(string txPartitionName, IEnumerable<TransactionEntry.Entity> txItems)
@@ -51,7 +52,7 @@
             foreach (TransactionEntry.Entity item in txItems)
             {
                 transactionsBatch.Add(TableOperation.InsertOrReplace(this.ToTableEntity(item)));
-                if (item.HasSmartContract)
+                if (this.IsSC && item.HasSmartContract)
                 {
                     this.logger.LogInformation($"SmartContract detected in Tx: {item.TxId}");
                     smartContractsBatch.Add(TableOperation.InsertOrReplace(item.GetChildTableEntity()));
@@ -79,11 +80,14 @@
             txBatches.Enqueue(transactionsBatch);
 
             Queue<TableBatchOperation> scBatches = new Queue<TableBatchOperation>();
-            scBatches.Enqueue(smartContractsBatch);
+            if (this.IsSC)
+            {
+                scBatches.Enqueue(smartContractsBatch);
+            }
 
             this.SendEntities(ref transactionsBatch, txTable, options, context, ref txBatches);
 
-            if (smartContractDetailsBatch.Count > 0)
+            if (this.IsSC && smartContractDetailsBatch.Count > 0)
             {
                 this.SendEntities(ref smartContractsBatch, scTable, options, context, ref scBatches);
                 if (smartContractDetailsBatch.Count > 0)

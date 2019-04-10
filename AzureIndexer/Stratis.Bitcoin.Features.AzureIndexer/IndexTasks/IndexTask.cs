@@ -29,6 +29,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
             this.SaveProgression = true;
             this.MaxQueued = 100;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
+            this.IsSC = this.Configuration.IsSidechain;
+
         }
 
         public int MaxQueued { get; set; }
@@ -40,6 +42,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public IndexerConfiguration Configuration { get; private set; }
 
         public bool SaveProgression { get; set; }
+
+        public bool IsSC { get; set; }
+
 
         public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network)
         {
@@ -53,7 +58,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }
 
                 var bulk = new BulkImport<TIndexed>(this.PartitionSize);
-                var scBulk = new BulkImport<SmartContactEntry.Entity>(1);
+                var scBulk = this.IsSC ? new BulkImport<SmartContactEntry.Entity>(1) : null;
                 if (!this.SkipToEnd)
                 {
                     try
