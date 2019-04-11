@@ -101,7 +101,9 @@
 
         public class Entity : IIndexed
         {
-            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network)
+            private bool isSC = false;
+
+            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool isSC = false)
             {
                 if (txId == null)
                 {
@@ -114,10 +116,18 @@
                 this.Transaction = tx;
                 this.BlockId = blockId;
                 this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
+                this.isSC = isSC;
 
-                this.CheckForSmartContract(tx);
-
-                this.Child = new SmartContactEntry.Entity(this);
+                if (this.isSC)
+                {
+                    this.CheckForSmartContract(tx);
+                    this.Child = new SmartContactEntry.Entity(this);
+                }
+                else
+                {
+                    this.HasSmartContract = false;
+                    this.Child = null;
+                }
             }
 
             public Entity(uint256 txId)
@@ -280,7 +290,10 @@
                 Helper.SetEntityProperty(entity, "c", Helper.SerializeList(this.PreviousTxOuts));
                 Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)this.Timestamp.UtcTicks, true));
 
-                this.CheckForSmartContract(this.Transaction);
+                if (this.isSC)
+                {
+                    this.CheckForSmartContract(this.Transaction);
+                }
 
                 entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(Convert.ToBoolean(this.HasSmartContract)));
 

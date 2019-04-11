@@ -14,14 +14,14 @@
 
     public abstract class IndexTableEntitiesTaskBase<TIndexed> : IndexTask<TIndexed>
     {
+        private int indexedEntities = 0;
+
         public IndexTableEntitiesTaskBase(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
         {
         }
 
-        int _IndexedEntities = 0;
-
-        public int IndexedEntities => _IndexedEntities;
+        public int IndexedEntities => this.indexedEntities;
 
         protected override int PartitionSize => 100;
 
@@ -47,8 +47,8 @@
             TableRequestOptions options = new TableRequestOptions()
             {
                 PayloadFormat = TablePayloadFormat.Json,
-                MaximumExecutionTime = this._Timeout,
-                ServerTimeout = this._Timeout,
+                MaximumExecutionTime = this.Timeout,
+                ServerTimeout = this.Timeout,
             };
 
             OperationContext context = new OperationContext();
@@ -61,8 +61,8 @@
 
                 try
                 {
-                    Stopwatch watch = new Stopwatch();
-                    watch.Start();
+                    //Stopwatch watch = new Stopwatch();
+                    //watch.Start();
 
                     if (transactionsBatch.Count > 1)
                     {
@@ -76,23 +76,23 @@
                         }
                     }
 
-                    Interlocked.Add(ref _IndexedEntities, transactionsBatch.Count);
+                    Interlocked.Add(ref this.indexedEntities, transactionsBatch.Count);
                 }
                 catch (Exception ex)
                 {
-                    if (IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
+                    if (this.IsError413(ex) /* Request too large */ || Helper.IsError(ex, "OperationTimedOut"))
                     {
                         // Reduce the size of all batches to half the size of the offending batch.
-                        int maxSize = Math.Max(1, transactionsBatch.Count / 2);
-                        bool workDone = false;
-                        Queue<TableBatchOperation> newBatches = new Queue<TableBatchOperation>();
+                        var maxSize = Math.Max(1, transactionsBatch.Count / 2);
+                        var workDone = false;
+                        var newBatches = new Queue<TableBatchOperation>();
 
                         for (/* starting with the current batch */; ; transactionsBatch = batches.Dequeue())
                         {
-                            for (; transactionsBatch.Count > maxSize; )
+                            for (; transactionsBatch.Count > maxSize;)
                             {
-                                newBatches.Enqueue(ToBatch(transactionsBatch.Take(maxSize).ToList()));
-                                transactionsBatch = ToBatch(transactionsBatch.Skip(maxSize).ToList());
+                                newBatches.Enqueue(this.ToBatch(transactionsBatch.Take(maxSize).ToList()));
+                                transactionsBatch = this.ToBatch(transactionsBatch.Skip(maxSize).ToList());
                                 workDone = true;
                             }
 
@@ -112,16 +112,16 @@
                         // Nothing could be done?
                         if (!workDone)
                         {
-                            throw;
+                           // throw;
                         }
                     }
                     else if (Helper.IsError(ex, "EntityTooLarge"))
                     {
-                        TableOperation op = GetFaultyOperation(ex, transactionsBatch);
-                        DynamicTableEntity entity = (DynamicTableEntity)GetEntity(op);
+                        TableOperation op = this.GetFaultyOperation(ex, transactionsBatch);
+                        DynamicTableEntity entity = (DynamicTableEntity)this.GetEntity(op);
                         byte[] serialized = entity.Serialize();
 
-                        Configuration
+                        this.Configuration
                             .GetBlocksContainer()
                             .GetBlockBlobReference(entity.GetFatBlobName())
                             .UploadFromByteArrayAsync(serialized, 0, serialized.Length).GetAwaiter().GetResult();
@@ -131,7 +131,7 @@
                     }
                     else
                     {
-                        IndexerTrace.ErrorWhileImportingEntitiesToAzure(transactionsBatch.Select(b => GetEntity(b)).ToArray(), ex);
+                        IndexerTrace.ErrorWhileImportingEntitiesToAzure(transactionsBatch.Select(b => this.GetEntity(b)).ToArray(), ex);
                         batches.Enqueue(transactionsBatch);
                         throw;
                     }
@@ -254,7 +254,7 @@
 
         protected bool IsError413(Exception ex)
         {
-            StorageException storage = ex as StorageException;
+            StorageException storage = (StorageException)ex;
             if (storage == null)
             {
                 return false;
