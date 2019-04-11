@@ -73,6 +73,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     $" {this.name}.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) +
                     highestBlock.HashBlock);
             }
+
+            benchLogs.AppendLine($"IBD.Status: ".PadRight(LoggingConfiguration.ColumnLength + 1) +
+                                 this.indexerLoop.InitialBlockDownloadState.ToString().PadRight(8));
         }
 
         /// <summary>

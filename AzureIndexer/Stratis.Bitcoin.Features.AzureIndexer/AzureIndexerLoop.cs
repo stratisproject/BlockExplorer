@@ -64,6 +64,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>Gets the Indexer Configuration.</summary>
         public IndexerConfiguration IndexerConfig { get; private set; }
 
+        public bool InitialBlockDownloadState { get; set; }
+
         public Dictionary<string, int> StatsDictionary { get; set; } = new Dictionary<string, int>();
 
         /// <summary>Gets the highest block that has been indexed.</summary>
@@ -81,6 +83,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.FullNode = fullNode;
             this.chain = fullNode.Chain;
             this.nodeLifetime = fullNode.NodeLifetime;
+            this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.loggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
@@ -327,6 +330,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             while (this.StoreTip.Height < this.indexerSettings.To && !cancellationToken.IsCancellationRequested)
             {
+                this.InitialBlockDownloadState = this.FullNode.InitialBlockDownloadState.IsInitialBlockDownload();
                 try
                 {
                     // All indexes will progress more or less in step
