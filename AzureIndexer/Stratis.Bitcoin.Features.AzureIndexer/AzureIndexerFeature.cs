@@ -80,9 +80,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public void Initialize()
         {
-            this.logger.LogTrace("()");
             this.indexerLoop.Initialize();
-            this.logger.LogTrace("(-)");
         }
 
         public void LoadConfiguration()
@@ -97,10 +95,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public override Task InitializeAsync()
         {
-            this.logger.LogTrace("()");
             this.LoadConfiguration();
             this.indexerLoop.Initialize();
-            this.logger.LogTrace("(-)");
             return Task.CompletedTask;
         }
 
@@ -111,7 +107,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogInformation("Stopping {0}...", this.name);
             this.indexerLoop.Shutdown();
-            this.logger.LogTrace("(-)");
         }
     }
 }

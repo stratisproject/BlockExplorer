@@ -141,7 +141,7 @@
                 var workDone = false;
                 var newBatches = new Queue<TableBatchOperation>();
 
-                for ( /* starting with the current batch */;; transactionsBatch = txBatches.Dequeue())
+                for ( /* starting with the current batch */; ; transactionsBatch = txBatches.Dequeue())
                 {
                     for (; transactionsBatch.Count > maxSize;)
                     {
