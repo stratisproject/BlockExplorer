@@ -11,32 +11,34 @@
     /// </summary>
     public class AzureIndexerSettings
     {
-        /// <summary>Azure storage account.</summary>
+        /// <summary>Gets or sets azure storage account.</summary>
         public string AzureAccountName { get; set; }
 
-        /// <summary>Azure storage account key.</summary>
+        /// <summary>Gets or sets azure storage account key.</summary>
         public string AzureKey { get; set; }
 
-        /// <summary>Azure storage emulator used.</summary>
+        /// <summary>Gets or sets a value indicating whether azure storage emulator used.</summary>
         public bool AzureEmulatorUsed { get; set; }
 
-        /// <summary>Checkpoint interval determines how often to record checkpoints.</summary>
+        /// <summary>Gets or sets checkpoint interval determines how often to record checkpoints.</summary>
         public TimeSpan CheckpointInterval { get; set; }
 
-        /// <summary>Checkpointset name.</summary>
+        /// <summary>Gets or sets checkpointset name.</summary>
         public string CheckpointsetName { get; set; }
 
-        /// <summary>Determines whether to regard or update checkpoints.</summary>
+        /// <summary>Gets or sets a value indicating whether determines whether to regard or update checkpoints.</summary>
         public bool IgnoreCheckpoints { get; set; }
 
-        /// <summary>The block to start indexing from.</summary>
+        /// <summary>Gets or sets the block to start indexing from.</summary>
         public int From { get; set; }
 
-        /// <summary>The last block to index.</summary>
+        /// <summary>Gets or sets the last block to index.</summary>
         public int To { get; set; }
 
-        /// <summary>The storage namespace to use.</summary>
+        /// <summary>Gets or sets the storage namespace to use.</summary>
         public string StorageNamespace { get; set; }
+
+        public bool IsSidechain { get; set; }
 
         /// <summary>The callback used to modify settings on startup.</summary>
         private Action<AzureIndexerSettings> callback = null;
@@ -49,9 +51,10 @@
             this.AzureEmulatorUsed = false;
             this.From = 0;
             this.To = int.MaxValue;
-            this.StorageNamespace = "";
+            this.StorageNamespace = string.Empty;
             this.CheckpointsetName = "default";
             this.CheckpointInterval = TimeSpan.Parse("00:15:00");
+            this.IsSidechain = false;
         }
 
         /// <summary>
@@ -80,6 +83,8 @@
 
                 // Mime-encoded-data strings should always be a multiple of 4 in length. Provide trailing '='s if omitted..
                 this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
+
+                this.IsSidechain = config.GetOrDefault<bool>("sidechain", false);
             }
 
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
@@ -115,6 +120,7 @@
 
             builder.AppendLine($"-azureacc=<string>        Azure account name.");
             builder.AppendLine($"-azurekey=<string>        Azure account key.");
+            builder.AppendLine($"-sidechain=<bool>         Is SmartContracts indexer.");
             builder.AppendLine($"-azemu                    Azure storage emulator used. Default is not to use the emulator.");
             builder.AppendLine($"-chkptint=<hh:mm:ss>      Indexing checkpoint interval.");
             builder.AppendLine($"-nochkpts                 Do not use checkpoints. Default is to use checkpoints.");

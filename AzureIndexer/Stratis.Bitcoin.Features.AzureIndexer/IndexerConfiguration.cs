@@ -27,6 +27,12 @@
         private const string ChainTableName = "chain";
         private const string WalletsTableName = "wallets";
 
+        private readonly ILoggerFactory loggerFactory;
+
+        private CloudTableClient tableClient;
+
+        public bool IsSidechain;
+
         public Network Network { get; set; }
 
         public bool AzureStorageEmulatorUsed { get; set; }
@@ -40,10 +46,6 @@
         public string StorageNamespace { get; set; }
 
         public CloudStorageAccount StorageAccount { get; set; }
-
-        private readonly ILoggerFactory loggerFactory;
-
-        private CloudTableClient tableClient;
 
         public CloudTableClient TableClient
         {
@@ -91,6 +93,14 @@
             var key = GetValue(config, "Azure.Key", true);
             this.StorageNamespace = GetValue(config, "StorageNamespace", false);
             var network = GetValue(config, "Network", false) ?? "Main";
+
+            var sidechain = GetValue(config, "Sidechain", true) ?? "false";
+
+            if (!string.IsNullOrEmpty(sidechain))
+            {
+                this.IsSidechain = bool.Parse(sidechain);
+            }
+
             this.Network = NetworkHelpers.GetNetwork(network);
             if (this.Network == null)
             {

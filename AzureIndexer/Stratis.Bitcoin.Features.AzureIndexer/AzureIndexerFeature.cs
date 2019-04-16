@@ -73,6 +73,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     $" {this.name}.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) +
                     highestBlock.HashBlock);
             }
+
+            benchLogs.AppendLine($"IBD.Status: ".PadRight(LoggingConfiguration.ColumnLength + 1) +
+                                 this.indexerLoop.InitialBlockDownloadState.ToString().PadRight(8));
         }
 
         /// <summary>
@@ -80,9 +83,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public void Initialize()
         {
-            this.logger.LogTrace("()");
             this.indexerLoop.Initialize();
-            this.logger.LogTrace("(-)");
         }
 
         public void LoadConfiguration()
@@ -97,10 +98,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public override Task InitializeAsync()
         {
-            this.logger.LogTrace("()");
             this.LoadConfiguration();
             this.indexerLoop.Initialize();
-            this.logger.LogTrace("(-)");
             return Task.CompletedTask;
         }
 
@@ -111,7 +110,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.logger.LogInformation("Stopping {0}...", this.name);
             this.indexerLoop.Shutdown();
-            this.logger.LogTrace("(-)");
         }
     }
 }

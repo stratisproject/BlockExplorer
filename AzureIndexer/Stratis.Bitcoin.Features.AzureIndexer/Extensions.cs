@@ -18,7 +18,6 @@
             return input.Distinct(new AnonymousEqualityComparer<T, TComparer>(comparer));
         }
 
-
         public static CoinCollection SelectSpentCoins(this IEnumerable<OrderedBalanceChange> entries)
         {
             return SelectSpentCoins(entries, true);
@@ -32,23 +31,25 @@
         private static CoinCollection SelectSpentCoins(IEnumerable<OrderedBalanceChange> entries, bool spent)
         {
             CoinCollection result = new CoinCollection();
-            Dictionary<OutPoint, ICoin> spentCoins = new Dictionary<OutPoint, ICoin>();
-            Dictionary<OutPoint, ICoin> receivedCoins = new Dictionary<OutPoint, ICoin>();
-            foreach(OrderedBalanceChange entry in entries)
+            var spentCoins = new Dictionary<OutPoint, ICoin>();
+            var receivedCoins = new Dictionary<OutPoint, ICoin>();
+            foreach (OrderedBalanceChange entry in entries)
             {
-                if(entry.SpentCoins != null)
+                if (entry.SpentCoins != null)
                 {
-                    foreach(ICoin c in entry.SpentCoins)
+                    foreach (ICoin c in entry.SpentCoins)
                     {
                         spentCoins.AddOrReplace(c.Outpoint, c);
                     }
                 }
-                foreach(ICoin c in entry.ReceivedCoins)
+
+                foreach (ICoin c in entry.ReceivedCoins)
                 {
                     receivedCoins.AddOrReplace(c.Outpoint, c);
                 }
             }
-            if(spent)
+
+            if (spent)
             {
                 result.AddRange(spentCoins.Values.Select(s => s));
             }
@@ -56,6 +57,7 @@
             {
                 result.AddRange(receivedCoins.Where(r => !spentCoins.ContainsKey(r.Key)).Select(kv => kv.Value));
             }
+
             return result;
         }
 
@@ -101,11 +103,11 @@
 
         private static bool IsMinConf(OrderedBalanceChange e, int minConfirmation, ChainBase chain)
         {
-            if(e.BlockId == null)
+            if (e.BlockId == null)
                 return minConfirmation == 0;
 
             ChainedHeader b = chain.GetBlock(e.BlockId);
-            if(b == null)
+            if (b == null)
                 return false;
             return (chain.Height - b.Height) + 1 >= minConfirmation;
         }
@@ -128,7 +130,7 @@
 		public static byte[] Serialize(this ITableEntity entity)
         {
             MemoryStream ms = new MemoryStream();
-            using(ODataMessageWriter messageWriter = new ODataMessageWriter(new Message(ms), new ODataMessageWriterSettings()))
+            using (ODataMessageWriter messageWriter = new ODataMessageWriter(new Message(ms), new ODataMessageWriterSettings()))
             {
                 // Create an entry writer to write a top-level entry to the message.
                 ODataWriter entryWriter = messageWriter.CreateODataEntryWriter();
@@ -140,7 +142,7 @@
 		public static void Deserialize(this ITableEntity entity, byte[] value)
         {
             MemoryStream ms = new MemoryStream(value);
-            using(ODataMessageReader messageReader = new ODataMessageReader(new Message(ms), new ODataMessageReaderSettings()
+            using (ODataMessageReader messageReader = new ODataMessageReader(new Message(ms), new ODataMessageReaderSettings()
             {
                 MessageQuotas = new ODataMessageQuotas()
                 {

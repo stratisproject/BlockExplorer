@@ -102,6 +102,7 @@
             }
         }
 
+        /// <inheritdoc />
         public SmartContactEntry()
         {
         }

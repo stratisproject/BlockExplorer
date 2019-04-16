@@ -75,67 +75,44 @@
 
         private void SetThrottling()
         {
-            this._logger.LogTrace("()");
-
             Helper.SetThrottling();
             ServicePoint tableServicePoint = ServicePointManager.FindServicePoint(this.Configuration.TableClient.BaseUri);
             tableServicePoint.ConnectionLimit = 1000;
-
-            this._logger.LogTrace("(-)");
         }
 
         private void PushTransactions(MultiValueDictionary<string, TransactionEntry.Entity> buckets,
                                         IEnumerable<TransactionEntry.Entity> indexedTransactions,
                                     BlockingCollection<TransactionEntry.Entity[]> transactions)
         {
-            this._logger.LogTrace("()");
-
             TransactionEntry.Entity[] array = indexedTransactions.ToArray();
             transactions.Add(array);
             buckets.Remove(array[0].PartitionKey);
-
-            this._logger.LogTrace("(-)");
         }
 
         private TimeSpan _Timeout = TimeSpan.FromMinutes(5.0);
 
         /// <summary>
-        /// TaskScheduler to parallelize individual object Index methods
+        /// Gets or sets taskScheduler to parallelize individual object Index methods
         /// </summary>
-        public TaskScheduler TaskScheduler
-        {
-            get;
-            set;
-        }
+        public TaskScheduler TaskScheduler { get; set; }
 
         public void Index(params Block[] blocks)
         {
-            this._logger.LogTrace("()");
-
             IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             task.Index(blocks, this.TaskScheduler);
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params Block[] blocks)
         {
-            this._logger.LogTrace("()");
-
             IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
             Task indexTask = task.IndexAsync(blocks, this.TaskScheduler);
 
-            this._logger.LogTrace("()");
             return indexTask;
         }
 
         public void Index(params TransactionEntry.Entity[] entities)
         {
-            this._logger.LogTrace("()");
-
             this.Index(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
@@ -145,11 +122,7 @@
 
         public void Index(IEnumerable<OrderedBalanceChange> balances)
         {
-            this._logger.LogTrace("()");
-
             this.Index(balances.Select(b => b.ToEntity()), this.Configuration.GetBalanceTable());
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexAsync(IEnumerable<OrderedBalanceChange> balances)
@@ -159,22 +132,15 @@
 
         private void Index(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this._logger.LogTrace("()");
-
             IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             task.Index(entities, this.TaskScheduler);
-
-            this._logger.LogTrace("(-)");
         }
 
         private Task IndexAsync(IEnumerable<ITableEntity> entities, CloudTable table)
         {
-            this._logger.LogTrace("()");
-
             IndexTableEntitiesTask task = new IndexTableEntitiesTask(this.Configuration, table, this._loggerFactory);
             Task indexTask = task.IndexAsync(entities, this.TaskScheduler);
 
-            this._logger.LogTrace("(-)");
             return indexTask;
         }
 
@@ -190,15 +156,12 @@
 
         public CheckpointRepository GetCheckpointRepository()
         {
-            this._logger.LogTrace("()");
-
             CheckpointRepository repository = new CheckpointRepository(
                 this._configuration.GetBlocksContainer(),
                 this._configuration.Network,
                 string.IsNullOrWhiteSpace(this._configuration.CheckpointSetName) ? "default" : this._configuration.CheckpointSetName,
                 this._loggerFactory);
 
-            this._logger.LogTrace("(-)");
             return repository;
         }
 
@@ -209,8 +172,6 @@
 
         public void IndexOrderedBalance(int height, Block block)
         {
-            this._logger.LogTrace("()");
-
             CloudTable table = this.Configuration.GetBalanceTable();
             uint256 blockId = block?.GetHash();
             BlockHeader header = block?.Header;
@@ -222,11 +183,7 @@
                         .Select(_ => _.ToEntity())
                         .AsEnumerable();
 
-            this._logger.LogTrace("Indexing ordered balance");
-
             this.Index(entities, table);
-
-            this._logger.LogTrace("(-)");
         }
 
         // TODO: Is it in use?
@@ -252,8 +209,6 @@
 
         public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {
-            this._logger.LogTrace("()");
-
             try
             {
                 this.IndexWalletOrderedBalanceAsync(height, block, walletRules).Wait();
@@ -263,14 +218,10 @@
                 this._logger.LogTrace("Exception: {0}", ex.ToString());
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexWalletOrderedBalanceAsync(int height, Block block, WalletRuleEntryCollection walletRules)
         {
-            this._logger.LogTrace("()");
-
             CloudTable table = this.Configuration.GetBalanceTable();
             uint256 blockId = block?.GetHash();
 
@@ -283,19 +234,14 @@
 
             Task indexingTask = this.IndexAsync(entities, table);
 
-            this._logger.LogTrace("(-)");
             return indexingTask;
         }
 
         public void IndexOrderedBalance(Transaction tx)
         {
-            this._logger.LogTrace("()");
-
             CloudTable table = this.Configuration.GetBalanceTable();
             IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this._configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             this.Index(entities, table);
-
-            this._logger.LogTrace("(-)");
         }
 
         public Task IndexOrderedBalanceAsync(Transaction tx)
@@ -309,8 +255,6 @@
 
         internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this._logger.LogTrace("({0}:{1})", nameof(startHeight), startHeight);
-
             var entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
             ChainPartEntry chainPart = null;
@@ -339,14 +283,10 @@
             }
 
             this.Index(entries, cancellationToken);
-
-            this._logger.LogTrace("(-)");
         }
 
         private void Index(List<ChainPartEntry> chainParts, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this._logger.LogTrace("()");
-
             CloudTable table = this.Configuration.GetChainTable();
             TableBatchOperation batch = new TableBatchOperation();
             ChainPartEntry last = chainParts[chainParts.Count - 1];
@@ -365,12 +305,8 @@
 
             if (batch.Count > 0)
             {
-                this._logger.LogTrace("Batch count: {0}", batch.Count);
-
                 table.ExecuteBatchAsync(batch, null, null, cancellationToken).GetAwaiter().GetResult();
             }
-
-            this._logger.LogTrace("(-)");
         }
 
         public TimeSpan CheckpointInterval { get; set; }
@@ -379,10 +315,10 @@
 
         public bool IgnoreCheckpoints { get; set; }
 
+        public int ToHeight { get; set; }
+
         public void IndexChain(ChainBase chain, CancellationToken cancellationToken = default(CancellationToken))
         {
-            this._logger.LogTrace("()");
-
             if (chain == null)
             {
                 throw new ArgumentNullException("chain");
@@ -400,14 +336,11 @@
                 var height = 0;
                 if (changes.Count != 0)
                 {
-                    this._logger.LogTrace("Changes count: {0}", changes.Count);
-
                     IndexerTrace.IndexedChainTip(changes[0].BlockId, changes[0].Height);
                     if (changes[0].Height > chain.Tip.Height)
                     {
                         IndexerTrace.InputChainIsLate();
 
-                        this._logger.LogTrace("(-):LATE");
                         return;
                     }
 
@@ -416,23 +349,17 @@
                     {
                         IndexerTrace.IndexedChainIsUpToDate(chain.Tip);
 
-                        this._logger.LogTrace("(-):UP_TO_DATE");
                         return;
                     }
                 }
                 else
                 {
-                    this._logger.LogTrace("No work found");
                     IndexerTrace.NoForkFoundWithStored();
                 }
 
                 IndexerTrace.IndexingChain(chain.GetBlock(height), chain.Tip);
                 this.Index(chain, height, cancellationToken);
             }
-
-            this._logger.LogTrace("(-)");
         }
-
-        public int ToHeight { get; set; }
     }
 }
