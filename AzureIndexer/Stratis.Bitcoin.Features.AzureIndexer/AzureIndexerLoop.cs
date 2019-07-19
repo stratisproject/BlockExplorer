@@ -9,6 +9,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Auth;
     using NBitcoin;
+    using Stratis.Bitcoin.Base;
     using Stratis.Bitcoin.Configuration.Logging;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Utilities;
@@ -25,7 +26,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly IAsyncLoopFactory asyncLoopFactory;
 
         /// <summary>Best chain of block headers.</summary>
-        private readonly ConcurrentChain chain;
+        private readonly IChainState chain;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -81,7 +82,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.asyncLoopFactory = fullNode.AsyncLoopFactory;
             this.FullNode = fullNode;
-            this.chain = fullNode.Chain;
+            this.chain = fullNode.ChainBehaviorState;
             this.nodeLifetime = fullNode.NodeLifetime;
             this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
@@ -128,7 +129,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if (this.indexerSettings.IgnoreCheckpoints)
             {
-                this.SetStoreTip(this.chain.GetBlock(indexer.FromHeight));
+                this.SetStoreTip(this.chain.BlockStoreTip..GetBlock(indexer.FromHeight));
             }
             else
             {
@@ -190,7 +191,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private ChainedHeader GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
-            ChainedHeader fork = this.chain.FindFork(checkpoint.BlockLocator);
+            ChainedHeader fork = this.chain.BlockStoreTip.FindFork(checkpoint.BlockLocator);
 
             return fork;
         }
