@@ -40,8 +40,13 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="NBitcoin, Version=4.0.0.75, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\StratisLibs\NBitcoin.dll</HintPath>
+      <SpecificVersion>true</SpecificVersion>
+    </Reference>
     <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
       <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Stratis.Sidechains.Networks">
       <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>

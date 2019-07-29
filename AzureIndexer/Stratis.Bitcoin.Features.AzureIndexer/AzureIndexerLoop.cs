@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -13,6 +12,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Stratis.Bitcoin.Configuration.Logging;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Utilities;
+    using Stratis.Bitcoin.Base;
+    using Stratis.Bitcoin.Configuration;
+    using Stratis.Bitcoin.Connection;
+    using Stratis.Bitcoin.Consensus;
+    using Stratis.Bitcoin.AsyncWork;
 
     /// <summary>
     /// The AzureIndexerStoreLoop loads blocks from the block repository and indexes them in Azure.
@@ -23,10 +27,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private const int IndexBatchSize = 100;
 
         /// <summary>Factory for creating background async loop tasks.</summary>
-        private readonly IAsyncLoopFactory asyncLoopFactory;
+        private readonly IAsyncProvider asyncProvider;
 
         /// <summary>Best chain of block headers.</summary>
-        private readonly IChainState chain;
+        protected ChainIndexer chain;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -80,9 +84,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="loggerFactory">The logger factory.</param>
         public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory)
         {
-            this.asyncLoopFactory = fullNode.AsyncLoopFactory;
+            this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
-            this.chain = fullNode.ChainBehaviorState;
+            this.chain = fullNode.ChainIndexer;
             this.nodeLifetime = fullNode.NodeLifetime;
             this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
@@ -129,7 +133,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if (this.indexerSettings.IgnoreCheckpoints)
             {
-                this.SetStoreTip(this.chain.BlockStoreTip..GetBlock(indexer.FromHeight));
+                this.SetStoreTip(this.chain.GetHeader(indexer.FromHeight));
             }
             else
             {
@@ -180,7 +184,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             minHeight = Math.Min(minHeight, lastTransactions?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastBalances?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastWallets?.Height ?? 0);
-            this.SetStoreTip(this.chain.GetBlock(minHeight));
+            this.SetStoreTip(this.chain.GetHeader(minHeight));
         }
 
         /// <summary>
@@ -191,7 +195,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private ChainedHeader GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
-            ChainedHeader fork = this.chain.BlockStoreTip.FindFork(checkpoint.BlockLocator);
+            ChainedHeader fork = this.chain.FindFork(checkpoint.BlockLocator);
 
             return fork;
         }
@@ -201,7 +205,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         private void StartLoop()
         {
-            this.asyncLoop = this.asyncLoopFactory.Run($"{this.StoreName}.IndexAsync", async token =>
+            this.asyncLoop = this.asyncProvider.Run($"{this.StoreName}.IndexAsync", async token =>
                 {
                     await this.IndexAsync(this.nodeLifetime.ApplicationStopping);
                 },
@@ -209,7 +213,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 repeatEvery: TimeSpans.RunOnce,
                 startAfter: TimeSpans.FiveSeconds);
 
-            this.asyncLoopChain = this.asyncLoopFactory.Run($"{this.StoreName}.IndexChainAsync", async token =>
+            this.asyncLoopChain = this.asyncProvider.Run($"{this.StoreName}.IndexChainAsync", async token =>
                 {
                     await this.IndexChainAsync(this.nodeLifetime.ApplicationStopping);
                 },
