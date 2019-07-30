@@ -31,27 +31,20 @@
             return indexerConfig.CreateIndexer();
         }
 
-        private readonly IndexerConfiguration _configuration;
+        private readonly IndexerConfiguration configuration;
 
         private readonly ILoggerFactory _loggerFactory;
 
         private readonly ILogger _logger;
 
-        public IndexerConfiguration Configuration
-        {
-            get
-            {
-                return this._configuration;
-            }
-        }
+        public IndexerConfiguration Configuration => this.configuration;
 
-        /// <inheritdoc />
         public AzureIndexer(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this._loggerFactory = loggerFactory;
             this.TaskScheduler = TaskScheduler.Default;
             this.CheckpointInterval = TimeSpan.FromMinutes(15.0);
-            this._configuration = configuration ?? throw new ArgumentNullException("configuration");
+            this.configuration = configuration ?? throw new ArgumentNullException("configuration");
             this.FromHeight = 0;
             this.ToHeight = int.MaxValue;
             this._logger = loggerFactory.CreateLogger(this.GetType().FullName);
@@ -157,15 +150,15 @@
         public CheckpointRepository GetCheckpointRepository()
         {
             CheckpointRepository repository = new CheckpointRepository(
-                this._configuration.GetBlocksContainer(),
-                this._configuration.Network,
-                string.IsNullOrWhiteSpace(this._configuration.CheckpointSetName) ? "default" : this._configuration.CheckpointSetName,
+                this.configuration.GetBlocksContainer(),
+                this.configuration.Network,
+                string.IsNullOrWhiteSpace(this.configuration.CheckpointSetName) ? "default" : this.configuration.CheckpointSetName,
                 this._loggerFactory);
 
             return repository;
         }
 
-        internal ChainBase GetMainChain()
+        internal ChainIndexer GetMainChain()
         {
             return this.Configuration.CreateIndexerClient().GetMainChain();
         }
@@ -179,33 +172,12 @@
             IEnumerable<DynamicTableEntity> entities =
                     block
                         .Transactions
-                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height, this._configuration.Network))
+                        .SelectMany(t => OrderedBalanceChange.ExtractScriptBalances(t.GetHash(), t, blockId, header, height, this.configuration.Network))
                         .Select(_ => _.ToEntity())
                         .AsEnumerable();
 
             this.Index(entities, table);
         }
-
-        // TODO: Is it in use?
-        //public void IndexTransactions(int height, Block block)
-        //{
-        //    this._logger.LogTrace("()");
-
-        //    CloudTable table = this.Configuration.GetTransactionTable();
-        //    uint256 blockId = block?.GetHash();
-        //    IEnumerable<DynamicTableEntity> entities =
-        //                block
-        //                .Transactions
-        //                .Select(t => new TransactionEntry.Entity(t.GetHash(), t, blockId))
-        //                .Select(c => c.CreateTableEntity(this.Configuration.Network))
-        //                .AsEnumerable();
-
-        //    this._logger.LogTrace("Indexing transactions");
-
-        //    this.Index(entities, table);
-
-        //    this._logger.LogTrace("(-)");
-        //}
 
         public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {
@@ -228,7 +200,7 @@
             IEnumerable<DynamicTableEntity> entities =
                     block
                     .Transactions
-                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules, this._configuration.Network))
+                    .SelectMany(t => OrderedBalanceChange.ExtractWalletBalances(null, t, blockId, block.Header, height, walletRules, this.configuration.Network))
                     .Select(t => t.ToEntity())
                     .AsEnumerable();
 
@@ -240,25 +212,25 @@
         public void IndexOrderedBalance(Transaction tx)
         {
             CloudTable table = this.Configuration.GetBalanceTable();
-            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this._configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
+            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this.configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             this.Index(entities, table);
         }
 
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
             CloudTable table = this.Configuration.GetBalanceTable();
-            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this._configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
+            IEnumerable<DynamicTableEntity> entities = OrderedBalanceChange.ExtractScriptBalances(tx, this.configuration.Network).Select(t => t.ToEntity()).AsEnumerable();
             return this.IndexAsync(entities, table);
         }
 
         internal const int BlockHeaderPerRow = 6;
 
-        internal void Index(ChainBase chain, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
+        internal void Index(ChainIndexer chainIndexer, int startHeight, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var entries = new List<ChainPartEntry>(((chain.Height - startHeight) / BlockHeaderPerRow) + 5);
+            var entries = new List<ChainPartEntry>(((chainIndexer.Height - startHeight) / BlockHeaderPerRow) + 5);
             startHeight = startHeight - (startHeight % BlockHeaderPerRow);
             ChainPartEntry chainPart = null;
-            for (var i = startHeight; i <= chain.Tip.Height; i++)
+            for (var i = startHeight; i <= chainIndexer.Tip.Height; i++)
             {
                 if (chainPart == null)
                 {
@@ -268,7 +240,7 @@
                     };
                 }
 
-                ChainedHeader block = chain.GetBlock(i);
+                ChainedHeader block = chainIndexer.GetHeader(i);
                 chainPart.BlockHeaders.Add(block.Header);
                 if (chainPart.BlockHeaders.Count == BlockHeaderPerRow)
                 {
@@ -317,11 +289,11 @@
 
         public int ToHeight { get; set; }
 
-        public void IndexChain(ChainBase chain, CancellationToken cancellationToken = default(CancellationToken))
+        public void IndexChain(ChainIndexer chainIndexer, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (chain == null)
+            if (chainIndexer == null)
             {
-                throw new ArgumentNullException("chain");
+                throw new ArgumentNullException("chainIndexer");
             }
 
             this.SetThrottling();
@@ -329,15 +301,15 @@
             using (IndexerTrace.NewCorrelation("Index main chain to azure started"))
             {
                 this.Configuration.GetChainTable().CreateIfNotExistsAsync().GetAwaiter().GetResult();
-                IndexerTrace.InputChainTip(chain.Tip);
+                IndexerTrace.InputChainTip(chainIndexer.Tip);
                 IndexerClient client = this.Configuration.CreateIndexerClient();
-                List<ChainBlockHeader> changes = client.GetChainChangesUntilFork(chain.Tip, true, cancellationToken).ToList();
+                List<ChainBlockHeader> changes = client.GetChainChangesUntilFork(chainIndexer.Tip, true, cancellationToken).ToList();
 
                 var height = 0;
                 if (changes.Count != 0)
                 {
                     IndexerTrace.IndexedChainTip(changes[0].BlockId, changes[0].Height);
-                    if (changes[0].Height > chain.Tip.Height)
+                    if (changes[0].Height > chainIndexer.Tip.Height)
                     {
                         IndexerTrace.InputChainIsLate();
 
@@ -345,9 +317,9 @@
                     }
 
                     height = changes[changes.Count - 1].Height + 1;
-                    if (height > chain.Height)
+                    if (height > chainIndexer.Height)
                     {
-                        IndexerTrace.IndexedChainIsUpToDate(chain.Tip);
+                        IndexerTrace.IndexedChainIsUpToDate(chainIndexer.Tip);
 
                         return;
                     }
@@ -357,8 +329,8 @@
                     IndexerTrace.NoForkFoundWithStored();
                 }
 
-                IndexerTrace.IndexingChain(chain.GetBlock(height), chain.Tip);
-                this.Index(chain, height, cancellationToken);
+                IndexerTrace.IndexingChain(chainIndexer.GetHeader(height), chainIndexer.Tip);
+                this.Index(chainIndexer, height, cancellationToken);
             }
         }
     }

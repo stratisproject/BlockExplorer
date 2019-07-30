@@ -30,7 +30,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly IAsyncProvider asyncProvider;
 
         /// <summary>Best chain of block headers.</summary>
-        protected ChainIndexer chain;
+        protected ChainIndexer chainIndexer;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -86,7 +86,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
-            this.chain = fullNode.ChainIndexer;
+            this.chainIndexer = fullNode.ChainIndexer;
             this.nodeLifetime = fullNode.NodeLifetime;
             this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
@@ -133,7 +133,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             if (this.indexerSettings.IgnoreCheckpoints)
             {
-                this.SetStoreTip(this.chain.GetHeader(indexer.FromHeight));
+                this.SetStoreTip(this.chainIndexer.GetHeader(indexer.FromHeight));
             }
             else
             {
@@ -184,7 +184,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             minHeight = Math.Min(minHeight, lastTransactions?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastBalances?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastWallets?.Height ?? 0);
-            this.SetStoreTip(this.chain.GetHeader(minHeight));
+            this.SetStoreTip(this.chainIndexer.GetHeader(minHeight));
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private ChainedHeader GetCheckPointBlock(IndexerCheckpoints indexerCheckpoints)
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
-            ChainedHeader fork = this.chain.FindFork(checkpoint.BlockLocator);
+            ChainedHeader fork = this.chainIndexer.FindFork(checkpoint.BlockLocator);
 
             return fork;
         }
@@ -205,7 +205,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         private void StartLoop()
         {
-            this.asyncLoop = this.asyncProvider.Run($"{this.StoreName}.IndexAsync", async token =>
+            this.asyncLoop = this.asyncProvider.CreateAndRunAsyncLoop($"{this.StoreName}.IndexAsync", async token =>
                 {
                     await this.IndexAsync(this.nodeLifetime.ApplicationStopping);
                 },
@@ -213,7 +213,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 repeatEvery: TimeSpans.RunOnce,
                 startAfter: TimeSpans.FiveSeconds);
 
-            this.asyncLoopChain = this.asyncProvider.Run($"{this.StoreName}.IndexChainAsync", async token =>
+            this.asyncLoopChain = this.asyncProvider.CreateAndRunAsyncLoop($"{this.StoreName}.IndexChainAsync", async token =>
                 {
                     await this.IndexChainAsync(this.nodeLifetime.ApplicationStopping);
                 },
@@ -235,7 +235,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(indexerCheckpoints);
             FullNodeBlocksRepository repo = new FullNodeBlocksRepository(this.FullNode);
 
-            BlockFetcher fetcher = new BlockFetcher(checkpoint, repo, this.chain, this.chain.FindFork(checkpoint.BlockLocator), this.loggerFactory)
+            BlockFetcher fetcher = new BlockFetcher(checkpoint, repo, this.chainIndexer, this.chainIndexer.FindFork(checkpoint.BlockLocator), this.loggerFactory)
             {
                 NeedSaveInterval = this.indexerSettings.CheckpointInterval,
                 FromHeight = this.StoreTip.Height + 1,
@@ -257,7 +257,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             {
                 try
                 {
-                    this.AzureIndexer.IndexChain(this.chain, cancellationToken);
+                    this.AzureIndexer.IndexChain(this.chainIndexer, cancellationToken);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
@@ -284,7 +284,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         {
             Checkpoint checkpoint = this.AzureIndexer.GetCheckpointInternal(type);
             BlockLocator blockLocator = checkpoint.BlockLocator;
-            return this.chain.FindFork(blockLocator);
+            return this.chainIndexer.FindFork(blockLocator);
         }
 
         /// <summary>

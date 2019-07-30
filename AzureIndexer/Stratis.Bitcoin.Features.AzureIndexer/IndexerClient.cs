@@ -518,16 +518,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             });
         }
 
-        public ConcurrentChain GetMainChain()
+        public ChainIndexer GetMainChain()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            ConcurrentChain chain = new ConcurrentChain(this.Configuration.Network);
+            ChainIndexer chain = new ChainIndexer(this.Configuration.Network);
 #pragma warning restore CS0618 // Type or member is obsolete
             this.SynchronizeChain(chain);
             return chain;
         }
 
-        public void SynchronizeChain(ChainBase chain)
+        public void SynchronizeChain(ChainIndexer chain)
         {
             if (chain.Tip != null && chain.Genesis.HashBlock != this.network.GetGenesis().GetHash())
             {
