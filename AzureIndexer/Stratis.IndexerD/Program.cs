@@ -1,6 +1,4 @@
-﻿using Stratis.Bitcoin.Networks;
-
-namespace Stratis.IndexerD
+﻿namespace Stratis.IndexerD
 {
     using System;
     using System.Linq;
@@ -19,6 +17,7 @@ namespace Stratis.IndexerD
     using Stratis.Bitcoin.Features.SmartContracts;
     using Stratis.Bitcoin.Features.SmartContracts.PoA;
     using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+    using Stratis.Bitcoin.Networks;
     using Stratis.Bitcoin.Utilities;
     using Stratis.Sidechains.Networks;
 
@@ -66,7 +65,10 @@ namespace Stratis.IndexerD
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    {
+                            MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+                    };
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()
