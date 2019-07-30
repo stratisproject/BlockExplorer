@@ -40,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="NBitcoin">
+      <HintPath>..\StratisLibs\NBitcoin.dll</HintPath>
+    </Reference>
     <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
       <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
     </Reference>

@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using Stratis.Bitcoin.AsyncWork;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Concurrent;
@@ -25,9 +27,9 @@
 
     public class AzureIndexer
     {
-        public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory)
+        public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration(config, loggerFactory);
+            IndexerConfiguration indexerConfig = new IndexerConfiguration(config, loggerFactory, asyncProvider);
             return indexerConfig.CreateIndexer();
         }
 

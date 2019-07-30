@@ -89,27 +89,32 @@
                                     (DateTime.UtcNow - e.SeenUtc) < expiration));
         }
 
-        public static IEnumerable<OrderedBalanceChange> WhereConfirmed(this IEnumerable<OrderedBalanceChange> entries, ChainBase chain, int minConfirmation = 1)
+        public static IEnumerable<OrderedBalanceChange> WhereConfirmed(this IEnumerable<OrderedBalanceChange> entries, ChainIndexer chainIndexer, int minConfirmation = 1)
         {
             return
                 entries
-                .Where(e => IsMinConf(e, minConfirmation, chain));
+                .Where(e => IsMinConf(e, minConfirmation, chainIndexer));
         }
 
-        public static BalanceSheet AsBalanceSheet(this IEnumerable<OrderedBalanceChange> entries, ChainBase chain)
+        public static BalanceSheet AsBalanceSheet(this IEnumerable<OrderedBalanceChange> entries, ChainIndexer chainIndexer)
         {
-            return new BalanceSheet(entries, chain);
+            return new BalanceSheet(entries, chainIndexer);
         }
 
-        private static bool IsMinConf(OrderedBalanceChange e, int minConfirmation, ChainBase chain)
+        private static bool IsMinConf(OrderedBalanceChange e, int minConfirmation, ChainIndexer chainIndexer)
         {
             if (e.BlockId == null)
+            {
                 return minConfirmation == 0;
+            }
 
-            ChainedHeader b = chain.GetBlock(e.BlockId);
+            ChainedHeader b = chainIndexer.GetHeader(e.BlockId);
             if (b == null)
+            {
                 return false;
-            return (chain.Height - b.Height) + 1 >= minConfirmation;
+            }
+
+            return (chainIndexer.Height - b.Height) + 1 >= minConfirmation;
         }
 
         public static void MakeFat(this DynamicTableEntity entity, int size)
@@ -117,29 +122,31 @@
             entity.Properties.Clear();
             entity.Properties.Add("fat", new EntityProperty(size));
         }
+
         public static bool IsFat(this DynamicTableEntity entity)
         {
             return entity.Properties.Any(p => p.Key.Equals("fat", StringComparison.OrdinalIgnoreCase) &&
                                               p.Value.PropertyType == EdmType.Int32);
         }
+
         public static string GetFatBlobName(this ITableEntity entity)
         {
             return "unk" + Hashes.Hash256(Encoding.UTF8.GetBytes(entity.PartitionKey + entity.RowKey)).ToString();
         }
 
-		public static byte[] Serialize(this ITableEntity entity)
+        public static byte[] Serialize(this ITableEntity entity)
         {
             MemoryStream ms = new MemoryStream();
             using (ODataMessageWriter messageWriter = new ODataMessageWriter(new Message(ms), new ODataMessageWriterSettings()))
             {
                 // Create an entry writer to write a top-level entry to the message.
-                ODataWriter entryWriter = messageWriter.CreateODataEntryWriter();
-				TableOperationHttpWebRequestFactory.WriteOdataEntity(entity, TableOperationType.Insert, null, entryWriter, null, true);
+                ODataWriter entryWriter = messageWriter.CreateODataEntryWriter(); 
+                TableOperationHttpWebRequestFactory.WriteOdataEntity(entity, TableOperationType.Insert, null, entryWriter, null, true);
                 return ms.ToArray();
             }
         }
 
-		public static void Deserialize(this ITableEntity entity, byte[] value)
+        public static void Deserialize(this ITableEntity entity, byte[] value)
         {
             MemoryStream ms = new MemoryStream(value);
             using (ODataMessageReader messageReader = new ODataMessageReader(new Message(ms), new ODataMessageReaderSettings()
@@ -151,8 +158,8 @@
             }))
             {
                 ODataReader reader = messageReader.CreateODataEntryReader();
-                reader.Read();
-				TableOperationHttpWebRequestFactory.ReadAndUpdateTableEntity(entity, (ODataEntry)reader.Item, null);
+                reader.Read(); 
+                TableOperationHttpWebRequestFactory.ReadAndUpdateTableEntity(entity, (ODataEntry)reader.Item, null);
             }
         }
 
@@ -164,13 +171,12 @@
             public Message(Stream stream)
             {
                 this.stream = stream;
-                SetHeader("Content-Type", "application/atom+xml");
+                this.SetHeader("Content-Type", "application/atom+xml");
             }
 
             public string GetHeader(string headerName)
             {
-                string value;
-                headers.TryGetValue(headerName, out value);
+                this.headers.TryGetValue(headerName, out var value);
                 return value;
             }
 
@@ -192,11 +198,7 @@
                 }
             }
 
-            public int StatusCode
-            {
-                get;
-                set;
-            }
+            public int StatusCode { get; set; }
         }
     }
 }

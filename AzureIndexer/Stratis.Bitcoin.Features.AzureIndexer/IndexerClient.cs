@@ -521,10 +521,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public ChainIndexer GetMainChain()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            ChainIndexer chain = new ChainIndexer(this.Configuration.Network);
+            ChainIndexer chainIndexer = new ChainIndexer(this.Configuration.Network);
 #pragma warning restore CS0618 // Type or member is obsolete
-            this.SynchronizeChain(chain);
-            return chain;
+            this.SynchronizeChain(chainIndexer);
+            return chainIndexer;
         }
 
         public void SynchronizeChain(ChainIndexer chain)

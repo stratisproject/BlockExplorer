@@ -25,7 +25,7 @@
         {
             get
             {
-                return _Checkpoint;
+                return this._Checkpoint;
             }
         }
 
@@ -35,7 +35,7 @@
         {
             get
             {
-                return _BlocksRepository;
+                return this._BlocksRepository;
             }
         }
 
@@ -43,26 +43,18 @@
 
         private readonly ILogger logger;
 
-        private readonly ChainBase _BlockHeaders;
-
-        public ChainBase BlockHeaders
-        {
-            get
-            {
-                return _BlockHeaders;
-            }
-        }
+        private readonly ChainIndexer BlockHeaders;
 
         private void InitDefault()
         {
-            NeedSaveInterval = TimeSpan.FromMinutes(15);
-            ToHeight = int.MaxValue;
+            this.NeedSaveInterval = TimeSpan.FromMinutes(15);
+            this.ToHeight = int.MaxValue;
         }
 
-        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainBase chain, ChainedHeader lastProcessed, ILoggerFactory loggerFactory)
+        public BlockFetcher(Checkpoint checkpoint, IBlocksRepository blocksRepository, ChainIndexer chain, ChainedHeader lastProcessed, ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
-            this.logger = this.loggerFactory.CreateLogger(GetType().FullName);
+            this.logger = this.loggerFactory.CreateLogger(this.GetType().FullName);
 
             if (blocksRepository == null)
             {
@@ -79,12 +71,12 @@
                 throw new ArgumentNullException("checkpoint");
             }
 
-            _BlockHeaders = chain;
-            _BlocksRepository = blocksRepository;
-            _Checkpoint = checkpoint;
-            _LastProcessed = lastProcessed;
+            this.BlockHeaders = chain;
+            this._BlocksRepository = blocksRepository;
+            this._Checkpoint = checkpoint;
+            this._LastProcessed = lastProcessed;
 
-            InitDefault();
+            this.InitDefault();
         }
 
         public TimeSpan NeedSaveInterval { get; set; }
@@ -93,14 +85,18 @@
 
         public ChainedHeader _LastProcessed { get; private set; }
 
+        public int FromHeight { get; set; }
+
+        public int ToHeight { get; set; }
+
         public IEnumerator<BlockInfo> GetEnumerator()
         {
             Queue<DateTime> lastLogs = new Queue<DateTime>();
             Queue<int> lastHeights = new Queue<int>();
 
-            ChainedHeader fork = this._BlockHeaders.FindFork(this._Checkpoint.BlockLocator);
-            IEnumerable<ChainedHeader> headers = this._BlockHeaders.EnumerateAfter(fork);
-            headers = headers.Where(h => h.Height <= ToHeight);
+            ChainedHeader fork = this.BlockHeaders.FindFork(this._Checkpoint.BlockLocator);
+            IEnumerable<ChainedHeader> headers = this.BlockHeaders.EnumerateAfter(fork);
+            headers = headers.Where(h => h.Height <= this.ToHeight);
             ChainedHeader first = headers.FirstOrDefault();
             if (first == null)
             {
@@ -114,13 +110,13 @@
                 height = 0;
             }
 
-            foreach (Block block in _BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), CancellationToken))
+            foreach (Block block in this._BlocksRepository.GetBlocks(headers.Select(b => b.HashBlock), this.CancellationToken))
             {
-                ChainedHeader header = _BlockHeaders.GetBlock(height);
+                ChainedHeader header = this.BlockHeaders.GetHeader(height);
 
                 if (block == null)
                 {
-                    Block storeTip = _BlocksRepository.GetStoreTip();
+                    Block storeTip = this._BlocksRepository.GetStoreTip();
                     if (storeTip != null)
                     {
                         // Store is caught up with Chain but the block is missing from the store.
@@ -134,7 +130,7 @@
                     break;
                 }
 
-                _LastProcessed = header;
+                this._LastProcessed = header;
                 yield return new BlockInfo()
                 {
                     Block = block,
@@ -142,25 +138,21 @@
                     Height = header.Height
                 };
 
-                IndexerTrace.Processed(height, Math.Min(ToHeight, _BlockHeaders.Tip.Height), lastLogs, lastHeights);
+                IndexerTrace.Processed(height, Math.Min(this.ToHeight, this.BlockHeaders.Tip.Height), lastLogs, lastHeights);
                 height++;
             }
         }
 
         internal void SkipToEnd()
         {
-            var height = Math.Min(ToHeight, _BlockHeaders.Tip.Height);
-            _LastProcessed = _BlockHeaders.GetBlock(height);
+            var height = Math.Min(this.ToHeight, this.BlockHeaders.Tip.Height);
+            this._LastProcessed = this.BlockHeaders.GetHeader(height);
         }
-
-        #region IEnumerable Members
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return this.GetEnumerator();
         }
-
-        #endregion
 
         private DateTime _LastSaved = DateTime.UtcNow;
 
@@ -168,7 +160,7 @@
         {
             get
             {
-                return (DateTime.UtcNow - _LastSaved) > NeedSaveInterval;
+                return (DateTime.UtcNow - this._LastSaved) > this.NeedSaveInterval;
             }
         }
 
@@ -176,21 +168,19 @@
         {
             this.logger.LogTrace("()");
 
-            if (_LastProcessed != null)
+            if (this._LastProcessed != null)
             {
                 this.logger.LogTrace("Saving checkpoints");
 
-                _Checkpoint.SaveProgress(_LastProcessed);
-                IndexerTrace.CheckpointSaved(_LastProcessed, _Checkpoint.CheckpointName);
+                this._Checkpoint.SaveProgress(this._LastProcessed);
+                IndexerTrace.CheckpointSaved(this._LastProcessed, this._Checkpoint.CheckpointName);
             }
 
-            _LastSaved = DateTime.UtcNow;
+            this._LastSaved = DateTime.UtcNow;
 
             this.logger.LogTrace("(-)");
         }
 
-        public int FromHeight { get; set; }
-
-        public int ToHeight { get; set; }
+        
     }
 }
