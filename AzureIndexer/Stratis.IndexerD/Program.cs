@@ -17,6 +17,7 @@
     using Stratis.Bitcoin.Features.SmartContracts;
     using Stratis.Bitcoin.Features.SmartContracts.PoA;
     using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+    using Stratis.Bitcoin.Networks;
     using Stratis.Bitcoin.Utilities;
     using Stratis.Sidechains.Networks;
 
@@ -41,7 +42,10 @@
 
                 if (isSideChain)
                 {
-                   nodeSettings = new NodeSettings(networksSelector: FederatedPegNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
+                   nodeSettings = new NodeSettings(networksSelector: CirrusNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args)
+                   {
+                       MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+                   };
                    node = new FullNodeBuilder()
                        .UseNodeSettings(nodeSettings)
                        .UseBlockStore()
@@ -49,6 +53,7 @@
                        .AddSmartContracts(options =>
                        {
                            options.UseReflectionExecutor();
+                           options.UsePoAWhitelistedContracts();
                        })
                        .UseSmartContractPoAConsensus()
                        .UseSmartContractPoAMining()
@@ -60,7 +65,10 @@
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Stratis.Bitcoin.Networks.Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args);
+                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    {
+                            MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+                    };
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()

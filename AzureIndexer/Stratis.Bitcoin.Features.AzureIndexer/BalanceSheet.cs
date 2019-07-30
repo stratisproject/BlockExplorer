@@ -7,26 +7,14 @@
 
     public class BalanceSheet
     {
-        private readonly ChainBase _Chain;
-
-        public ChainBase Chain
+        public BalanceSheet(IEnumerable<OrderedBalanceChange> changes, ChainIndexer chain)
         {
-            get
-            {
-                return _Chain;
-            }
-        }
-
-        public BalanceSheet(IEnumerable<OrderedBalanceChange> changes, ChainBase chain)
-        {
-            if (chain == null)
-                throw new ArgumentNullException("chain");
-            _Chain = chain;
+            this.ChainIndexer = chain ?? throw new ArgumentNullException("chain");
 
             List<OrderedBalanceChange> all = changes
-                        .Where(c => c.SpentCoins != null) //Remove line whose previous coins have not been loadedcould not be deduced
-                        .Where(c => c.MempoolEntry || chain.GetBlock(c.BlockId) != null) //Take only mempool entry, or confirmed one
-                        .Where(c => !(c.IsCoinbase && c.MempoolEntry)) //There is no such thing as a Coinbase unconfirmed, by definition a coinbase appear in a block
+                        .Where(c => c.SpentCoins != null) // Remove line whose previous coins have not been loaded could not be deduced
+                        .Where(c => c.MempoolEntry || this.ChainIndexer.GetHeader(c.BlockId) != null) // Take only mempool entry, or confirmed one
+                        .Where(c => !(c.IsCoinbase && c.MempoolEntry)) // There is no such thing as a Coinbase unconfirmed, by definition a coinbase appear in a block
                         .ToList(); 
             Dictionary<uint256, OrderedBalanceChange> confirmed = all.Where(o => o.BlockId != null).ToDictionary(o => o.TransactionId);
             Dictionary<uint256, OrderedBalanceChange> unconfirmed = new Dictionary<uint256, OrderedBalanceChange>();
@@ -36,54 +24,24 @@
                 unconfirmed.AddOrReplace(item.TransactionId, item);
             }
 
-            _Prunable = all.Where(o => o.BlockId == null && confirmed.ContainsKey(o.TransactionId)).ToList();
-            _All = all.Where(o => 
+            this.Prunable = all.Where(o => o.BlockId == null && confirmed.ContainsKey(o.TransactionId)).ToList();
+            this.All = all.Where(o => 
                 (unconfirmed.ContainsKey(o.TransactionId) || confirmed.ContainsKey(o.TransactionId)) 
                     &&
                     !(o.BlockId == null && confirmed.ContainsKey(o.TransactionId))
                 ).ToList();
-            _Confirmed = _All.Where(o => o.BlockId != null && confirmed.ContainsKey(o.TransactionId)).ToList();
-            _Unconfirmed = _All.Where(o => o.BlockId == null && unconfirmed.ContainsKey(o.TransactionId)).ToList();
+            this.Confirmed = this.All.Where(o => o.BlockId != null && confirmed.ContainsKey(o.TransactionId)).ToList();
+            this.Unconfirmed = this.All.Where(o => o.BlockId == null && unconfirmed.ContainsKey(o.TransactionId)).ToList();
         }
 
-        private readonly List<OrderedBalanceChange> _Unconfirmed;
+        public ChainIndexer ChainIndexer { get; }
 
-        public List<OrderedBalanceChange> Unconfirmed
-        {
-            get
-            {
-                return _Unconfirmed;
-            }
-        }
+        public List<OrderedBalanceChange> Unconfirmed { get; }
 
-        private readonly List<OrderedBalanceChange> _Confirmed;
+        public List<OrderedBalanceChange> Confirmed { get; }
 
-        public List<OrderedBalanceChange> Confirmed
-        {
-            get
-            {
-                return _Confirmed;
-            }
-        }
+        public List<OrderedBalanceChange> All { get; }
 
-        private readonly List<OrderedBalanceChange> _All;
-
-        public List<OrderedBalanceChange> All
-        {
-            get
-            {
-                return _All;
-            }
-        }
-
-        private readonly List<OrderedBalanceChange> _Prunable;
-
-        public List<OrderedBalanceChange> Prunable
-        {
-            get
-            {
-                return _Prunable;
-            }
-        }
+        public List<OrderedBalanceChange> Prunable { get; }
     }
 }

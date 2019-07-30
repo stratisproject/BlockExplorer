@@ -20,12 +20,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
     <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />	
@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="NBitcoin, Version=4.0.0.75, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\StratisLibs\NBitcoin.dll</HintPath>
+      <SpecificVersion>true</SpecificVersion>
+    </Reference>
     <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
       <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
     </Reference>

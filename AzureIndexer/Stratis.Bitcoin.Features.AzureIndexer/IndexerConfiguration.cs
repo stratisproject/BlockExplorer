@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using Stratis.Bitcoin.AsyncWork;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -19,6 +21,7 @@
 
     public class IndexerConfiguration
     {
+        
         private const string IndexerBlobContainerName = "indexer";
         private const string TransactionsTableName = "transactions";
         private const string SmartContractsTableName = "smartcontracts";
@@ -31,7 +34,9 @@
 
         private CloudTableClient tableClient;
 
-        public bool IsSidechain;
+        public bool IsSidechain { get; set; }
+
+        public IAsyncProvider AsyncProvider { get; }
 
         public Network Network { get; set; }
 
@@ -79,14 +84,16 @@
             set => this.blobClient = value;
         }
 
-        public IndexerConfiguration(ILoggerFactory loggerFactory)
+        public IndexerConfiguration(ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
         {
+            this.AsyncProvider = asyncProvider;
             this.loggerFactory = loggerFactory;
             this.Network = Networks.Networks.Stratis.Mainnet();
         }
 
-        public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory)
+        public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
         {
+            this.AsyncProvider = asyncProvider;
             this.loggerFactory = loggerFactory;
 
             var account = GetValue(config, "Azure.AccountName", true);
@@ -131,7 +138,8 @@
                 throw new IndexerConfigurationErrorsException("Node setting is not configured");
             }
 
-            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, new LoggerFactory(), new PayloadProvider().DiscoverPayloads(), null, null, null); // TODO: fix last 3 parameters
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(network: this.Network, dateTimeProvider: DateTimeProvider.Default, loggerFactory: this.loggerFactory,
+                payloadProvider: new PayloadProvider().DiscoverPayloads(),selfEndpointTracker: null, initialBlockDownloadState: null, connectionManagerSettings: null, this.AsyncProvider);
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(this.Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 

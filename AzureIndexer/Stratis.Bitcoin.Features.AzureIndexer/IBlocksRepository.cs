@@ -24,7 +24,7 @@
 
         public Block GetStoreTip()
         {
-            return this.repo.GetBlockAsync(this.repo.TipHashAndHeight.Hash).GetAwaiter().GetResult();
+            return this.repo.GetBlock(this.repo.TipHashAndHeight.Hash);
         }
 
         public IEnumerable<Block> GetBlocks(IEnumerable<uint256> hashes, CancellationToken cancellationToken)
@@ -42,7 +42,7 @@
                 }
                 else
                 {
-                    yield return this.repo.GetBlockAsync(hash).GetAwaiter().GetResult();
+                    yield return this.repo.GetBlock(hash);
                 }
             }
         }
