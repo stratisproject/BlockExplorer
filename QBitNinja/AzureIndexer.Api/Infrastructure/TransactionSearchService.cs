@@ -11,11 +11,11 @@
 
     public class TransactionSearchService : ITransactionSearchService
     {
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
         private readonly QBitNinjaConfiguration configuration;
         private readonly IMapper mapper;
 
-        public TransactionSearchService(ConcurrentChain chain, QBitNinjaConfiguration configuration, IMapper mapper)
+        public TransactionSearchService(ChainIndexer chain, QBitNinjaConfiguration configuration, IMapper mapper)
         {
             this.chain = chain;
             this.configuration = configuration;

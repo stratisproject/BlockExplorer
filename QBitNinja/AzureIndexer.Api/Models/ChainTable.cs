@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AzureIndexer.Api.Infrastructure;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using Stratis.Bitcoin.Features.AzureIndexer;
@@ -67,7 +68,7 @@ namespace AzureIndexer.Api.Models
             }
         }
 
-        public IEnumerable<T> Query(ChainBase chain, BalanceQuery query = null)
+        public IEnumerable<T> Query(ChainIndexer chain, BalanceQuery query = null)
         {
             if(query == null)
                 query = new BalanceQuery();

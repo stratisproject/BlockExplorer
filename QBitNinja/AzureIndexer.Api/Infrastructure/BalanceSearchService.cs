@@ -12,12 +12,12 @@
 
     public class BalanceSearchService : IBalanceSearchService
     {
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
         private readonly QBitNinjaConfiguration configuration;
         private readonly TimeSpan expiration = TimeSpan.FromHours(24.0);
         private readonly Network network;
 
-        public BalanceSearchService(ConcurrentChain chain, QBitNinjaConfiguration configuration)
+        public BalanceSearchService(ChainIndexer chain, QBitNinjaConfiguration configuration)
         {
             this.chain = chain;
             this.configuration = configuration;

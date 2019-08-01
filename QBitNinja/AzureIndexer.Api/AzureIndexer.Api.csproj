@@ -21,8 +21,8 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.3" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.3" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.5.3" />
@@ -39,8 +39,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Stratis.Sidechains.Networks, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="NBitcoin, Version=4.0.0.75, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\AzureIndexer\StratisLibs\NBitcoin.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.Sidechains.Networks">
       <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.SmartContracts.CLR">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.SmartContracts.CLR.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.SmartContracts.CLR.Validation">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.SmartContracts.CLR.Validation.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.SmartContracts.Core">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.SmartContracts.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.SmartContracts.Networks">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
+    </Reference>
+    <Reference Include="Stratis.SmartContracts.RuntimeObserver">
+      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.SmartContracts.RuntimeObserver.dll</HintPath>
     </Reference>
   </ItemGroup>
 

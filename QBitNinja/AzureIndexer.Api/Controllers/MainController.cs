@@ -29,14 +29,14 @@ namespace AzureIndexer.Api.Controllers
     {
         private readonly IMapper mapper;
 
-        public MainController(ConcurrentChain chain, QBitNinjaConfiguration config, IMapper mapper)
+        public MainController(ChainIndexer chain, QBitNinjaConfiguration config, IMapper mapper)
         {
             this.mapper = mapper;
             this.Configuration = config;
             this.Chain = chain;
         }
 
-        public ConcurrentChain Chain { get; set; }
+        public ChainIndexer Chain { get; set; }
 
         public QBitNinjaConfiguration Configuration { get; set; }
 

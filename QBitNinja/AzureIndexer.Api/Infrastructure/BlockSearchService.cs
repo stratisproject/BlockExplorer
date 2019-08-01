@@ -11,11 +11,11 @@ namespace AzureIndexer.Api.Infrastructure
 
     public class BlockSearchService : IBlockSearchService
     {
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
         private readonly QBitNinjaConfiguration configuration;
         private readonly IMapper mapper;
 
-        public BlockSearchService(ConcurrentChain chain, QBitNinjaConfiguration configuration, IMapper mapper)
+        public BlockSearchService(ChainIndexer chain, QBitNinjaConfiguration configuration, IMapper mapper)
         {
             this.chain = chain;
             this.configuration = configuration;

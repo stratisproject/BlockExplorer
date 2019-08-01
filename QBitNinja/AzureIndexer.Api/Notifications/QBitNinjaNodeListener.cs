@@ -133,13 +133,13 @@ namespace AzureIndexer.Api.Notifications
         CustomThreadPoolTaskScheduler _IndexerScheduler;
 
         List<IDisposable> _Disposables = new List<IDisposable>();
-        public void Listen(ConcurrentChain chain = null)
+        public void Listen(ChainIndexer chain = null)
         {
-            _Chain = new ConcurrentChain(_Configuration.Indexer.Network);
+            _Chain = new ChainIndexer(_Configuration.Indexer.Network);
             _Indexer = Configuration.Indexer.CreateIndexer();
             if(chain == null)
             {
-                chain = new ConcurrentChain(_Configuration.Indexer.Network);
+                chain = new ChainIndexer(_Configuration.Indexer.Network);
             }
             _Chain = chain;
             ListenerTrace.Info("Fetching headers from " + _Chain.Tip.Height + " (from azure)");
@@ -387,8 +387,8 @@ namespace AzureIndexer.Api.Notifications
         }
 
 
-        private ConcurrentChain _Chain;
-        public ConcurrentChain Chain
+        private ChainIndexer _Chain;
+        public ChainIndexer Chain
         {
             get
             {

@@ -8,7 +8,9 @@ using Microsoft.Extensions.Logging;
 using NBitcoin.Networks;
 using Newtonsoft.Json;
 using Serilog;
+using Stratis.Bitcoin.AsyncWork;
 using Stratis.Bitcoin.Networks;
+using Stratis.Bitcoin.Utilities;
 using Stratis.Sidechains.Networks;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -60,6 +62,7 @@ namespace AzureIndexer.Api
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddSingleton(new DBreezeSerializer(network.Consensus.ConsensusFactory));
             services.AddSingleton<IHostedService, BuildChainCache>();
             services.AddSingleton<IHostedService, UpdateChainListener>();
             services.AddCors();
@@ -79,7 +82,8 @@ namespace AzureIndexer.Api
                 ctx =>
                 {
                     var loggerFactory = ctx.Resolve<ILoggerFactory>();
-                    var config = new QBitNinjaConfiguration(this.Configuration, loggerFactory);
+                    var asyncProvider = ctx.Resolve<IAsyncProvider>();
+                    var config = new QBitNinjaConfiguration(this.Configuration, loggerFactory, asyncProvider);
                     config.Indexer.EnsureSetup();
                     return config;
                 }).As<QBitNinjaConfiguration>().SingleInstance();
@@ -92,10 +96,10 @@ namespace AzureIndexer.Api
             builder.Register(ctx =>
             {
                 var config = ctx.Resolve<QBitNinjaConfiguration>();
-                var chain = new ConcurrentChain(config.Indexer.Network);
+                var chain = new ChainIndexer(config.Indexer.Network);
 
                 return chain;
-            }).As<ConcurrentChain>().SingleInstance();
+            }).As<ChainIndexer>().SingleInstance();
 
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
             builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
@@ -120,9 +124,11 @@ namespace AzureIndexer.Api
             switch (networkName)
             {
                 case "CirrusMain":
-                    return FederatedPegNetwork.NetworksSelector.Mainnet();
+                    return CirrusNetwork.NetworksSelector.Mainnet();
+                case "CirrusTest":
+                    return CirrusNetwork.NetworksSelector.Testnet();
                 case "FederatedPegTest":
-                    return FederatedPegNetwork.NetworksSelector.Testnet();
+                    return CirrusNetwork.NetworksSelector.Regtest();
                 case "StratisMain":
                     return new StratisMain();
                 case "StratisTest":

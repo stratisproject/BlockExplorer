@@ -11,13 +11,13 @@
     public class UpdateChainListener : BackgroundService
     {
         private readonly IndexerClient indexer;
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
         private readonly ILogger logger;
         private readonly ChainCacheProvider provider;
 
         public UpdateChainListener(
             IndexerClient indexer,
-            ConcurrentChain chain,
+            ChainIndexer chain,
             ILogger logger,
             ChainCacheProvider provider)
         {

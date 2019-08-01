@@ -15,7 +15,7 @@
         private readonly ISmartContractSearchService smartContractSearchService;
 
         public TransactionsController(
-            ConcurrentChain chain,
+            ChainIndexer chain,
             QBitNinjaConfiguration config,
             IMapper mapper,
             ITransactionSearchService transactionSearchService,
@@ -28,7 +28,7 @@
             this.Chain = chain;
         }
 
-        public ConcurrentChain Chain { get; set; }
+        public ChainIndexer Chain { get; set; }
 
         public QBitNinjaConfiguration Configuration { get; set; }
 

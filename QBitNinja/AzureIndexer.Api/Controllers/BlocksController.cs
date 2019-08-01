@@ -18,7 +18,7 @@ namespace AzureIndexer.Api.Controllers
         private readonly ITransactionSearchService transactionSearchService;
 
         public BlocksController(
-            ConcurrentChain chain,
+            ChainIndexer chain,
             QBitNinjaConfiguration config,
             IMapper mapper,
             IBlockSearchService blockSearchService,
@@ -31,7 +31,7 @@ namespace AzureIndexer.Api.Controllers
             this.Chain = chain;
         }
 
-        public ConcurrentChain Chain { get; set; }
+        public ChainIndexer Chain { get; set; }
 
         public QBitNinjaConfiguration Configuration { get; set; }
 

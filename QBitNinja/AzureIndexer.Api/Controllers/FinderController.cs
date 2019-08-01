@@ -14,7 +14,7 @@
         private readonly WhatIsIt finder;
         private readonly TimeSpan expiration = TimeSpan.FromHours(24.0);
 
-        public FinderController(ConcurrentChain chain, QBitNinjaConfiguration config, IMapper mapper, WhatIsIt finder)
+        public FinderController(ChainIndexer chain, QBitNinjaConfiguration config, IMapper mapper, WhatIsIt finder)
         {
             this.mapper = mapper;
             this.finder = finder;
@@ -22,7 +22,7 @@
             this.Chain = chain;
         }
 
-        public ConcurrentChain Chain { get; set; }
+        public ChainIndexer Chain { get; set; }
 
         public QBitNinjaConfiguration Configuration { get; set; }
 

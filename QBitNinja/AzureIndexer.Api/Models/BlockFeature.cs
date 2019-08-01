@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using AzureIndexer.Api.Infrastructure;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 
@@ -50,7 +51,7 @@ namespace QBitNinja.Client.Models
             set;
         }
 
-        public ChainedHeader GetChainedBlock(ChainBase chain)
+        public ChainedHeader GetChainedBlock(ChainIndexer chain)
         {
             ChainedHeader chainedBlock;
             if (Special != null && Special.Value == SpecialFeature.Last)

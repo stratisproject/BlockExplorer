@@ -1,8 +1,12 @@
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
+using DBreeze.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Stratis.Bitcoin.Base;
+using Stratis.Bitcoin.Utilities;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -15,25 +19,27 @@ namespace AzureIndexer.Api.Infrastructure
     public class ChainCacheProvider
     {
         private readonly string cacheFilePath;
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
+        private readonly IChainRepository repository;
         private readonly IndexerClient client;
 
-        public ChainCacheProvider(IConfiguration configuration, ConcurrentChain chain, IndexerClient client)
+        public ChainCacheProvider(IConfiguration configuration, ChainIndexer chain, IndexerClient client, DBreezeSerializer dBreezeSerializer, ILoggerFactory loggerFactory)
         {
             this.cacheFilePath = configuration["LocalChain"];
             this.chain = chain;
             this.client = client;
+            this.repository = new ChainRepository(this.cacheFilePath, loggerFactory, dBreezeSerializer);
         }
 
         public bool IsCacheAvailable =>
             File.Exists(this.cacheFilePath) &&
             DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.cacheFilePath)).TotalHours < 24;
 
-        public void BuildCache()
+        public async Task BuildCache()
         {
             try
             {
-                this.LoadCache();
+                await this.LoadCache();
 
                 var changes = this.client.GetChainChangesUntilFork(this.chain.Tip, false);
                 try
@@ -65,7 +71,7 @@ namespace AzureIndexer.Api.Infrastructure
                     this.client.Configuration.CreateIndexer().IndexChain(this.chain);
                 }
 
-                this.SaveChainCache();
+                await this.SaveChainCache();
             }
             catch
             {
@@ -73,7 +79,7 @@ namespace AzureIndexer.Api.Infrastructure
             }
         }
 
-        private void LoadCache()
+        private async Task LoadCache()
         {
             if (string.IsNullOrEmpty(this.cacheFilePath))
                 return;
@@ -81,7 +87,7 @@ namespace AzureIndexer.Api.Infrastructure
             try
             {
                 var bytes = File.ReadAllBytes(this.cacheFilePath);
-                this.chain.Load(bytes);
+                await this.repository.LoadAsync(this.chain.Genesis);
             }
             catch
             {
@@ -89,21 +95,14 @@ namespace AzureIndexer.Api.Infrastructure
             }
         }
 
-        private void SaveChainCache()
+        private async Task SaveChainCache()
         {
             if (string.IsNullOrEmpty(this.cacheFilePath))
                 return;
 
             try
             {
-                var file = new FileInfo(this.cacheFilePath);
-                if (!file.Exists || (DateTime.UtcNow - file.LastWriteTimeUtc) > TimeSpan.FromDays(1))
-                {
-                    using (var fs = File.Open(this.cacheFilePath, FileMode.Create))
-                    {
-                        this.chain.WriteTo(fs);
-                    }
-                }
+                await this.repository.SaveAsync(this.chain);
             }
             catch
             {

@@ -116,7 +116,7 @@
         {
             public TransactionSummaryModel Convert(TransactionResponseModel source, TransactionSummaryModel destination, ResolutionContext context)
             {
-                var chain = ServiceLocator.Current.GetInstance<ConcurrentChain>();
+                var chain = ServiceLocator.Current.GetInstance<ChainIndexer>();
                 var summary = new TransactionSummaryModel
                 {
                     Hash = source.TransactionId,
@@ -142,7 +142,7 @@
         {
             public string Convert(Transaction source, string destination, ResolutionContext context)
             {
-                var chain = ServiceLocator.Current.GetInstance<ConcurrentChain>();
+                var chain = ServiceLocator.Current.GetInstance<ChainIndexer>();
                 var summary = source.GetHash().ToString();
 
                 return summary;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AzureIndexer.Api.Infrastructure;
 using NBitcoin;
 using NBitcoin.OpenAsset;
 using Newtonsoft.Json;
@@ -22,12 +23,12 @@ namespace QBitNinja.Client.Models
 
         }
 #if !CLIENT
-        public BalanceModel(IEnumerable<OrderedBalanceChange> balance, ConcurrentChain chain)
+        public BalanceModel(IEnumerable<OrderedBalanceChange> balance, ChainIndexer chain)
         {
             Operations = GetBalanceOperations(balance, chain);
         }
 
-        internal List<BalanceOperation> GetBalanceOperations(IEnumerable<OrderedBalanceChange> balance, ConcurrentChain chain)
+        internal List<BalanceOperation> GetBalanceOperations(IEnumerable<OrderedBalanceChange> balance, ChainIndexer chain)
         {
             return balance
                 .Where(b => b.SpentCoins.Count > 0 || b.ReceivedCoins.Count > 0)
@@ -319,7 +320,7 @@ namespace QBitNinja.Client.Models
             SpentCoins = new List<ICoin>();
         }
 #if !CLIENT
-        public BalanceOperation(OrderedBalanceChange balanceChange, ChainBase chain)
+        public BalanceOperation(OrderedBalanceChange balanceChange, ChainIndexer chain)
         {
             ReceivedCoins = balanceChange.ReceivedCoins.ToList();
             SpentCoins = balanceChange.SpentCoins.ToList();
