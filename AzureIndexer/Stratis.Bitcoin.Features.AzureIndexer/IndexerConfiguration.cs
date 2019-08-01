@@ -138,8 +138,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 throw new IndexerConfigurationErrorsException("Node setting is not configured");
             }
 
-            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(network: this.Network, dateTimeProvider: DateTimeProvider.Default, loggerFactory: this.loggerFactory,
-                payloadProvider: new PayloadProvider().DiscoverPayloads(),selfEndpointTracker: null, initialBlockDownloadState: null, connectionManagerSettings: null, this.AsyncProvider);
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, this.loggerFactory, new PayloadProvider().DiscoverPayloads(), null, null, null, this.AsyncProvider);
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(this.Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 
