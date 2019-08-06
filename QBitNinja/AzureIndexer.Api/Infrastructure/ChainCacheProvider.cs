@@ -32,7 +32,7 @@ namespace AzureIndexer.Api.Infrastructure
         }
 
         public bool IsCacheAvailable =>
-            File.Exists(Path.Combine(this.cacheFilePath, "_DBreezeSchema")) &&
+            File.Exists(Path.Combine(this.cacheFilePath, "_completed")) &&
             DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.cacheFilePath)).TotalHours < 24;
 
         public async Task BuildCache()
@@ -72,6 +72,7 @@ namespace AzureIndexer.Api.Infrastructure
                 }
 
                 await this.SaveChainCache();
+                File.Create(Path.Combine(cacheFilePath, "_completed"));
             }
             catch
             {
