@@ -23,16 +23,16 @@ namespace AzureIndexer.Api.Infrastructure
         private readonly IChainRepository repository;
         private readonly IndexerClient client;
 
-        public ChainCacheProvider(IConfiguration configuration, ChainIndexer chain, IndexerClient client, DBreezeSerializer dBreezeSerializer, ILoggerFactory loggerFactory)
+        public ChainCacheProvider(IConfiguration configuration, ChainIndexer chain, IndexerClient client, ILoggerFactory loggerFactory, IChainRepository chainRepository)
         {
             this.cacheFilePath = configuration["LocalChain"];
             this.chain = chain;
             this.client = client;
-            this.repository = new ChainRepository(this.cacheFilePath, loggerFactory, dBreezeSerializer);
+            this.repository = chainRepository;
         }
 
         public bool IsCacheAvailable =>
-            File.Exists(this.cacheFilePath) &&
+            File.Exists(Path.Combine(this.cacheFilePath, "_DBreezeSchema")) &&
             DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.cacheFilePath)).TotalHours < 24;
 
         public async Task BuildCache()
@@ -86,7 +86,6 @@ namespace AzureIndexer.Api.Infrastructure
 
             try
             {
-                var bytes = File.ReadAllBytes(this.cacheFilePath);
                 await this.repository.LoadAsync(this.chain.Genesis);
             }
             catch

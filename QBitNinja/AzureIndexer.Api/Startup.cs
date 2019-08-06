@@ -9,7 +9,10 @@ using NBitcoin.Networks;
 using Newtonsoft.Json;
 using Serilog;
 using Stratis.Bitcoin.AsyncWork;
+using Stratis.Bitcoin.Base;
+using Stratis.Bitcoin.EventBus;
 using Stratis.Bitcoin.Networks;
+using Stratis.Bitcoin.Signals;
 using Stratis.Bitcoin.Utilities;
 using Stratis.Sidechains.Networks;
 using Swashbuckle.AspNetCore.Swagger;
@@ -101,7 +104,17 @@ namespace AzureIndexer.Api
                 return chain;
             }).As<ChainIndexer>().SingleInstance();
 
+            builder.RegisterType<AsyncProvider>().As<IAsyncProvider>();
+            builder.Register(ctx =>
+            {
+                var loggerFactory = ctx.Resolve<ILoggerFactory>();
+                var signals = new Signals(loggerFactory, new DefaultSubscriptionErrorHandler(loggerFactory));
+
+                return signals;
+            }).As<ISignals>().SingleInstance();
+            builder.RegisterType<ChainRepository>().As<IChainRepository>().WithParameter("folder", this.Configuration["LocalChain"]).SingleInstance();
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
+            builder.RegisterType<NodeLifetime>().As<INodeLifetime>();
             builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
             builder.RegisterType<BlockSearchService>().As<IBlockSearchService>();
             builder.RegisterType<SmartContractSearchService>().As<ISmartContractSearchService>();
