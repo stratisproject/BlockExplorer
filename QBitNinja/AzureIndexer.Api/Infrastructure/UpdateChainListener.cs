@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.Infrastructure
+﻿using Microsoft.Extensions.Logging;
+
+namespace AzureIndexer.Api.Infrastructure
 {
     using System;
     using System.Threading;
@@ -13,18 +15,21 @@
         private readonly IndexerClient indexer;
         private readonly ChainIndexer chain;
         private readonly ILogger logger;
+        private readonly ILoggerFactory loggerFactory;
         private readonly ChainCacheProvider provider;
 
         public UpdateChainListener(
             IndexerClient indexer,
             ChainIndexer chain,
             ILogger logger,
-            ChainCacheProvider provider)
+            ChainCacheProvider provider,
+            ILoggerFactory loggerFactory)
         {
             this.indexer = indexer;
             this.chain = chain;
             this.logger = logger;
             this.provider = provider;
+            this.loggerFactory = loggerFactory;
         }
 
         protected virtual TimeSpan Delay => TimeSpan.FromSeconds(10);
@@ -57,7 +62,7 @@
         {
             var oldTip = this.chain.Tip.HashBlock;
             var changes = this.indexer.GetChainChangesUntilFork(this.chain.Tip, false);
-            changes.UpdateChain(this.chain);
+            changes.UpdateChain(this.chain, this.loggerFactory.CreateLogger<UpdateChainListener>());
             var newTip = this.chain.Tip.HashBlock;
             return newTip != oldTip;
         }

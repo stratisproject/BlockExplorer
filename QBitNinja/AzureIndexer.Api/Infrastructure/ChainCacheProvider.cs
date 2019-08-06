@@ -22,6 +22,7 @@ namespace AzureIndexer.Api.Infrastructure
         private readonly ChainIndexer chain;
         private readonly IChainRepository repository;
         private readonly IndexerClient client;
+        private readonly ILogger logger;
 
         public ChainCacheProvider(IConfiguration configuration, ChainIndexer chain, IndexerClient client, ILoggerFactory loggerFactory, IChainRepository chainRepository)
         {
@@ -29,6 +30,7 @@ namespace AzureIndexer.Api.Infrastructure
             this.chain = chain;
             this.client = client;
             this.repository = chainRepository;
+            this.logger = loggerFactory.CreateLogger<ChainCacheProvider>();
         }
 
         public bool IsCacheAvailable =>
@@ -44,7 +46,7 @@ namespace AzureIndexer.Api.Infrastructure
                 var changes = this.client.GetChainChangesUntilFork(this.chain.Tip, false);
                 try
                 {
-                    changes.UpdateChain(this.chain);
+                    changes.UpdateChain(this.chain, this.logger);
                 }
                 catch (ArgumentException)
                 {
