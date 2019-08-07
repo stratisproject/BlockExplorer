@@ -29,13 +29,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4.1" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
