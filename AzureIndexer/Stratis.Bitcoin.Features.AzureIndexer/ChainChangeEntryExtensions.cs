@@ -1,4 +1,5 @@
-﻿using FodyNlogAdapter;
+﻿using System.Linq;
+using FodyNlogAdapter;
 using Microsoft.Extensions.Logging;
 using NLog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -13,32 +14,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public static void UpdateChain(this IEnumerable<ChainBlockHeader> entries, ChainIndexer chain, ILogger logger = null)
         {
             Stack<ChainBlockHeader> toApply = new Stack<ChainBlockHeader>();
-            foreach (ChainBlockHeader entry in entries)
+            foreach (ChainBlockHeader entry in entries.OrderBy(e => e.Height))
             {
                 ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);
-                if (toApply.Count % 1000 == 0)
-                {
-                    logger?.LogInformation("Total blocks to apply {count}", toApply.Count);
-                }
-
-                if (prev == null)
-                {
-                    toApply.Push(entry);
-                }
-                else
-                {
-                    toApply.Push(entry);
-                    break;
-                }
+                chain.Add(new ChainedHeader(entry.Header, entry.BlockId, prev));
             }
 
-            while (toApply.Count > 0)
-            {
-                ChainBlockHeader newTip = toApply.Pop();
-
-                ChainedHeader chained = new ChainedHeader(newTip.Header, newTip.BlockId, chain.GetHeader(newTip.Header.HashPrevBlock));
-                chain.SetTip(chained);
-            }
+            chain.SetTip(chain.Tip);
         }
     }
 }

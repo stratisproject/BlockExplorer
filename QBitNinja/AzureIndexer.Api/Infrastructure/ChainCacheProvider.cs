@@ -48,7 +48,7 @@ namespace AzureIndexer.Api.Infrastructure
                 {
                     changes.UpdateChain(this.chain, this.logger);
                 }
-                catch (ArgumentException)
+                catch (ArgumentException ex)
                 {
                     // Happen when chain in table is corrupted
                     this.client.Configuration.GetChainTable().DeleteIfExistsAsync().GetAwaiter().GetResult();
@@ -76,7 +76,7 @@ namespace AzureIndexer.Api.Infrastructure
                 await this.SaveChainCache();
                 File.Create(Path.Combine(cacheFilePath, "_completed"));
             }
-            catch
+            catch (Exception ex)
             {
                 // ignore
             }
@@ -128,8 +128,8 @@ namespace AzureIndexer.Api.Infrastructure
         {
             if (this.provider.IsCacheAvailable == false)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.NoContent;
-                await context.Response.WriteAsync("Cache is being built.");
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                await context.Response.WriteAsync("Cache is being built. Try refreshing this page in 15minutes");
                 return;
             }
 
