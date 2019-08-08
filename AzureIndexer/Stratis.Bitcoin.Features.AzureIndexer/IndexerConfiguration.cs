@@ -21,7 +21,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public class IndexerConfiguration
     {
-        
         private const string IndexerBlobContainerName = "indexer";
         private const string TransactionsTableName = "transactions";
         private const string SmartContractsTableName = "smartcontracts";
