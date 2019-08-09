@@ -1,11 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using NBitcoin.OpenAsset;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +8,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
+using NBitcoin;
+using NBitcoin.OpenAsset;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
@@ -108,7 +106,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var tx = Transaction.Parse(File.ReadAllText("../../../Data/BigTransaction.txt"), RawFormat.BlockExplorer, KnownNetworks.StratisMain);
             var txId = tx.GetHash();
             var result = OrderedBalanceChange.ExtractScriptBalances(txId, tx, null, null, 0, KnownNetworks.StratisMain);
-            foreach(var e in result)
+            foreach (var e in result)
             {
                 var entity = e.ToEntity();
             }
@@ -376,7 +374,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(coloredEntry.GetAssetAmount(goldId).CompareTo(30L) == 0);
             }
         }
-        
+
         // TODO: Fix this test case
         /*
         [Fact]
@@ -460,7 +458,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public void CanGeneratePartitionKey()
         {
             HashSet<string> results = new HashSet<string>();
-            while(results.Count != 4096)
+            while (results.Count != 4096)
             {
                 results.Add(Helper.GetPartitionKey(12, RandomUtils.GetBytes(3), 0, 3));
             }
@@ -851,7 +849,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var all = tester.Client.GetOrderedBalance(bob).ToArray();
                 Assert.Equal(all.Length, txs.Count);
 
-                foreach(var test in tests)
+                foreach (var test in tests)
                 {
                     var data = test;
                     BalanceQuery query = new BalanceQuery();
@@ -875,7 +873,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var name = txs.Single(t => t.Value.GetHash() == change.TransactionId).Key;
             var unconf1 = name.StartsWith("u");
             var unconf2 = change.BlockId == null;
-            if(unconf1 != unconf2)
+            if (unconf1 != unconf2)
                 Assert.False(true, "A confirmed or unconfirmed transaction should not have been returned");
             return name;
         }
@@ -887,7 +885,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         private BalanceLocator Parse(string loc, OrderedBalanceChange[] changes, Dictionary<string, Transaction> txs)
         {
-            if(loc.Contains("{"))
+            if (loc.Contains("{"))
             {
                 var res = Regex.Match(loc, "{(.*?)}");
                 var tx = txs[res.Groups[1].Value];
@@ -905,7 +903,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         {
             if (!StartAzureStorageDependentTest()) return;
 
-            using(var tester = this.CreateTester())
+            using (var tester = this.CreateTester())
             {
                 var bob = new Key();
                 var alice = new Key();
@@ -1004,7 +1002,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var str = FastEncoder.Instance.EncodeData(bytes);
             byte[] actual = FastEncoder.Instance.DecodeData(str);
             Assert.True(bytes.SequenceEqual(actual));
-            for(int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 bytes = RandomUtils.GetBytes(100);
                 str = FastEncoder.Instance.EncodeData(bytes);
@@ -1019,7 +1017,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         {
             TaskCompletionSource<int> completion = new TaskCompletionSource<int>();
             var scheduler = new CustomThreadPoolTaskScheduler(10, 20);
-            for(int i = 0; i < 30; i++)
+            for (int i = 0; i < 30; i++)
             {
                 new Task(() => Task.WaitAll(completion.Task)).Start(scheduler);
             }
@@ -1052,7 +1050,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             {
                 var builder = tester.CreateChainBuilder();
                 Transaction tx = new Transaction();
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                     tx.AddOutput(new TxOut(Money.Zero, new Script(new byte[500 * 1024])));
                 tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null));
 
@@ -1062,7 +1060,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 Transaction tx2 = new Transaction();
                 var txhash = tx.GetHash();
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                     tx2.Inputs.Add(new TxIn(new OutPoint(txhash, i)));
                 tx2.AddOutput(new TxOut(Money.Zero, new Script(RandomUtils.GetBytes(500 * 1024))));
                 tester.Indexer.Index(new TransactionEntry.Entity(null, tx2, null));
@@ -1145,7 +1143,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(bobBalance.Length == 3);
 
                 var tx = new Transaction();
-                foreach(var coin in bobCoins)
+                foreach (var coin in bobCoins)
                 {
                     tx.Inputs.Add(new TxIn()
                     {
@@ -1160,12 +1158,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
 
-                for(int i = 0; i < 2; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     bobBalance = tester.Client.GetOrderedBalance(bobId).ToArray();
                     Assert.True(bobBalance.Length == 4); //OP_NOP spending should not appear
                     Assert.True(bobBalance[0].SpentCoins.Count == 3);
-                    foreach(var coin in bobBalance[0].SpentCoins)
+                    foreach (var coin in bobBalance[0].SpentCoins)
                     {
                         Assert.Equal(bob.ScriptPubKey, coin.TxOut.ScriptPubKey);
                     }
@@ -1218,7 +1216,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             chainBuilder.SubmitBlock();
             chainBuilder.SyncIndexer();
 
-            for(int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 bobBalance = tester.Client.GetOrderedBalance(bobId).ToArray();
                 Assert.True(bobBalance.Length < 2); //OP_NOP spending should not appear
@@ -1364,7 +1362,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 bobBalance = tester.Client.GetOrderedBalance(bob).ToArray();
                 Assert.True(bobBalance[0].Amount == -Money.Parse("5.0"));
 
-                for(int i = 0; i < 2; i++)
+                for (int i = 0; i < 2; i++)
                 {
 
                     aliceBalance = tester.Client.GetOrderedBalance(alice).ToArray();
@@ -1523,7 +1521,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
             NoSqlTransactionRepository repository = new NoSqlTransactionRepository(KnownNetworks.StratisRegTest);
 
-            foreach(var tx in testcase.txs)
+            foreach (var tx in testcase.txs)
             {
                 var txObj = Transaction.Parse(tx, RawFormat.Satoshi, KnownNetworks.StratisRegTest);
                 this.Transactions.Add(txObj);
@@ -1549,14 +1547,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public string AutoDownloadMissingTransaction(Action act)
         {
             StringBuilder builder = new StringBuilder();
-            while(true)
+            while (true)
             {
                 try
                 {
                     act();
                     break;
                 }
-                catch(TransactionNotFoundException ex)
+                catch (TransactionNotFoundException ex)
                 {
                     WebClient client = new WebClient();
                     var result = client.DownloadString("http://btc.blockr.io/api/v1/tx/raw/" + ex.TxId);

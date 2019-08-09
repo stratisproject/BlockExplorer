@@ -1,15 +1,7 @@
-﻿using NBitcoin.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
-	public class MiniNode
-	{
+    public class MiniNode
+    {
         // TODO: Find a NodeServer replacement and fix this code
         /*
 		public MiniNode(IndexerTester tester, NodeServer server)
@@ -95,5 +87,5 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 			}
 		}
         */
-	}
+    }
 }

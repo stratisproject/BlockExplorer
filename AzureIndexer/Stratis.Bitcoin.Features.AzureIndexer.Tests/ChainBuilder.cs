@@ -1,9 +1,6 @@
-﻿using NBitcoin.BitcoinCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
@@ -20,6 +17,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 return _Chain;
             }
         }
+
         public ChainBuilder(IndexerTester indexerTester)
         {
             this._Tester = indexerTester;
@@ -124,7 +122,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         public Block Generate(int count = 1)
         {
             Block b = null;
-            for (int i = 0 ; i < count ; i++)
+            for (int i = 0; i < count; i++)
                 b = SubmitBlock();
             return b;
         }

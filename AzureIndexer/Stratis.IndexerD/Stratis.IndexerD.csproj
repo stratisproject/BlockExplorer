@@ -13,6 +13,8 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1705;IDE0008;</NoWarn>
+    <DocumentationFile></DocumentationFile>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,15 +22,20 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
+    <PackageReference Include="NStratis" Version="4.0.0.76" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="1.0.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.4.1" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
-    <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />	
+    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.1" />
+    <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />
+    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.1" />	
   </ItemGroup>
 
   <ItemGroup>
@@ -37,37 +44,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="NBitcoin, Version=4.0.0.75, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\StratisLibs\NBitcoin.dll</HintPath>
-      <SpecificVersion>true</SpecificVersion>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
-      <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR.Validation">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.Validation.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Core">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Core.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Networks">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.RuntimeObserver">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.RuntimeObserver.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

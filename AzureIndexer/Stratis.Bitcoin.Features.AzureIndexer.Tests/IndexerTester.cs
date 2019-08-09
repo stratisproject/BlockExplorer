@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin.Protocol;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
@@ -24,12 +21,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
         }
 
-		public static IndexerConfiguration CreateConfiguration(ILoggerFactory loggerFactory)
-		{
-			var confBuilder = new ConfigurationBuilder();
-			var config = new IndexerConfiguration(confBuilder.Build(), loggerFactory);
-			return config;
-		}
+        public static IndexerConfiguration CreateConfiguration(ILoggerFactory loggerFactory)
+        {
+            var confBuilder = new ConfigurationBuilder();
+            var config = new IndexerConfiguration(confBuilder.Build(), loggerFactory);
+            return config;
+        }
 
         string _Folder;
         public IndexerTester(string folder)
@@ -43,14 +40,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
             _Importer = config.CreateIndexer();
 
-			List<Task> creating = new List<Task>();
+            List<Task> creating = new List<Task>();
             foreach (var table in config.EnumerateTables())
             {
-				creating.Add(table.CreateIfNotExistsAsync());
+                creating.Add(table.CreateIfNotExistsAsync());
             }
 
-			creating.Add(config.GetBlocksContainer().CreateIfNotExistsAsync());
-			Task.WaitAll(creating.ToArray());
+            creating.Add(config.GetBlocksContainer().CreateIfNotExistsAsync());
+            Task.WaitAll(creating.ToArray());
 
             _Folder = folder;
         }
@@ -69,7 +66,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             {
                 foreach (var table in _Importer.Configuration.EnumerateTables())
                 {
-					table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+                    table.CreateIfNotExistsAsync().GetAwaiter().GetResult();
                     var entities = table.ExecuteQuery(new TableQuery()).ToList();
                     Parallel.ForEach(entities, e =>
                     {
@@ -101,7 +98,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         public uint256 KnownBlockId = uint256.Parse("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943");
         public uint256 UnknownBlockId = uint256.Parse("000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4942");
-        
+
         // TODO: Fix IndexBlocks and this code
         /*
         internal void ImportCachedBlocks()

@@ -29,45 +29,17 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.0.4-beta" />
+    <PackageReference Include="NStratis" Version="4.0.0.76" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.4.1" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="NBitcoin, Version=4.0.0.75, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\StratisLibs\NBitcoin.dll</HintPath>
-      <SpecificVersion>true</SpecificVersion>
-    </Reference>
-    <Reference Include="Stratis.Bitcoin.Features.SmartContracts">
-      <HintPath>..\StratisLibs\Stratis.Bitcoin.Features.SmartContracts.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.CLR.Validation">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.CLR.Validation.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Core">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.Networks">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.Networks.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Stratis.SmartContracts.RuntimeObserver">
-      <HintPath>..\StratisLibs\Stratis.SmartContracts.RuntimeObserver.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
