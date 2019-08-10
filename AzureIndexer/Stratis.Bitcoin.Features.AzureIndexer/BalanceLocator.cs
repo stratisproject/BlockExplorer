@@ -3,7 +3,7 @@ using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
-    public abstract class BalanceLocator
+    public class BalanceLocator
     {
         static BalanceLocator()
         {
@@ -51,7 +51,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.ToString(false);
         }
 
-        public abstract string ToString(bool queryFormat);
+        public virtual string ToString(bool queryFormat)
+        {
+            return this.ToString();
+        }
 
         public bool IsGreaterThan(BalanceLocator to)
         {
@@ -59,8 +62,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return result < 1;
         }
 
-        public abstract BalanceLocator Floor();
+        public virtual BalanceLocator Floor()
+        {
+            return this;
+        }
 
-        public abstract BalanceLocator Ceil();
+        public virtual BalanceLocator Ceil()
+        {
+            return this;
+        }
     }
 }

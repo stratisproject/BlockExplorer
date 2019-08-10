@@ -73,9 +73,16 @@ namespace AzureIndexer.Api.Models
             if(query == null)
                 query = new BalanceQuery();
             var tableQuery = query.CreateTableQuery(Escape(Scope), "");
-            return ExecuteBalanceQuery(Table, tableQuery, query.PageSizes)
+            var items = ExecuteBalanceQuery(Table, tableQuery, query.PageSizes)
                    .Where(_ => chain.Contains(((ConfirmedBalanceLocator)UnEscapeLocator(_.RowKey)).BlockHash))
-                   .Select(_ => Serializer.ToObject<T>(ParseData(_)));
+                   .Select(_ =>
+                   {
+                       var data = this.ParseData(_);
+                       var parsed = Serializer.ToObject<T>(data);
+                       return parsed;
+                   });
+            
+            return items;
         }
 
         private string ParseData(DynamicTableEntity entity)
