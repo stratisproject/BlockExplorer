@@ -272,7 +272,7 @@ namespace QBitNinja.Client.Models
         }
 #if !CLIENT
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public BalanceLocator Locator
+        public ConfirmedBalanceLocator Locator
         {
             get;
             set;
