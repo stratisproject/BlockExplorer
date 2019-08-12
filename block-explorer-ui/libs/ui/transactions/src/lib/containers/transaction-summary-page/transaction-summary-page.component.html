@@ -4,7 +4,7 @@
       <div class="row">
         <!-- overview -->
         <div class="col-12 mt-4">
-          <ngb-tabset type="pills" id="v-pills-tabContent">
+          <ngb-tabset type="pills" id="v-pills-tabContent" [ngClass]="{ single: !isSmartContract }">
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>

@@ -6,3 +6,7 @@
 @import '~prismjs/themes/prism-coy.css';
 
 @import 'assets/styles/bootstrap.css';
+
+.single .nav-pills {
+    display: none !important;
+}

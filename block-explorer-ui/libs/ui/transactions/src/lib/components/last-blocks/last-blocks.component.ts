@@ -28,8 +28,8 @@ export class LastBlocksComponent implements OnInit {
   }
 
   public getBlockTransactions(block: BlockResponseModel) {
-    return !!block.extendedInformation
-            ? block.extendedInformation.transactionCount || 0
+    return !!block.block && !!(<any>block.block).transactionIds
+            ? (<any>block.block).transactionIds.length || 0
             : 0;
   }
 
