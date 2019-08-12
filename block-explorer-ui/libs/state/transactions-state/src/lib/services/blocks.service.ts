@@ -132,8 +132,8 @@ export class BlocksService {
      * @param extended (optional)
      * @return Success
      */
-    blocks(): Observable<BlockResponseModel[]> {
-        let url_ = APP_CONFIG.apiBaseUrl + "/api/v1/blocks/top";
+    blocks(records: number): Observable<BlockResponseModel[]> {
+        let url_ = `${APP_CONFIG.apiBaseUrl}/api/v1/blocks/top?start=0&top=${records}`;
         url_ = url_.replace(/[?&]$/, "");
 
         const options_ : any = {

@@ -51,7 +51,7 @@ export class TransactionsEffects {
 
   @Effect() loadLastBlocks$ = this.dataPersistence.fetch(TransactionsActionTypes.LoadLastBlocks, {
     run: (action: LoadLastBlocks, state: TransactionsPartialState) => {
-      return this.blocksService.blocks().pipe(
+      return this.blocksService.blocks(action.records).pipe(
         map((blocks) => {
           return new LastBlocksLoaded(blocks);
         })

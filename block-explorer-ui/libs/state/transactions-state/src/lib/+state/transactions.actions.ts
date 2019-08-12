@@ -31,6 +31,7 @@ export class LoadTransactions implements Action {
 
 export class LoadLastBlocks implements Action {
   readonly type = TransactionsActionTypes.LoadLastBlocks;
+  constructor(public records: number) {}
 }
 
 export class GetAddress implements Action {

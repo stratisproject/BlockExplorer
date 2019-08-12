@@ -5,8 +5,8 @@
       <tr>
         <th>Height</th>
         <th>Age</th>
-        <th>Confirmations</th>
-        <th>Rewards</th>
+        <th class="text-center">Confirmations</th>
+        <th class="text-center">Transactions</th>
         <th>Hash</th>
       </tr>
     </thead>
@@ -14,10 +14,14 @@
       <tr *ngFor="let block of blocks">
         <td><a [routerLink]="['/blocks', getHeight(block)]">{{getHeight(block)}}</a></td>
         <td>{{getAge(block)}}</td>
-        <td>{{getConfirmations(block)}}</td>
-        <td><blockexplorer-balance [balance]="getBlockReward(block)"></blockexplorer-balance></td>
+        <td class="text-center">{{getConfirmations(block)}}</td>
+        <td class="text-center">{{getBlockTransactions(block)}}</td>
         <td>{{getHash(block)}}</td>
       </tr>
     </tbody>
   </table>
+  <div class="text-center">
+    <a class="btn btn-primary load-more" *ngIf="!loading" (click)="getNext10()">Fetch next 10 blocks</a>
+    <span [hidden]="!loading"><i>Loading next 10 blocks...</i></span>
+  </div>
 </div>

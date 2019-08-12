@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BlockResponseModel } from '@blockexplorer/shared/models';
 import * as moment from 'moment';
 
@@ -10,7 +10,10 @@ import * as moment from 'moment';
 export class LastBlocksComponent implements OnInit {
 
   @Input() blocks: BlockResponseModel[] = [];
+  @Input() loading = false;
+  @Output() loadMore = new EventEmitter<number>();
 
+  private records = 10;
   constructor() { }
 
   ngOnInit() {
@@ -24,9 +27,9 @@ export class LastBlocksComponent implements OnInit {
     return block.extendedInformation.transactionCount || 0;
   }
 
-  public getBlockReward(block: BlockResponseModel) {
-    return !!block.extendedInformation && !!block.extendedInformation.blockReward
-            ? block.extendedInformation.blockReward.satoshi || 0
+  public getBlockTransactions(block: BlockResponseModel) {
+    return !!block.extendedInformation
+            ? block.extendedInformation.transactionCount || 0
             : 0;
   }
 
@@ -53,5 +56,11 @@ export class LastBlocksComponent implements OnInit {
     return date.toString();
     // TODO: decide which format we want to show date in.
     // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  }
+
+  public getNext10() {
+    this.records = this.records + 10;
+    console.log(this.records);
+    this.loadMore.emit(this.records);
   }
 }

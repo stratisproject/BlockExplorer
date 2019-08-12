@@ -27,7 +27,7 @@ export class AppConfigService {
           const config = new AppConfig();
 
           if (!environment.production) {
-            APP_CONFIG.apiBaseUrl = 'http://localhost:5000';
+            APP_CONFIG.apiBaseUrl = 'http://localhost:54678';
           } else {
             APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
           }

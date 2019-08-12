@@ -32,8 +32,8 @@ export class TransactionsFacade {
     this.store.dispatch(new LoadTransactions());
   }
 
-  getLastBlocks() {
-    this.store.dispatch(new LoadLastBlocks());
+  getLastBlocks(records: number) {
+    this.store.dispatch(new LoadLastBlocks(records));
   }
 
   getAddress(hash: string) {
