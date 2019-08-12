@@ -34,8 +34,8 @@ namespace AzureIndexer.Api.Infrastructure
         }
 
         public bool IsCacheAvailable =>
-            File.Exists(Path.Combine(this.cacheFilePath, "_completed")) &&
-            DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(this.cacheFilePath)).TotalHours < 24;
+            File.Exists(Path.Combine(this.cacheFilePath, "_completed.lock")) &&
+            DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(Path.Combine(this.cacheFilePath, "_completed.lock"))).TotalHours < 24;
 
         public async Task BuildCache()
         {
@@ -74,7 +74,13 @@ namespace AzureIndexer.Api.Infrastructure
                 }
 
                 await this.SaveChainCache();
-                File.Create(Path.Combine(cacheFilePath, "_completed"));
+                if (!Directory.Exists(cacheFilePath))
+                {
+                    Directory.CreateDirectory(cacheFilePath);
+                }
+
+                File.Delete(Path.Combine(cacheFilePath, "_completed.lock"));
+                File.Create(Path.Combine(cacheFilePath, "_completed.lock"));
             }
             catch (Exception ex)
             {

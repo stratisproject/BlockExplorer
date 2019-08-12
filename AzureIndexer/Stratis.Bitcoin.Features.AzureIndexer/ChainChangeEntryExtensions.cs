@@ -13,7 +13,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     {
         public static void UpdateChain(this IEnumerable<ChainBlockHeader> entries, ChainIndexer chain, ILogger logger = null)
         {
-            Stack<ChainBlockHeader> toApply = new Stack<ChainBlockHeader>();
             foreach (ChainBlockHeader entry in entries.OrderBy(e => e.Height))
             {
                 ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);

@@ -66,14 +66,14 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("top")]
-        public async Task<BlockResponseModel[]> Blocks(int top = 10)
+        public async Task<BlockResponseModel[]> Blocks(int top = 10, int start = 0)
         {
             var blocks = new List<BlockResponseModel>();
             var currentTip = this.Chain.Tip;
-            for (int i = 0; i < top; i++)
+            for (int i = start; i < start + top; i++)
             {
                 if (currentTip == null) break;
-                var blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), true, false);
+                var blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), false, false);
                 if (blockData != null)
                 {
                     var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
