@@ -1,46 +1,47 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-
-import { AppComponent } from './app.component';
-import { NxModule } from '@nrwl/nx';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
+import { SharedModelsModule } from '@blockexplorer/shared/models';
+import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
+import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
+import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
+import { UiLayoutModule } from '@blockexplorer/ui/layout';
+import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
 import {
-  APP_FEATURE_KEY,
-  initialState as appInitialState,
-  appReducer
-} from './+state/app.reducer';
+  TransactionsPageComponent,
+  uiAddressesRoutes,
+  uiBlockRoutes,
+  uiOtherRoutes,
+  UiTransactionsModule,
+  uiTransactionsRoutes,
+} from '@blockexplorer/ui/transactions';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { PrismModule } from '@ngx-prism/core';
+import { NxModule } from '@nrwl/nx';
+import { storeFreeze } from 'ngrx-store-freeze';
+
+import { environment } from '../environments/environment';
+import { AppConfigService } from './+state/app-config.service';
 import { AppEffects } from './+state/app.effects';
 import { AppFacade } from './+state/app.facade';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { environment } from '../environments/environment';
-import { StoreRouterConnectingModule } from '@ngrx/router-store';
-import { storeFreeze } from 'ngrx-store-freeze';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { PrismModule } from '@ngx-prism/core';
-import { UiLayoutModule } from '@blockexplorer/ui/layout';
-import { FormsModule } from '@angular/forms';
-import { uiTransactionsRoutes, UiTransactionsModule, TransactionsPageComponent, uiAddressesRoutes, uiOtherRoutes, uiBlockRoutes } from '@blockexplorer/ui/transactions';
-import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
-import { SharedModelsModule, AppConfig, APP_CONFIG } from '@blockexplorer/shared/models';
-import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
-import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
-import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
-import { AppConfigService } from './+state/app-config.service';
+import { appReducer, initialState as appInitialState } from './+state/app.reducer';
+import { AppComponent } from './app.component';
 
 /**
 * Exported function so that it works with AOT
 * @param {AppConfigService} configService
 * @returns {Function}
 */
-export function loadConfigService(configService: AppConfigService): Function 
-
-{
-  return () => { 
-    return configService.load(); 
-  }; 
+export function loadConfigService(configService: AppConfigService): Function {
+  return () => {
+    return configService.load();
+  };
 }
 
 @NgModule({
@@ -61,7 +62,7 @@ export function loadConfigService(configService: AppConfigService): Function
     NxModule.forRoot(),
     RouterModule.forRoot(
       [
-        { path: '', component: TransactionsPageComponent, data: { breadcrumb: 'Home' } },
+        { path: '', component: TransactionsPageComponent, data: { breadcrumb: 'Dashboard' } },
         { path: 'transactions', children: uiTransactionsRoutes, data: { breadcrumb: 'Transactions' } },
         { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } },
         { path: 'blocks', children: uiBlockRoutes, data: { breadcrumb: 'Block' } },
@@ -87,8 +88,8 @@ export function loadConfigService(configService: AppConfigService): Function
     AppConfigService,
     AppFacade,
     { provide: ENVIRONMENT, useValue: environment.production ? 'prod' : 'dev' },
-    { provide: APP_INITIALIZER, useFactory: loadConfigService , deps: [AppConfigService], multi: true },
+    { provide: APP_INITIALIZER, useFactory: loadConfigService, deps: [AppConfigService], multi: true },
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

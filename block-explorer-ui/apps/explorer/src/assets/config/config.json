@@ -1,5 +1,11 @@
 {
-    "apiBaseUrl": "http://localhost:5000",
-    "symbol": "CIRR",
-    "chain": "Cirrus Main"
+  "apiBaseUrl": "http://localhost:5000",
+  "symbol": "CRS",
+  "chain": "Cirrus Mainnet",
+  "sidechainColor": "#3bafba",
+  "stratColor": "#158bcf",
+  "stratMainUrl": "https://cirrusmainexplorer1.azurewebsites.net/",
+  "stratTestUrl": "https://cirrusmainexplorer1.azurewebsites.net/",
+  "sidechainMainUrl": "https://cirrusmainexplorer1.azurewebsites.net/",
+  "sidechainTestUrl": "https://cirrusmainexplorer1.azurewebsites.net/"
 }

@@ -1,45 +1,48 @@
-import { IndentifyEntity } from './../../../../../libs/state/global-state/src/lib/+state/global.actions';
-import { Inject, Injectable, InjectionToken } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {environment} from "../../environments/environment";
-import {catchError} from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { APP_CONFIG, AppConfig } from '@blockexplorer/shared/models';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
 
 /**
  * Service in charge of dynamically initialising configuration
  */
 @Injectable()
-export class AppConfigService
-{
+export class AppConfigService {
 
-  constructor(private http: HttpClient)
-  {
+  constructor(private http: HttpClient) {
   }
 
-  public load()
-  {
+  public load() {
     return new Promise((resolve, reject) => {
 
       this.http.get('/assets/config/config.json')
-          .pipe(catchError((error: any): any => {
-                    reject(true);
-                    return Observable.throw('Server error');
-                }))
-          .subscribe((envResponse :any) => {
-                const config = new AppConfig();
-                
-                if (!environment.production) {
-                    APP_CONFIG.apiBaseUrl = 'http://localhost:5000';
-                } else {
-                    APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
-                }
+        .pipe(catchError((error: any): any => {
+          reject(true);
+          return Observable.throw('Server error');
+        }))
+        .subscribe((envResponse: any) => {
+          const config = new AppConfig();
 
-                APP_CONFIG.symbol = envResponse.symbol;
-                APP_CONFIG.chain = envResponse.chain;
+          if (!environment.production) {
+            APP_CONFIG.apiBaseUrl = 'http://localhost:5000';
+          } else {
+            APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
+          }
 
-                resolve(true);
-            });
+          APP_CONFIG.symbol = envResponse.symbol;
+          APP_CONFIG.chain = envResponse.chain;
+          APP_CONFIG.sidechainColor = envResponse.sidechainColor;
+          APP_CONFIG.stratColor = envResponse.stratColor;
+          APP_CONFIG.sidechainMainUrl = envResponse.sidechainMainUrl;
+          APP_CONFIG.sidechainTestUrl = envResponse.sidechainTestUrl;
+          APP_CONFIG.stratMainUrl = envResponse.stratMainUrl;
+          APP_CONFIG.stratTestUrl = envResponse.stratTestUrl;
+
+          resolve(true);
+        });
 
     });
   }
