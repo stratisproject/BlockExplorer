@@ -16,7 +16,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             foreach (ChainBlockHeader entry in entries.OrderBy(e => e.Height))
             {
                 ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);
-                chain.Add(new ChainedHeader(entry.Header, entry.BlockId, prev));
+                if (chain.GetHeader(entry.Height) == null)
+                {
+                    chain.Add(new ChainedHeader(entry.Header, entry.BlockId, prev));
+                }
             }
 
             chain.SetTip(chain.Tip);
