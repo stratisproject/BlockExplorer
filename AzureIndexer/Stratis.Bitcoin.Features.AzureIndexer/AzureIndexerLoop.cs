@@ -110,7 +110,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 Network = network,
                 CheckpointSetName = indexerSettings.CheckpointsetName,
                 AzureStorageEmulatorUsed = indexerSettings.AzureEmulatorUsed,
-                StorageCredentials = indexerSettings.AzureEmulatorUsed ? null : new StorageCredentials(indexerSettings.AzureAccountName, indexerSettings.AzureKey)
+                StorageCredentials = indexerSettings.AzureEmulatorUsed ? null : new StorageCredentials(indexerSettings.AzureAccountName, indexerSettings.AzureKey),
+                IsSidechain = indexerSettings.IsSidechain
             };
             return indexerConfig;
         }
