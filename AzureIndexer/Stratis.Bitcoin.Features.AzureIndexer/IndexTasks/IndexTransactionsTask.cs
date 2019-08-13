@@ -21,7 +21,7 @@
         {
             this.config = configuration;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            this.IsSC = settings.IsSidechain; //this.config.IsSidechain;
+            this.IsSC = settings.IsSidechain;
         }
 
 
