@@ -311,7 +311,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                             task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Transactions:
-                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
+                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory, this.indexerSettings);
                             break;
                         case IndexerCheckpoints.Balances:
                             task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);

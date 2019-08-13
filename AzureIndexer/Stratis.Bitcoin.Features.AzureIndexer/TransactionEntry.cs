@@ -322,6 +322,9 @@
 
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {
+                    if (!transactionOutput.ScriptPubKey.IsSmartContractCreate())
+                        continue;
+
                     Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
                     if (contractTxDataResult.IsSuccess)
                     {

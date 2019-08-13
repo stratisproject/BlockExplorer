@@ -16,12 +16,12 @@
         private readonly IndexerConfiguration config;
         private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
-        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
+        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, AzureIndexerSettings settings)
             : base(configuration, loggerFactory)
         {
             this.config = configuration;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            this.IsSC = this.config.IsSidechain;
+            this.IsSC = settings.IsSidechain; //this.config.IsSidechain;
         }
 
 
