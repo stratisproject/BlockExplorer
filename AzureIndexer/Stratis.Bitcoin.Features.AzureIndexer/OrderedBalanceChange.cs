@@ -14,7 +14,7 @@
     {
         public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(uint256 txId, Transaction transaction, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
-            if(transaction == null)
+            if (transaction == null)
             {
                 throw new ArgumentNullException("transaction");
             }
@@ -29,17 +29,19 @@
                 blockId = blockHeader.GetHash();
             }
 
-            Dictionary<Script, OrderedBalanceChange> changeByScriptPubKey = new Dictionary<Script, OrderedBalanceChange>();
+            var changeByScriptPubKey = new Dictionary<Script, OrderedBalanceChange>();
             uint i = 0;
-            foreach(TxIn input in transaction.Inputs)
+            foreach (TxIn input in transaction.Inputs)
             {
-                if(transaction.IsCoinBase)
+                if (transaction.IsCoinBase)
                 {
                     i++;
                     break;
                 }
+
                 TxDestination signer = null;
-                if(input.ScriptSig.Length != 0)
+
+                if (input.ScriptSig.Length != 0)
                 {
                     signer = input.ScriptSig.GetSigner(network);
                 }
@@ -47,26 +49,29 @@
                 {
                     signer = GetSigner(input.WitScript, network);
                 }
-                if(signer != null)
+
+                if (signer != null)
                 {
                     OrderedBalanceChange entry = null;
-                    if(!changeByScriptPubKey.TryGetValue(signer.ScriptPubKey, out entry))
+                    if (!changeByScriptPubKey.TryGetValue(signer.ScriptPubKey, out entry))
                     {
                         entry = new OrderedBalanceChange(txId, signer.ScriptPubKey, blockId, blockHeader, height);
                         changeByScriptPubKey.Add(signer.ScriptPubKey, entry);
                     }
+
                     entry.SpentOutpoints.Add(input.PrevOut);
                     entry.SpentIndices.Add(i);
                 }
+
                 i++;
             }
 
             i = 0;
             bool hasOpReturn = false;
-            foreach(TxOut output in transaction.Outputs)
+            foreach (TxOut output in transaction.Outputs)
             {
                 byte[] bytes = output.ScriptPubKey.ToBytes(true);
-                if(bytes.Length != 0 && bytes[0] == (byte)OpcodeType.OP_RETURN)
+                if (bytes.Length != 0 && bytes[0] == (byte)OpcodeType.OP_RETURN)
                 {
                     hasOpReturn = true;
                     i++;
@@ -74,11 +79,13 @@
                 }
 
                 OrderedBalanceChange entry = null;
-                if(!changeByScriptPubKey.TryGetValue(output.ScriptPubKey, out entry))
+
+                if (!changeByScriptPubKey.TryGetValue(output.ScriptPubKey, out entry))
                 {
                     entry = new OrderedBalanceChange(txId, output.ScriptPubKey, blockId, blockHeader, height);
                     changeByScriptPubKey.Add(output.ScriptPubKey, entry);
                 }
+
                 entry.ReceivedCoins.Add(new Coin()
                 {
                     Outpoint = new OutPoint(txId, i),
@@ -87,7 +94,7 @@
                 i++;
             }
 
-            foreach(KeyValuePair<Script, OrderedBalanceChange> entity in changeByScriptPubKey)
+            foreach (KeyValuePair<Script, OrderedBalanceChange> entity in changeByScriptPubKey)
             {
                 entity.Value.HasOpReturn = hasOpReturn;
                 entity.Value.IsCoinbase = transaction.IsCoinBase;
@@ -98,7 +105,7 @@
 
         public static TxDestination GetSigner(WitScript witScript, Network network)
         {
-            if(witScript == WitScript.Empty)
+            if (witScript == WitScript.Empty)
             {
                 return null;
             }
@@ -123,12 +130,12 @@
         {
             Dictionary<string, OrderedBalanceChange> entitiesByWallet = new Dictionary<string, OrderedBalanceChange>();
             IEnumerable<OrderedBalanceChange> scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
-            foreach(OrderedBalanceChange scriptBalance in scriptBalances)
+            foreach (OrderedBalanceChange scriptBalance in scriptBalances)
             {
-                foreach(WalletRuleEntry walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
+                foreach (WalletRuleEntry walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
                 {
                     OrderedBalanceChange walletEntity = null;
-                    if(!entitiesByWallet.TryGetValue(walletRuleEntry.WalletId, out walletEntity))
+                    if (!entitiesByWallet.TryGetValue(walletRuleEntry.WalletId, out walletEntity))
                     {
                         walletEntity = new OrderedBalanceChange(walletRuleEntry.WalletId, scriptBalance);
                         entitiesByWallet.Add(walletRuleEntry.WalletId, walletEntity);
@@ -348,16 +355,11 @@
             get;
             set;
         }
-        public uint256 BlockId
-        {
-            get;
-            set;
-        }
-        public uint256 TransactionId
-        {
-            get;
-            set;
-        }
+
+        public uint256 BlockId { get; set; }
+
+        public uint256 TransactionId { get; set; }
+
         public bool HasOpReturn
         {
             get;
@@ -382,7 +384,9 @@
             _SpentOutpoints = new List<OutPoint>();
             _ReceivedCoins = new CoinCollection();
         }
+
         private List<uint> _SpentIndices;
+
         public List<uint> SpentIndices
         {
             get
@@ -533,6 +537,7 @@
             get;
             set;
         }
+
         public void UpdateToColoredCoins()
         {
             if(ColoredTransaction == null)
@@ -580,6 +585,7 @@
                 }
             }
         }
+
         public void UpdateToUncoloredCoins()
         {
             if(SpentCoins != null)
@@ -640,6 +646,7 @@
             IsCoinbase = source.IsCoinbase;
             HasOpReturn = source.HasOpReturn;
         }
+
         internal class IntCompactVarInt : CompactVarInt
         {
             public IntCompactVarInt(uint value)
