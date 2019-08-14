@@ -25,7 +25,13 @@ import {
   BlockHeaderLoadError,
   LoadLastBlocks,
   LastBlocksLoaded,
-  LastBlocksLoadedError
+  LastBlocksLoadedError,
+  LoadSmartContractTransactions,
+  SmartContractTransactionsLoaded,
+  SmartContractTransactionsLoadError,
+  LoadStats,
+  StatsLoaded,
+  StatsLoadError
 } from './transactions.actions';
 import { TransactionsService } from '../services/transactions.service';
 import { map } from 'rxjs/operators';
@@ -46,6 +52,21 @@ export class TransactionsEffects {
     onError: (action: LoadTransactions, error) => {
       console.error('Error', error);
       return new TransactionsLoadError(error);
+    }
+  });
+
+  @Effect() loadSmartContractTransactions$ = this.dataPersistence.fetch(TransactionsActionTypes.LoadSmartContractTransactions, {
+    run: (action: LoadSmartContractTransactions, state: TransactionsPartialState) => {
+      return this.transactionsService.getSmartContractTransactions(false, action.records).pipe(
+        map((transactions) => {
+          return new SmartContractTransactionsLoaded(transactions);
+        })
+      );
+    },
+
+    onError: (action: LoadSmartContractTransactions, error) => {
+      console.error('Error', error);
+      return new SmartContractTransactionsLoadError(error);
     }
   });
 
@@ -106,6 +127,21 @@ export class TransactionsEffects {
     onError: (action: GetTransaction, error) => {
       console.error('Error', error);
       return new TransactionLoadError(error);
+    }
+  });
+
+  @Effect() loadStats$ = this.dataPersistence.fetch(TransactionsActionTypes.LoadStats, {
+    run: (action: LoadStats, state: TransactionsPartialState) => {
+      return this.blocksService.stats().pipe(
+        map((stats) => {
+          return new StatsLoaded(stats);
+        })
+      );
+    },
+
+    onError: (action: LoadStats, error) => {
+      console.error('Error', error);
+      return new StatsLoadError(error);
     }
   });
 

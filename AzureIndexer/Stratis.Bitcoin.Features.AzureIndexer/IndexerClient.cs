@@ -252,6 +252,26 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return entity;
         }
 
+        public async Task<List<SmartContactEntry>> GetAllSmartContractsAsync(int? take = 10)
+        {
+            CloudTable table = this.Configuration.GetSmartContactTable();
+            TableQuery query = new TableQuery();
+            if (take.HasValue)
+                query.TakeCount = take;
+
+            TableContinuationToken token = null;
+            var entities = new List<SmartContactEntry>();
+            do
+            {
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query, token).ConfigureAwait(false);
+                entities.AddRange(queryResult.Results.Select(r => new SmartContactEntry(r)));
+                token = queryResult.ContinuationToken;
+            }
+            while (token != null);
+
+            return entities;
+        }
+
         public async Task<SmartContactDetailsEntry> GetSmartContractDetailsAsync(string smartContractId)
         {
             Guard.NotNull(smartContractId, nameof(smartContractId));
@@ -263,6 +283,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             TableQuerySegment result = await table.ExecuteQuerySegmentedAsync(query, null).ConfigureAwait(false);
             SmartContactDetailsEntry entity = result.Results.Select(r => new SmartContactDetailsEntry(r)).FirstOrDefault();
             return entity;
+        }
+        
+        public async Task<List<SmartContactDetailsEntry>> GetAllSmartContractDetailsAsync(int take = 10)
+        {
+            CloudTable table = this.Configuration.GetSmartContactDetailTable();
+            TableQuery query = new TableQuery();
+            query.TakeCount = take;
+            
+            TableContinuationToken token = null;
+            var entities = new List<SmartContactDetailsEntry>();
+            do
+            {
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query, token).ConfigureAwait(false);
+                entities.AddRange(queryResult.Results.Select(r => new SmartContactDetailsEntry(r)));
+                token = queryResult.ContinuationToken;
+            }
+            while (token != null);
+
+            return entities;
         }
 
         public IEnumerable<ChainBlockHeader> GetChainChangesUntilFork(ChainedHeader currentTip, bool forkIncluded, CancellationToken cancellation = default(CancellationToken))

@@ -1,8 +1,10 @@
 import { Action } from '@ngrx/store';
-import { BalanceSummaryModel, BalanceResponseModel, TransactionSummaryModel, TransactionModel, BlockResponseModel, BlockHeaderResponseModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel, TransactionSummaryModel, TransactionModel, BlockResponseModel, BlockHeaderResponseModel, StatsModel } from '@blockexplorer/shared/models';
 
 export enum TransactionsActionTypes {
   LoadTransactions = '[Transactions] Load Transactions',
+  LoadStats = '[Transactions] Load Stats',
+  LoadSmartContractTransactions = '[Transactions] Smart Contract Transactions',
   LoadLastBlocks = '[Transactions] Load Last Blocks',
   LastBlocksLoadedError = '[Transactions] Load Last Blocks Error',
   GetAddress = '[Transactions] Get Address',
@@ -11,13 +13,17 @@ export enum TransactionsActionTypes {
   GetBlockHeader = '[Transactions] Get BlockHeader',
   GetAddressDetails = '[Transactions] Get Address Details',
   TransactionsLoaded = '[Transactions] Transactions Loaded',
+  StatsLoaded = '[Transactions] Stats Loaded',
   BlockLoaded = '[Transactions] Block Loaded',
   BlockHeaderLoaded = '[Transactions] Block Header Loaded',
   AddressLoaded = '[Transactions] Address Loaded',
   TransactionLoaded = '[Transactions] Transaction Loaded',
+  SmartContractTransactionsLoaded = '[Transactions] SmartContract Transactions Loaded',
   LastBlocksLoaded = '[Transactions] Last Blocks Loaded',
   AddressDetailsLoaded = '[Transactions] Address Details Loaded',
   TransactionsLoadError = '[Transactions] Transactions Load Error',
+  SmartContractTransactionsLoadError = '[Transactions] SmartContract Transactions Load Error',
+  StatsLoadError = '[Transactions] Address Load Error',
   AddressLoadError = '[Transactions] Address Load Error',
   BlockLoadError = '[Transactions] Block Load Error',
   BlockHeaderLoadError = '[Transactions] Block Header Load Error',
@@ -27,6 +33,15 @@ export enum TransactionsActionTypes {
 
 export class LoadTransactions implements Action {
   readonly type = TransactionsActionTypes.LoadTransactions;
+}
+
+export class LoadStats implements Action {
+  readonly type = TransactionsActionTypes.LoadStats;
+}
+
+export class LoadSmartContractTransactions implements Action {
+  readonly type = TransactionsActionTypes.LoadSmartContractTransactions;
+  constructor(public records: number) {}
 }
 
 export class LoadLastBlocks implements Action {
@@ -64,6 +79,11 @@ export class TransactionsLoadError implements Action {
   constructor(public payload: any) {}
 }
 
+export class StatsLoadError implements Action {
+  readonly type = TransactionsActionTypes.StatsLoadError;
+  constructor(public payload: any) {}
+}
+
 export class AddressLoadError implements Action {
   readonly type = TransactionsActionTypes.AddressLoadError;
   constructor(public payload: any) {}
@@ -94,9 +114,19 @@ export class AddressLoaded implements Action {
   constructor(public address: BalanceSummaryModel) {}
 }
 
+export class StatsLoaded implements Action {
+  readonly type = TransactionsActionTypes.StatsLoaded;
+  constructor(public stats: StatsModel) {}
+}
+
 export class TransactionLoaded implements Action {
   readonly type = TransactionsActionTypes.TransactionLoaded;
   constructor(public transaction: TransactionSummaryModel) {}
+}
+
+export class SmartContractTransactionsLoaded implements Action {
+  readonly type = TransactionsActionTypes.SmartContractTransactionsLoaded;
+  constructor(public transactions: TransactionSummaryModel[]) {}
 }
 
 export class BlockLoaded implements Action {
@@ -129,10 +159,19 @@ export class LastBlocksLoadedError implements Action {
   constructor(public payload: any) {}
 }
 
+export class SmartContractTransactionsLoadError implements Action {
+  readonly type = TransactionsActionTypes.SmartContractTransactionsLoadError;
+  constructor(public payload: any) {}
+}
+
 export type TransactionsAction =
   | LoadTransactions
+  | LoadStats
+  | LoadSmartContractTransactions
   | LoadLastBlocks
   | LastBlocksLoadedError
+  | StatsLoadError
+  | StatsLoaded
   | LastBlocksLoaded
   | GetAddress
   | GetTransaction
@@ -140,7 +179,9 @@ export type TransactionsAction =
   | GetBlockHeader
   | GetAddressDetails
   | TransactionsLoaded
+  | SmartContractTransactionsLoaded
   | TransactionsLoadError
+  | SmartContractTransactionsLoadError
   | AddressLoaded
   | TransactionLoaded
   | BlockLoaded
@@ -154,6 +195,10 @@ export type TransactionsAction =
 
 export const fromTransactionsActions = {
   LoadTransactions,
+  LoadStats,
+  StatsLoaded,
+  StatsLoadError,
+  LoadSmartContractTransactions,
   LoadLastBlocks,
   LastBlocksLoadedError,
   LastBlocksLoaded,
@@ -163,7 +208,9 @@ export const fromTransactionsActions = {
   GetBlock,
   GetBlockHeader,
   TransactionsLoaded,
+  SmartContractTransactionsLoaded,
   TransactionsLoadError,
+  SmartContractTransactionsLoadError,
   AddressLoaded,
   TransactionLoaded,
   BlockLoaded,

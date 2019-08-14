@@ -110,6 +110,8 @@
         public SmartContactEntry(DynamicTableEntity entity)
         {
             this.Id = entity.PartitionKey;
+            this.TxId = entity.RowKey;
+            this.Timestamp = entity.Timestamp;
 
             if (entity.Properties.ContainsKey(nameof(this.OpCode)))
             {
@@ -142,6 +144,10 @@
         }
 
         public string Id { get; set; }
+
+        public string TxId { get; set; }
+        
+        public DateTimeOffset Timestamp { get; set; }
 
         public string OpCode { get; set; }
 

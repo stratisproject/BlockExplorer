@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureIndexer.Api.Models.Response;
 
@@ -16,17 +17,20 @@ namespace AzureIndexer.Api.Controllers
         private readonly IMapper mapper;
         private readonly IBlockSearchService blockSearchService;
         private readonly ITransactionSearchService transactionSearchService;
+        private readonly Stats stats;
 
         public BlocksController(
             ChainIndexer chain,
             QBitNinjaConfiguration config,
             IMapper mapper,
             IBlockSearchService blockSearchService,
-            ITransactionSearchService transactionSearchService)
+            ITransactionSearchService transactionSearchService,
+            Stats stats)
         {
             this.mapper = mapper;
             this.blockSearchService = blockSearchService;
             this.transactionSearchService = transactionSearchService;
+            this.stats = stats;
             this.Configuration = config;
             this.Chain = chain;
         }
@@ -84,6 +88,13 @@ namespace AzureIndexer.Api.Controllers
             }
 
             return blocks.ToArray();
+        }
+
+        [HttpGet]
+        [Route("last24")]
+        public async Task<Stats> BlocksLast24Hours()
+        {
+            return this.stats;
         }
     }
 }

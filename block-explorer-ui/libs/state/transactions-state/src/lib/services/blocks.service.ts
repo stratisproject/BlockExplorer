@@ -2,7 +2,7 @@ import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 
 import { Observable, throwError as _observableThrow, of as _observableOf, of } from 'rxjs';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { blobToText, throwException, APP_CONFIG, BlockResponseModel, BlockHeaderResponseModel, AppConfig } from '@blockexplorer/shared/models';
+import { blobToText, throwException, APP_CONFIG, BlockResponseModel, BlockHeaderResponseModel, AppConfig, StatsModel } from '@blockexplorer/shared/models';
 
 @Injectable()
 export class BlocksService {
@@ -179,5 +179,55 @@ export class BlocksService {
             }));
         }
         return _observableOf<BlockResponseModel[]>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    stats(): Observable<StatsModel> {
+        const url_ = APP_CONFIG.apiBaseUrl + "/api/v1/blocks/last24";
+
+        const options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processStats(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processStats(<any>response_);
+                } catch (e) {
+                    return <Observable<StatsModel>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<StatsModel>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processStats(response: HttpResponseBase): Observable<StatsModel> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            const resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? StatsModel.fromJS(resultData200) : new StatsModel();
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<StatsModel>(<any>null);
     }
 }

@@ -24,6 +24,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     try
                     {
                         ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);
+                        if (prev == null && entry.Height > 0) continue;
+
                         var newTip = new ChainedHeader(entry.Header, entry.BlockId, prev);
                         if (chain.GetHeader(entry.Height) == null)
                         {

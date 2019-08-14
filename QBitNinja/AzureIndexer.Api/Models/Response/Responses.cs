@@ -1221,6 +1221,9 @@
     {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash { get; set; }
+        
+        [JsonProperty("txId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string TxId { get; set; }
 
         [JsonProperty("gasPrice", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public MoneyModel GasPrice { get; set; }

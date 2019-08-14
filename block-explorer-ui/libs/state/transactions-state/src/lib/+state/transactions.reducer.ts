@@ -2,7 +2,7 @@ import {
   TransactionsAction,
   TransactionsActionTypes
 } from './transactions.actions';
-import { BalanceSummaryModel, BalanceResponseModel, TransactionModel, TransactionSummaryModel, BlockResponseModel, BlockHeaderResponseModel } from '@blockexplorer/shared/models';
+import { BalanceSummaryModel, BalanceResponseModel, TransactionModel, TransactionSummaryModel, BlockResponseModel, BlockHeaderResponseModel, StatsModel } from '@blockexplorer/shared/models';
 
 export const TRANSACTIONS_FEATURE_KEY = 'transactions';
 
@@ -20,9 +20,13 @@ export interface Entity {}
 export interface TransactionsState {
   list: TransactionModel[];
   lastBlocks: BlockResponseModel[];
+  smartContractTransactions: TransactionSummaryModel[];
+  smartContractTransactionsLoaded: boolean;
   lastBlocksLoaded: boolean;
+  statsLoaded: boolean;
   selectedId?: string | number;
   selectedAddress?: BalanceSummaryModel;
+  stats?: StatsModel;
   selectedTransaction?: TransactionSummaryModel;
   selectedBlock?: BlockResponseModel;
   selectedBlockHeader?: BlockHeaderResponseModel;
@@ -41,8 +45,12 @@ export interface TransactionsPartialState {
 export const initialState: TransactionsState = {
   list: [],
   lastBlocks: [],
+  smartContractTransactions: [],
+  smartContractTransactionsLoaded: false,
   lastBlocksLoaded: false,
+  statsLoaded: false,
   selectedAddress: null,
+  stats: null,
   selectedTransaction: null,
   selectedBlock: null,
   selectedBlockHeader: null,
@@ -65,6 +73,20 @@ export function transactionsReducer(
       };
       break;
     }
+    case TransactionsActionTypes.LoadSmartContractTransactions: {
+      state = {
+        ...state,
+        smartContractTransactionsLoaded: false,
+      };
+      break;
+    }
+    case TransactionsActionTypes.LoadStats: {
+      state = {
+        ...state,
+        statsLoaded: false,
+      };
+      break;
+    }
     case TransactionsActionTypes.TransactionsLoaded: {
       state = {
         ...state,
@@ -73,10 +95,33 @@ export function transactionsReducer(
       };
       break;
     }
+    case TransactionsActionTypes.SmartContractTransactionsLoaded: {
+      state = {
+        ...state,
+        smartContractTransactions: action.transactions,
+        smartContractTransactionsLoaded: true,
+      };
+      break;
+    }
     case TransactionsActionTypes.LoadLastBlocks: {
       state = {
         ...state,
         lastBlocksLoaded: false,
+      };
+      break;
+    }
+    case TransactionsActionTypes.StatsLoaded: {
+      state = {
+        ...state,
+        stats: action.stats,
+        statsLoaded: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.StatsLoadError: {
+      state = {
+        ...state,
+        statsLoaded: true
       };
       break;
     }
@@ -156,6 +201,13 @@ export function transactionsReducer(
       state = {
         ...state,
         loadedBlockData: true
+      };
+      break;
+    }
+    case TransactionsActionTypes.SmartContractTransactionsLoadError: {
+      state = {
+        ...state,
+        smartContractTransactionsLoaded: true
       };
       break;
     }

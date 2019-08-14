@@ -68,6 +68,7 @@ namespace AzureIndexer.Api
             services.AddSingleton(new DBreezeSerializer(network.Consensus.ConsensusFactory));
             services.AddSingleton<IHostedService, BuildChainCache>();
             services.AddSingleton<IHostedService, UpdateChainListener>();
+            services.AddSingleton<IHostedService, UpdateStatsListener>();
             services.AddCors();
             services.AddSwaggerGen(c =>
             {
@@ -121,6 +122,7 @@ namespace AzureIndexer.Api
             builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<ChainCacheProvider>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
+            builder.RegisterInstance(new Stats()).AsSelf();
             this.ApplicationContainer = builder.Build();
 
             var csl = new AutofacServiceLocator(this.ApplicationContainer);
