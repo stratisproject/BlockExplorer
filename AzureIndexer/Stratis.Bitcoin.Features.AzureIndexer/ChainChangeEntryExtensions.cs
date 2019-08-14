@@ -12,33 +12,49 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public static class ChainChangeEntryExtensions
     {
+        private static object lockObj = new object();
+
         public static void UpdateChain(this IEnumerable<ChainBlockHeader> entries, ChainIndexer chain, ILogger logger = null)
         {
-            var allEntries = entries.OrderBy(e => e.Height);
-            foreach (ChainBlockHeader entry in allEntries)
+            lock (lockObj)
             {
-                try
+                var allEntries = entries.OrderBy(e => e.Height);
+                foreach (ChainBlockHeader entry in allEntries)
                 {
-                    ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);
-                    if (chain.GetHeader(entry.Height) == null)
+                    try
                     {
+                        ChainedHeader prev = chain.GetHeader(entry.Header.HashPrevBlock);
                         var newTip = new ChainedHeader(entry.Header, entry.BlockId, prev);
-                        try
+                        if (chain.GetHeader(entry.Height) == null)
                         {
+                            try
+                            {
+                                chain.Add(newTip);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger?.LogError(ex, "Failed to add chain tip {entry}", entry);
+                                chain.Initialize(chain.Genesis);
+                                break;
+                            }
+                        }
+                        else if (newTip.Height <= chain.Tip.Height)
+                        {
+                            logger?.LogError("New tip is {newTip} current tip is {chain.Tip}", entry);
+                            while (chain.Height >= entry.Height)
+                            {
+                                if (chain.Height == 0) break;
+                                chain.Remove(chain.Tip);
+                            }
+
                             chain.Add(newTip);
                         }
-                        catch (Exception ex)
-                        {
-                            logger?.LogError(ex, "Failed to add chain tip {entry}", entry);
-                            chain.Initialize(chain.Genesis);
-                            break;
-                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    chain.Initialize(chain.Genesis);
-                    logger?.LogError(ex, "Failed to add chain tip {entry}", entry);
+                    catch (Exception ex)
+                    {
+                        chain.Initialize(chain.Genesis);
+                        logger?.LogError(ex, "Failed to add chain tip {entry}", entry);
+                    }
                 }
             }
 
