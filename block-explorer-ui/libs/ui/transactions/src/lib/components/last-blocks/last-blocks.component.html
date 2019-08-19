@@ -1,27 +1,27 @@
-<div class="list-group-item mb-4 m20top">
-  <h5>Last {{records}} blocks</h5>
+<div class="list-group-item my-4 m20top">
+  <h5 class="mb-4 mt-2">Last {{records}} blocks</h5>
   <table class="table table-striped">
     <thead>
       <tr>
         <th>Height</th>
-        <th>Age</th>
-        <th class="text-center">Confirmations</th>
-        <th class="text-center">Transactions</th>
+        <th class="d-none d-sm-table-cell">Age</th>
+        <th class="text-center d-none d-sm-table-cell">Confirmations</th>
+        <th class="text-center d-none d-md-table-cell">Transactions</th>
         <th>Hash</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let block of blocks">
         <td><a [routerLink]="['/blocks', getHeight(block)]">{{getHeight(block)}}</a></td>
-        <td>{{getAge(block)}}</td>
-        <td class="text-center">{{getConfirmations(block)}}</td>
-        <td class="text-center">{{getBlockTransactions(block)}}</td>
-        <td>{{getHash(block)}}</td>
+        <td class="d-none d-sm-table-cell">{{getAge(block)}}</td>
+        <td class="text-center d-none d-sm-table-cell">{{getConfirmations(block)}}</td>
+        <td class="text-center d-none d-md-table-cell">{{getBlockTransactions(block)}}</td>
+        <td class="d-inline-block text-truncate" style="max-width: 100px;">{{getHash(block)}}</td>
       </tr>
     </tbody>
   </table>
   <div class="text-center">
-    <a class="btn btn-primary load-more" *ngIf="!loading" (click)="getNext10()">Fetch next 10 blocks</a>
+    <a class="btn btn-outline-primary load-more" *ngIf="!loading" (click)="getNext10()">Fetch next 10 blocks</a>
     <span [hidden]="!loading"><i>Loading next 10 blocks...</i></span>
   </div>
 </div>

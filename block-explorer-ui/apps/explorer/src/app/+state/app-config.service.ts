@@ -27,7 +27,7 @@ export class AppConfigService {
           const config = new AppConfig();
 
           if (!environment.production) {
-            APP_CONFIG.apiBaseUrl = 'http://localhost:54678';
+            APP_CONFIG.apiBaseUrl = 'https://cirrusmainindexer1.azurewebsites.net';
           } else {
             APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
           }
