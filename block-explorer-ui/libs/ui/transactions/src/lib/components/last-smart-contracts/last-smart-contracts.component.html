@@ -13,7 +13,7 @@
     <tbody>
       <tr *ngFor="let tx of smartContracts">
         <td><a [routerLink]="['/blocks', tx.height]">{{tx.height}}</a></td>
-        <td class="d-inline-block text-truncate" style="max-width: 150px;">{{tx.smartContract?.hash}}</td>
+        <td class="d-inline-block text-truncate" style="max-width: 120px;">{{tx.smartContract?.hash}}</td>
         <td class="text-center d-none d-md-table-cell"><blockexplorer-balance [balance]="!!tx.amount?.satoshi || 0"></blockexplorer-balance></td>
         <td class="text-center d-none d-sm-table-cell">{{tx.confirmations}}</td>
         <td class="d-sm-inline-block text-truncate d-none d-sm-table-cell" style="max-width: 100px;"><a [routerLink]="['/transactions', tx.hash]">{{tx.hash}}</a></td>
