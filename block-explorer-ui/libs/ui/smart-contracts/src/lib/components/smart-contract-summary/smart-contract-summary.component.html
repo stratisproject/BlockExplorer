@@ -4,7 +4,7 @@
       <tbody>
         <tr>
           <th><label>Contract Hash</label></th>
-          <td>{{hash}}</td>
+          <td class="hash-truncate">{{hash}}</td>
         </tr>
         <tr>
           <th><label>Gas Price</label></th>
@@ -21,6 +21,14 @@
       </tbody>
     </table>
 
-    <ngx-prism [language]="'csharp'" [code]="code">
+    <div class="row">
+      <div class="col-12">
+        <button type="button" class="btn btn-outline-info btn-sm d-flex align-items-center ml-auto">
+          <i class="material-icons md-18 mr-2">file_copy</i> Copy to Clipboard
+        </button>
+      </div>
+    </div>
+
+    <ngx-prism class="p-0" [language]="'csharp'" [code]="code">
     </ngx-prism>
   </div>

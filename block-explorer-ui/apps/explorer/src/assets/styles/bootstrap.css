@@ -1762,9 +1762,9 @@ textarea.form-control {
   .btn:not(:disabled):not(.disabled) {
     cursor: pointer; }
   .btn.rounded {
-    width: 2rem;
-    height: 2rem;
-    line-height: 2rem;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1rem;
     border-radius: 50% !important;
     padding: 0;
     display: flex;
@@ -7008,9 +7008,51 @@ pre.language-csharp {
 
 
 /* custom */
-@media (max-width: 640px) {
+pre.language-csharp {padding: 1rem !important;}
+pre[class*="language-"] > code {
+  border-left: 0 solid #fff;
+  box-shadow: -1px 0px 0px 0px #fff, 0px 0px 0px 1px #fff;
+}
+
+@media (max-width: 660px) {
   #search-text.form-control {
     padding: 0.375rem 0.45rem;
   }
   .list-group-item h5, h3 {text-align: center;}
+  .breadcrumb {padding: 0.75rem;}
+  .breadcrumb-item:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 140px;
+  }
+
+  .hash-word-break {
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+  }
+  .hash-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 140px;
+  }
+}
+
+@media (min-width: 661px) and (max-width: 960px) {
+  .breadcrumb {padding: 0.75rem;}
+  .hash-word-break {
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+  }
 }

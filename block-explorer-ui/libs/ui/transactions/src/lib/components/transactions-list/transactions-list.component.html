@@ -11,7 +11,7 @@
     <i>No transactions to show</i>
   </div>
   <ul class="list-group" [hidden]="noTransactions">
-    <li class="list-group-item" *ngFor="let transaction of transactions">
+    <li class="list-group-item shadow-none" *ngFor="let transaction of transactions">
       <blockexplorer-transaction-list-item [showHeader]="showTransactionHeader" class="row" [transaction]="transaction"></blockexplorer-transaction-list-item>
     </li>
   </ul>
