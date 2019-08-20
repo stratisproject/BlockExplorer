@@ -49,7 +49,7 @@ namespace AzureIndexer.Api.Infrastructure
             this.stats = stats;
         }
 
-        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(100);
+        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(103);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -85,7 +85,7 @@ namespace AzureIndexer.Api.Infrastructure
             var blocksCount = 0;
             var transactionInputCounts = 0;
 
-            while (currentTip != null && currentTip.Header.BlockTime.Date >= dayAgo)
+            while (currentTip != null && currentTip.Header.BlockTime.DateTime >= dayAgo)
             {
                 blocksCount++;
                 if (!this.indexer.Configuration.IsSidechain)
