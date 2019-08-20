@@ -2155,10 +2155,10 @@ fieldset:disabled a.btn {
 
 .btn-link {
   font-weight: 400;
-  color: #158BCF;
+  color: #adb5bd;
   background-color: transparent; }
   .btn-link:hover {
-    color: #0e5c8a;
+    color: #212529;
     text-decoration: none;
     background-color: transparent;
     border-color: transparent; }

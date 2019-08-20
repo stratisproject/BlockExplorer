@@ -4,7 +4,12 @@
     <tbody>
       <tr>
         <th><label>Address</label></th>
-        <td><a [routerLink]="['/addresses', hash]">{{hash}}</a></td>
+        <td class="d-flex align-items-center">
+          <a [routerLink]="['/addresses', hash]">{{hash}}</a>
+          <button type="button" class="btn btn-link btn-sm mr-auto ml-2 d-flex align-items-center p-0">
+            <i class="material-icons md-18">file_copy</i>
+          </button>
+        </td>
       </tr>
       <tr>
         <th><label>Confirmed Balance</label></th>
