@@ -1970,7 +1970,7 @@ fieldset:disabled a.btn {
   background-image: none;
   border-color: #158BCF; }
   .btn-outline-primary:hover {
-    color: #fff;
+    color: #fff !important;
     background-color: #158BCF;
     border-color: #158BCF; }
   .btn-outline-primary:focus, .btn-outline-primary.focus {
