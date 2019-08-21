@@ -10,6 +10,8 @@ const getTransactionsState = createFeatureSelector<TransactionsState>(
 );
 
 const getLoadedTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedTransactions);
+const getLoadedStats = createSelector(getTransactionsState, (state: TransactionsState) => state.statsLoaded);
+const getLoadedSmartContractTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.smartContractTransactionsLoaded);
 const getLastBlocks = createSelector(getTransactionsState, (state: TransactionsState) => state.lastBlocks);
 const getLoadedLastBlocks = createSelector(getTransactionsState, (state: TransactionsState) => state.lastBlocksLoaded);
 const getLoadedAddress = createSelector(getTransactionsState, (state: TransactionsState) => state.loadedAddress);
@@ -21,6 +23,8 @@ const getSelectedAddressDetails = createSelector(getTransactionsState, (state: T
 const getError = createSelector(getTransactionsState, (state: TransactionsState) => state.error);
 const getSelectedBlock = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedBlock);
 const getSelectedBlockHeader = createSelector(getTransactionsState, (state: TransactionsState) => state.selectedBlockHeader);
+const getSmartContractTransactions = createSelector(getTransactionsState, (state: TransactionsState) => state.smartContractTransactions);
+const getStats = createSelector(getTransactionsState, (state: TransactionsState) => state.stats);
 
 const getAllTransactions = createSelector(
   getTransactionsState,
@@ -46,6 +50,8 @@ const getSelectedTransactions = createSelector(
 
 export const transactionsQuery = {
   getLoadedTransactions,
+  getLoadedStats,
+  getLoadedSmartContractTransactions,
   getLastBlocks,
   getLoadedLastBlocks,
   getLoadedAddress,
@@ -58,5 +64,7 @@ export const transactionsQuery = {
   getSelectedBlockHeader,
   getSelectedTransaction,
   getSelectedAddressDetails,
-  getSelectedTransactions
+  getSelectedTransactions,
+  getSmartContractTransactions,
+  getStats
 };

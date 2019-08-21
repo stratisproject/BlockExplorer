@@ -120,7 +120,7 @@
                 var summary = new TransactionSummaryModel
                 {
                     Hash = source.TransactionId,
-                    Time = source.Transaction.Time,
+                    Time = source.Block?.BlockHeader?.Time ?? source.Transaction.Time,
                     Confirmations = (chain.Tip.Height - source.Block?.Height ?? 0) + 1,
                     Fee = source.Fees,
                     Amount = source.Transaction.TotalOut,

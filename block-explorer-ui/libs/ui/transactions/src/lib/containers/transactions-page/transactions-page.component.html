@@ -4,7 +4,14 @@
     <ngb-alert type="info" [dismissible]="false" *ngIf="blocks.length === 0">
       <strong>Welcome</strong> Use search box in the top right corner to search addresses, transactions and smart contracts.
     </ngb-alert>
+
+    <blockexplorer-stats [stats]="stats" *ngIf="stats?.blockCount > 0">
+    </blockexplorer-stats>
+
     <blockexplorer-last-blocks [blocks]="blocks" [loading]="loadingMore$ | async" (loadMore)="loadMore($event)" *ngIf="blocks && blocks.length > 0">
     </blockexplorer-last-blocks>
+
+    <blockexplorer-last-smart-contracts [smartContracts]="smartContracts" [loading]="loadingMoreScs$ | async" (loadMore)="loadMoreScs($event)" *ngIf="smartContracts && smartContracts.length > 0">
+    </blockexplorer-last-smart-contracts>
   </div>
 </section>

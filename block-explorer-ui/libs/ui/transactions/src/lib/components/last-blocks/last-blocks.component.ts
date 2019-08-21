@@ -13,7 +13,7 @@ export class LastBlocksComponent implements OnInit {
   @Input() loading = false;
   @Output() loadMore = new EventEmitter<number>();
 
-  private records = 10;
+  records = 10;
   constructor() { }
 
   ngOnInit() {
@@ -28,8 +28,8 @@ export class LastBlocksComponent implements OnInit {
   }
 
   public getBlockTransactions(block: BlockResponseModel) {
-    return !!block.block && !!(<any>block.block).transactionIds
-            ? (<any>block.block).transactionIds.length || 0
+    return !!block.block && !!(<any>block.block).transactionIds && !!block.block.transactionIds.length 
+            ? block.block.transactionIds.length - 1 || 0
             : 0;
   }
 

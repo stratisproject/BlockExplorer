@@ -18,7 +18,7 @@
             this.logger = logger;
         }
 
-        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(10);
+        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(11);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
