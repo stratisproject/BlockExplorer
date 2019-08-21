@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -32,7 +33,7 @@ namespace AzureIndexer.Api.Infrastructure
             this.loggerFactory = loggerFactory;
         }
 
-        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(10);
+        protected virtual TimeSpan Delay => TimeSpan.FromSeconds(13);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {

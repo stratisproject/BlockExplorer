@@ -1,4 +1,6 @@
-﻿namespace Stratis.IndexerD
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+
+namespace Stratis.IndexerD
 {
     using System;
     using System.Linq;

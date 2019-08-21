@@ -4,6 +4,7 @@
     using System.Text;
     using NBitcoin;
     using Stratis.Bitcoin.Features.AzureIndexer.DamienG.Security.Cryptography;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public enum BalanceType
     {
@@ -137,10 +138,12 @@
         /// </summary>
         /// <param name="balanceId">The balance id to set.</param>
         /// <returns> Instance of BalanceId class</returns>
-        public static BalanceId Parse(string balanceId) =>
-            new BalanceId()
+        public static BalanceId Parse(string balanceId)
+        {
+            return new BalanceId()
             {
                 balanceId = balanceId
             };
+        }
     }
 }

@@ -9,12 +9,14 @@
     using NBitcoin;
     using NBitcoin.OpenAsset;
     using NBitcoin.Protocol;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public class OrderedBalanceChange
     {
         public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(uint256 txId, Transaction transaction, uint256 blockId, BlockHeader blockHeader, int height, Network network)
         {
-            if(transaction == null)
+            if (transaction == null)
             {
                 throw new ArgumentNullException("transaction");
             }
@@ -29,56 +31,64 @@
                 blockId = blockHeader.GetHash();
             }
 
-            Dictionary<Script, OrderedBalanceChange> changeByScriptPubKey = new Dictionary<Script, OrderedBalanceChange>();
+            var changeByScriptPubKey = new Dictionary<Script, OrderedBalanceChange>();
             uint i = 0;
-            foreach(TxIn input in transaction.Inputs)
+            foreach (TxIn input in transaction.Inputs)
             {
-                if(transaction.IsCoinBase)
+                if (transaction.IsCoinBase)
                 {
                     i++;
                     break;
                 }
+
                 TxDestination signer = null;
-                if(input.ScriptSig.Length != 0)
-                {
-                    signer = input.ScriptSig.GetSigner(network);
-                }
-                else
-                {
-                    signer = GetSigner(input.WitScript, network);
-                }
-                if(signer != null)
+
+                signer = input.ScriptSig.Length != 0 ? input.ScriptSig.GetSigner(network) : GetSigner(input.WitScript, network);
+
+                if (signer != null)
                 {
                     OrderedBalanceChange entry = null;
-                    if(!changeByScriptPubKey.TryGetValue(signer.ScriptPubKey, out entry))
+                    if (!changeByScriptPubKey.TryGetValue(signer.ScriptPubKey, out entry))
                     {
                         entry = new OrderedBalanceChange(txId, signer.ScriptPubKey, blockId, blockHeader, height);
                         changeByScriptPubKey.Add(signer.ScriptPubKey, entry);
                     }
+
                     entry.SpentOutpoints.Add(input.PrevOut);
                     entry.SpentIndices.Add(i);
                 }
+
                 i++;
             }
 
             i = 0;
-            bool hasOpReturn = false;
-            foreach(TxOut output in transaction.Outputs)
+            var hasOpReturn = false;
+            foreach (TxOut output in transaction.Outputs)
             {
                 byte[] bytes = output.ScriptPubKey.ToBytes(true);
-                if(bytes.Length != 0 && bytes[0] == (byte)OpcodeType.OP_RETURN)
+                if (bytes.Length != 0 && bytes[0] == (byte)OpcodeType.OP_RETURN)
                 {
                     hasOpReturn = true;
                     i++;
                     continue;
                 }
 
+                // Can be used to Extract Multisig Address
+                //var isScript = output.ScriptPubKey.IsPayToScriptHash(network);
+                //var ms = PayToScriptHashTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
+                //if (isScript || ms)
+                //{
+                //    var addr = output.ScriptPubKey.GetDestinationAddress(network);
+                //}
+
                 OrderedBalanceChange entry = null;
-                if(!changeByScriptPubKey.TryGetValue(output.ScriptPubKey, out entry))
+
+                if (!changeByScriptPubKey.TryGetValue(output.ScriptPubKey, out entry))
                 {
                     entry = new OrderedBalanceChange(txId, output.ScriptPubKey, blockId, blockHeader, height);
                     changeByScriptPubKey.Add(output.ScriptPubKey, entry);
                 }
+
                 entry.ReceivedCoins.Add(new Coin()
                 {
                     Outpoint = new OutPoint(txId, i),
@@ -87,7 +97,7 @@
                 i++;
             }
 
-            foreach(KeyValuePair<Script, OrderedBalanceChange> entity in changeByScriptPubKey)
+            foreach (KeyValuePair<Script, OrderedBalanceChange> entity in changeByScriptPubKey)
             {
                 entity.Value.HasOpReturn = hasOpReturn;
                 entity.Value.IsCoinbase = transaction.IsCoinBase;
@@ -98,13 +108,13 @@
 
         public static TxDestination GetSigner(WitScript witScript, Network network)
         {
-            if(witScript == WitScript.Empty)
+            if (witScript == WitScript.Empty)
             {
                 return null;
             }
 
             PayToWitPubkeyHashScriptSigParameters parameters = PayToWitPubKeyHashTemplate.Instance.ExtractWitScriptParameters(network, witScript);
-            if(parameters != null)
+            if (parameters != null)
             {
                 return parameters.PublicKey.WitHash;
             }
@@ -123,20 +133,22 @@
         {
             Dictionary<string, OrderedBalanceChange> entitiesByWallet = new Dictionary<string, OrderedBalanceChange>();
             IEnumerable<OrderedBalanceChange> scriptBalances = ExtractScriptBalances(txId, tx, blockId, blockHeader, height, network);
-            foreach(OrderedBalanceChange scriptBalance in scriptBalances)
+            foreach (OrderedBalanceChange scriptBalance in scriptBalances)
             {
-                foreach(WalletRuleEntry walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
+                foreach (WalletRuleEntry walletRuleEntry in walletCollection.GetRulesFor(scriptBalance.ScriptPubKey))
                 {
                     OrderedBalanceChange walletEntity = null;
-                    if(!entitiesByWallet.TryGetValue(walletRuleEntry.WalletId, out walletEntity))
+                    if (!entitiesByWallet.TryGetValue(walletRuleEntry.WalletId, out walletEntity))
                     {
                         walletEntity = new OrderedBalanceChange(walletRuleEntry.WalletId, scriptBalance);
                         entitiesByWallet.Add(walletRuleEntry.WalletId, walletEntity);
                     }
+
                     walletEntity.Merge(scriptBalance, walletRuleEntry.Rule);
                 }
             }
-            foreach(OrderedBalanceChange b in entitiesByWallet.Values)
+
+            foreach (OrderedBalanceChange b in entitiesByWallet.Values)
             {
                 b.UpdateToScriptCoins();
             }
@@ -144,113 +156,111 @@
             return entitiesByWallet.Values;
         }
 
-
         private List<MatchedRule> _MatchedRules = new List<MatchedRule>();
+
         public List<MatchedRule> MatchedRules
         {
-            get
-            {
-                return _MatchedRules;
-            }
-            internal set
-            {
-                _MatchedRules = value;
-            }
+            get => this._MatchedRules;
+            internal set => this._MatchedRules = value;
         }
 
         internal Task<bool> EnsureSpentCoinsLoadedAsync(uint256[] parentIds, Transaction[] transactions, IndexerConfiguration configuration)
         {
             NoSqlTransactionRepository repo = new NoSqlTransactionRepository(configuration.Network);
-            for(int i = 0; i < parentIds.Length; i++)
+            for (int i = 0; i < parentIds.Length; i++)
             {
-                if(transactions[i] == null)
+                if (transactions[i] == null)
                 {
                     return Task.FromResult(false);
                 }
 
                 repo.Put(parentIds[i], transactions[i]);
             }
-            return EnsureSpentCoinsLoadedAsync(repo);
+            return this.EnsureSpentCoinsLoadedAsync(repo);
         }
 
         public async Task<bool> EnsureSpentCoinsLoadedAsync(ITransactionRepository transactions)
         {
-            if(SpentCoins != null)
+            if (this.SpentCoins != null)
             {
                 return true;
             }
 
-            bool cleanSpent = false;
+            var cleanSpent = false;
             CoinCollection result = new CoinCollection();
-            for(int i = 0; i < SpentOutpoints.Count; i++)
+            for (var i = 0; i < this.SpentOutpoints.Count; i++)
             {
-                OutPoint outpoint = SpentOutpoints[i];
-                if(outpoint.IsNull)
+                OutPoint outpoint = this.SpentOutpoints[i];
+                if (outpoint.IsNull)
                 {
                     continue;
                 }
 
                 Transaction prev = await transactions.GetAsync(outpoint.Hash).ConfigureAwait(false);
-                if(prev == null)
+                if (prev == null)
                 {
                     return false;
                 }
 
-                Coin coin = new Coin(outpoint, prev.Outputs[SpentOutpoints[i].N]);
-                if(coin.ScriptPubKey != GetScriptPubkey(i))
+                Coin coin = new Coin(outpoint, prev.Outputs[this.SpentOutpoints[i].N]);
+                if (coin.ScriptPubKey != this.GetScriptPubkey(i))
                 {
                     cleanSpent = true;
-                    SpentOutpoints[i] = null;
+                    this.SpentOutpoints[i] = null;
                 }
                 else
+                {
                     result.Add(coin);
+                }
             }
 
-            if(cleanSpent)
+            if (cleanSpent)
             {
-                List<uint> spentIndices = new List<uint>();
-                List<OutPoint> spentOutpoints = new List<OutPoint>();
-                List<MatchedRule> matchedRules = new List<MatchedRule>();
-                for(int i = 0; i < SpentOutpoints.Count; i++)
+                var spentIndices = new List<uint>();
+                var spentOutpoints = new List<OutPoint>();
+                var matchedRules = new List<MatchedRule>();
+                for (var i = 0; i < this.SpentOutpoints.Count; i++)
                 {
-                    if(SpentOutpoints[i] != null)
+                    if (this.SpentOutpoints[i] != null)
                     {
-                        spentIndices.Add(SpentIndices[i]);
-                        spentOutpoints.Add(SpentOutpoints[i]);
-                        if(MatchedRules != null && MatchedRules.Count != 0)
+                        spentIndices.Add(this.SpentIndices[i]);
+                        spentOutpoints.Add(this.SpentOutpoints[i]);
+                        if (this.MatchedRules != null && this.MatchedRules.Count != 0)
                         {
-                            matchedRules.Add(MatchedRules[i]);
+                            matchedRules.Add(this.MatchedRules[i]);
                         }
                     }
                 }
-                SpentIndices = spentIndices;
-                SpentOutpoints = spentOutpoints;
-                MatchedRules = matchedRules;
+
+                this.SpentIndices = spentIndices;
+                this.SpentOutpoints = spentOutpoints;
+                this.MatchedRules = matchedRules;
             }
 
-            SpentCoins = result;
-            UpdateToScriptCoins();
+            this.SpentCoins = result;
+            this.UpdateToScriptCoins();
             return true;
         }
 
         private Script GetScriptPubkey(int i)
         {
-            if(this.MatchedRules.Count == 0)
+            if (this.MatchedRules.Count == 0)
             {
-                return ScriptPubKey;
+                return this.ScriptPubKey;
             }
 
-            return ((ScriptRule)(this.MatchedRules.First(r => r.MatchType == MatchLocation.Input && r.Index == SpentIndices[i]).Rule)).ScriptPubKey;
+            return ((ScriptRule)(this.MatchedRules.First(r => r.MatchType == MatchLocation.Input && r.Index == this.SpentIndices[i]).Rule)).ScriptPubKey;
         }
 
         internal void Merge(OrderedBalanceChange other, WalletRule walletRule)
         {
-            if(other.ReceivedCoins.Count != 0)
+            if (other.ReceivedCoins.Count != 0)
             {
-                ReceivedCoins.AddRange(other.ReceivedCoins);
-                ReceivedCoins = new CoinCollection(ReceivedCoins.Distinct<ICoin, OutPoint>(c => c.Outpoint));
-                if(walletRule != null)
-                    foreach(ICoin c in other.ReceivedCoins)
+                this.ReceivedCoins.AddRange(other.ReceivedCoins);
+                this.ReceivedCoins = new CoinCollection(this.ReceivedCoins.Distinct<ICoin, OutPoint>(c => c.Outpoint));
+                if (walletRule != null)
+                {
+                    foreach (ICoin c in other.ReceivedCoins)
                     {
                         this.MatchedRules.Add(new MatchedRule()
                         {
@@ -259,22 +269,24 @@
                             MatchType = MatchLocation.Output
                         });
                     }
+                }
             }
 
-            if(other.SpentIndices.Count != 0)
+            if (other.SpentIndices.Count != 0)
             {
-                SpentIndices.AddRange(other.SpentIndices);
-                SpentIndices = SpentIndices.Distinct().ToList();
+                this.SpentIndices.AddRange(other.SpentIndices);
+                this.SpentIndices = this.SpentIndices.Distinct().ToList();
 
-                SpentOutpoints.AddRange(other.SpentOutpoints);
-                SpentOutpoints = SpentOutpoints.Distinct().ToList();
+                this.SpentOutpoints.AddRange(other.SpentOutpoints);
+                this.SpentOutpoints = this.SpentOutpoints.Distinct().ToList();
 
-                //Remove cached value, no longer correct
-                UpdateToUncoloredCoins();
-                SpentCoins = null;
+                // Remove cached value, no longer correct.
+                this.UpdateToUncoloredCoins();
+                this.SpentCoins = null;
 
-                if(walletRule != null)
-                    foreach(var c in other.SpentIndices)
+                if (walletRule != null)
+                {
+                    foreach (var c in other.SpentIndices)
                     {
                         this.MatchedRules.Add(new MatchedRule()
                         {
@@ -283,37 +295,36 @@
                             MatchType = MatchLocation.Input
                         });
                     }
+                }
             }
         }
 
-
-
         public void UpdateToScriptCoins()
         {
-            foreach(MatchedRule match in MatchedRules)
+            foreach (MatchedRule match in this.MatchedRules)
             {
                 ScriptRule scriptRule = match.Rule as ScriptRule;
-                if(scriptRule != null && scriptRule.RedeemScript != null)
+                if (scriptRule != null && scriptRule.RedeemScript != null)
                 {
-                    if(match.MatchType == MatchLocation.Output)
+                    if (match.MatchType == MatchLocation.Output)
                     {
-                        OutPoint outpoint = new OutPoint(TransactionId, match.Index);
-                        Coin coin = ReceivedCoins[outpoint] as Coin;
-                        if(coin != null)
+                        OutPoint outpoint = new OutPoint(this.TransactionId, match.Index);
+                        Coin coin = this.ReceivedCoins[outpoint] as Coin;
+                        if (coin != null)
                         {
-                            ReceivedCoins[outpoint] = coin.ToScriptCoin(scriptRule.RedeemScript);
+                            this.ReceivedCoins[outpoint] = coin.ToScriptCoin(scriptRule.RedeemScript);
                         }
                     }
                     else
                     {
-                        if(SpentCoins == null)
+                        if (this.SpentCoins == null)
                         {
                             continue;
                         }
 
                         var n = this.SpentIndices.IndexOf(match.Index);
-                        Coin coin = SpentCoins[n] as Coin;
-                        if(coin != null)
+                        Coin coin = this.SpentCoins[n] as Coin;
+                        if (coin != null)
                         {
                             this.SpentCoins[n] = coin.ToScriptCoin(scriptRule.RedeemScript);
                         }
@@ -323,104 +334,57 @@
         }
 
         BalanceId _BalanceId;
+
         public BalanceId BalanceId
         {
-            get
-            {
-                return _BalanceId;
-            }
-            internal set
-            {
-                _BalanceId = value;
-            }
+            get => this._BalanceId;
+            internal set => this._BalanceId = value;
         }
 
-        public string PartitionKey
-        {
-            get
-            {
-                return BalanceId.PartitionKey;
-            }
-        }
+        public string PartitionKey => this.BalanceId.PartitionKey;
 
-        public int Height
-        {
-            get;
-            set;
-        }
-        public uint256 BlockId
-        {
-            get;
-            set;
-        }
-        public uint256 TransactionId
-        {
-            get;
-            set;
-        }
-        public bool HasOpReturn
-        {
-            get;
-            set;
-        }
+        public int Height { get; set; }
 
-        public bool IsCoinbase
-        {
-            get;
-            set;
-        }
+        public uint256 BlockId { get; set; }
 
-        public DateTime SeenUtc
-        {
-            get;
-            set;
-        }
+        public uint256 TransactionId { get; set; }
+
+        public bool HasOpReturn { get; set; }
+
+        public bool IsCoinbase { get; set; }
+
+        public DateTime SeenUtc { get; set; }
 
         public OrderedBalanceChange()
         {
-            _SpentIndices = new List<uint>();
-            _SpentOutpoints = new List<OutPoint>();
-            _ReceivedCoins = new CoinCollection();
+            this._SpentIndices = new List<uint>();
+            this._SpentOutpoints = new List<OutPoint>();
+            this._ReceivedCoins = new CoinCollection();
         }
+
         private List<uint> _SpentIndices;
+
         public List<uint> SpentIndices
         {
-            get
-            {
-                return _SpentIndices;
-            }
-            private set
-            {
-                _SpentIndices = value;
-            }
+            get => this._SpentIndices;
+            private set => this._SpentIndices = value;
         }
 
         private List<OutPoint> _SpentOutpoints;
+
         public List<OutPoint> SpentOutpoints
         {
-            get
-            {
-                return _SpentOutpoints;
-            }
-            private set
-            {
-                _SpentOutpoints = value;
-            }
+            get => this._SpentOutpoints;
+            private set => this._SpentOutpoints = value;
         }
 
         private CoinCollection _ReceivedCoins;
+
         public CoinCollection ReceivedCoins
         {
-            get
-            {
-                return _ReceivedCoins;
-            }
-            private set
-            {
-                _ReceivedCoins = value;
-            }
+            get => this._ReceivedCoins;
+            private set => this._ReceivedCoins = value;
         }
-
 
         private CoinCollection _SpentCoins;
 
@@ -429,124 +393,118 @@
         /// </summary>
         public CoinCollection SpentCoins
         {
-            get
-            {
-                return _SpentCoins;
-            }
-            internal set
-            {
-                _SpentCoins = value;
-            }
+            get => this._SpentCoins;
+            internal set => this._SpentCoins = value;
         }
 
         Money _Amount;
+
         public Money Amount
         {
             get
             {
-                if(_Amount == null && _SpentCoins != null)
+                if (this._Amount == null && this._SpentCoins != null)
                 {
-                    _Amount = _ReceivedCoins.WhereUncolored().Select(c => c.Amount).Sum() - _SpentCoins.WhereUncolored().Select(c => c.Amount).Sum();
+                    this._Amount = this._ReceivedCoins.WhereUncolored().Select(c => c.Amount).Sum() - this._SpentCoins.WhereUncolored().Select(c => c.Amount).Sum();
                 }
-                return _Amount;
+                return this._Amount;
             }
         }
 
         internal OrderedBalanceChange(DynamicTableEntity entity)
         {
             string[] splitted = entity.RowKey.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-            Height = Helper.StringToHeight(splitted[1]);
-            BalanceId = BalanceId.Parse(splitted[0]);
+            this.Height = Helper.StringToHeight(splitted[1]);
+            this.BalanceId = BalanceId.Parse(splitted[0]);
 
             BalanceLocator locator = BalanceLocator.Parse(string.Join("-", splitted.Skip(1).ToArray()), true);
             ConfirmedBalanceLocator confLocator = locator as ConfirmedBalanceLocator;
-            if(confLocator != null)
+            if (confLocator != null)
             {
-                Height = confLocator.Height;
-                TransactionId = confLocator.TransactionId;
-                BlockId = confLocator.BlockHash;
+                this.Height = confLocator.Height;
+                this.TransactionId = confLocator.TransactionId;
+                this.BlockId = confLocator.BlockHash;
             }
 
             UnconfirmedBalanceLocator unconfLocator = locator as UnconfirmedBalanceLocator;
-            if(unconfLocator != null)
+            if (unconfLocator != null)
             {
-                TransactionId = unconfLocator.TransactionId;
+                this.TransactionId = unconfLocator.TransactionId;
             }
 
-            SeenUtc = entity.Properties["s"].DateTime.Value;
+            this.SeenUtc = entity.Properties["s"].DateTime.Value;
 
-            _SpentOutpoints = Helper.DeserializeList<OutPoint>(Helper.GetEntityProperty(entity, "a"));
+            this._SpentOutpoints = Helper.DeserializeList<OutPoint>(Helper.GetEntityProperty(entity, "a"));
 
-            if(entity.Properties.ContainsKey("b0"))
-                _SpentCoins = new CoinCollection(Helper.DeserializeList<Spendable>(Helper.GetEntityProperty(entity, "b")).Select(s => new Coin()
+            if (entity.Properties.ContainsKey("b0"))
+            {
+                this._SpentCoins = new CoinCollection(Helper.DeserializeList<Spendable>(Helper.GetEntityProperty(entity, "b")).Select(s => new Coin()
                 {
                     Outpoint = s.OutPoint,
                     TxOut = s.TxOut
                 }).ToList());
-            else if(_SpentOutpoints.Count == 0)
+            }
+            else if (this._SpentOutpoints.Count == 0)
             {
-                _SpentCoins = new CoinCollection();
+                this._SpentCoins = new CoinCollection();
             }
 
-            _SpentIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "ss")).Select(i => (uint)i.ToLong()).ToList();
+            this._SpentIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "ss")).Select(i => (uint)i.ToLong()).ToList();
 
             List<uint> receivedIndices = Helper.DeserializeList<IntCompactVarInt>(Helper.GetEntityProperty(entity, "c")).Select(i => (uint)i.ToLong()).ToList();
             List<TxOut> receivedTxOuts = Helper.DeserializeList<TxOut>(Helper.GetEntityProperty(entity, "d"));
 
-            _ReceivedCoins = new CoinCollection();
-            for(int i = 0; i < receivedIndices.Count; i++)
+            this._ReceivedCoins = new CoinCollection();
+            for (int i = 0; i < receivedIndices.Count; i++)
             {
-                _ReceivedCoins.Add(new Coin()
+                this._ReceivedCoins.Add(new Coin()
                 {
-                    Outpoint = new OutPoint(TransactionId, receivedIndices[i]),
+                    Outpoint = new OutPoint(this.TransactionId, receivedIndices[i]),
                     TxOut = receivedTxOuts[i]
                 });
             }
 
             var flags = entity.Properties["e"].StringValue;
-            HasOpReturn = flags[0] == 'o';
-            IsCoinbase = flags[1] == 'o';
+            this.HasOpReturn = flags[0] == 'o';
+            this.IsCoinbase = flags[1] == 'o';
 
-            _MatchedRules = Helper.DeserializeObject<List<MatchedRule>>(entity.Properties["f"].StringValue).ToList();
+            this._MatchedRules = Helper.DeserializeObject<List<MatchedRule>>(entity.Properties["f"].StringValue).ToList();
 
-            if(entity.Properties.ContainsKey("g"))
+            if (entity.Properties.ContainsKey("g"))
             {
                 ColoredTransaction ctx = new ColoredTransaction();
                 ctx.FromBytes(entity.Properties["g"].BinaryValue);
-                ColoredTransaction = ctx;
+                this.ColoredTransaction = ctx;
             }
 
-            if(entity.Properties.ContainsKey("h"))
+            if (entity.Properties.ContainsKey("h"))
             {
-                _ScriptPubKey = new Script(entity.Properties["h"].BinaryValue);
+                this._ScriptPubKey = new Script(entity.Properties["h"].BinaryValue);
             }
 
             byte[] data = Helper.GetEntityProperty(entity, "cu");
-            if(data != null)
+            if (data != null)
             {
-                CustomData = Encoding.UTF8.GetString(data);
+                this.CustomData = Encoding.UTF8.GetString(data);
             }
         }
 
-        public ColoredTransaction ColoredTransaction
-        {
-            get;
-            set;
-        }
+        public ColoredTransaction ColoredTransaction { get; set; }
+
         public void UpdateToColoredCoins()
         {
-            if(ColoredTransaction == null)
+            if (this.ColoredTransaction == null)
             {
                 throw new InvalidOperationException("Impossible to get colored coin if ColoredTransaction is unknown");
             }
 
-            UpdateToColoredCoins(SpentCoins, true);
-            UpdateToColoredCoins(ReceivedCoins, false);
+            this.UpdateToColoredCoins(this.SpentCoins, true);
+            this.UpdateToColoredCoins(this.ReceivedCoins, false);
         }
 
         private void UpdateToColoredCoins(CoinCollection collection, bool input)
         {
-            if(collection == null)
+            if (collection == null)
             {
                 return;
             }
@@ -554,25 +512,25 @@
             for (int i = 0; i < collection.Count; i++)
             {
                 Coin coin = collection[i] as Coin;
-                if(coin != null)
+                if (coin != null)
                 {
-                    if(input)
+                    if (input)
                     {
-                        var txinIndex = SpentIndices[i];
-                        AssetMoney asset = ColoredTransaction
+                        var txinIndex = this.SpentIndices[i];
+                        AssetMoney asset = this.ColoredTransaction
                                         .Inputs
                                         .Where(_ => _.Index == (uint)txinIndex)
                                         .Select(_ => _.Asset)
                                         .FirstOrDefault();
-                        if(asset != null)
+                        if (asset != null)
                         {
                             collection[i] = coin.ToColoredCoin(asset);
                         }
                     }
                     else
                     {
-                        ColoredEntry asset = ColoredTransaction.GetColoredEntry(coin.Outpoint.N);
-                        if(asset != null)
+                        ColoredEntry asset = this.ColoredTransaction.GetColoredEntry(coin.Outpoint.N);
+                        if (asset != null)
                         {
                             collection[i] = coin.ToColoredCoin(asset.Asset);
                         }
@@ -580,18 +538,19 @@
                 }
             }
         }
+
         public void UpdateToUncoloredCoins()
         {
-            if(SpentCoins != null)
+            if (this.SpentCoins != null)
             {
-                UpdateToUncoloredCoins(SpentCoins);
-                UpdateToUncoloredCoins(ReceivedCoins);
+                this.UpdateToUncoloredCoins(this.SpentCoins);
+                this.UpdateToUncoloredCoins(this.ReceivedCoins);
             }
         }
 
         private void UpdateToUncoloredCoins(CoinCollection collection)
         {
-            if(collection == null)
+            if (collection == null)
             {
                 return;
             }
@@ -599,7 +558,7 @@
             for (int i = 0; i < collection.Count; i++)
             {
                 ColoredCoin coin = collection[i] as ColoredCoin;
-                if(coin != null)
+                if (coin != null)
                 {
                     collection[i] = coin.Bearer;
                 }
@@ -610,36 +569,37 @@
             : this()
         {
             BalanceId balanceId = new BalanceId(scriptPubKey);
-            Init(txId, balanceId, blockId, blockHeader, height);
-            if(!balanceId.ContainsScript)
+            this.Init(txId, balanceId, blockId, blockHeader, height);
+            if (!balanceId.ContainsScript)
             {
-                _ScriptPubKey = scriptPubKey;
+                this._ScriptPubKey = scriptPubKey;
             }
         }
 
         private void Init(uint256 txId, BalanceId balanceId, uint256 blockId, BlockHeader blockHeader, int height)
         {
-            BlockId = blockId;
-            SeenUtc = blockHeader == null ? DateTime.UtcNow : blockHeader.BlockTime.UtcDateTime;
-            Height = blockId == null ? UnconfirmedBalanceLocator.UnconfHeight : height;
-            TransactionId = txId;
-            BalanceId = balanceId;
+            this.BlockId = blockId;
+            this.SeenUtc = blockHeader == null ? DateTime.UtcNow : blockHeader.BlockTime.UtcDateTime;
+            this.Height = blockId == null ? UnconfirmedBalanceLocator.UnconfHeight : height;
+            this.TransactionId = txId;
+            this.BalanceId = balanceId;
         }
 
         internal OrderedBalanceChange(uint256 txId, string walletId, Script scriptPubKey, uint256 blockId, BlockHeader blockHeader, int height)
             : this()
         {
-            Init(txId, new BalanceId(walletId), blockId, blockHeader, height);
-            _ScriptPubKey = scriptPubKey;
+            this.Init(txId, new BalanceId(walletId), blockId, blockHeader, height);
+            this._ScriptPubKey = scriptPubKey;
         }
 
         internal OrderedBalanceChange(string walletId, OrderedBalanceChange source)
             : this(source.TransactionId, walletId, source.ScriptPubKey, source.BlockId, null, source.Height)
         {
-            SeenUtc = source.SeenUtc;
-            IsCoinbase = source.IsCoinbase;
-            HasOpReturn = source.HasOpReturn;
+            this.SeenUtc = source.SeenUtc;
+            this.IsCoinbase = source.IsCoinbase;
+            this.HasOpReturn = source.HasOpReturn;
         }
+
         internal class IntCompactVarInt : CompactVarInt
         {
             public IntCompactVarInt(uint value)
@@ -655,9 +615,9 @@
 
         public BalanceLocator CreateBalanceLocator()
         {
-            if (Height == UnconfirmedBalanceLocator.UnconfHeight)
+            if (this.Height == UnconfirmedBalanceLocator.UnconfHeight)
             {
-                return new UnconfirmedBalanceLocator(SeenUtc, TransactionId);
+                return new UnconfirmedBalanceLocator(this.SeenUtc, this.TransactionId);
             }
             else
             {
@@ -669,52 +629,50 @@
         {
             DynamicTableEntity entity = new DynamicTableEntity();
             entity.ETag = "*";
-            entity.PartitionKey = PartitionKey;
+            entity.PartitionKey = this.PartitionKey;
 
-            BalanceLocator locator = CreateBalanceLocator();
-            entity.RowKey = BalanceId + "-" + locator.ToString(true);
+            BalanceLocator locator = this.CreateBalanceLocator();
+            entity.RowKey = this.BalanceId + "-" + locator.ToString(true);
 
-            entity.Properties.Add("s", new EntityProperty(SeenUtc));
-            Helper.SetEntityProperty(entity, "ss", Helper.SerializeList(SpentIndices.Select(e => new IntCompactVarInt(e))));
+            entity.Properties.Add("s", new EntityProperty(this.SeenUtc));
+            Helper.SetEntityProperty(entity, "ss", Helper.SerializeList(this.SpentIndices.Select(e => new IntCompactVarInt(e))));
 
-            Helper.SetEntityProperty(entity, "a", Helper.SerializeList(SpentOutpoints));
-            if(SpentCoins != null)
+            Helper.SetEntityProperty(entity, "a", Helper.SerializeList(this.SpentOutpoints));
+            if (this.SpentCoins != null)
             {
-                Helper.SetEntityProperty(entity, "b", Helper.SerializeList(SpentCoins.Select(c => new Spendable(c.Outpoint, c.TxOut))));
+                Helper.SetEntityProperty(entity, "b", Helper.SerializeList(this.SpentCoins.Select(c => new Spendable(c.Outpoint, c.TxOut))));
             }
 
-            Helper.SetEntityProperty(entity, "c", Helper.SerializeList(ReceivedCoins.Select(e => new IntCompactVarInt(e.Outpoint.N))));
-            Helper.SetEntityProperty(entity, "d", Helper.SerializeList(ReceivedCoins.Select(e => e.TxOut)));
-            var flags = (HasOpReturn ? "o" : "n") + (IsCoinbase ? "o" : "n");
+            Helper.SetEntityProperty(entity, "c", Helper.SerializeList(this.ReceivedCoins.Select(e => new IntCompactVarInt(e.Outpoint.N))));
+            Helper.SetEntityProperty(entity, "d", Helper.SerializeList(this.ReceivedCoins.Select(e => e.TxOut)));
+            var flags = (this.HasOpReturn ? "o" : "n") + (this.IsCoinbase ? "o" : "n");
             entity.Properties.AddOrReplace("e", new EntityProperty(flags));
-            entity.Properties.AddOrReplace("f", new EntityProperty(Helper.Serialize(MatchedRules)));
-            if(ColoredTransaction != null)
+            entity.Properties.AddOrReplace("f", new EntityProperty(Helper.Serialize(this.MatchedRules)));
+            if (this.ColoredTransaction != null)
             {
-                entity.Properties.AddOrReplace("g", new EntityProperty(ColoredTransaction.ToBytes()));
+                entity.Properties.AddOrReplace("g", new EntityProperty(this.ColoredTransaction.ToBytes()));
             }
-            if(ScriptPubKey != null && !BalanceId.ContainsScript)
+
+            if (this.ScriptPubKey != null && !this.BalanceId.ContainsScript)
             {
-                byte[] bytes = ScriptPubKey.ToBytes(true);
-                if(bytes.Length < 63000)
+                byte[] bytes = this.ScriptPubKey.ToBytes(true);
+                if (bytes.Length < 63000)
                 {
                     entity.Properties.Add("h", new EntityProperty(bytes));
                 }
             }
-            if(CustomData != null)
+
+            if (this.CustomData != null)
             {
-                Helper.SetEntityProperty(entity, "cu", Encoding.UTF8.GetBytes(CustomData));
+                Helper.SetEntityProperty(entity, "cu", Encoding.UTF8.GetBytes(this.CustomData));
             }
+
             return entity;
         }
 
-        public string CustomData
-        {
-            get;
-            set;
-        }
+        public string CustomData { get; set; }
 
         const string DateFormat = "yyyyMMddhhmmssff";
-
 
         public static IEnumerable<OrderedBalanceChange> ExtractScriptBalances(Transaction tx, Network network)
         {
@@ -722,72 +680,68 @@
         }
 
         Script _ScriptPubKey;
+
         internal Script ScriptPubKey
         {
             get
             {
-                if(_ScriptPubKey == null)
+                if (this._ScriptPubKey == null)
                 {
-                    _ScriptPubKey = BalanceId.ExtractScript();
+                    this._ScriptPubKey = this.BalanceId.ExtractScript();
                 }
 
-                return _ScriptPubKey;
+                return this._ScriptPubKey;
             }
         }
 
-
         public IEnumerable<WalletRule> GetMatchedRules(int index, MatchLocation matchType)
         {
-            return MatchedRules.Where(r => r.Index == index && r.MatchType == matchType).Select(c => c.Rule);
+            return this.MatchedRules.Where(r => r.Index == index && r.MatchType == matchType).Select(c => c.Rule);
         }
 
 
         public IEnumerable<WalletRule> GetMatchedRules(ICoin coin)
         {
-            return GetMatchedRules(coin.Outpoint);
+            return this.GetMatchedRules(coin.Outpoint);
         }
+
+        public bool MempoolEntry => this.BlockId == null;
+
+        internal bool IsEmpty => this.SpentCoins.Count == 0 && this.ReceivedCoins.Count == 0;
 
         public IEnumerable<WalletRule> GetMatchedRules(OutPoint outPoint)
         {
-            if(outPoint.Hash == TransactionId)
-                return GetMatchedRules((int)outPoint.N, MatchLocation.Output);
+            if (outPoint.Hash == this.TransactionId)
+            {
+                return this.GetMatchedRules((int)outPoint.N, MatchLocation.Output);
+            }
             else
             {
-                var index = SpentOutpoints.IndexOf(outPoint);
-                if(index == -1)
+                var index = this.SpentOutpoints.IndexOf(outPoint);
+                if (index == -1)
                 {
                     return new WalletRule[0];
                 }
 
-                return GetMatchedRules((int)SpentIndices[index], MatchLocation.Input);
+                return this.GetMatchedRules((int)this.SpentIndices[index], MatchLocation.Input);
             }
         }
-
-
-        public bool MempoolEntry
-        {
-            get
-            {
-                return BlockId == null;
-            }
-        }
-
-
 
         public async Task<bool> EnsureColoredTransactionLoadedAsync(IColoredTransactionRepository repository)
         {
-            if(ColoredTransaction != null)
+            if (this.ColoredTransaction != null)
             {
                 this.UpdateToColoredCoins();
                 return true;
             }
-            if(!(repository is CachedColoredTransactionRepository))
+
+            if (!(repository is CachedColoredTransactionRepository))
             {
                 repository = new CachedColoredTransactionRepository(repository);
             }
 
-            Transaction tx = await repository.Transactions.GetAsync(TransactionId).ConfigureAwait(false);
-            if(tx == null)
+            Transaction tx = await repository.Transactions.GetAsync(this.TransactionId).ConfigureAwait(false);
+            if (tx == null)
             {
                 return false;
             }
@@ -795,16 +749,16 @@
             try
             {
                 ColoredTransaction color = await tx.GetColoredTransactionAsync(repository).ConfigureAwait(false);
-                if(color == null)
+                if (color == null)
                 {
                     return false;
                 }
 
-                ColoredTransaction = color;
+                this.ColoredTransaction = color;
                 this.UpdateToColoredCoins();
                 return true;
             }
-            catch(TransactionNotFoundException)
+            catch (TransactionNotFoundException)
             {
                 return false;
             }
@@ -814,39 +768,34 @@
         /// Get the quantity of asset in this balance change
         /// </summary>
         /// <param name="assetId">The asset id, if null, returns uncolored satoshi</param>
-        /// <returns></returns>
+        /// <returns>Money</returns>
         public IMoney GetAssetAmount(BitcoinAssetId assetId)
         {
-            if(assetId == null)
+            if (assetId == null)
             {
-                return Amount;
+                return this.Amount;
             }
 
-            return GetAssetAmount(assetId.AssetId);
+            return this.GetAssetAmount(assetId.AssetId);
         }
+
+
+
         /// <summary>
         /// Get the quantity of asset in this balance change
         /// </summary>
         /// <param name="assetId">The asset id, if null, returns uncolored satoshi</param>
-        /// <returns></returns>
+        /// <returns>Money</returns>
         public IMoney GetAssetAmount(AssetId assetId)
         {
-            if(assetId == null)
+            if (assetId == null)
             {
-                return Amount;
+                return this.Amount;
             }
 
-            AssetMoney amount = _ReceivedCoins.WhereColored(assetId)
-                .Select(c => c.Amount).Sum(assetId) - _SpentCoins.WhereColored(assetId).Select(c => c.Amount).Sum(assetId);
+            AssetMoney amount = this._ReceivedCoins.WhereColored(assetId)
+                .Select(c => c.Amount).Sum(assetId) - this._SpentCoins.WhereColored(assetId).Select(c => c.Amount).Sum(assetId);
             return amount;
-        }
-
-        internal bool IsEmpty
-        {
-            get
-            {
-                return SpentCoins.Count == 0 && ReceivedCoins.Count == 0;
-            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using FodyNlogAdapter;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer

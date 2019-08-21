@@ -8,6 +8,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 
     public class IndexTableEntitiesTask : IndexTableEntitiesTaskBase<ITableEntity>
     {

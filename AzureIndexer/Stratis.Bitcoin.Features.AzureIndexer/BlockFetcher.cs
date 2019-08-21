@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -95,9 +97,15 @@
             Queue<int> lastHeights = new Queue<int>();
 
             ChainedHeader fork = this.BlockHeaders.FindFork(this._Checkpoint.BlockLocator);
+
+            if (fork == null)
+            {
+                yield break;
+            }
+
             IEnumerable<ChainedHeader> headers = this.BlockHeaders.EnumerateAfter(fork);
-            headers = headers.Where(h => h.Height <= this.ToHeight);
-            ChainedHeader first = headers.FirstOrDefault();
+            headers = headers?.Where(h => h.Height <= this.ToHeight);
+            ChainedHeader first = headers?.FirstOrDefault();
             if (first == null)
             {
                 yield break;

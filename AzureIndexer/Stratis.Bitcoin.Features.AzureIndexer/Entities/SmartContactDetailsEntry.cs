@@ -3,6 +3,7 @@
     using System;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 
     public class SmartContactDetailsEntry
     {

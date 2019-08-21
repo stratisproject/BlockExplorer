@@ -1,4 +1,4 @@
-﻿using Stratis.Bitcoin.AsyncWork;
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -14,6 +14,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.AsyncWork;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Features.AzureIndexer.Internal;
 
@@ -97,6 +100,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             task.Index(blocks, this.TaskScheduler);
         }
 
+        /// <summary>
+        /// Used by API
+        /// </summary>
+        /// <param name="blocks">Block array</param>
+        /// <returns>Block Task</returns>
         public Task IndexAsync(params Block[] blocks)
         {
             IndexBlocksTask task = new IndexBlocksTask(this.Configuration, this._loggerFactory);
@@ -110,6 +118,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.Index(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
         }
 
+        /// <summary>
+        /// Used by API
+        /// </summary>
+        /// <param name="entities">Transaction Entities</param>
+        /// <returns>Task</returns>
         public Task IndexAsync(params TransactionEntry.Entity[] entities)
         {
             return this.IndexAsync(entities.Select(e => e.CreateTableEntity(this.Configuration.Network)).ToArray(), this.Configuration.GetTransactionTable());
@@ -165,6 +178,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.Configuration.CreateIndexerClient().GetMainChain();
         }
 
+        // Used just in Test project. Not sure why.
         public void IndexOrderedBalance(int height, Block block)
         {
             CloudTable table = this.Configuration.GetBalanceTable();
@@ -181,6 +195,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.Index(entities, table);
         }
 
+        // Used just in Test project. Not sure why.
         public void IndexWalletOrderedBalance(int height, Block block, WalletRuleEntryCollection walletRules)
         {
             try
@@ -194,6 +209,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
+        // Used just in Test project. Not sure why.
         public Task IndexWalletOrderedBalanceAsync(int height, Block block, WalletRuleEntryCollection walletRules)
         {
             CloudTable table = this.Configuration.GetBalanceTable();
@@ -211,6 +227,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return indexingTask;
         }
 
+        // Used just in Test project. Not sure why.
         public void IndexOrderedBalance(Transaction tx)
         {
             CloudTable table = this.Configuration.GetBalanceTable();
@@ -218,6 +235,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.Index(entities, table);
         }
 
+        // Used by API.
         public Task IndexOrderedBalanceAsync(Transaction tx)
         {
             CloudTable table = this.Configuration.GetBalanceTable();

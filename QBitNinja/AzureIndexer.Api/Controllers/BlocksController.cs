@@ -47,14 +47,18 @@ namespace AzureIndexer.Api.Controllers
         {
             var blockData = this.blockSearchService.GetBlock(block.ToBlockFeature(), headerOnly, extended);
 
-            var mappedBlock =  this.mapper.Map<BlockResponseModel>(blockData);
-            mappedBlock.Block.Transactions = new List<TransactionSummaryModel>();
-            foreach (var transactionId in mappedBlock.Block.TransactionIds)
+            var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
+            if (mappedBlock.Block != null)
             {
-                var transaction = await this.transactionSearchService.FindTransaction(uint256.Parse(transactionId), false);
-                var transactionSummary = this.mapper.Map<TransactionSummaryModel>(transaction);
-                transactionSummary.Spent = false;
-                mappedBlock.Block.Transactions.Add(transactionSummary);
+                mappedBlock.Block.Transactions = new List<TransactionSummaryModel>();
+                foreach (var transactionId in mappedBlock.Block.TransactionIds)
+                {
+                    var transaction =
+                        await this.transactionSearchService.FindTransaction(uint256.Parse(transactionId), false);
+                    var transactionSummary = this.mapper.Map<TransactionSummaryModel>(transaction);
+                    transactionSummary.Spent = false;
+                    mappedBlock.Block.Transactions.Add(transactionSummary);
+                }
             }
 
             return mappedBlock;
@@ -77,11 +81,25 @@ namespace AzureIndexer.Api.Controllers
             for (int i = start; i < start + top; i++)
             {
                 if (currentTip == null) break;
-                var blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), false, false);
-                if (blockData != null)
+                BlockResponse blockData;
+                try
                 {
-                    var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
-                    blocks.Add(mappedBlock);
+                    blockData =
+                        this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), false, false);
+                    if (blockData != null)
+                    {
+                        var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
+                        blocks.Add(mappedBlock);
+                    }
+                }
+                catch (HttpResponseException ex)
+                {
+                    blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), true, false);
+                    if (blockData != null)
+                    {
+                        var mappedBlock = this.mapper.Map<BlockResponseModel>(blockData);
+                        blocks.Add(mappedBlock);
+                    }
                 }
 
                 currentTip = currentTip.Previous;

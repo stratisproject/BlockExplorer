@@ -1,4 +1,4 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Entities
 {
     using System;
     using Microsoft.WindowsAzure.Storage.Table;

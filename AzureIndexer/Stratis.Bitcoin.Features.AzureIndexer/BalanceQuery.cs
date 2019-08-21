@@ -5,6 +5,7 @@
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
     using NBitcoin.DataEncoders;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public class UnconfirmedBalanceLocator : BalanceLocator
     {

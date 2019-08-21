@@ -11,6 +11,7 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 
     public class IndexBlocksTask : IndexTask<BlockInfo>
     {

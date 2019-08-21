@@ -1,4 +1,4 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
     using System;
     using NBitcoin;
@@ -16,16 +16,19 @@
             return chainIndexer.TrySetTip(header, out chainedHeader);
         }
 
-        public static bool TrySetTip(this ChainIndexer chainIndexer, BlockHeader header,
-            out ChainedHeader chainedHeader)
+        public static bool TrySetTip(this ChainIndexer chainIndexer, BlockHeader header, out ChainedHeader chainedHeader)
         {
             if (header == null)
+            {
                 throw new ArgumentNullException("header");
+            }
 
             chainedHeader = null;
             ChainedHeader prev = chainIndexer.GetHeader(header.HashPrevBlock);
             if (prev == null)
+            {
                 return false;
+            }
 
             chainedHeader = new ChainedHeader(header, header.GetHash(), chainIndexer.GetHeader(header.HashPrevBlock));
             chainIndexer.SetTip(chainedHeader);
