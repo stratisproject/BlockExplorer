@@ -73,24 +73,13 @@
                     continue;
                 }
 
-                //var ddd=  PayToMultiSigTemplate.Instance.Type
-                //List<Op> ops = output.ScriptPubKey.ToOps().ToList();
-
-                var isScript = output.ScriptPubKey.IsPayToScriptHash(network);
-                var ms = PayToScriptHashTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
-                var ms2 = PayToMultiSigTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
-                if (isScript || ms || ms2)
-                {
-                    var addr = output.ScriptPubKey.GetDestinationAddress(network);
-                }
-                //foreach (Op op in ops)
+                // Can be used to Extract Multisig Address
+                //var isScript = output.ScriptPubKey.IsPayToScriptHash(network);
+                //var ms = PayToScriptHashTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
+                //if (isScript || ms)
                 //{
-                //    if (op.Code == OpcodeType.OP_CHECKMULTISIG)
-                //    {
-
-                //    }
+                //    var addr = output.ScriptPubKey.GetDestinationAddress(network);
                 //}
-                //var dd = new NBitcoin.Formatters.SatoshiFormatter(network);
 
                 OrderedBalanceChange entry = null;
 
@@ -354,33 +343,17 @@
 
         public string PartitionKey => this.BalanceId.PartitionKey;
 
-        public int Height
-        {
-            get;
-            set;
-        }
+        public int Height { get; set; }
 
         public uint256 BlockId { get; set; }
 
         public uint256 TransactionId { get; set; }
 
-        public bool HasOpReturn
-        {
-            get;
-            set;
-        }
+        public bool HasOpReturn { get; set; }
 
-        public bool IsCoinbase
-        {
-            get;
-            set;
-        }
+        public bool IsCoinbase { get; set; }
 
-        public DateTime SeenUtc
-        {
-            get;
-            set;
-        }
+        public DateTime SeenUtc { get; set; }
 
         public OrderedBalanceChange()
         {
@@ -516,11 +489,7 @@
             }
         }
 
-        public ColoredTransaction ColoredTransaction
-        {
-            get;
-            set;
-        }
+        public ColoredTransaction ColoredTransaction { get; set; }
 
         public void UpdateToColoredCoins()
         {
@@ -683,6 +652,7 @@
             {
                 entity.Properties.AddOrReplace("g", new EntityProperty(this.ColoredTransaction.ToBytes()));
             }
+
             if (this.ScriptPubKey != null && !this.BalanceId.ContainsScript)
             {
                 byte[] bytes = this.ScriptPubKey.ToBytes(true);
@@ -691,10 +661,12 @@
                     entity.Properties.Add("h", new EntityProperty(bytes));
                 }
             }
+
             if (this.CustomData != null)
             {
                 Helper.SetEntityProperty(entity, "cu", Encoding.UTF8.GetBytes(this.CustomData));
             }
+
             return entity;
         }
 
