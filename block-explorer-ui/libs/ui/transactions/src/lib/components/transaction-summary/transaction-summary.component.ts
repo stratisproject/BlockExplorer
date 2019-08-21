@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
@@ -35,7 +35,7 @@ export class TransactionSummaryComponent implements OnInit {
     if (!this.transaction || !this.transaction.time) return 'Unknown';
     const date = new Date(1000 * this.transaction.time);
 
-    return date.toString();
+    return date.toLocaleString();
     // TODO: decide which format we want to show date in.
     // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }

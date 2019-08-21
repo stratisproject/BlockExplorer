@@ -8,10 +8,11 @@
     </tbody>
   </table>
 </div>
-<div class="col d-flex align-items-center flex-column justify-content-center">
+<div class="col d-flex align-items-center flex-column justify-content-center" *ngIf="hasInputsOrOutputs">
   <div class="row no-gutters w-100" *ngFor="let tx of transaction.in">
     <div class="col-auto text-md-right truncate-sm">
-      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span>
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span
+        *ngIf="!tx.hash">Unspecified</span>
     </div>
     <div class="col-auto ml-auto text-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>
@@ -19,17 +20,21 @@
   </div>
 </div>
 
-<div class="col-lg-auto d-flex justify-content-center align-items-center my-3 align-items-top">
-  <div class="arrowTx bg-success rounded" [ngClass]="{'bg-success': !transaction.spent, 'bg-danger': transaction.spent}" >
+<div class="col-lg-auto d-flex justify-content-center align-items-center my-3 align-items-top"
+  *ngIf="hasInputsOrOutputs">
+  <div class="arrowTx bg-success rounded"
+    [ngClass]="{'bg-success': !transaction.spent, 'bg-danger': transaction.spent}">
     <i class="material-icons md-18">arrow_forward</i>
   </div>
 </div>
 
-<div class="col d-flex align-items-center flex-column justify-content-center">
+<div class="col d-flex align-items-center flex-column justify-content-center" *ngIf="hasInputsOrOutputs">
   <div class="row no-gutters w-100" *ngFor="let tx of transaction.out">
     <div class="col-auto text-md-right truncate-sm">
-      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span>
-      <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span
+        *ngIf="!tx.hash">Unspecified</span>
+      <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }">
+        {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
     </div>
     <div class="col-auto ml-auto text-md-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>

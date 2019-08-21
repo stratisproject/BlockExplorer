@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Stratis.IndexerD": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-sidechain -iprangefiltering=false -azureacc=igortestindexer1 -azemu=0 -azurekey=BA9xl5vElvBWxk+fwaLFP1wcl7nzKDSsbhcdOMw0MHqaLUO9cfGTYv9m8TXGQJnIz8oj598AbkntZWMnbSxJBA== indexprefix= -addnode=40.122.34.35"
     }
   }
 }

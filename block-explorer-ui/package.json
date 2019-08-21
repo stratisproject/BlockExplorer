@@ -50,6 +50,7 @@
     "core-js": "^2.5.4",
     "lodash-es": "^4.17.11",
     "moment": "^2.24.0",
+    "ngx-clipboard": "^12.2.0",
     "ngx-spinner": "^6.1.2",
     "prismjs": "^1.15.0",
     "rxjs": "~6.3.3",

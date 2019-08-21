@@ -1,6 +1,7 @@
 //import 'prismjs/components/prism-csharp';
 import { Component, Input, OnInit } from '@angular/core';
 import { SmartContractModel } from '@blockexplorer/shared/models';
+import { ClipboardService } from 'ngx-clipboard';
 
 
 @Component({
@@ -12,7 +13,7 @@ export class SmartContractSummaryComponent implements OnInit {
 
   @Input() smartContract: SmartContractModel = null;
 
-  constructor() { }
+  constructor(private clipboard: ClipboardService) { }
 
   ngOnInit() {
   }
@@ -37,5 +38,9 @@ export class SmartContractSummaryComponent implements OnInit {
     return !!this.smartContract && !!this.smartContract.gasPrice
       ? this.smartContract.gasPrice.satoshi || 0
       : 0;
+  }
+
+  copy(value: string) {
+    this.clipboard.copyFromContent(value);
   }
 }

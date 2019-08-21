@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { BlockResponseModel } from '@blockexplorer/shared/models';
 
 @Component({
@@ -25,8 +25,8 @@ export class BlockSummaryComponent implements OnInit {
 
   public get blockReward() {
     return !!this.block.extendedInformation && !!this.block.extendedInformation.blockReward
-            ? this.block.extendedInformation.blockReward.satoshi || 0
-            : 0;
+      ? this.block.extendedInformation.blockReward.satoshi || 0
+      : 0;
   }
 
   public get confirmations() {
@@ -45,7 +45,7 @@ export class BlockSummaryComponent implements OnInit {
     if (!this.block || !this.block.block.header.time) return 'Unknown';
     const date = new Date(1000 * this.block.block.header.time);
 
-    return date.toString();
+    return date.toLocaleString();
     // TODO: decide which format we want to show date in.
     // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
   }

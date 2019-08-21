@@ -25,6 +25,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { PrismModule } from '@ngx-prism/core';
 import { NxModule } from '@nrwl/nx';
 import { storeFreeze } from 'ngrx-store-freeze';
+import { ClipboardModule } from 'ngx-clipboard';
 
 import { environment } from '../environments/environment';
 import { AppConfigService } from './+state/app-config.service';
@@ -50,6 +51,7 @@ export function loadConfigService(configService: AppConfigService): Function {
     BrowserModule,
     NgbModule,
     HttpClientModule,
+    ClipboardModule,
     FormsModule,
     UiLayoutModule,
     PrismModule,

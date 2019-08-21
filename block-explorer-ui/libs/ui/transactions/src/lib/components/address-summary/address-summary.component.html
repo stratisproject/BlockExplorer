@@ -6,18 +6,23 @@
         <th><label>Address</label></th>
         <td class="d-flex align-items-center">
           <a class="truncate-sm" [routerLink]="['/addresses', hash]">{{hash}}</a>
-          <button type="button" class="btn btn-link btn-sm mr-auto ml-2 d-flex align-items-center p-0">
+          <button type="button" class="btn btn-link btn-sm mr-auto ml-2 d-flex align-items-center p-0"
+            (click)="copy(hash)">
             <i class="material-icons md-18">file_copy</i>
           </button>
         </td>
       </tr>
       <tr>
         <th><label>Confirmed Balance</label></th>
-        <td><blockexplorer-balance [balance]="confirmedBalance"></blockexplorer-balance></td>
+        <td>
+          <blockexplorer-balance [balance]="confirmedBalance"></blockexplorer-balance>
+        </td>
       </tr>
       <tr>
         <th><label>Unconfirmed Balance</label></th>
-        <td><blockexplorer-balance [balance]="unconfirmedBalance"></blockexplorer-balance></td>
+        <td>
+          <blockexplorer-balance [balance]="unconfirmedBalance"></blockexplorer-balance>
+        </td>
       </tr>
       <tr>
         <th><label>Type</label></th>

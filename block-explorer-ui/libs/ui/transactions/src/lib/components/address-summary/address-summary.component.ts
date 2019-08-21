@@ -1,5 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { BalanceResponseModel, BalanceSummaryModel } from '@blockexplorer/shared/models';
+import { Component, Input, OnInit } from '@angular/core';
+import { BalanceSummaryModel } from '@blockexplorer/shared/models';
+import { ClipboardService } from 'ngx-clipboard';
 
 @Component({
   selector: 'blockexplorer-address-summary',
@@ -11,7 +12,7 @@ export class AddressSummaryComponent implements OnInit {
   @Input() hash = '';
   @Input() address: BalanceSummaryModel = null;
 
-  constructor() { }
+  constructor(private clipboard: ClipboardService) { }
 
   ngOnInit() {
   }
@@ -35,5 +36,9 @@ export class AddressSummaryComponent implements OnInit {
       return 0;
 
     return this.address.spendable.amount.satoshi;
+  }
+
+  copy(value: string) {
+    this.clipboard.copyFromContent(value);
   }
 }

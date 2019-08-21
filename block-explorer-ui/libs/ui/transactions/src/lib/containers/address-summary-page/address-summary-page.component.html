@@ -8,98 +8,28 @@
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator [hidden]="addressSummaryLoaded$ | async"></blockexplorer-busy-indicator>
-                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
+                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash"
+                  [address]="address$ | async"></blockexplorer-address-summary>
 
                 <div class="list-group-item mb-4" *ngIf="addressDetailsLoaded$ | async">
-                  <div _ngcontent-c6="" class="row"><h3 _ngcontent-c6="" class="my-4 col-12">Transactions (21) <span _ngcontent-c6="" hidden="">(1)</span></h3></div>
-
-                  <div class="row mt-4">
-                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages" [hidden]="noTransactions"></blockexplorer-pager>
+                  <div _ngcontent-c6="" class="row">
+                    <h3 _ngcontent-c6="" class="my-4 col-12">Transactions ({{transactions.length}}) <span
+                        _ngcontent-c6="" hidden="">(1)</span></h3>
                   </div>
 
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th class="text-left">Hash</th>
-                        <th class="text-center">Age</th>
-                        <th class="text-center">From</th>
-                        <th class="text-center d-none d-md-table-cell"></th>
-                        <th class="text-center d-none d-sm-table-cell">To</th>
-                        <th class="text-center d-none d-sm-table-cell">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td class="text-truncate" style="max-width:80px;"><a href="#">0xbbdbcae72f10857102f021b81915a7144da957fc7f58c7e194ffb3549949bb27</a></td>
-                        <td class="text-center">4 minutes ago</td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CbfEeXFUZQm5eoBRNoqewiZXJtC4q9SAsR</a>
-                        </td>
-                        <td class="justify-content-center align-items-center d-none d-md-flex">
-                          <span class="arrowTx_small bg-success rounded">
-                            <i class="material-icons md-12">arrow_forward</i>
-                          </span>
-                        </td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CU42YEDzn2XekCscjy5XBNjJB33HwbH6GE</a>
-                        </td>
-                        <td class="text-right"><strong>1</strong><small>.2989 CRS</small></td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate" style="max-width:80px;"><a href="#">0xbbdbcae72f10857102f021b81915a7144da957fc7f58c7e194ffb3549949bb27</a></td>
-                        <td class="text-center">10 minutes ago</td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CbfEeXFUZQm5eoBRNoqewiZXJtC4q9SAsR</a>
-                        </td>
-                        <td class="justify-content-center align-items-center d-none d-md-flex">
-                          <span class="arrowTx_small bg-danger rounded">
-                            <i class="material-icons md-12">arrow_forward</i>
-                          </span>
-                        </td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CU42YEDzn2XekCscjy5XBNjJB33HwbH6GE</a>
-                        </td>
-                        <td class="text-right"><strong>1</strong><small>.2989 CRS</small></td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate" style="max-width:80px;"><a href="#">0xbbdbcae72f10857102f021b81915a7144da957fc7f58c7e194ffb3549949bb27</a></td>
-                        <td class="text-center">22 hours ago</td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CbfEeXFUZQm5eoBRNoqewiZXJtC4q9SAsR</a>
-                        </td>
-                        <td class="justify-content-center align-items-center d-none d-md-flex">
-                          <span class="arrowTx_small bg-success rounded">
-                            <i class="material-icons md-12">arrow_forward</i>
-                          </span>
-                        </td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CU42YEDzn2XekCscjy5XBNjJB33HwbH6GE</a>
-                        </td>
-                        <td class="text-right"><strong>1</strong><small>.2989 CRS</small></td>
-                      </tr>
-                      <tr>
-                        <td class="text-truncate" style="max-width:80px;"><a href="#">0xbbdbcae72f10857102f021b81915a7144da957fc7f58c7e194ffb3549949bb27</a></td>
-                        <td class="text-center">12 days ago</td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CbfEeXFUZQm5eoBRNoqewiZXJtC4q9SAsR</a>
-                        </td>
-                        <td class="justify-content-center align-items-center d-none d-md-flex">
-                          <span class="arrowTx_small bg-success rounded">
-                            <i class="material-icons md-12">arrow_forward</i>
-                          </span>
-                        </td>
-                        <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-                          <a href="#">CU42YEDzn2XekCscjy5XBNjJB33HwbH6GE</a>
-                        </td>
-                        <td class="text-right"><strong>998</strong><small>.1560 CRS</small></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div class="row mt-4">
+                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
+                      [hidden]="transactions.length === 0"></blockexplorer-pager>
+                  </div>
+
+                  <blockexplorer-transactions-table [transactions]="transactions">
+                  </blockexplorer-transactions-table>
 
                   <div class="row mt-4">
-                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages" [hidden]="noTransactions"></blockexplorer-pager>
+                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
+                      [hidden]="transactions.length === 0"></blockexplorer-pager>
                   </div>
-                  
+
                 </div>
 
               </ng-template>

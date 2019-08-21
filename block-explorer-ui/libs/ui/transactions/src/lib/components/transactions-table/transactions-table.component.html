@@ -1,0 +1,39 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="text-left">Hash</th>
+      <th class="text-center">Age</th>
+      <th class="text-center">From</th>
+      <th class="text-center d-none d-md-table-cell"></th>
+      <th class="text-center d-none d-sm-table-cell">To</th>
+      <th class="text-center d-none d-sm-table-cell">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let transaction of transactions">
+      <td class="text-truncate" style="max-width:80px;">
+        <a [routerLink]="['/transactions', transaction.hash]">{{transaction.hash}}</a>
+      </td>
+      <td class="text-center">{{age(transaction)}}</td>
+      <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
+        <a *ngIf="!!firstItem(transaction.in)" [attr.title]="itemsTooltip(transaction.in)"
+          [routerLink]="['/addresses', firstItem(transaction.in)]">{{firstItem(transaction.in) || 'Unspecified'}}</a>
+        <span *ngIf="!firstItem(transaction.in)"></span>
+      </td>
+      <td class="justify-content-center align-items-center d-none d-md-flex">
+        <span class="arrowTx_small rounded"
+          [ngClass]="{'bg-success': !transaction.spent, 'bg-danger': transaction.spent}">
+          <i class="material-icons md-12">arrow_forward</i>
+        </span>
+      </td>
+      <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
+        <a *ngIf="!!firstItem(transaction.out)" [attr.title]="itemsTooltip(transaction.out)"
+          [routerLink]="['/addresses', firstItem(transaction.out)]">{{firstItem(transaction.out) || 'Unspecified'}}</a>
+        <span *ngIf="!firstItem(transaction.out)"></span>
+      </td>
+      <td class="text-right">
+        <blockexplorer-balance [balance]="transaction.amount?.satoshi || 0"></blockexplorer-balance>
+      </td>
+    </tr>
+  </tbody>
+</table>
