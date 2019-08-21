@@ -1,9 +1,9 @@
-﻿using NBitcoin;
-using NBitcoin.Networks;
-using Stratis.Bitcoin.Networks;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
+    using NBitcoin;
+    using NBitcoin.Networks;
+    using Stratis.Bitcoin.Networks;
+
     public static class KnownNetworks
     {
         public static Network Main => NetworkRegistration.GetNetwork("Main") ?? NetworkRegistration.Register(new BitcoinMain());

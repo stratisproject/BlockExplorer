@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Stratis.IndexerD": {
+      "commandName": "Project",
+      "commandLineArgs": "   -azemu=0 -mainnet -sidechain -azureacc=blockexpstratischain -azurekey=JLO791Yn79nd/J1+prWsEQU/AMW9HhhuXMdumADIZ1GhP2ae0WHUIZfl1iYs5fZUJkG+tHbNOfq86EtJ1/gL7w=="
+    }
+  }
+}

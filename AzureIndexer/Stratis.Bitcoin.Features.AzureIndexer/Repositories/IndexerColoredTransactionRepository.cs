@@ -1,10 +1,11 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Repositories
 {
     using System;
     using System.Linq;
     using System.Threading.Tasks;
     using NBitcoin;
     using NBitcoin.OpenAsset;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 
     internal class ReadOnlyTransactionRepository : ITransactionRepository
     {

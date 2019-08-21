@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -50,6 +52,8 @@
 
         /// <summary>Gets the Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
+
+        public IndexerClient AzureIndexerClient { get; private set; }
 
         public BlockFetcher BlocksFetcher { get; private set; }
 
@@ -117,6 +121,7 @@
             this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory, this.asyncProvider);
 
             AzureIndexer indexer = this.IndexerConfig.CreateIndexer();
+            IndexerClient indexerClient = this.IndexerConfig.CreateIndexerClient();
             indexer.Configuration.EnsureSetup();
             indexer.TaskScheduler = new CustomThreadPoolTaskScheduler(30, 100);
             indexer.CheckpointInterval = this.indexerSettings.CheckpointInterval;
@@ -125,6 +130,7 @@
             indexer.ToHeight = this.indexerSettings.To;
 
             this.AzureIndexer = indexer;
+            this.AzureIndexerClient = indexerClient;
 
             if (this.indexerSettings.IgnoreCheckpoints)
             {
@@ -248,6 +254,10 @@
         /// <returns>A task for asynchronous completion.</returns>
         private async Task IndexChainAsync(CancellationToken cancellationToken)
         {
+            //var balanceIDfromScript = new BalanceId(new Script("f6a0c7018774503084cbe4fcbe96d34ff7508899"));
+            //var balanceId= new BalanceId("cnYBwudqzHBtGVELyQNUGzviKV4Ym3yiEo");
+            //var rr = this.AzureIndexerClient.GetOrderedBalance(balanceId);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -305,7 +315,7 @@
                             task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Transactions:
-                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory, this.indexerSettings);
+                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Balances:
                             task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);

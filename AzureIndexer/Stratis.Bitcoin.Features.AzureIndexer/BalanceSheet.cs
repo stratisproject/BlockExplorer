@@ -15,11 +15,11 @@
                         .Where(c => c.SpentCoins != null) // Remove line whose previous coins have not been loaded could not be deduced
                         .Where(c => c.MempoolEntry || this.ChainIndexer.GetHeader(c.BlockId) != null) // Take only mempool entry, or confirmed one
                         .Where(c => !(c.IsCoinbase && c.MempoolEntry)) // There is no such thing as a Coinbase unconfirmed, by definition a coinbase appear in a block
-                        .ToList(); 
+                        .ToList();
             Dictionary<uint256, OrderedBalanceChange> confirmed = all.Where(o => o.BlockId != null).ToDictionary(o => o.TransactionId);
-            Dictionary<uint256, OrderedBalanceChange> unconfirmed = new Dictionary<uint256, OrderedBalanceChange>();
+            var unconfirmed = new Dictionary<uint256, OrderedBalanceChange>();
 
-            foreach(OrderedBalanceChange item in all.Where(o => o.MempoolEntry && !confirmed.ContainsKey(o.TransactionId)))
+            foreach (OrderedBalanceChange item in all.Where(o => o.MempoolEntry && !confirmed.ContainsKey(o.TransactionId)))
             {
                 unconfirmed.AddOrReplace(item.TransactionId, item);
             }

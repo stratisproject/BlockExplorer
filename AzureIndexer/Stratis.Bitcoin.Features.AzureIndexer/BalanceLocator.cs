@@ -1,8 +1,9 @@
-﻿using System;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
+    using System;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+
     public class BalanceLocator
     {
         static BalanceLocator()

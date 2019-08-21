@@ -1,4 +1,7 @@
 ﻿// ReSharper disable ArrangeThisQualifier
+
+using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
@@ -13,6 +16,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
     using NBitcoin.OpenAsset;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.Bitcoin.Utilities;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "<Pending>")]
@@ -363,7 +368,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             BalanceQuery query = null,
             CancellationToken cancel = default(CancellationToken))
         {
-            return this.GetOrderedBalanceCore(balanceId, query, cancel);
+            var res = this.GetOrderedBalanceCore(balanceId, query, cancel);
+            return res; //this.GetOrderedBalanceCore(balanceId, query, cancel);
         }
 
         public IEnumerable<Task<List<OrderedBalanceChange>>> GetOrderedBalanceAsync(

@@ -4,6 +4,7 @@ using System.Threading;
 using NBitcoin;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
+using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
 
 namespace AzureIndexer.Api.Notifications
 {

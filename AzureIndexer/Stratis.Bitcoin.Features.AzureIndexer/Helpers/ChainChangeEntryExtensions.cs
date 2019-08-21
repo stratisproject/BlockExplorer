@@ -1,13 +1,9 @@
-﻿using System.Linq;
-using FodyNlogAdapter;
-using Microsoft.Extensions.Logging;
-using NLog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using NBitcoin;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public static class ChainChangeEntryExtensions
     {

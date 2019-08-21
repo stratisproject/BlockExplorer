@@ -7,6 +7,7 @@ using AzureIndexer.Api.Models;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 
 namespace AzureIndexer.Api.Notifications

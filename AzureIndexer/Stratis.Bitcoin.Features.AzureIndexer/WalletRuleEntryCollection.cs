@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
     using Stratis.Bitcoin.Features.AzureIndexer.Internal;
 
     public class WalletRuleEntryCollection : IEnumerable<WalletRuleEntry>
