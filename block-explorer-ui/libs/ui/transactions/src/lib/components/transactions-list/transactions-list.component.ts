@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
@@ -14,12 +14,18 @@ export class TransactionsListComponent implements OnInit {
   @Input() showCount = true;
   @Output() selected = new EventEmitter<string>();
 
-  constructor() {}
+  transactionsOnCurrentPage: TransactionSummaryModel[] = [];
 
-  ngOnInit() {}
+  currentPage = 1;
+
+  constructor() { }
+
+  ngOnInit() {
+    this.page();
+  }
 
   get noTransactions() {
-    return  !this.transactions || this.transactions.length === 0;
+    return !this.transactions || this.transactions.length === 0;
   }
 
   get totalPages() {
@@ -27,5 +33,33 @@ export class TransactionsListComponent implements OnInit {
     const pages = Math.trunc(this.transactions.length / 20);
     if (this.transactions.length % 20 === 0) return pages;
     return pages + 1;
+  }
+
+  first() {
+    this.currentPage = 1;
+    this.page();
+  }
+
+  last() {
+    this.currentPage = this.transactions.length || 1;
+    this.page();
+  }
+
+  next() {
+    if (this.currentPage === this.transactions.length) { return; }
+    this.currentPage++;
+    this.page();
+  }
+
+  previous() {
+    if (this.currentPage <= 1) { return; }
+    this.currentPage--;
+    this.page();
+  }
+
+  page() {
+    const pageNumber = this.currentPage - 1;
+    const pageSize = 20;
+    this.transactionsOnCurrentPage = this.transactions.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
   }
 }

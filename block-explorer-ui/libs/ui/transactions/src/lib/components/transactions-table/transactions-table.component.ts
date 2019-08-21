@@ -15,9 +15,14 @@ export class TransactionsTableComponent implements OnInit {
   @Input() showCount = true;
   @Output() selected = new EventEmitter<string>();
 
+  currentPage = 1;
+  transactionsOnCurrentPage: TransactionSummaryModel[] = [];
+
   constructor() { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.page();
+  }
 
   get noTransactions() {
     return !this.transactions || this.transactions.length === 0;
@@ -57,5 +62,33 @@ export class TransactionsTableComponent implements OnInit {
   public itemsTooltip(items: LineItemModel[]) {
     if ((items || []).length === 0) return '';
     return items.filter(i => !!i.hash).map(i => i.hash).join(', ');
+  }
+
+  first() {
+    this.currentPage = 1;
+    this.page();
+  }
+
+  last() {
+    this.currentPage = this.totalPages;
+    this.page();
+  }
+
+  next() {
+    if (this.currentPage === this.transactions.length) { return; }
+    this.currentPage++;
+    this.page();
+  }
+
+  previous() {
+    if (this.currentPage <= 1) { return; }
+    this.currentPage--;
+    this.page();
+  }
+
+  page() {
+    const pageNumber = this.currentPage - 1;
+    const pageSize = 20;
+    this.transactionsOnCurrentPage = this.transactions.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
   }
 }

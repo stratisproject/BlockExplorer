@@ -17,18 +17,8 @@
                         _ngcontent-c6="" hidden="">(1)</span></h3>
                   </div>
 
-                  <div class="row mt-4">
-                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
-                      [hidden]="transactions.length === 0"></blockexplorer-pager>
-                  </div>
-
                   <blockexplorer-transactions-table [transactions]="transactions">
                   </blockexplorer-transactions-table>
-
-                  <div class="row mt-4">
-                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
-                      [hidden]="transactions.length === 0"></blockexplorer-pager>
-                  </div>
 
                 </div>
 
