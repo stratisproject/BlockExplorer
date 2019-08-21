@@ -13,6 +13,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public abstract class IndexTask<TIndexed> : IIndexTask
     {
@@ -44,7 +46,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
         public bool SaveProgression { get; set; }
 
         public bool IsSC { get; set; }
-
 
         public void Index(BlockFetcher blockFetcher, TaskScheduler scheduler, Network network)
         {

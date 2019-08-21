@@ -1,22 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage.Auth;
     using NBitcoin;
-    using Stratis.Bitcoin.Base;
-    using Stratis.Bitcoin.Configuration.Logging;
+    using Stratis.Bitcoin.AsyncWork;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Utilities;
-    using Stratis.Bitcoin.Base;
-    using Stratis.Bitcoin.Configuration;
-    using Stratis.Bitcoin.Connection;
-    using Stratis.Bitcoin.Consensus;
-    using Stratis.Bitcoin.AsyncWork;
 
     /// <summary>
     /// The AzureIndexerStoreLoop loads blocks from the block repository and indexes them in Azure.
@@ -26,11 +21,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>The number of blocks to index at a time.</summary>
         private const int IndexBatchSize = 100;
 
+        /// <summary>Best chain of block headers.</summary>
+        private readonly ChainIndexer chainIndexer;
+
         /// <summary>Factory for creating background async loop tasks.</summary>
         private readonly IAsyncProvider asyncProvider;
-
-        /// <summary>Best chain of block headers.</summary>
-        protected ChainIndexer chainIndexer;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -53,10 +48,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         public FullNode FullNode { get; }
 
         /// <summary>Gets the name of this node feature for reporting stats.</summary>
-        public virtual string StoreName { get { return "AzureIndexer"; } }
+        public virtual string StoreName => "AzureIndexer";
 
         /// <summary>Gets the Azure Indexer.</summary>
         public AzureIndexer AzureIndexer { get; private set; }
+
+        public IndexerClient AzureIndexerClient { get; private set; }
 
         public BlockFetcher BlocksFetcher { get; private set; }
 
@@ -100,7 +97,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="indexerSettings">The AzureIndexerSettings object to use.</param>
         /// <param name="network">The network to use.</param>
         /// <param name="loggerFactory">logger factory</param>
-        /// <param name="asyncProvider"></param>
+        /// <param name="asyncProvider">current chain</param>
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
         public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
         {
@@ -124,6 +121,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory, this.asyncProvider);
 
             AzureIndexer indexer = this.IndexerConfig.CreateIndexer();
+            IndexerClient indexerClient = this.IndexerConfig.CreateIndexerClient();
             indexer.Configuration.EnsureSetup();
             indexer.TaskScheduler = new CustomThreadPoolTaskScheduler(30, 100);
             indexer.CheckpointInterval = this.indexerSettings.CheckpointInterval;
@@ -132,6 +130,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             indexer.ToHeight = this.indexerSettings.To;
 
             this.AzureIndexer = indexer;
+            this.AzureIndexerClient = indexerClient;
 
             if (this.indexerSettings.IgnoreCheckpoints)
             {
@@ -312,7 +311,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                             task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Transactions:
-                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory, this.indexerSettings);
+                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Balances:
                             task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);

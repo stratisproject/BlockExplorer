@@ -1,6 +1,4 @@
-﻿using Stratis.Bitcoin.AsyncWork;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -15,6 +13,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
     using NBitcoin.Protocol;
+    using Stratis.Bitcoin.AsyncWork;
     using Stratis.Bitcoin.P2P.Peer;
     using Stratis.Bitcoin.P2P.Protocol.Payloads;
     using Utilities;
@@ -189,37 +188,51 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public CloudTable GetTransactionTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(TransactionsTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(TransactionsTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetSmartContactTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(SmartContractsTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(SmartContractsTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetSmartContactDetailTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(SmartContractDetailsTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(SmartContractDetailsTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetWalletRulesTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(WalletsTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(WalletsTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetTable(string tableName)
         {
-            return this.TableClient.GetTableReference(this.GetFullName(tableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(tableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetBalanceTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(BalancesTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(BalancesTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudTable GetChainTable()
         {
-            return this.TableClient.GetTableReference(this.GetFullName(ChainTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(ChainTableName));
+            table.CreateIfNotExistsAsync();
+            return table;
         }
 
         public CloudBlobContainer GetBlocksContainer()

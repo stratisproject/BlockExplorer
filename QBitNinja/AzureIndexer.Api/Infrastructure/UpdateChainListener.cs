@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
 namespace AzureIndexer.Api.Infrastructure
 {

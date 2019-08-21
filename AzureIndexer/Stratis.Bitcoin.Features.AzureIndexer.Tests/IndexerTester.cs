@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Table;
-using NBitcoin;
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage.Table;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+
     public class IndexerTester : IDisposable
     {
         private readonly AzureIndexer _Importer;
+
         public AzureIndexer Indexer
         {
             get
@@ -29,6 +33,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         }
 
         string _Folder;
+
         public IndexerTester(string folder)
         {
             TestUtils.EnsureNew(folder);

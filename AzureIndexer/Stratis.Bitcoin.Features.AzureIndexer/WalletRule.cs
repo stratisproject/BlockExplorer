@@ -1,6 +1,7 @@
 ﻿namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using Newtonsoft.Json;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public abstract class WalletRule
     {

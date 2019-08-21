@@ -1,27 +1,28 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Entities
 {
     using System.Text;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin.DataEncoders;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public class WalletRuleEntry
     {
         public WalletRuleEntry()
         {
-
         }
 
         public WalletRuleEntry(DynamicTableEntity entity, IndexerClient client)
         {
             this.WalletId = Encoding.UTF8.GetString(Encoders.Hex.DecodeData(entity.PartitionKey));
 
-            if (!entity.Properties.ContainsKey("a0")) // Legacy.
+            // Legacy.
+            if (!entity.Properties.ContainsKey("a0"))
             {
                 this.Rule = Helper.DeserializeObject<WalletRule>(Encoding.UTF8.GetString(Encoders.Hex.DecodeData(entity.RowKey)));
             }
             else
             {
-                Rule = Helper.DeserializeObject<WalletRule>(Encoding.UTF8.GetString(Helper.GetEntityProperty(entity, "a")));
+                this.Rule = Helper.DeserializeObject<WalletRule>(Encoding.UTF8.GetString(Helper.GetEntityProperty(entity, "a")));
             }
         }
 

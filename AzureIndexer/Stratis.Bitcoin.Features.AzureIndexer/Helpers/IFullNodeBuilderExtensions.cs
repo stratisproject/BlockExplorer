@@ -1,14 +1,14 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Stratis.Bitcoin.Builder;
-using Stratis.Bitcoin.Configuration.Logging;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+    using Stratis.Bitcoin.Builder;
+    using Stratis.Bitcoin.Configuration.Logging;
+
     /// <summary>
     /// A class providing extension methods for <see cref="IFullNodeBuilder"/>.
     /// </summary>
-    public static partial class IFullNodeBuilderExtensions
+    public static class IFullNodeBuilderExtensions
     {
         public static IFullNodeBuilder UseAzureIndexer(this IFullNodeBuilder fullNodeBuilder, Action<AzureIndexerSettings> setup = null)
         {

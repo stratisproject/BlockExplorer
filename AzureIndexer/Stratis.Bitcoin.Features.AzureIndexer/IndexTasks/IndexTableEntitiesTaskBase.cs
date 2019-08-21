@@ -11,6 +11,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public abstract class IndexTableEntitiesTaskBase<TIndexed> : IndexTask<TIndexed>
     {

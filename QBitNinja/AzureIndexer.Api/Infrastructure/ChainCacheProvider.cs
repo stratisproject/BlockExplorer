@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stratis.Bitcoin.Base;
+using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 using Stratis.Bitcoin.Utilities;
 
 namespace AzureIndexer.Api.Infrastructure

@@ -1,7 +1,7 @@
-﻿using System.IO;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
+    using System.IO;
+
     internal class TestUtils
     {
         internal static void EnsureNew(string folderName)

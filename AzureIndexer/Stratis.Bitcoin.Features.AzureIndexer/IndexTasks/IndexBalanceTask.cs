@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using Microsoft.Extensions.Logging;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 
     public class IndexBalanceTask : IndexTableEntitiesTaskBase<OrderedBalanceChange>
     {

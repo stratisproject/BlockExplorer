@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NBitcoin;
-
-namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+
     public class ChainBuilder
     {
         private IndexerTester _Tester;

@@ -1,4 +1,4 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Repositories
 {
     using System;
     using System.Collections.Generic;
@@ -14,8 +14,7 @@
     {
         private readonly ILoggerFactory loggerFactory;
 
-        public CheckpointRepository(CloudBlobContainer container, Network network, string checkpointSet,
-            ILoggerFactory loggerFactory)
+        public CheckpointRepository(CloudBlobContainer container, Network network, string checkpointSet, ILoggerFactory loggerFactory)
         {
             this.loggerFactory = loggerFactory;
             _Network = network;

@@ -9,6 +9,8 @@
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 
     public class IndexTransactionsTask : IndexTableEntitiesTaskBase<TransactionEntry.Entity>
     {
@@ -16,14 +18,12 @@
         private readonly IndexerConfiguration config;
         private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
-        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, AzureIndexerSettings settings)
+        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
             : base(configuration, loggerFactory)
         {
             this.config = configuration;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            this.IsSC = settings.IsSidechain;
         }
-
 
         protected override void ProcessBlock(BlockInfo block, BulkImport<TransactionEntry.Entity> transactionsBulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
         {

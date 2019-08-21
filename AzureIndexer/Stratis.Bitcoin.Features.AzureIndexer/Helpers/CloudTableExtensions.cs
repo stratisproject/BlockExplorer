@@ -1,4 +1,4 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
     using System.Collections.Generic;
     using System.Threading;

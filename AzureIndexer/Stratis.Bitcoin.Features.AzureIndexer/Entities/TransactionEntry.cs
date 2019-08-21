@@ -1,4 +1,4 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Entities
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
     using NBitcoin.OpenAsset;
-    using Stratis.Bitcoin.Networks;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.SmartContracts.CLR;
     using Stratis.SmartContracts.CLR.Compilation;
     using Stratis.SmartContracts.CLR.Decompilation;
@@ -101,7 +101,7 @@
 
         public class Entity : IIndexed
         {
-            private bool isSC = false;
+            private readonly bool isSC = false;
 
             public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool isSC = false)
             {
