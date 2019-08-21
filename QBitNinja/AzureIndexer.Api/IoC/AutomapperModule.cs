@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.IoC
+﻿using System;
+
+namespace AzureIndexer.Api.IoC
 {
     using System.Linq;
     using System.Net;
@@ -94,7 +96,19 @@
             public ScriptModel Convert(Script source, ScriptModel destination, ResolutionContext context)
             {
                 var network = ServiceLocator.Current.GetInstance<QBitNinjaConfiguration>().Indexer.Network;
-                var address = source.GetAddressFromScript(network);
+                string address = string.Empty;
+                var isScript = source.IsPayToScriptHash(network);
+                if (isScript)
+                {
+                    if (PayToScriptHashTemplate.Instance.CheckScriptPubKey(source))
+                    {
+                        address = source.GetDestinationAddress(network).ToString();
+                    }
+                }
+                else
+                {
+                    address = source.GetAddressFromScript(network);
+                }
 
                 var scriptModel = new ScriptModel
                 {
