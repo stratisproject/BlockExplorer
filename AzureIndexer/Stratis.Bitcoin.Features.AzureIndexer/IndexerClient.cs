@@ -289,7 +289,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             SmartContactDetailsEntry entity = result.Results.Select(r => new SmartContactDetailsEntry(r)).FirstOrDefault();
             return entity;
         }
-        
+
         public async Task<List<SmartContactDetailsEntry>> GetAllSmartContractDetailsAsync(int take = 10)
         {
             CloudTable table = this.Configuration.GetSmartContactDetailTable();
@@ -402,13 +402,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             return this.GetOrderedBalanceCore(new BalanceId(walletId), query, cancel);
         }
 
-        public IEnumerable<OrderedBalanceChange> GetOrderedBalance(
-            BalanceId balanceId,
-            BalanceQuery query = null,
-            CancellationToken cancel = default(CancellationToken))
+        public IEnumerable<OrderedBalanceChange> GetOrderedBalance(BalanceId balanceId, BalanceQuery query = null, CancellationToken cancel = default(CancellationToken))
         {
-            var res = this.GetOrderedBalanceCore(balanceId, query, cancel);
-            return res; //this.GetOrderedBalanceCore(balanceId, query, cancel);
+            return this.GetOrderedBalanceCore(balanceId, query, cancel);
         }
 
         public IEnumerable<Task<List<OrderedBalanceChange>>> GetOrderedBalanceAsync(

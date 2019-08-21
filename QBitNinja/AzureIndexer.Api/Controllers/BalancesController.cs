@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.Controllers
+﻿using AzureIndexer.Api.Models;
+
+namespace AzureIndexer.Api.Controllers
 {
     using System.Threading.Tasks;
     using AutoMapper;
@@ -43,7 +45,7 @@
             bool loadTransactionDetails = false)
         {
             colored = colored || this.IsColoredAddress();
-            var balance = this.balanceSearchService.GetBalanceDetails(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
+            BalanceModel balance = this.balanceSearchService.GetBalanceDetails(balanceId.ToBalanceId(this.Network), continuation.ToBalanceLocator(), until.ToBlockFeature(), from.ToBlockFeature(), includeImmature, unspentOnly, colored);
             var mappedBalance = this.mapper.Map<BalanceResponseModel>(balance);
 
             if (!loadTransactionDetails)
