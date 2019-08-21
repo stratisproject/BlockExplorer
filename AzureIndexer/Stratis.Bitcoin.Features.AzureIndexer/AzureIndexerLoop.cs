@@ -254,10 +254,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <returns>A task for asynchronous completion.</returns>
         private async Task IndexChainAsync(CancellationToken cancellationToken)
         {
-            //var balanceIDfromScript = new BalanceId(new Script("f6a0c7018774503084cbe4fcbe96d34ff7508899"));
-            //var balanceId= new BalanceId("cnYBwudqzHBtGVELyQNUGzviKV4Ym3yiEo");
-            //var rr = this.AzureIndexerClient.GetOrderedBalance(balanceId);
-
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
