@@ -1,4 +1,4 @@
-<section class="col-lg-11 col-xl-9 col-12 mx-auto">
+<section class="col-lg-10 col-md-10 col-12 mx-auto">
   <div class="card">
     <div class="card-body">
       <div class="row">
@@ -8,21 +8,42 @@
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator [hidden]="addressSummaryLoaded$ | async"></blockexplorer-busy-indicator>
-                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash" [address]="address$ | async"></blockexplorer-address-summary>
+                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash"
+                  [address]="address$ | async"></blockexplorer-address-summary>
+
                 <div class="list-group-item mb-4" *ngIf="addressDetailsLoaded$ | async">
-                  <blockexplorer-transactions-list [showCount]="false" [showPaging]="false" title="Last Transaction" [transactions]="lastTransaction"></blockexplorer-transactions-list>
+                  <div _ngcontent-c6="" class="row">
+                    <h3 _ngcontent-c6="" class="my-4 col-12">Transactions ({{transactions.length}}) <span
+                        _ngcontent-c6="" hidden="">(1)</span></h3>
+                  </div>
+
+                  <div class="row mt-4">
+                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
+                      [hidden]="transactions.length === 0"></blockexplorer-pager>
+                  </div>
+
+                  <blockexplorer-transactions-table [transactions]="transactions">
+                  </blockexplorer-transactions-table>
+
+                  <div class="row mt-4">
+                    <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages"
+                      [hidden]="transactions.length === 0"></blockexplorer-pager>
+                  </div>
+
                 </div>
+
               </ng-template>
             </ngb-tab>
             <ngb-tab title="Transactions">
               <ng-template ngbTabContent>
-                <div class="list-group-item mb-3">
+                <div class="list-group-item my-4">
                   <blockexplorer-transactions-list [transactions]="transactions"></blockexplorer-transactions-list>
                 </div>
               </ng-template>
             </ngb-tab>
           </ngb-tabset>
         </div>
+
       </div>
     </div>
   </div>

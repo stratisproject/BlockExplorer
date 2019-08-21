@@ -1,42 +1,50 @@
-
 <div class="col-12" *ngIf="showHeader">
   <table class="table table-striped mb-4">
     <tbody>
       <tr>
-        <th><a [routerLink]="['/transactions', transaction.hash]">{{transaction.hash}}</a></th>
+        <th><a class="truncate-wide" [routerLink]="['/transactions', transaction.hash]">{{transaction.hash}}</a></th>
         <td class="text-right d-none d-sm-block">{{transactionTime}}</td>
       </tr>
     </tbody>
   </table>
 </div>
-<div class="col">
-  <div class="row" *ngFor="let tx of transaction.in">
-    <div class="col-12 col-lg-8 padded">
-      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span>
+<div class="col d-flex align-items-center flex-column justify-content-center" *ngIf="hasInputsOrOutputs">
+  <div class="row no-gutters w-100" *ngFor="let tx of transaction.in">
+    <div class="col-auto text-md-right truncate-sm">
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span
+        *ngIf="!tx.hash">Unspecified</span>
     </div>
-    <div class="col-12 col-lg-4 text-lg-right">
+    <div class="col-auto ml-auto text-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>
     </div>
   </div>
 </div>
-<div class="col-12 col-md-1 d-flex justify-content-start justify-content-md-center my-3 my-md-0 align-items-top">
-  <div class="arrowTx bg-success rounded" [ngClass]="{'bg-success': !transaction.spent, 'bg-danger': transaction.spent}" >
+
+<div class="col-lg-auto d-flex justify-content-center align-items-center my-3 align-items-top"
+  *ngIf="hasInputsOrOutputs">
+  <div class="arrowTx bg-success rounded"
+    [ngClass]="{'bg-success': !transaction.spent, 'bg-danger': transaction.spent}">
     <i class="material-icons md-18">arrow_forward</i>
   </div>
 </div>
-<div class="col">
-  <div class="row" *ngFor="let tx of transaction.out">
-    <div class="col-12 col-lg-8 text-sm-left text-lg-left text-xl-left text-md-right">
-      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span *ngIf="!tx.hash">Unspecified</span><small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }" > {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
+
+<div class="col d-flex align-items-center flex-column justify-content-center" *ngIf="hasInputsOrOutputs">
+  <div class="row no-gutters w-100" *ngFor="let tx of transaction.out">
+    <div class="col-auto text-md-right truncate-sm">
+      <a *ngIf="!!tx.hash" [routerLink]="['/addresses', tx.hash]">{{tx.hash || 'Unspecified'}}</a><span
+        *ngIf="!tx.hash">Unspecified</span>
+      <small class="text-danger" [ngClass]="{ 'text-success': isUnspent(tx), 'text-danger': !isUnspent(tx) }">
+        {{isUnspent(tx) ? '(Unspent)' : '(Spent)'}}</small>
     </div>
-    <div class="col-12 col-lg-4 text-left text-md-right text-lg-right text-xl-right">
+    <div class="col-auto ml-auto text-md-right">
       <blockexplorer-balance [balance]="!!tx.amount ? tx.amount.satoshi : 0"></blockexplorer-balance>
     </div>
   </div>
-  <div class="row">
-    <hr class="col-11 col-md-2 offset-md-9 d-flex justify-content-end">
-    <div class="col-12 text-dark text-left text-md-right text-lg-right text-xl-right">
-      <blockexplorer-balance [balance]="!!transaction.amount ? transaction.amount.satoshi : 0"></blockexplorer-balance>
-    </div>
+</div>
+
+<div class="col-12">
+  <hr class="d-block my-1">
+  <div class="text-dark text-right">
+    <blockexplorer-balance [balance]="!!transaction.amount ? transaction.amount.satoshi : 0"></blockexplorer-balance>
   </div>
 </div>

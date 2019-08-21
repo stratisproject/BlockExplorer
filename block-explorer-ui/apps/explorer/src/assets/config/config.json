@@ -1,5 +1,5 @@
 {
-  "apiBaseUrl": "https://cirrusmainexplorer1.azurewebsites.net",
+  "apiBaseUrl": "https://cirrusmainindexer1.azurewebsites.net",
   "symbol": "CRS",
   "chain": "Cirrus Mainnet",
   "sidechainColor": "#3bafba",

@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { TransactionSummaryModel, LineItemModel } from '@blockexplorer/shared/models';
+import { Component, Input, OnInit } from '@angular/core';
+import { LineItemModel, TransactionSummaryModel } from '@blockexplorer/shared/models';
 
 @Component({
   selector: 'blockexplorer-transaction-list-item',
@@ -17,15 +17,13 @@ export class TransactionListItemComponent implements OnInit {
 
   public isUnspent(tx: LineItemModel) {
     return !!tx && !!this.transaction && !!this.transaction.in
-              ? this.transaction.in.find(t => t.hash === tx.hash)
-              : false;
+      ? this.transaction.in.find(t => t.hash === tx.hash)
+      : false;
   }
 
   public get transactionTime() {
     if (!this.transaction || !this.transaction.firstSeen) return 'Unknown';
-    return this.transaction.firstSeen.toString();
-    // TODO: decide which format we want to show date in.
-    // return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    return this.transaction.firstSeen.toLocaleString();
   }
 
   public get transactionType() {
@@ -34,6 +32,10 @@ export class TransactionListItemComponent implements OnInit {
     if (this.transaction.isCoinstake) return 'Coinstake';
     if (this.transaction.height === -50) return 'Smart Contract'
     return 'Transaction';
+  }
+
+  get hasInputsOrOutputs() {
+    return (this.transaction.in || []).length > 0 || (this.transaction.out || []).length;
   }
 
 }
