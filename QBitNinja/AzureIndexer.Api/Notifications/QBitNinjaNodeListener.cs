@@ -560,7 +560,7 @@ namespace AzureIndexer.Api.Notifications
                         });
                         TryLock(_LockTransactions, () =>
                         {
-                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory, new AzureIndexerSettings())
+                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory)
                             {
                                 EnsureIsSetup = false
                             }
