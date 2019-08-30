@@ -11,15 +11,12 @@
                 <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash"
                   [address]="address$ | async"></blockexplorer-address-summary>
 
-                <div class="list-group-item mb-4" *ngIf="addressDetailsLoaded$ | async">
-                  <div _ngcontent-c6="" class="row">
-                    <h3 _ngcontent-c6="" class="my-4 col-12">Transactions ({{transactions.length}}) <span
-                        _ngcontent-c6="" hidden="">(1)</span></h3>
-                  </div>
-
-                  <blockexplorer-transactions-table [transactions]="transactions">
+                <h4 _ngcontent-c6="" class="">
+                  Transactions<span> ({{transactions.length}})</span>
+                </h4>
+                <div class="list-group-item mb-4">
+                  <blockexplorer-transactions-table [transactions]="transactions" *ngIf="addressDetailsLoaded$ | async">
                   </blockexplorer-transactions-table>
-
                 </div>
 
               </ng-template>

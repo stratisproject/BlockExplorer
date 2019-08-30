@@ -8,15 +8,17 @@
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>
-                <blockexplorer-transaction-summary *ngIf="transactionsLoaded$ | async" [transaction]="transaction$ | async"></blockexplorer-transaction-summary>
-                <div class="list-group-item mb-4" *ngIf="transactionsLoaded$ | async">
-                  <blockexplorer-transactions-list [showCount]="false" [showTransactionHeader]="false" [showPaging]="false" title="Details" [transactions]="transactions"></blockexplorer-transactions-list>
-                </div>
+                <blockexplorer-transaction-summary *ngIf="transactionsLoaded$ | async"
+                  [transaction]="transaction$ | async"></blockexplorer-transaction-summary>
+                <blockexplorer-transactions-list *ngIf="transactionsLoaded$ | async" [showCount]="false"
+                  [showTransactionHeader]="false" [showPaging]="false" title="Details" [transactions]="transactions">
+                </blockexplorer-transactions-list>
               </ng-template>
             </ngb-tab>
             <ngb-tab title="Code" *ngIf="isSmartContract">
               <ng-template ngbTabContent>
-                <blockexplorer-smart-contract-summary [smartContract]="smartContract"></blockexplorer-smart-contract-summary>
+                <blockexplorer-smart-contract-summary [smartContract]="smartContract">
+                </blockexplorer-smart-contract-summary>
               </ng-template>
             </ngb-tab>
           </ngb-tabset>

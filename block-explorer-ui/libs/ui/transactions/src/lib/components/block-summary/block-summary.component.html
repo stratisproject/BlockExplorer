@@ -1,14 +1,16 @@
-<div class="list-group-item my-4">
-  <h3 class="my-4 col-12">Summary</h3>
+<h3>Block #{{height}}</h3>
+<div class="alert alert-secondary">
+  <b>Block Hash</b> {{hash}}
+</div>
+<h4 class="">Summary</h4>
+<div class="list-group-item my-4-x">
   <table class="table table-striped">
     <tbody>
       <tr>
-        <th><label>Block Hash</label></th>
-        <td class="hash-word-break hash-truncate">{{hash}}</td>
-      </tr>
-      <tr>
         <th><label>Block Reward</label></th>
-        <td><blockexplorer-balance [balance]="blockReward"></blockexplorer-balance></td>
+        <td>
+          <blockexplorer-balance [balance]="blockReward"></blockexplorer-balance>
+        </td>
       </tr>
       <tr>
         <th><label>Confirmations</label></th>

@@ -1,9 +1,6 @@
+<h4>{{title}} <span [hidden]="noTransactions || !showCount">({{!!transactions ? transactions.length : 0}})</span></h4>
 <div class="card">
   <div class="col-12">
-    <div class="row">
-      <h3 class="my-4 col-12">{{title}} <span
-          [hidden]="noTransactions || !showCount">({{!!transactions ? transactions.length : 0}})</span></h3>
-    </div>
     <div class="row">
       <blockexplorer-pager *ngIf="showPaging" [totalPages]="totalPages" class="col-12" [hidden]="noTransactions"
         [currentPage]="currentPage" (last)="last()" (first)="first()" (next)="next()" (previous)="previous()">

@@ -1,5 +1,15 @@
-<div class="list-group-item my-4">
-  <h3 class="my-4 col-12">Summary</h3>
+<h3>Address <blockexplorer-balance [balance]="confirmedBalance"></blockexplorer-balance>
+</h3>
+<div class="alert alert-secondary">
+  <b>Address Hash</b>&nbsp;
+  <a class="truncate-sm" [routerLink]="['/addresses', hash]">{{hash}}</a>
+  <button type="button" class="btn btn-link btn-sm mr-auto ml-2 d-flex align-items-center p-0 copy-btn"
+    (click)="copy(hash)">
+    <i class="material-icons md-18">file_copy</i>
+  </button>
+</div>
+<h4 class="">Summary</h4>
+<div class="list-group-item my-4-x">
   <table class="table table-striped">
     <tbody>
       <tr>
