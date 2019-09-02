@@ -78,9 +78,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             tableServicePoint.ConnectionLimit = 1000;
         }
 
-        private void PushTransactions(MultiValueDictionary<string, TransactionEntry.Entity> buckets,
-                                        IEnumerable<TransactionEntry.Entity> indexedTransactions,
-                                    BlockingCollection<TransactionEntry.Entity[]> transactions)
+        private void PushTransactions(MultiValueDictionary<string, TransactionEntry.Entity> buckets, IEnumerable<TransactionEntry.Entity> indexedTransactions, BlockingCollection<TransactionEntry.Entity[]> transactions)
         {
             TransactionEntry.Entity[] array = indexedTransactions.ToArray();
             transactions.Add(array);

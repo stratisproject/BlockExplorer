@@ -36,10 +36,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         private bool StartAzureStorageDependentTest()
         {
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
                 return false;
+            }
 
             if (isverified && isavailable)
+            {
                 return true;
+            }
 
             if (!isverified)
             {
@@ -47,7 +51,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 try
                 {
-                    using (var tester = this.CreateTester())
+                    using (IndexerTester tester = this.CreateTester())
                     {
                     }
 
@@ -61,7 +65,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             }
 
             if (!isavailable)
+            {
                 throw new Exception("The Azure Storage Emulator is not available or is not started");
+            }
 
             return true;
         }
@@ -115,7 +121,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var entity = e.ToEntity();
             }
         }
+
         // TODO: Fix this test case
+
         /*
         [Fact]
         public void CanIndexBlocks()
@@ -144,7 +152,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Equal(0, tester.Indexer.IndexBlocks());
 
                 // Will not pass proof-of-work verification
-          
+
                 tester.Indexer.GetCheckpointRepository().DeleteCheckpoints();
 
                 tester.Indexer.FromHeight = 10;
@@ -183,7 +191,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             Assert.Equal("propertyvalue", entity2.Properties["propertyname"].StringValue);
             Assert.True(entity2.Serialize().SequenceEqual(entity.Serialize()));
         }
+
         // TODO: Fix this test case
+
         /*
         [Fact]
         public void CanIndexTransactions()
@@ -260,7 +270,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetColoredBalance()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             BitcoinSecret alice = new BitcoinSecret("KyJTjvFpPF6DDX4fnT56d2eATPfxjdUPXFFUb85psnCdh34iyXRQ");
             BitcoinSecret bob = new BitcoinSecret("KysJMPCkFP4SLsEQAED9CzCurJBkeVvAa4jeN1BBtYS7P5LocUBQ");
@@ -478,7 +491,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanMergeBalance()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -623,7 +639,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetWalletOrderedBalances()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -803,7 +822,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanQueryBalanceRange()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -878,7 +900,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var unconf1 = name.StartsWith("u");
             var unconf2 = change.BlockId == null;
             if (unconf1 != unconf2)
+            {
                 Assert.False(true, "A confirmed or unconfirmed transaction should not have been returned");
+            }
+
             return name;
         }
 
@@ -905,7 +930,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetBalanceSheet()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -1078,7 +1106,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanIndexLongScript()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -1093,7 +1124,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void NonStandardScriptPubKeyDoesNotReturnsWrongBalance()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -1230,7 +1264,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalancesP2WPKH()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -1273,7 +1310,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalancesP2WSH()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
@@ -1315,7 +1355,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void CanGetOrderedBalances()
         {
-            if (!StartAzureStorageDependentTest()) return;
+            if (!StartAzureStorageDependentTest())
+            {
+                return;
+            }
 
             using (var tester = this.CreateTester())
             {
