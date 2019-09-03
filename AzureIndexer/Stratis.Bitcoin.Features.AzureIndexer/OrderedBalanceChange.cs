@@ -74,12 +74,12 @@
                 }
 
                 // Can be used to Extract Multisig Address
-                //var isScript = output.ScriptPubKey.IsPayToScriptHash(network);
-                //var ms = PayToScriptHashTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
-                //if (isScript || ms)
-                //{
-                //    var addr = output.ScriptPubKey.GetDestinationAddress(network);
-                //}
+                var isScript = output.ScriptPubKey.IsPayToScriptHash(network);
+                var ms = PayToScriptHashTemplate.Instance.CheckScriptPubKey(output.ScriptPubKey);
+                if (isScript || ms)
+                {
+                    var addr = output.ScriptPubKey.GetDestinationAddress(network);
+                }
 
                 OrderedBalanceChange entry = null;
 
