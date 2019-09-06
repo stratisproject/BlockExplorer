@@ -73,9 +73,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>Gets the highest block that has been indexed.</summary>
         internal ChainedHeader StoreTip { get; private set; }
 
-        /// <summary>Gets the highest block that has been indexed.</summary>
-        internal int LastSavedBlockHeight { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureIndexerLoop"/> class.
         /// Constructs the AzureIndexerLoop.

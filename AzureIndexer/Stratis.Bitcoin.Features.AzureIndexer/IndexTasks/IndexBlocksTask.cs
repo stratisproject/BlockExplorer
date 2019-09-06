@@ -78,6 +78,11 @@
 
         protected override void IndexCore(string partitionName, IEnumerable<BlockInfo> blocks)
         {
+            var from = blocks.FirstOrDefault()?.Height;
+            var to = blocks.LastOrDefault()?.Height;
+
+            this.logger.LogDebug("Indexing blocks from {0} to {1}", from, to);
+
             BlockInfo first = blocks.First();
             Block block = first.Block;
             var hash = first.BlockId.ToString();
@@ -118,6 +123,8 @@
 
                     //IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
                     this.indexedBlocks++;
+
+                    this.logger.LogDebug("Completed Indexing blocks from {0} to {1}", from, to);
 
                     break;
                 }
