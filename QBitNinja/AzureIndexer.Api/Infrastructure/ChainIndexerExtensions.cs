@@ -25,7 +25,14 @@ namespace AzureIndexer.Api.Infrastructure
 
         public static ChainedHeader GetBlock(this ChainIndexer indexer, int height)
         {
-            return indexer.GetHeader(height);
+            try
+            {
+                return indexer.GetHeader(height);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

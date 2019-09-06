@@ -42,9 +42,8 @@
             }
             catch (AggregateException aex)
             {
+                this.logger.LogError(aex, "Exception occurred: {0}", aex.ToString());
                 ExceptionDispatchInfo.Capture(aex.InnerException).Throw();
-
-                this.logger.LogError("Exception occurred: {0}", aex.ToString());
             }
         }
 
@@ -134,14 +133,14 @@
                     // IndexerTrace.BlockAlreadyUploaded();
                     this.indexedBlocks++;
 
-                    this.logger.LogTrace("Storage exception occurred: {0}", ex.ToString());
+                    this.logger.LogError(ex, "Storage exception occurred: {0}", ex.ToString());
                     break;
                 }
                 catch (Exception ex)
                 {
                     IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
 
-                    this.logger.LogTrace("Exception occurred: {0}", ex.ToString());
+                    this.logger.LogError(ex, "Exception occurred: {0}", ex.ToString());
                     throw;
                 }
             }

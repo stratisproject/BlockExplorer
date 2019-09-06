@@ -17,9 +17,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public static void UpdateChain(this IEnumerable<ChainBlockHeader> entries, ChainIndexer chain, ILogger logger = null)
         {
-            lock (lockObj)
+            var allEntries = entries.OrderBy(e => e.Height);
+            try
             {
-                var allEntries = entries.OrderBy(e => e.Height);
                 foreach (ChainBlockHeader entry in allEntries)
                 {
                     try
@@ -59,6 +59,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         logger?.LogError(ex, "Failed to add chain tip {entry}", entry);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to add chain tip");
             }
 
             chain.SetTip(chain.Tip);

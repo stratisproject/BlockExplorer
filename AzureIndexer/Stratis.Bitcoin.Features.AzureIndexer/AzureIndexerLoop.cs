@@ -73,6 +73,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>Gets the highest block that has been indexed.</summary>
         internal ChainedHeader StoreTip { get; private set; }
 
+        /// <summary>Gets the highest block that has been indexed.</summary>
+        internal int LastSavedBlockHeight { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureIndexerLoop"/> class.
         /// Constructs the AzureIndexerLoop.
@@ -206,6 +209,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         private void StartLoop()
         {
+            this.logger.LogInformation("Starting indexer loop");
             this.asyncLoop = this.asyncProvider.CreateAndRunAsyncLoop($"{this.StoreName}.IndexAsync", async token =>
                 {
                     await this.IndexAsync(this.nodeLifetime.ApplicationStopping);
@@ -267,7 +271,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogTrace("Exception occurred: {0}", ex.ToString());
+                    this.logger.LogError("Exception occurred: {0}", ex.ToString());
 
                     // If something goes wrong then try again 1 minute later.
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
@@ -342,6 +346,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     // All indexes will progress more or less in step
                     var fromHeight = this.StoreTip.Height + 1;
                     var toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
+
+                    this.logger.LogInformation("IndexAsync from {0} to {1} and batch size {2}", fromHeight, toHeight, IndexBatchSize);
 
                     // Index a batch of blocks
                     this.PerformIndexing(IndexerCheckpoints.Blocks, fromHeight, toHeight);

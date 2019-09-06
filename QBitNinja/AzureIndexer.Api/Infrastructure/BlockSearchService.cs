@@ -1,4 +1,6 @@
-﻿#pragma warning disable 618
+﻿using Swashbuckle.AspNetCore.Swagger;
+
+#pragma warning disable 618
 namespace AzureIndexer.Api.Infrastructure
 {
     using System.IO;
@@ -36,6 +38,14 @@ namespace AzureIndexer.Api.Infrastructure
                 ExtendedInformation = extended ? this.FetchExtendedBlockInformation(blockFeature, block) : null,
                 Block = headerOnly ? null : block
             };
+
+            if (response.ExtendedInformation == null)
+            {
+                response.ExtendedInformation = new ExtendedBlockInformation
+                {
+                    BlockSubsidy = this.GetBlockSubsidy(blockFeature.Height)
+                };
+            }
 
             return response;
         }
