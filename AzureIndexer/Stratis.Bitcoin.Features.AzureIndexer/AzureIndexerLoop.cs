@@ -344,8 +344,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     var fromHeight = this.StoreTip.Height + 1;
                     var toHeight = Math.Min(this.StoreTip.Height + IndexBatchSize, this.indexerSettings.To);
 
-                    this.logger.LogInformation("IndexAsync from {0} to {1} and batch size {2}", fromHeight, toHeight, IndexBatchSize);
-
                     // Index a batch of blocks
                     this.PerformIndexing(IndexerCheckpoints.Blocks, fromHeight, toHeight);
 
