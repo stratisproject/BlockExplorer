@@ -22,20 +22,20 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="NStratis" Version="4.0.0.76" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="1.0.1" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4.1" />
+    <PackageReference Include="NStratis" Version="4.0.0.77" />
+    <PackageReference Include="Stratis.Bitcoin" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Api" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Features.SmartContracts" Version="1.0.2" />
+    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.5" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.5" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.4.1" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
-    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.1" />
+    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.2" />
     <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />
-    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.1" />	
+    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.2" />	
   </ItemGroup>
 
   <ItemGroup>

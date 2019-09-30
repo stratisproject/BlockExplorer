@@ -55,7 +55,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.nodeSettings = nodeSettings;
             this.indexerSettings = indexerSettings;
-            nodeStats.RegisterStats(this.AddNodeStats, StatsType.Inline, 1000);
+            nodeStats.RegisterStats(this.AddNodeStats, StatsType.Inline, name, 1000);
         }
 
         /// <summary>

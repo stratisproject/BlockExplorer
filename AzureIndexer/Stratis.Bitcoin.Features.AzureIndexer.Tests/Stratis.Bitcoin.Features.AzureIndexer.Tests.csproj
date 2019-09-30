@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NStratis" Version="4.0.0.76" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.4.1" />
+    <PackageReference Include="NStratis" Version="4.0.0.77" />
+    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.5" />
     <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.4.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.console" Version="2.4.1">
