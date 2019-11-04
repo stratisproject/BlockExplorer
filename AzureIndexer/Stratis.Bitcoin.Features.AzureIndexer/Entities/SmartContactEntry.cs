@@ -16,6 +16,7 @@
                 this.ContractTxData = this.transactionEntity.ContractTxData;
                 this.ContractCode = this.transactionEntity.ContractCode;
                 this.ContractByteCode = this.transactionEntity.ContractByteCode;
+                this.IsStandardToken = this.transactionEntity.IsStandardToken;
                 this.Child = new SmartContactDetailsEntry.Entity(this);
             }
 
@@ -72,6 +73,9 @@
 
             public string ContractCode { get; set; }
 
+            public bool IsStandardToken { get; set; }
+
+
             public ITableEntity CreateTableEntity()
             {
                 return this.CreateTableEntity(null);
@@ -81,12 +85,15 @@
             {
                 DynamicTableEntity entity = new DynamicTableEntity
                 {
-                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.RowKey
+                    ETag = "*",
+                    PartitionKey = this.PartitionKey,
+                    RowKey = this.RowKey
                 };
 
                 entity.Properties.AddOrReplace("GasPrice", new EntityProperty(Convert.ToInt64(this.ContractTxData.GasPrice)));
                 entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
                 entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType.ToString())); // TODO Convert to proper string name
+                entity.Properties.AddOrReplace("IsStandardToken", new EntityProperty(this.IsStandardToken));
 
                 return entity;
             }
@@ -141,12 +148,21 @@
                     this.GasPrice = entity.Properties[nameof(this.GasPrice)].Int64Value ?? 0;
                 }
             }
+
+            if (entity.Properties.TryGetValue("IsStandardToken", out EntityProperty isStandardTokenProperty))
+            {
+                this.IsStandardToken = isStandardTokenProperty.BooleanValue ?? false;
+            }
+            else
+            {
+                this.IsStandardToken = false;
+            }
         }
 
         public string Id { get; set; }
 
         public string TxId { get; set; }
-        
+
         public DateTimeOffset Timestamp { get; set; }
 
         public string OpCode { get; set; }
@@ -154,5 +170,7 @@
         public string MethodName { get; set; }
 
         public double GasPrice { get; set; }
+
+        public bool IsStandardToken { get; set; }
     }
 }

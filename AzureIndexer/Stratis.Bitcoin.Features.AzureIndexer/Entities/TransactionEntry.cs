@@ -22,6 +22,8 @@
 
         public bool HasSmartContract { get; set; }
 
+        public bool IsStandardToken { get; set; }
+
         public Money Fees
         {
             get
@@ -90,6 +92,7 @@
                 }
 
                 this.HasSmartContract = loadedEntity.HasSmartContract;
+                this.IsStandardToken = loadedEntity.IsStandardToken;
             }
 
             Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
@@ -126,6 +129,7 @@
                 else
                 {
                     this.HasSmartContract = false;
+                    this.IsStandardToken = false;
                     this.Child = null;
                 }
             }
@@ -190,6 +194,15 @@
                         this.HasSmartContract = false;
                     }
                 }
+
+                if (entity.Properties.TryGetValue("IsStandardToken", out EntityProperty isStandardToken))
+                {
+                    this.IsStandardToken = isStandardToken.BooleanValue ?? false;
+                }
+                else
+                {
+                    this.IsStandardToken = false;
+                }
             }
 
             public Entity(uint256 txId, ColoredTransaction colored)
@@ -236,6 +249,8 @@
 
             public string ContractCode { get; set; }
 
+            public bool IsStandardToken { get; set; }
+
             public enum TransactionEntryType
             {
                 Mempool,
@@ -275,7 +290,9 @@
             {
                 DynamicTableEntity entity = new DynamicTableEntity
                 {
-                    ETag = "*", PartitionKey = this.PartitionKey, RowKey = this.TxId + "-" + this.TypeLetter + "-" + this.BlockId
+                    ETag = "*",
+                    PartitionKey = this.PartitionKey,
+                    RowKey = this.TxId + "-" + this.TypeLetter + "-" + this.BlockId
                 };
                 if (this.Transaction != null)
                 {
@@ -296,6 +313,8 @@
                 }
 
                 entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(Convert.ToBoolean(this.HasSmartContract)));
+
+                entity.Properties.AddOrReplace("IsStandardToken", new EntityProperty(Convert.ToBoolean(this.IsStandardToken)));
 
                 return entity;
             }
@@ -347,6 +366,8 @@
                                 if (csharpDecompileResult.IsSuccess)
                                 {
                                     this.ContractCode = csharpDecompileResult.Value;
+
+                                    this.IsStandardToken = contractDecompileResult.Value.IsStandardToken();
                                 }
                             }
                         }
