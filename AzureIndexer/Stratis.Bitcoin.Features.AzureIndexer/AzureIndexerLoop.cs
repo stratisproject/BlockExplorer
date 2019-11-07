@@ -227,7 +227,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// Gets a block fetcher that respects the given type of checkpoint.
         /// The block fetcher will return "IndexBatchSize" blocks starting at this.StoreTip + 1.
-        /// If "this.AzureIndexer.IgnoreCheckpoints" is set then the checkpoints 
+        /// If "this.AzureIndexer.IgnoreCheckpoints" is set then the checkpoints
         /// will be ignored by "GetCheckpointInternal".
         /// </summary>
         /// <param name="indexerCheckpoints">The type of checkpoint (wallets, blocks, transactions or balances).</param>
@@ -356,8 +356,14 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                     // Index a batch of wallets
                     this.PerformIndexing(IndexerCheckpoints.Wallets, fromHeight, toHeight);
 
-                    // Update the StoreTip
-                    this.UpdateStoreTip();
+                    if (this.indexerSettings.IgnoreCheckpoints)
+                    {
+                        this.SetStoreTip(this.chainIndexer.GetHeader(toHeight));
+                    }
+                    else
+                    {
+                        this.UpdateStoreTip();
+                    }
                 }
                 catch (OperationCanceledException)
                 {

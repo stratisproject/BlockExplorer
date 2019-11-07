@@ -83,9 +83,9 @@
 
                 // Mime-encoded-data strings should always be a multiple of 4 in length. Provide trailing '='s if omitted..
                 this.AzureKey = (this.AzureKey + "===").Substring(0, AzureKey.Length + 3 - ((this.AzureKey.Length + 3) % 4));
-
-                this.IsSidechain = config.GetOrDefault<bool>("sidechain", false);
             }
+
+            this.IsSidechain = config.GetOrDefault<bool>("sidechain", false);
 
             this.CheckpointInterval = TimeSpan.Parse(config.GetOrDefault<string>("chkptint", "00:15:00"));
             this.IgnoreCheckpoints = config.GetOrDefault<bool>("nochkpts", false);
