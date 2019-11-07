@@ -104,7 +104,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
 
             IEnumerable<ChainedHeader> headers = this.BlockHeaders.EnumerateAfter(fork);
-            headers = headers?.Where(h => h.Height <= this.ToHeight);
+            headers = headers?.Where(h => h.Height >= this.FromHeight && h.Height <= this.ToHeight);
             ChainedHeader first = headers?.FirstOrDefault();
             if (first == null)
             {
@@ -189,6 +189,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.logger.LogTrace("(-)");
         }
 
-        
+
     }
 }
