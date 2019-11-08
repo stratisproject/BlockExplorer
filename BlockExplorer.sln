@@ -1,0 +1,81 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer", "AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj", "{E91D94CC-03A8-498F-A050-E6B797399E58}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer.Tests", "AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.Tests\Stratis.Bitcoin.Features.AzureIndexer.Tests.csproj", "{C5709F93-4939-4525-AFA9-6ED5C1440304}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.IndexerD", "AzureIndexer\Stratis.IndexerD\Stratis.IndexerD.csproj", "{D16167A9-0D99-40E3-A592-A5BE40B13E6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureIndexer", "AzureIndexer", "{AB305E64-25A4-40E1-BE98-0C8F3BAAC0AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{7A2FF5B6-6D8C-475B-8786-0C0D7C1B026B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureIndexer.Api", "QBitNinja\AzureIndexer.Api\AzureIndexer.Api.csproj", "{1B964C17-5582-4EA6-8795-5F2397ED24F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WEB.UI", "WEB.UI", "{ABD4FE0D-8F0D-4905-AB54-6AEF77D6B64E}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "block-explorer-ui", "block-explorer-ui\", "{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv2.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_54134"
+		Debug.AspNetCompiler.PhysicalPath = "block-explorer-ui\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54134\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_54134"
+		Release.AspNetCompiler.PhysicalPath = "block-explorer-ui\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54134\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "54134"
+		SlnRelativePath = "block-explorer-ui\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E91D94CC-03A8-498F-A050-E6B797399E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E91D94CC-03A8-498F-A050-E6B797399E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E91D94CC-03A8-498F-A050-E6B797399E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E91D94CC-03A8-498F-A050-E6B797399E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5709F93-4939-4525-AFA9-6ED5C1440304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5709F93-4939-4525-AFA9-6ED5C1440304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5709F93-4939-4525-AFA9-6ED5C1440304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5709F93-4939-4525-AFA9-6ED5C1440304}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D16167A9-0D99-40E3-A592-A5BE40B13E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D16167A9-0D99-40E3-A592-A5BE40B13E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D16167A9-0D99-40E3-A592-A5BE40B13E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D16167A9-0D99-40E3-A592-A5BE40B13E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B964C17-5582-4EA6-8795-5F2397ED24F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B964C17-5582-4EA6-8795-5F2397ED24F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B964C17-5582-4EA6-8795-5F2397ED24F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B964C17-5582-4EA6-8795-5F2397ED24F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E91D94CC-03A8-498F-A050-E6B797399E58} = {AB305E64-25A4-40E1-BE98-0C8F3BAAC0AE}
+		{C5709F93-4939-4525-AFA9-6ED5C1440304} = {AB305E64-25A4-40E1-BE98-0C8F3BAAC0AE}
+		{D16167A9-0D99-40E3-A592-A5BE40B13E6C} = {AB305E64-25A4-40E1-BE98-0C8F3BAAC0AE}
+		{1B964C17-5582-4EA6-8795-5F2397ED24F7} = {7A2FF5B6-6D8C-475B-8786-0C0D7C1B026B}
+		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD} = {ABD4FE0D-8F0D-4905-AB54-6AEF77D6B64E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B1B21350-17DD-423E-8FC2-BA32EE8AF9E7}
+	EndGlobalSection
+EndGlobal
