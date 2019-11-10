@@ -18,7 +18,7 @@ export class AppConfigService {
   public load() {
     return new Promise((resolve, reject) => {
 
-      this.http.get('/assets/config/config.json')
+      this.http.get(environment.configFile)
         .pipe(catchError((error: any): any => {
           reject(true);
           return Observable.throw('Server error');
@@ -26,12 +26,7 @@ export class AppConfigService {
         .subscribe((envResponse: any) => {
           const config = new AppConfig();
 
-          if (!environment.production) {
-            APP_CONFIG.apiBaseUrl = 'https://cirrusmainindexer1.azurewebsites.net';
-          } else {
-            APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
-          }
-
+          APP_CONFIG.apiBaseUrl = envResponse.apiBaseUrl;
           APP_CONFIG.symbol = envResponse.symbol;
           APP_CONFIG.chain = envResponse.chain;
           APP_CONFIG.sidechainColor = envResponse.sidechainColor;
