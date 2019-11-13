@@ -104,9 +104,9 @@
 
         public class Entity : IIndexed
         {
-            private readonly bool isSC = false;
+            private readonly bool checkSmartContract = false;
 
-            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool isSC = false)
+            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool checkSmartContract = false)
             {
                 if (txId == null)
                 {
@@ -119,9 +119,9 @@
                 this.Transaction = tx;
                 this.BlockId = blockId;
                 this.Type = blockId == null ? TransactionEntryType.Mempool : TransactionEntryType.ConfirmedTransaction;
-                this.isSC = isSC;
+                this.checkSmartContract = checkSmartContract;
 
-                if (this.isSC)
+                if (this.checkSmartContract)
                 {
                     this.CheckForSmartContract(tx);
                     this.Child = new SmartContactEntry.Entity(this);
@@ -307,7 +307,7 @@
                 Helper.SetEntityProperty(entity, "c", Helper.SerializeList(this.PreviousTxOuts));
                 Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)this.Timestamp.UtcTicks, true));
 
-                if (this.isSC)
+                if (this.checkSmartContract)
                 {
                     this.CheckForSmartContract(this.Transaction);
                 }
