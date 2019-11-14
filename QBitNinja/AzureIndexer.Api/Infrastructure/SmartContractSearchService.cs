@@ -31,13 +31,17 @@ namespace AzureIndexer.Api.Infrastructure
                 TxId = smartContract.TxId,
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
-                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice }
+                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice },
+                IsSuccessful = smartContract.IsSuccessful
             };
 
             var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);
             if (smartContractDetails != null)
             {
                 smartContractModel.Code = smartContractDetails.Code;
+                smartContractModel.ContractName = smartContractDetails.ContractName;
+                smartContractModel.ContractSymbol = smartContractDetails.ContractSymbol;
+                smartContractModel.IsStandardToken = smartContractDetails.IsStandardToken;
             }
 
             return smartContractModel;
@@ -58,7 +62,8 @@ namespace AzureIndexer.Api.Infrastructure
                 TxId = smartContract.TxId,
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
-                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice }
+                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice },
+                IsSuccessful = smartContract.IsSuccessful
             }).ToList();
 
             if (!loadDetails) return smartContractModels;
@@ -68,6 +73,9 @@ namespace AzureIndexer.Api.Infrastructure
                 if (smartContractDetails != null)
                 {
                     smartContractModel.Code = smartContractDetails.Code;
+                    smartContractModel.ContractName = smartContractDetails.ContractName;
+                    smartContractModel.ContractSymbol = smartContractDetails.ContractSymbol;
+                    smartContractModel.IsStandardToken = smartContractDetails.IsStandardToken;
                 }
             }
 

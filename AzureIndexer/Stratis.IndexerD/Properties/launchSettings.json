@@ -1,7 +1,12 @@
 {
-    "profiles": {
-        "Stratis.IndexerD": {
-            "commandName": "Project"
-        }
+  "profiles": {
+    "Stratis.IndexerD": {
+      "commandName": "Project",
+      "commandLineArgs": "-sidechain -datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu",
+    },
+    "FromIndex": {
+      "commandName": "Project",
+      "commandLineArgs": "-sidechain -datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu -nochkpts -indexfrom=39111 -indexto=39113"
     }
+  }
 }

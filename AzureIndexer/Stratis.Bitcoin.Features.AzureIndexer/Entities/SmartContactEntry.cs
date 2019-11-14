@@ -3,24 +3,28 @@
     using System;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.SmartContracts.CLR;
+    using Stratis.SmartContracts.Core;
 
     public class SmartContactEntry
     {
         public class Entity : IIndexed
         {
-            public Entity(TransactionEntry.Entity transactionEntity)
+            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, uint160 smartContractAddress, SmartContractOperations smartContractOperations)
             {
-                this.transactionEntity = transactionEntity;
-                this.TxId = this.transactionEntity.TxId;
-                this.ContractTxData = this.transactionEntity.ContractTxData;
-                this.ContractCode = this.transactionEntity.ContractCode;
-                this.ContractByteCode = this.transactionEntity.ContractByteCode;
-                this.IsStandardToken = this.transactionEntity.IsStandardToken;
-                this.Child = new SmartContactDetailsEntry.Entity(this);
-            }
+                this.TxId = txId;
+                this.IsSuccessful = isSuccessful;
 
-            private readonly TransactionEntry.Entity transactionEntity;
+                // if it's a contract creation, stores its detail too.
+                if (isSuccessful && contractTxData.IsCreateContract)
+                {
+                    // ensures the creation was successful
+                    this.Child = new SmartContactDetailsEntry.Entity(this, smartContractOperations);
+                }
+
+                this.SmartContractAddress = smartContractAddress;
+            }
 
             private string _partitionKey;
 
@@ -73,8 +77,9 @@
 
             public string ContractCode { get; set; }
 
-            public bool IsStandardToken { get; set; }
+            public bool IsSuccessful { get; }
 
+            public uint160 SmartContractAddress { get; }
 
             public ITableEntity CreateTableEntity()
             {
@@ -92,8 +97,9 @@
 
                 entity.Properties.AddOrReplace("GasPrice", new EntityProperty(Convert.ToInt64(this.ContractTxData.GasPrice)));
                 entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
-                entity.Properties.AddOrReplace("OpCode", new EntityProperty(this.ContractTxData.OpCodeType.ToString())); // TODO Convert to proper string name
-                entity.Properties.AddOrReplace("IsStandardToken", new EntityProperty(this.IsStandardToken));
+                entity.Properties.AddOrReplace("OpCode", new EntityProperty(((ScOpcodeType)this.ContractTxData.OpCodeType).ToString()));
+                entity.Properties.AddOrReplace("IsSuccessful", new EntityProperty(this.IsSuccessful));
+                entity.Properties.AddOrReplace("SmartContractAddress", new EntityProperty(this.SmartContractAddress.ToString()));
 
                 return entity;
             }
@@ -149,13 +155,18 @@
                 }
             }
 
-            if (entity.Properties.TryGetValue("IsStandardToken", out EntityProperty isStandardTokenProperty))
+            if (entity.Properties.TryGetValue(nameof(this.IsSuccessful), out EntityProperty isSuccessfulProperty))
             {
-                this.IsStandardToken = isStandardTokenProperty.BooleanValue ?? false;
+                this.IsSuccessful = isSuccessfulProperty.BooleanValue ?? false;
             }
             else
             {
-                this.IsStandardToken = false;
+                this.IsSuccessful = false;
+            }
+
+            if (entity.Properties.ContainsKey(nameof(this.SmartContractAddress)))
+            {
+                this.SmartContractAddress = entity.Properties[nameof(this.SmartContractAddress)].StringValue;
             }
         }
 
@@ -171,6 +182,8 @@
 
         public double GasPrice { get; set; }
 
-        public bool IsStandardToken { get; set; }
+        public bool IsSuccessful { get; set; }
+
+        public string SmartContractAddress { get; private set; }
     }
 }

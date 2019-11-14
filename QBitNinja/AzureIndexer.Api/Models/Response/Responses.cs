@@ -1,5 +1,4 @@
-﻿namespace AzureIndexer.Api.Models.Response
-{
+﻿namespace AzureIndexer.Api.Models.Response {
     using System;
     using System.Collections.Generic;
     using System.Net.Sockets;
@@ -7,8 +6,7 @@
     using Newtonsoft.Json;
     using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
-    public class BroadcastResponseModel
-    {
+    public class BroadcastResponseModel {
         [JsonProperty("success", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? Success { get; set; }
 
@@ -16,8 +14,7 @@
         public BroadcastErrorModel Error { get; set; }
     }
 
-    public class BroadcastErrorModel
-    {
+    public class BroadcastErrorModel {
         [JsonProperty("errorCode", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public RejectCode? ErrorCode { get; set; }
 
@@ -25,8 +22,7 @@
         public string Reason { get; set; }
     }
 
-    public class TransactionResponseModel
-    {
+    public class TransactionResponseModel {
         [JsonProperty("transaction", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public TransactionModel Transaction { get; set; }
 
@@ -55,8 +51,7 @@
         public MoneyModel Fees { get; set; }
     }
 
-    public class TransactionModel
-    {
+    public class TransactionModel {
         [JsonProperty("rBF", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? RBF { get; set; }
 
@@ -88,8 +83,7 @@
         public bool? HasWitness { get; set; }
     }
 
-    public class BlockInformationModel
-    {
+    public class BlockInformationModel {
         [JsonProperty("blockId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string BlockId { get; set; }
 
@@ -109,8 +103,7 @@
         public DateTimeOffset? BlockTime { get; set; }
     }
 
-    public class CoinModel
-    {
+    public class CoinModel {
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public object Amount { get; set; }
 
@@ -121,14 +114,12 @@
         public TxOutModel TxOut { get; set; }
     }
 
-    public class MoneyModel
-    {
+    public class MoneyModel {
         [JsonProperty("satoshi", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? Satoshi { get; set; }
     }
 
-    public class LockTimeModel
-    {
+    public class LockTimeModel {
         [JsonProperty("date", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? Date { get; set; }
 
@@ -145,8 +136,7 @@
         public bool? IsTimeLock { get; set; }
     }
 
-    public class TxInModel
-    {
+    public class TxInModel {
         [JsonProperty("sequence", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public SequenceModel Sequence { get; set; }
 
@@ -160,8 +150,7 @@
         public bool? IsFinal { get; set; }
     }
 
-    public class TxOutModel
-    {
+    public class TxOutModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
 
@@ -172,8 +161,7 @@
         public MoneyModel Value { get; set; }
     }
 
-    public class BlockHeaderModel
-    {
+    public class BlockHeaderModel {
         [JsonProperty("currentVersion", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? CurrentVersion { get; set; }
 
@@ -202,8 +190,7 @@
         public DateTimeOffset? BlockTime { get; set; }
     }
 
-    public class OutPointModel
-    {
+    public class OutPointModel {
         [JsonProperty("isNull", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsNull { get; set; }
 
@@ -214,8 +201,7 @@
         public long? N { get; set; }
     }
 
-    public class SequenceModel
-    {
+    public class SequenceModel {
         [JsonProperty("value", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public uint? Value { get; set; }
 
@@ -233,8 +219,7 @@
         // public string LockPeriod { get; set; }
     }
 
-    public class ScriptModel
-    {
+    public class ScriptModel {
         [JsonProperty("length", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Length { get; set; }
 
@@ -260,32 +245,27 @@
         public bool? IsValid { get; set; }
     }
 
-    public class TargetModel
-    {
+    public class TargetModel {
         [JsonProperty("difficulty", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public double? Difficulty { get; set; }
     }
 
-    public class ScriptIdModel
-    {
+    public class ScriptIdModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WitScriptIdModel
-    {
+    public class WitScriptIdModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WalletResponseModel
-    {
+    public class WalletResponseModel {
         [JsonProperty("name", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
     }
 
-    public class SubscriptionModel
-    {
+    public class SubscriptionModel {
         [JsonProperty("id", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Id { get; set; }
 
@@ -296,8 +276,7 @@
         public SubscriptionType? Type { get; set; }
     }
 
-    public class BalanceResponseModel
-    {
+    public class BalanceResponseModel {
         [JsonProperty("continuation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Continuation { get; set; }
 
@@ -311,8 +290,7 @@
         public ICollection<BalanceOperationModel> ConflictedOperations { get; set; }
     }
 
-    public class BalanceOperationModel
-    {
+    public class BalanceOperationModel {
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public MoneyModel Amount { get; set; }
 
@@ -341,8 +319,7 @@
         public TransactionSummaryModel TransactionSummary { get; set; }
     }
 
-    public class TransactionSummaryModel
-    {
+    public class TransactionSummaryModel {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash { get; set; }
 
@@ -386,8 +363,7 @@
         public SmartContractModel SmartContract { get; set; }
     }
 
-    public class LineItemModel
-    {
+    public class LineItemModel {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash { get; set; }
 
@@ -398,8 +374,7 @@
         public long N { get; set; }
     }
 
-    public class InsertWalletAddressModel
-    {
+    public class InsertWalletAddressModel {
         [JsonProperty("mergePast", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? MergePast { get; set; }
 
@@ -413,14 +388,12 @@
         public object UserData { get; set; }
     }
 
-    public class DestinationModel
-    {
+    public class DestinationModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WalletAddressModel
-    {
+    public class WalletAddressModel {
         [JsonProperty("WalletName", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string WalletName { get; set; }
 
@@ -440,8 +413,7 @@
         public object UserData { get; set; }
     }
 
-    public class HDKeySetModel
-    {
+    public class HDKeySetModel {
         [JsonProperty("name", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
 
@@ -461,8 +433,7 @@
         public bool? P2SH { get; set; }
     }
 
-    public class HDKeyDataModel
-    {
+    public class HDKeyDataModel {
         [JsonProperty("path", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public KeyPathModel Path { get; set; }
 
@@ -479,8 +450,7 @@
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class BitcoinExtPubKeyModel
-    {
+    public class BitcoinExtPubKeyModel {
         [JsonProperty("extPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ExtPubKeyModel ExtPubKey { get; set; }
 
@@ -494,8 +464,7 @@
         //public NetworkModel Network { get; set; }
     }
 
-    public class KeyPathModel
-    {
+    public class KeyPathModel {
         [JsonProperty("indexes", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<int> Indexes { get; set; }
 
@@ -506,8 +475,7 @@
         public bool? IsHardened { get; set; }
     }
 
-    public class BitcoinAddressModel
-    {
+    public class BitcoinAddressModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
 
@@ -515,8 +483,7 @@
         //public NetworkModel Network { get; set; }
     }
 
-    public class ExtPubKeyModel
-    {
+    public class ExtPubKeyModel {
         [JsonProperty("depth", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Depth { get; set; }
 
@@ -539,8 +506,7 @@
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class NetworkModel
-    {
+    public class NetworkModel {
         [JsonProperty("magicBytesArray", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public byte[] MagicBytesArray { get; set; }
 
@@ -577,8 +543,8 @@
         [JsonProperty("additionalNames", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<string> AdditionalNames { get; set; }
 
-        [JsonProperty("coinTicker", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public string CoinTicker { get; set; }
+        [JsonProperty("coinSymbol", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string CoinSymbol { get; set; }
 
         [JsonProperty("rootFolderName", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string RootFolderName { get; set; }
@@ -629,8 +595,7 @@
         public string GenesisHash { get; set; }
     }
 
-    public class PubKeyModel
-    {
+    public class PubKeyModel {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public KeyIdModel Hash { get; set; }
 
@@ -644,8 +609,7 @@
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class ConsensusModel
-    {
+    public class ConsensusModel {
         [JsonProperty("coinbaseMaturity", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? CoinbaseMaturity { get; set; }
 
@@ -779,8 +743,7 @@
         public ICollection<object> FullValidationRules { get; set; }
     }
 
-    public class NetworkAddressModel
-    {
+    public class NetworkAddressModel {
         [JsonProperty("service", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? Service { get; set; }
 
@@ -794,8 +757,7 @@
         public DateTimeOffset? Time { get; set; }
     }
 
-    public class DNSSeedDataModel
-    {
+    public class DNSSeedDataModel {
         [JsonProperty("name", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
 
@@ -803,8 +765,7 @@
         public string Host { get; set; }
     }
 
-    public class CheckpointInfoModel
-    {
+    public class CheckpointInfoModel {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash { get; set; }
 
@@ -812,20 +773,17 @@
         public string StakeModifierV2 { get; set; }
     }
 
-    public class Bech32EncoderModel
-    {
+    public class Bech32EncoderModel {
         [JsonProperty("humanReadablePart", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public byte[] HumanReadablePart { get; set; }
     }
 
-    public class KeyIdModel
-    {
+    public class KeyIdModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WitKeyIdModel
-    {
+    public class WitKeyIdModel {
         [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ScriptModel ScriptPubKey { get; set; }
 
@@ -833,8 +791,7 @@
         public ScriptModel WitScriptPubKey { get; set; }
     }
 
-    public class ConsensusOptionsModel
-    {
+    public class ConsensusOptionsModel {
         [JsonProperty("maxBlockBaseSize", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? MaxBlockBaseSize { get; set; }
 
@@ -866,14 +823,12 @@
         public int? MaxStandardTxSigopsCost { get; set; }
     }
 
-    public class IBIP9DeploymentsArrayModel
-    {
+    public class IBIP9DeploymentsArrayModel {
         [JsonProperty("length", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Length { get; set; }
     }
 
-    public class BigIntegerModel
-    {
+    public class BigIntegerModel {
         [JsonProperty("bitCount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? BitCount { get; set; }
 
@@ -890,8 +845,7 @@
         public int? SignValue { get; set; }
     }
 
-    public class IPEndPointModel
-    {
+    public class IPEndPointModel {
         [JsonProperty("addressFamily", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public AddressFamily? AddressFamily { get; set; }
 
@@ -902,8 +856,7 @@
         public int? Port { get; set; }
     }
 
-    public class IPAddressModel
-    {
+    public class IPAddressModel {
         [JsonProperty("addressFamily", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public AddressFamily? AddressFamily { get; set; }
 
@@ -929,8 +882,7 @@
         public long? Address { get; set; }
     }
 
-    public class KeySetDataModel
-    {
+    public class KeySetDataModel {
         [JsonProperty("keySet", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public HDKeySetModel KeySet { get; set; }
 
@@ -938,14 +890,12 @@
         public HDKeyStateModel State { get; set; }
     }
 
-    public class HDKeyStateModel
-    {
+    public class HDKeyStateModel {
         [JsonProperty("nextUnused", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? NextUnused { get; set; }
     }
 
-    public class BalanceSummaryModel
-    {
+    public class BalanceSummaryModel {
         [JsonProperty("unConfirmed", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BalanceSummaryDetailsModel UnConfirmed { get; set; }
 
@@ -968,8 +918,7 @@
         public CacheHit? CacheHit { get; set; }
     }
 
-    public class BalanceSummaryDetailsModel
-    {
+    public class BalanceSummaryDetailsModel {
         [JsonProperty("transactionCount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? TransactionCount { get; set; }
 
@@ -983,8 +932,7 @@
         public ICollection<AssetBalanceSummaryDetailsModel> Assets { get; set; }
     }
 
-    public class AssetBalanceSummaryDetailsModel
-    {
+    public class AssetBalanceSummaryDetailsModel {
         [JsonProperty("asset", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BitcoinAssetIdModel Asset { get; set; }
 
@@ -995,8 +943,7 @@
         public long? Received { get; set; }
     }
 
-    public class BitcoinAssetIdModel
-    {
+    public class BitcoinAssetIdModel {
         [JsonProperty("assetId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public object AssetId { get; set; }
 
@@ -1007,8 +954,7 @@
         //public NetworkModel Network { get; set; }
     }
 
-    public class WhatIsBlockHeaderModel
-    {
+    public class WhatIsBlockHeaderModel {
         [JsonProperty("version", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Version { get; set; }
 
@@ -1034,8 +980,7 @@
         public double? Difficulty { get; set; }
     }
 
-    public class VersionStatsResponseModel
-    {
+    public class VersionStatsResponseModel {
         [JsonProperty("last144", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public VersionStatsModel Last144 { get; set; }
 
@@ -1046,8 +991,7 @@
         public VersionStatsModel SincePeriodStart { get; set; }
     }
 
-    public class WhatIsPublicKeyModel
-    {
+    public class WhatIsPublicKeyModel {
         [JsonProperty("hex", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hex { get; set; }
 
@@ -1064,8 +1008,7 @@
         public WhatIsScriptModel ScriptPubKey { get; set; }
     }
 
-    public class WhatIsAddressModel
-    {
+    public class WhatIsAddressModel {
         [JsonProperty("isP2SH", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsP2SH { get; set; }
 
@@ -1094,8 +1037,7 @@
         public string StringType { get; set; }
     }
 
-    public class WhatIsScriptModel
-    {
+    public class WhatIsScriptModel {
         [JsonProperty("hash160", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash160 { get; set; }
 
@@ -1112,8 +1054,7 @@
         public string Asm { get; set; }
     }
 
-    public class VersionStatsModel
-    {
+    public class VersionStatsModel {
         [JsonProperty("total", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Total { get; set; }
 
@@ -1127,8 +1068,7 @@
         public ICollection<VersionStatsItemModel> Stats { get; set; }
     }
 
-    public class VersionStatsItemModel
-    {
+    public class VersionStatsItemModel {
         [JsonProperty("version", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Version { get; set; }
 
@@ -1142,8 +1082,7 @@
         public double? Percentage { get; set; }
     }
 
-    public class BlockResponseModel
-    {
+    public class BlockResponseModel {
         [JsonProperty("additionalInformation", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public BlockInformationModel AdditionalInformation { get; set; }
 
@@ -1154,8 +1093,7 @@
         public BlockModel Block { get; set; }
     }
 
-    public class ExtendedBlockInformationModel
-    {
+    public class ExtendedBlockInformationModel {
         [JsonProperty("size", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Size { get; set; }
 
@@ -1172,8 +1110,7 @@
         public MoneyModel BlockReward { get; set; }
     }
 
-    public class BlockModel
-    {
+    public class BlockModel {
         [JsonProperty("blockSize", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? BlockSize { get; set; }
 
@@ -1190,8 +1127,7 @@
         public BlockHeaderModel Header { get; set; }
     }
 
-    public class BlockHeaderResponseModel
-    {
+    public class BlockHeaderResponseModel {
         [JsonProperty("version", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Version { get; set; }
 
@@ -1217,11 +1153,10 @@
         public double? Difficulty { get; set; }
     }
 
-    public class SmartContractModel
-    {
+    public class SmartContractModel {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Hash { get; set; }
-        
+
         [JsonProperty("txId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string TxId { get; set; }
 
@@ -1234,7 +1169,19 @@
         [JsonProperty("methodName", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string MethodName { get; set; }
 
+        [JsonProperty("isSuccessful", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsSuccessful{ get; set; }
+
+        [JsonProperty("isStandardToken", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsStandardToken { get; set; }
+
         [JsonProperty("code", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Code { get; set; }
+
+        [JsonProperty("contractName", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string ContractName { get; set; }
+
+        [JsonProperty("contractSymbol", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string ContractSymbol { get; set; }
     }
 }

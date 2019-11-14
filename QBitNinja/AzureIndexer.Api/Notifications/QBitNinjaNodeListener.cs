@@ -16,6 +16,7 @@ using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.Consensus;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Features.AzureIndexer.Entities;
+using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
 using Stratis.Bitcoin.Interfaces;
@@ -23,6 +24,7 @@ using Stratis.Bitcoin.P2P.Peer;
 using Stratis.Bitcoin.P2P.Protocol;
 using Stratis.Bitcoin.P2P.Protocol.Behaviors;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.SmartContracts.Core.Receipts;
 using ReaderWriterLock = NBitcoin.ReaderWriterLock;
 
 namespace AzureIndexer.Api.Notifications
@@ -92,6 +94,7 @@ namespace AzureIndexer.Api.Notifications
         private readonly IConnectionManager connectionManager;
         private readonly IPeerBanning peerBanning;
         private readonly ILoggerFactory loggerFactory;
+        private readonly SmartContractOperations smartContractOperations;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -118,7 +121,8 @@ namespace AzureIndexer.Api.Notifications
             IConsensusManager consensusManager,
             IConnectionManager connectionManager,
             IPeerBanning peerBanning,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            SmartContractOperations smartContractOperations)
         {
             _Configuration = configuration;
             this.initialBlockDownloadState = initialBlockDownloadState;
@@ -126,6 +130,7 @@ namespace AzureIndexer.Api.Notifications
             this.connectionManager = connectionManager;
             this.peerBanning = peerBanning;
             this.loggerFactory = loggerFactory;
+            this.smartContractOperations = smartContractOperations;
         }
 
         private Stratis.Bitcoin.Features.AzureIndexer.AzureIndexer _Indexer;
@@ -560,7 +565,7 @@ namespace AzureIndexer.Api.Notifications
                         });
                         TryLock(_LockTransactions, () =>
                         {
-                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory)
+                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory, this.smartContractOperations)
                             {
                                 EnsureIsSetup = false
                             }

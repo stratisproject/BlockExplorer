@@ -22,6 +22,7 @@
                     {
                         services.AddSingleton<AzureIndexerLoop>();
                         services.AddSingleton<AzureIndexerSettings>(new AzureIndexerSettings(setup));
+                        services.AddSingleton<SmartContractOperations>();
                     });
             });
 

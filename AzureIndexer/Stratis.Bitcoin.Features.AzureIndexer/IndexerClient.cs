@@ -295,7 +295,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             CloudTable table = this.Configuration.GetSmartContactDetailTable();
             TableQuery query = new TableQuery();
             query.TakeCount = take;
-            
+
             TableContinuationToken token = null;
             var entities = new List<SmartContactDetailsEntry>();
             do

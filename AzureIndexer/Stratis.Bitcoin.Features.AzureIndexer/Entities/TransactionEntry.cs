@@ -13,6 +13,7 @@
     using Stratis.SmartContracts.CLR.Decompilation;
     using Stratis.SmartContracts.CLR.Serialization;
     using Stratis.SmartContracts.Core;
+    using Stratis.SmartContracts.Core.Receipts;
 
     public partial class TransactionEntry
     {
@@ -92,7 +93,6 @@
                 }
 
                 this.HasSmartContract = loadedEntity.HasSmartContract;
-                this.IsStandardToken = loadedEntity.IsStandardToken;
             }
 
             Entity coloredLoadedEntity = entities.FirstOrDefault(e => e.ColoredTransaction != null);
@@ -106,7 +106,7 @@
         {
             private readonly bool checkSmartContract = false;
 
-            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool checkSmartContract = false)
+            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool checkSmartContract = false, SmartContractOperations smartContractOperations = null)
             {
                 if (txId == null)
                 {
@@ -123,13 +123,12 @@
 
                 if (this.checkSmartContract)
                 {
-                    this.CheckForSmartContract(tx);
-                    this.Child = new SmartContactEntry.Entity(this);
+                    this.Child = this.GetSmartContractEntry(tx, smartContractOperations);
+                    this.HasSmartContract = this.Child != null;
                 }
                 else
                 {
                     this.HasSmartContract = false;
-                    this.IsStandardToken = false;
                     this.Child = null;
                 }
             }
@@ -194,15 +193,6 @@
                         this.HasSmartContract = false;
                     }
                 }
-
-                if (entity.Properties.TryGetValue("IsStandardToken", out EntityProperty isStandardToken))
-                {
-                    this.IsStandardToken = isStandardToken.BooleanValue ?? false;
-                }
-                else
-                {
-                    this.IsStandardToken = false;
-                }
             }
 
             public Entity(uint256 txId, ColoredTransaction colored)
@@ -242,14 +232,6 @@
             public bool HasSmartContract { get; set; }
 
             public Network Network { get; set; }
-
-            public ContractTxData ContractTxData { get; set; }
-
-            public byte[] ContractByteCode { get; set; }
-
-            public string ContractCode { get; set; }
-
-            public bool IsStandardToken { get; set; }
 
             public enum TransactionEntryType
             {
@@ -307,14 +289,7 @@
                 Helper.SetEntityProperty(entity, "c", Helper.SerializeList(this.PreviousTxOuts));
                 Helper.SetEntityProperty(entity, "d", Utils.ToBytes((ulong)this.Timestamp.UtcTicks, true));
 
-                if (this.checkSmartContract)
-                {
-                    this.CheckForSmartContract(this.Transaction);
-                }
-
                 entity.Properties.AddOrReplace("HasSmartContract", new EntityProperty(Convert.ToBoolean(this.HasSmartContract)));
-
-                entity.Properties.AddOrReplace("IsStandardToken", new EntityProperty(Convert.ToBoolean(this.IsStandardToken)));
 
                 return entity;
             }
@@ -333,48 +308,29 @@
             /// Check Tx for containing SmartContract in it.
             /// </summary>
             /// <param name="transaction">Transaction</param>
+            /// <param name="smartContractOperations">Helper class to obtain smart contract information related to this transaction.</param>
+            /// <remarks>A transaction can contain only one output that call/creates a transaction.</remarks>
             /// <returns>True or False</returns>
-            private bool CheckForSmartContract(Transaction transaction)
+            private SmartContactEntry.Entity GetSmartContractEntry(Transaction transaction, SmartContractOperations smartContractOperations)
             {
-                CallDataSerializer smartContractSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.Network));
-                CSharpContractDecompiler csharpDecompiler = new CSharpContractDecompiler();
-
-                foreach (TxOut transactionOutput in transaction.Outputs)
+                var smartContractExecution = smartContractOperations.GetSmartContractExecution(transaction);
+                if (!smartContractExecution.hasSmartContractExecution)
                 {
-                    if (!transactionOutput.ScriptPubKey.IsSmartContractCreate())
-                        continue;
-
-                    Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
-                    if (contractTxDataResult.IsSuccess)
-                    {
-                        this.HasSmartContract = true;
-                        this.ContractTxData = contractTxDataResult.Value;
-                        if (!this.ContractTxData.IsCreateContract)
-                        {
-                            continue;
-                        }
-
-                        // Get & Save Contract details just on Op_Create
-                        Result<IContractModuleDefinition> contractDecompileResult = ContractDecompiler.GetModuleDefinition(this.ContractTxData.ContractExecutionCode);
-                        if (contractDecompileResult.IsSuccess)
-                        {
-                            this.ContractByteCode = contractDecompileResult.Value.ToByteCode().Value;
-                            if (this.ContractByteCode.Length > 0)
-                            {
-                                Result<string> csharpDecompileResult =
-                                    csharpDecompiler.GetSource(this.ContractByteCode);
-                                if (csharpDecompileResult.IsSuccess)
-                                {
-                                    this.ContractCode = csharpDecompileResult.Value;
-
-                                    this.IsStandardToken = contractDecompileResult.Value.IsStandardToken();
-                                }
-                            }
-                        }
-                    }
+                    return null;
                 }
 
-                return this.HasSmartContract;
+                Receipt receipt = smartContractExecution.receipt;
+                bool successfulCall = smartContractExecution.receipt.Success;
+
+                uint160 contractAddress = smartContractExecution.isSmartContractCreation ? receipt?.NewContractAddress : receipt?.To;
+
+                return new SmartContactEntry.Entity(
+                        txId: transaction.GetHash(),
+                        smartContractExecution.contractTxData,
+                        successfulCall,
+                        contractAddress,
+                        smartContractOperations
+                        );
             }
 
             public TransactionEntryType GetType(string letter)

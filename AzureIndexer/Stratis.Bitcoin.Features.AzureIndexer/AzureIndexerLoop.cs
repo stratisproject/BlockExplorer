@@ -10,8 +10,10 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
     using Microsoft.WindowsAzure.Storage.Auth;
     using NBitcoin;
     using Stratis.Bitcoin.AsyncWork;
+    using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
     using Stratis.Bitcoin.Utilities;
+    using Stratis.SmartContracts.Core.Receipts;
 
     /// <summary>
     /// The AzureIndexerStoreLoop loads blocks from the block repository and indexes them in Azure.
@@ -34,6 +36,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly INodeLifetime nodeLifetime;
 
         private readonly ILoggerFactory loggerFactory;
+
+        /// <summary>The smart contract operations helper, used to collect information about an eventual smart contract that need to be indexed.</summary>
+        private readonly SmartContractOperations smartContractOperations;
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
@@ -74,12 +79,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         internal ChainedHeader StoreTip { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureIndexerLoop"/> class.
+        /// Initializes a new instance of the <see cref="AzureIndexerLoop" /> class.
         /// Constructs the AzureIndexerLoop.
         /// </summary>
         /// <param name="fullNode">The full node that will be indexed.</param>
         /// <param name="loggerFactory">The logger factory.</param>
-        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory)
+        /// <param name="receiptRepository">The smart contract receipt repository.</param>
+        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, SmartContractOperations smartContractOperations)
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
@@ -88,6 +94,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.loggerFactory = loggerFactory;
+            this.smartContractOperations = smartContractOperations;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
@@ -312,7 +319,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                             task = new IndexBlocksTask(this.IndexerConfig, this.loggerFactory);
                             break;
                         case IndexerCheckpoints.Transactions:
-                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory);
+                            task = new IndexTransactionsTask(this.IndexerConfig, this.loggerFactory, this.smartContractOperations);
                             break;
                         case IndexerCheckpoints.Balances:
                             task = new IndexBalanceTask(this.IndexerConfig, null, this.loggerFactory);

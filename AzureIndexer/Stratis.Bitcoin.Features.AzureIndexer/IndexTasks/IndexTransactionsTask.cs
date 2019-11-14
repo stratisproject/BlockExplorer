@@ -11,17 +11,20 @@
     using NBitcoin;
     using Stratis.Bitcoin.Features.AzureIndexer.Entities;
     using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+    using Stratis.SmartContracts.Core.Receipts;
 
     public class IndexTransactionsTask : IndexTableEntitiesTaskBase<TransactionEntry.Entity>
     {
         private readonly ILogger logger;
         private readonly IndexerConfiguration config;
+        private readonly SmartContractOperations smartContractOperations;
         private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
-        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory)
+        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, SmartContractOperations smartContractOperations)
             : base(configuration, loggerFactory)
         {
             this.config = configuration;
+            this.smartContractOperations = smartContractOperations;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
@@ -29,13 +32,13 @@
         {
             foreach (Transaction transaction in block.Block.Transactions)
             {
-                TransactionEntry.Entity indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network, this.IsSC);
+                TransactionEntry.Entity indexed = new TransactionEntry.Entity(null, transaction, block.BlockId, network, this.IsSC, this.smartContractOperations);
 
                 if (this.IsSC)
                 {
                     if (indexed.HasSmartContract && smartContractBulk != null)
                     {
-                        SmartContactEntry.Entity scEntity = new SmartContactEntry.Entity(indexed);
+                        SmartContactEntry.Entity scEntity = indexed.Child;
                         smartContractBulk.Add(scEntity.PartitionKey, scEntity);
                     }
                 }
