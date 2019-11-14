@@ -32,7 +32,8 @@ namespace AzureIndexer.Api.Infrastructure
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
                 GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice },
-                IsSuccessful = smartContract.IsSuccessful
+                IsSuccessful = smartContract.IsSuccessful,
+                ErrorMessage = smartContract.ErrorMessage
             };
 
             var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);
@@ -63,7 +64,8 @@ namespace AzureIndexer.Api.Infrastructure
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
                 GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice },
-                IsSuccessful = smartContract.IsSuccessful
+                IsSuccessful = smartContract.IsSuccessful,
+                ErrorMessage = smartContract.ErrorMessage
             }).ToList();
 
             if (!loadDetails) return smartContractModels;

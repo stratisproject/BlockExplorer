@@ -1170,7 +1170,10 @@
         public string MethodName { get; set; }
 
         [JsonProperty("isSuccessful", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public bool IsSuccessful{ get; set; }
+        public bool IsSuccessful { get; set; }
+
+        [JsonProperty("errorMessage", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string ErrorMessage { get; set; }
 
         [JsonProperty("isStandardToken", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool IsStandardToken { get; set; }

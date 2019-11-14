@@ -11,10 +11,13 @@
     {
         public class Entity : IIndexed
         {
-            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, uint160 smartContractAddress, SmartContractOperations smartContractOperations)
+            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, string errorMessage, uint160 smartContractAddress, SmartContractOperations smartContractOperations)
             {
                 this.TxId = txId;
+                this.ContractTxData = contractTxData;
                 this.IsSuccessful = isSuccessful;
+                this.ErrorMessage = errorMessage;
+                this.SmartContractAddress = smartContractAddress;
 
                 // if it's a contract creation, stores its detail too.
                 if (isSuccessful && contractTxData.IsCreateContract)
@@ -22,8 +25,6 @@
                     // ensures the creation was successful
                     this.Child = new SmartContactDetailsEntry.Entity(this, smartContractOperations);
                 }
-
-                this.SmartContractAddress = smartContractAddress;
             }
 
             private string _partitionKey;
@@ -40,13 +41,13 @@
                 {
                     if (this._partitionKey == null && this.TxId != null)
                     {
-                        if (this.ContractTxData.IsCreateContract)
+                        if (this.ContractTxData?.IsCreateContract == true)
                         {
                             this._partitionKey = this.addressGenerator.GenerateAddress(this.TxId, 0).ToString();
                         }
                         else
                         {
-                            this._partitionKey = this.ContractTxData.ContractAddress.ToString();
+                            this._partitionKey = this.ContractTxData?.ContractAddress.ToString();
                         }
                     }
 
@@ -78,6 +79,7 @@
             public string ContractCode { get; set; }
 
             public bool IsSuccessful { get; }
+            public string ErrorMessage { get; }
 
             public uint160 SmartContractAddress { get; }
 
@@ -99,7 +101,8 @@
                 entity.Properties.AddOrReplace("MethodName", new EntityProperty(this.ContractTxData.MethodName));
                 entity.Properties.AddOrReplace("OpCode", new EntityProperty(((ScOpcodeType)this.ContractTxData.OpCodeType).ToString()));
                 entity.Properties.AddOrReplace("IsSuccessful", new EntityProperty(this.IsSuccessful));
-                entity.Properties.AddOrReplace("SmartContractAddress", new EntityProperty(this.SmartContractAddress.ToString()));
+                entity.Properties.AddOrReplace("SmartContractAddress", new EntityProperty(this.SmartContractAddress?.ToString()));
+                entity.Properties.AddOrReplace("ErrorMessage", new EntityProperty(this.ErrorMessage));
 
                 return entity;
             }
@@ -168,6 +171,11 @@
             {
                 this.SmartContractAddress = entity.Properties[nameof(this.SmartContractAddress)].StringValue;
             }
+
+            if (entity.Properties.ContainsKey(nameof(this.ErrorMessage)))
+            {
+                this.ErrorMessage = entity.Properties[nameof(this.ErrorMessage)].StringValue;
+            }
         }
 
         public string Id { get; set; }
@@ -185,5 +193,7 @@
         public bool IsSuccessful { get; set; }
 
         public string SmartContractAddress { get; private set; }
+
+        public string ErrorMessage { get; private set; }
     }
 }

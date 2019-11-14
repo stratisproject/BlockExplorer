@@ -90,7 +90,7 @@
 
             this.SendEntities(ref transactionsBatch, txTable, options, context, ref txBatches);
 
-            if (this.IsSC && smartContractDetailsBatch.Count > 0)
+            if (this.IsSC && smartContractsBatch.Count > 0)
             {
                 this.SendEntities(ref smartContractsBatch, scTable, options, context, ref scBatches);
                 if (smartContractDetailsBatch.Count > 0)

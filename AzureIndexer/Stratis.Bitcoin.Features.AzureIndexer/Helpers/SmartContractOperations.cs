@@ -69,9 +69,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 
                 return (
                     true,
-                    contractTxDataResult.IsSuccess ? contractTxDataResult.Value : null,
+                    contractTxDataResult.Value,
                     receipt,
-                    smartContractExecutionOutput.ScriptPubKey.IsSmartContractCreate());
+                    contractTxDataResult.Value?.IsCreateContract ?? smartContractExecutionOutput.ScriptPubKey.IsSmartContractCreate());
             }
             else
             {
@@ -133,12 +133,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 
         public string GetStandardTokenSymbol(uint160 contractAddress)
         {
-            return this.GetStorageValue<string>(contractAddress, "get_Symbol");
+            return this.GetStorageValue<string>(contractAddress, "Symbol");
         }
 
         public string GetStandardTokenName(uint160 contractAddress)
         {
-            return this.GetStorageValue<string>(contractAddress, "get_Name");
+            return this.GetStorageValue<string>(contractAddress, "Name");
         }
 
         public TReturnValue GetPropertyValue<TReturnValue>(uint160 contractAddress, string propertyName, int height, ulong gasPrice = 1000, ulong gasLimit = 10000)

@@ -320,16 +320,16 @@
                 }
 
                 Receipt receipt = smartContractExecution.receipt;
-                bool successfulCall = smartContractExecution.receipt.Success;
 
                 uint160 contractAddress = smartContractExecution.isSmartContractCreation ? receipt?.NewContractAddress : receipt?.To;
 
                 return new SmartContactEntry.Entity(
                         txId: transaction.GetHash(),
-                        smartContractExecution.contractTxData,
-                        successfulCall,
-                        contractAddress,
-                        smartContractOperations
+                        contractTxData: smartContractExecution.contractTxData,
+                        isSuccessful: receipt.Success,
+                        errorMessage: receipt.ErrorMessage,
+                        smartContractAddress: contractAddress,
+                        smartContractOperations: smartContractOperations
                         );
             }
 
