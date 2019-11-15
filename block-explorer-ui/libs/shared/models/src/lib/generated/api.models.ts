@@ -1472,6 +1472,8 @@ export class SmartContractModel implements ISmartContractModel {
   opCode?: string | undefined;
   methodName?: string | undefined;
   code?: string | undefined;
+  isSuccessful?: boolean | undefined;
+  isStandardToken?: boolean | undefined;
 
   constructor(data?: ISmartContractModel) {
     if (data) {
@@ -1496,6 +1498,8 @@ export class SmartContractModel implements ISmartContractModel {
       this.code = data["code"];
       this.opCode = data["opCode"];
       this.methodName = data["methodName"];
+      this.isSuccessful = data["isSuccessful"];
+      this.isStandardToken = data["isStandardToken"];
     }
   }
 
@@ -1516,6 +1520,8 @@ export interface ISmartContractModel {
   opCode?: string | undefined;
   methodName?: string | undefined;
   code?: string | undefined;
+  isSuccessful?: boolean | undefined;
+  isStandardToken?: boolean | undefined;
 }
 
 export enum BalanceSummaryModelCacheHit {
