@@ -9,7 +9,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class BalanceComponent implements OnInit {
 
   @Input() balance = 0;
-  @Input() decimalPlaces = 4;
+  @Input() decimalPlaces = 8;
 
   constructor() { }
 
