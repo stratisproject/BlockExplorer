@@ -37,6 +37,7 @@ namespace AzureIndexer.Api.IoC
                 cfg.CreateMap<BlockHeader, BlockHeaderModel>();
                 cfg.CreateMap<OutPoint, OutPointModel>();
                 cfg.CreateMap<WhatIsPublicKey, WhatIsPublicKeyModel>();
+                cfg.CreateMap<WhatIsSmartContract, WhatIsSmartContractModel>();
                 cfg.CreateMap<Sequence, SequenceModel>();
                 cfg.CreateMap<Script, ScriptModel>().ConvertUsing<ScriptTypeConverter>();
                 cfg.CreateMap<TransactionResponseModel, TransactionSummaryModel>().ConvertUsing<TransactionResponseSummaryConverter>();

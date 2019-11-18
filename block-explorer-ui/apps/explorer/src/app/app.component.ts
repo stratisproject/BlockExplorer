@@ -49,6 +49,9 @@ export class AppComponent implements OnDestroy {
           case 'BLOCK':
             this.router.navigate(['blocks', this.text]);
             break;
+          case 'SMART_CONTRACT':
+            this.router.navigate(['smartcontracts', this.text]);
+            break;
           default:
             this.router.navigate(['search', 'not-found']);
             break;

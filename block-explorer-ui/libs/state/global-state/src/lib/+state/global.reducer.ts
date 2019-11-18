@@ -16,7 +16,7 @@ export interface Entity {}
 export interface GlobalState {
   loaded: boolean;
   error?: any;
-  identifiedType: 'PUBKEY_ADDRESS' | 'TRANSACTION';
+  identifiedType: 'PUBKEY_ADDRESS' | 'TRANSACTION' | 'SMART_CONTRACT';
   identifiedEntity: any;
 }
 

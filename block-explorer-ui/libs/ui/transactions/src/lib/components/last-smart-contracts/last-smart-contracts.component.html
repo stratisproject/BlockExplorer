@@ -1,29 +1,27 @@
 <div class="list-group-item my-4 m20top">
   <h5 class="mb-4 mt-2">Last {{records}} smart contract transactions</h5>
-  <table class="table table-striped">
+  <table class="table table-striped ">
     <thead>
       <tr>
         <th>Height</th>
         <th>Contract Address</th>
-        <th class="text-center d-none d-md-table-cell">OP_Code</th>
-        <th class="text-center d-none d-md-table-cell">Successful</th>
-        <th class="text-center d-none d-sm-table-cell">Confirmations</th>
-        <th class="text-center d-none d-sm-table-cell">Method Name</th>
-        <th class="d-none d-sm-table-cell">Tx Hash</th>
+        <th class="text-center">Action Type</th>
+        <th class="text-center">Action</th>
+        <th class="text-center">Successful</th>
+        <th class="d-sm-table-cell">Tx Hash</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let tx of smartContracts">
         <td><a [routerLink]="['/blocks', tx.height]">{{tx.height}}</a></td>
-        <td class="d-inline-block text-truncate" style="max-width: 120px;">{{tx.smartContract?.hash}}</td>
-        <td class="d-none d-md-table-cell">{{tx.smartContract?.opCode}}</td>
-        <td class="text-center d-none d-sm-table-cell">
-          <i class="material-icons md-24" *ngIf="tx.smartContract?.isSuccessful">check</i>
-          <i class="material-icons md-24" *ngIf="!tx.smartContract?.isSuccessful">error_outline</i>
+        <td class="address text-truncate">{{tx.smartContract?.hash}}</td>
+        <td class="action-type text-center"><blockexplorer-smart-contract-opcode [opCode]="tx.smartContract?.opCode"></blockexplorer-smart-contract-opcode></td>
+        <td class="action" style="max-width: 100px;">{{tx.smartContract?.methodName}}</td>
+        <td class="success text-center">
+          <i class="material-icons md-18" *ngIf="tx.smartContract?.isSuccessful">check</i>
+          <i class="material-icons md-18" *ngIf="!tx.smartContract?.isSuccessful">error_outline</i>
         </td>
-        <td class="text-center d-none d-sm-table-cell">{{tx.confirmations}}</td>
-        <td class="d-sm-inline-block text-truncate d-none d-sm-table-cell" style="max-width: 100px;">{{tx.smartContract?.methodName}}</td>
-        <td class="d-sm-inline-block text-truncate d-none d-sm-table-cell" style="max-width: 100px;"><a [routerLink]="['/transactions', tx.hash]">{{tx.hash}}</a></td>
+        <td class="txid text-truncate" style="max-width: 100px;"><a [routerLink]="['/transactions', tx.hash]">{{tx.hash}}</a></td>
       </tr>
     </tbody>
   </table>

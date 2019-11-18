@@ -1,4 +1,16 @@
 .load-more {
-    color: #fff;
-    margin-top: 20px;
+  color: #fff;
+  margin-top: 20px;
+}
+
+.address {
+  max-width: 120px;
+}
+
+.action-type {
+  max-width: 40px;
+}
+
+.action {
+  max-width: 100px;
 }

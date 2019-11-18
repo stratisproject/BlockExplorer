@@ -1054,6 +1054,23 @@
         public string Asm { get; set; }
     }
 
+    public class WhatIsSmartContractModel {
+        [JsonProperty("type", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Address { get; set; }
+
+        [JsonProperty("code", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Code { get; set; }
+
+        [JsonProperty("symbol", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Symbol { get; set; }
+
+        [JsonProperty("name", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Name { get; set; }
+    }
+
     public class VersionStatsModel {
         [JsonProperty("total", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int? Total { get; set; }

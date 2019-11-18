@@ -8,7 +8,7 @@ import { ENVIRONMENT, SharedUtilsModule } from '@blockexplorer/shared/utils';
 import { StateGlobalStateModule } from '@blockexplorer/state/global-state';
 import { StateTransactionsStateModule } from '@blockexplorer/state/transactions-state';
 import { UiLayoutModule } from '@blockexplorer/ui/layout';
-import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
+import { UiSmartContractsModule, uiSmartContractsRoutes } from '@blockexplorer/ui/smart-contracts';
 import {
   TransactionsPageComponent,
   uiAddressesRoutes,
@@ -68,6 +68,7 @@ export function loadConfigService(configService: AppConfigService): Function {
         { path: 'transactions', children: uiTransactionsRoutes, data: { breadcrumb: 'Transactions' } },
         { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } },
         { path: 'blocks', children: uiBlockRoutes, data: { breadcrumb: 'Block' } },
+        { path: 'smartcontracts', children: uiSmartContractsRoutes, data: { breadcrumb: 'Smart Contract' } },
         { path: 'search', children: uiOtherRoutes, data: { breadcrumb: 'Not Found' } }
       ],
       {

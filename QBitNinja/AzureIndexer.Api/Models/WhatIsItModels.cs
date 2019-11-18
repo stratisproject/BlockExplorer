@@ -209,7 +209,27 @@ namespace QBitNinja.Client.Models
 		}
 	}
 
-	public class WhatIsTransactionSignature
+    public class WhatIsSmartContract  {
+        public WhatIsSmartContract(uint160 address, string code, string symbol, string name) {
+            this.Type = "SMART_CONTRACT";
+            this.Address = address.ToString();
+            this.Code = code;
+            this.Symbol = symbol;
+            this.Name = name;
+        }
+
+        public string Type { get; set; }
+
+        public string Address { get; set; }
+
+        public string Code { get; set; }
+
+        public string Symbol { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    public class WhatIsTransactionSignature
 	{
 		public WhatIsTransactionSignature()
 		{
@@ -341,7 +361,7 @@ namespace QBitNinja.Client.Models
 			IsP2SH = address is BitcoinScriptAddress;
 			ScriptPubKey = new WhatIsScript(address.ScriptPubKey, address.Network);
 			Hash = GetHash(address);
-			
+
 			if(address is IBase58Data)
 				ColoredAddress = address.ToColoredAddress().ToString();
 		}

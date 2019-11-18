@@ -7,6 +7,7 @@ using AzureIndexer.Api.Models;
 using AzureIndexer.Api.Models.Response;
 using NBitcoin;
 using NBitcoin.DataEncoders;
+using Stratis.Bitcoin.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -71,6 +72,11 @@ namespace AzureIndexer.Api.Infrastructure
                 {
                     return mapper.Map<WhatIsAddressModel>(address);
                 }
+
+                if (await this.FindSmartContract(data) is SmartContactDetailsEntry smartContractDetail) {
+                    var smartContract = new WhatIsSmartContract(uint160.Parse(data), smartContractDetail.Code, smartContractDetail.ContractSymbol, smartContractDetail.ContractName);
+                    return mapper.Map<WhatIsSmartContractModel>(smartContract);
+                }
             }
 
             var script = this.NoException(() => GetScriptFromBytes(data));
@@ -119,6 +125,11 @@ namespace AzureIndexer.Api.Infrastructure
             }
 
             return null;
+        }
+
+        private async Task<SmartContactDetailsEntry> FindSmartContract(string data) {
+            var indexer = this.Configuration.Indexer.CreateIndexerClient();
+            return await indexer.GetSmartContractDetailsAsync(data);
         }
 
         private static Script GetScriptFromText(string data)

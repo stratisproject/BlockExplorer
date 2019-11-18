@@ -1,0 +1,5 @@
+<ng-container [ngSwitch]="opCode">
+  <i class="material-icons md-18" title="{{opCode}}" *ngSwitchCase="'OP_CALLCONTRACT'">call_made</i>
+  <i class="material-icons md-18" title="{{opCode}}" *ngSwitchCase="'OP_CREATECONTRACT'">add</i>
+  <i class="material-icons md-18" title="{{opCode}}" *ngSwitchDefault>help</i>
+</ng-container>
