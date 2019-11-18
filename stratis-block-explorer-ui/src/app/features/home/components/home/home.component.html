@@ -1,0 +1,6 @@
+<app-menu-bar (find)="find($event)"></app-menu-bar>
+<app-breadcrumb></app-breadcrumb>
+<div class="main-content">
+   <router-outlet [hidden]="!found"></router-outlet>
+   <app-busy-indicator [hidden]="found$ | async"></app-busy-indicator>
+</div>

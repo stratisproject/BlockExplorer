@@ -2,7 +2,7 @@
   "profiles": {
     "Stratis.IndexerD": {
       "commandName": "Project",
-      "commandLineArgs": "-sidechain -datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu",
+      "commandLineArgs": "-sidechain -datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu"
     },
     "FromIndex": {
       "commandName": "Project",

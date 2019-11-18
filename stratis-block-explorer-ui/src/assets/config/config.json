@@ -1,0 +1,11 @@
+{
+  "apiBaseUrl": "https://cirrusmainindexer1.azurewebsites.net",
+  "symbol": "CRS",
+  "chain": "Cirrus Mainnet",
+  "sidechainColor": "#3bafba",
+  "stratColor": "#158bcf",
+  "stratMainUrl": "https://stratisinttestbe-mainnet.azurewebsites.net/",
+  "stratTestUrl": "https://stratisinttestbe-testnet.azurewebsites.net/",
+  "sidechainMainUrl": "https://cirrusmainexplorer1.azurewebsites.net/",
+  "sidechainTestUrl": "https://cirrusmainexplorer1.azurewebsites.net/"
+}

@@ -23,19 +23,40 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "block-explorer-ui", "block-
 		Debug.AspNetCompiler.VirtualPath = "/localhost_54134"
 		Debug.AspNetCompiler.PhysicalPath = "block-explorer-ui\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54134\"
-		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.Updateable = "false"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_54134"
 		Release.AspNetCompiler.PhysicalPath = "block-explorer-ui\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54134\"
-		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.Updateable = "false"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "54134"
 		SlnRelativePath = "block-explorer-ui\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "stratis-block-explorer-ui", "stratis-block-explorer-ui\", "{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_9850"
+		Debug.AspNetCompiler.PhysicalPath = "stratis-block-explorer-ui\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_9850\"
+		Debug.AspNetCompiler.Updateable = "false"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_9850"
+		Release.AspNetCompiler.PhysicalPath = "stratis-block-explorer-ui\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_9850\"
+		Release.AspNetCompiler.Updateable = "false"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "9850"
+		SlnRelativePath = "stratis-block-explorer-ui\"
 	EndProjectSection
 EndProject
 Global
@@ -62,6 +83,10 @@ Global
 		{1B964C17-5582-4EA6-8795-5F2397ED24F7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +97,7 @@ Global
 		{D16167A9-0D99-40E3-A592-A5BE40B13E6C} = {AB305E64-25A4-40E1-BE98-0C8F3BAAC0AE}
 		{1B964C17-5582-4EA6-8795-5F2397ED24F7} = {7A2FF5B6-6D8C-475B-8786-0C0D7C1B026B}
 		{DBC1FCFA-CD06-413F-847C-EB10A1E483DD} = {ABD4FE0D-8F0D-4905-AB54-6AEF77D6B64E}
+		{24A7CDB1-4F8E-4B25-8AD6-DAAF4BB9EE55} = {ABD4FE0D-8F0D-4905-AB54-6AEF77D6B64E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1B21350-17DD-423E-8FC2-BA32EE8AF9E7}
