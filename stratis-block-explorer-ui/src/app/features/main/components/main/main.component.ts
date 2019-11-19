@@ -50,7 +50,7 @@ export class MainComponent implements OnDestroy {
                   this.router.navigate(['transactions', this.text]);
                   break;
                case 'BLOCK':
-                  this.router.navigate(['blocks', this.text]);
+                  this.router.navigate(['block', this.text]);
                   break;
                case 'SMART_CONTRACT':
                   this.router.navigate(['smartcontracts', this.text]);
@@ -68,6 +68,7 @@ export class MainComponent implements OnDestroy {
    }
 
    find(text: string) {
+      this.text = text;
       this.store.dispatch(action.identifyEntity({ text }));
    }
 }

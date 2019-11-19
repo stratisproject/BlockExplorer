@@ -9,6 +9,7 @@ export const blockRoutes: Route[] = [
    //      { path: ':blockHeight', component: fromBlock.BlockComponent }
    //   ]
    //}
+   { path: '', component: fromBlock.BlocksComponent },
    { path: 'blocks', component: fromBlock.BlocksComponent },
    { path: 'block/:blockHeight', component: fromBlock.BlockComponent }
 ];
@@ -21,11 +22,9 @@ const exportedComponents: Type<any>[] = [
 @NgModule({
    declarations: [...exportedComponents],
    imports: [
-      CommonModule,
-      RouterModule.forChild(blockRoutes)
+      CommonModule
    ],
-   exports: [...exportedComponents],
-   providers: [provideRoutes(blockRoutes)]
+   exports: [...exportedComponents]
 })
 export class BlockModule { }
 
