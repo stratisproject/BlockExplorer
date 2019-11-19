@@ -1,21 +1,24 @@
 import {
-  ActionReducer,
-  ActionReducerMap,
-  createFeatureSelector,
-  createSelector,
-  MetaReducer
+   ActionReducer,
+   ActionReducerMap,
+   createFeatureSelector,
+   createSelector,
+   MetaReducer
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import * as fromHome from '../features/home/store/reducers/home.reducer';
+import * as fromMain from '../features/main/store/reducers/main.reducer';
+import * as fromRouter from '@ngrx/router-store';
 
 export const appStoreFeatureKey = 'appStore';
 
 export interface State {
-  home: fromHome.HomeState
+   router: fromRouter.RouterReducerState,
+   main: fromMain.MainState
 }
 
 export const reducers: ActionReducerMap<State> = {
-  home: fromHome.reducer
+   router: fromRouter.routerReducer,
+   main: fromMain.reducer
 };
 
 

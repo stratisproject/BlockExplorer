@@ -1,25 +1,25 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { HomeState } from '../../store/reducers/home.reducer';
+import { MainState } from '../../store/reducers/main.reducer';
 import { Router } from '@angular/router';
 import { Observable, ReplaySubject } from 'rxjs';
-import * as action from '../../store/actions/home.actions';
-import * as selector from '../../store/selectors/home.selectors';
+import * as action from '../../store/actions/main.actions';
+import * as selector from '../../store/selectors/main.selectors';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-   selector: 'app-home',
-   templateUrl: './home.component.html',
-   styleUrls: ['./home.component.scss']
+   selector: 'app-main',
+   templateUrl: './main.component.html',
+   styleUrls: ['./main.component.scss']
 })
-export class HomeComponent implements OnDestroy {
+export class MainComponent implements OnDestroy {
    identifiedEntity$: Observable<any>;
    found$: Observable<boolean>;
    found: boolean;
    destroyed$ = new ReplaySubject<any>();
    text = '';
 
-   constructor(private store: Store<HomeState>, private router: Router) {
+   constructor(private store: Store<MainState>, private router: Router) {
       this.found$ = this.store.pipe(select(selector.getLoaded));
       this.found$
          .pipe(takeUntil(this.destroyed$))
