@@ -9,7 +9,6 @@ export const blockRoutes: Route[] = [
    //      { path: ':blockHeight', component: fromBlock.BlockComponent }
    //   ]
    //}
-   { path: '', component: fromBlock.BlocksComponent },
    { path: 'blocks', component: fromBlock.BlocksComponent },
    { path: 'block/:blockHeight', component: fromBlock.BlockComponent }
 ];

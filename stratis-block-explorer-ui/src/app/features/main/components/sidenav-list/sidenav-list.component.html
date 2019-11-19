@@ -1,0 +1,5 @@
+<mat-nav-list>
+   <a mat-list-item href="{{link.url}}" *ngFor="let link of links" (click)="onSidenavClose()">
+      <span class="nav-caption">{{link.title}}</span>
+   </a>
+</mat-nav-list>

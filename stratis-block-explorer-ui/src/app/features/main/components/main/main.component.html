@@ -1,6 +1,16 @@
-<app-menu-bar (find)="find($event)"></app-menu-bar>
-<app-breadcrumb></app-breadcrumb>
-<div class="main-content">
-   <router-outlet [hidden]="!found"></router-outlet>
-   <app-busy-indicator [hidden]="found$ | async"></app-busy-indicator>
+<div fxLayout="row wrap" fxLayoutAlign="center center" class="layout-wrapper">
+   <div fxFlex="80%" fxFlex.lt-md="100%" class="flex-wrapper">
+      <mat-sidenav-container>
+         <mat-sidenav #sidenav role="navigation">
+            <app-sidenav-list [links]="links" (sidenavClose)="sidenav.close()"></app-sidenav-list>
+         </mat-sidenav>
+         <mat-sidenav-content>
+            <app-menu-bar [links]="links" (find)="find($event)" (sidenavToggle)="sidenav.toggle()"></app-menu-bar>
+            <app-busy-indicator [hidden]="found$ | async"></app-busy-indicator>
+            <main>
+               <router-outlet [hidden]="!found"></router-outlet>
+            </main>
+         </mat-sidenav-content>
+      </mat-sidenav-container>
+   </div>
 </div>

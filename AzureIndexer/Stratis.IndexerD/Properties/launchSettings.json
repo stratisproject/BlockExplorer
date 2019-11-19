@@ -7,6 +7,10 @@
     "FromIndex": {
       "commandName": "Project",
       "commandLineArgs": "-sidechain -datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu -nochkpts -indexfrom=66911 -indexto=66921"
+    },
+    "C-drive": {
+      "commandName": "Project",
+      "commandLineArgs": "-sidechain -datadir=\"C:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu"
     }
   }
 }

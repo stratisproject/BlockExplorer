@@ -1,0 +1,43 @@
+.logo {
+   width: 36px;
+   height: 36px;
+   padding-right: 8px;
+}
+
+a {
+   text-decoration: none;
+   color: white;
+}
+
+a:hover, a:active {
+   color: lightgray;
+}
+
+.navigation-items {
+   list-style-type: none;
+   padding: 0;
+   margin: 0;
+
+   a {
+      font-size: 15px !important;
+   }
+}
+
+.search {
+   padding: 0 20px;
+}
+
+mat-toolbar {
+   border-radius: 3px;
+}
+
+@media(max-width: 959px) {
+   mat-toolbar {
+      border-radius: 0px;
+   }
+}
+
+.nav-caption {
+   display: inline-block;
+   padding-left: 6px;
+}

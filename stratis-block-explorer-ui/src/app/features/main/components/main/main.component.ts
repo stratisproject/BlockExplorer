@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { MainState } from '../../store/reducers/main.reducer';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { Observable, ReplaySubject } from 'rxjs';
 import * as action from '../../store/actions/main.actions';
 import * as selector from '../../store/selectors/main.selectors';
 import { takeUntil } from 'rxjs/operators';
+import { AppConfigService } from '@core/services/app-config.service';
 
 @Component({
    selector: 'app-main',
@@ -13,13 +14,27 @@ import { takeUntil } from 'rxjs/operators';
    styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnDestroy {
+   private mobileQueryListener: () => void;
+
+   title = 'Stratis Block Explorer';
+   mobileQuery: MediaQueryList;
+
    identifiedEntity$: Observable<any>;
    found$: Observable<boolean>;
    found: boolean;
    destroyed$ = new ReplaySubject<any>();
    text = '';
 
-   constructor(private store: Store<MainState>, private router: Router) {
+   @Output() public sidenavToggle = new EventEmitter();
+
+   links = [
+      { title: "Stratis Mainnet", url: this.appConfig.Config.stratMainUrl || "https://stratisinttestbe-mainnet.azurewebsites.net/" },
+      { title: "Cirrus Mainnet", url: this.appConfig.Config.sidechainMainUrl || "https://stratisinttestbe.azurewebsites.net/" },
+      { title: "Stratis Testnet", url: this.appConfig.Config.stratTestUrl || "https://stratisinttestbe-testnet.azurewebsites.net/" },
+      { title: "Cirrus Testnet", url: this.appConfig.Config.sidechainTestUrl || "https://stratisinttestbe-testnet.azurewebsites.net/" }
+   ];
+
+   constructor(private appConfig: AppConfigService, private store: Store<MainState>, private router: Router) {
       this.found$ = this.store.pipe(select(selector.getLoaded));
       this.found$
          .pipe(takeUntil(this.destroyed$))
@@ -63,6 +78,8 @@ export class MainComponent implements OnDestroy {
    }
 
    ngOnDestroy(): void {
+      this.mobileQuery.removeListener(this.mobileQueryListener);
+
       this.destroyed$.next(true);
       this.destroyed$.complete();
    }
@@ -70,5 +87,9 @@ export class MainComponent implements OnDestroy {
    find(text: string) {
       this.text = text;
       this.store.dispatch(action.identifyEntity({ text }));
+   }
+
+   public onToggleSidenav = () => {
+      this.sidenavToggle.emit();
    }
 }

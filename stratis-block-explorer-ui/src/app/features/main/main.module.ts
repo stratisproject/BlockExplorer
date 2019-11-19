@@ -8,17 +8,20 @@ import { MainEffects } from './store/effects/main.effects';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 
 const exportedComponents: Type<any>[] = [
    fromComponents.MenuBarComponent,
    fromComponents.BreadcrumbComponent,
-   fromComponents.MainComponent
+   fromComponents.MainComponent,
+   fromComponents.SidenavListComponent
 ]
 
 
 @NgModule({
    declarations: [
-      ...exportedComponents
+      ...exportedComponents,
+      SidenavListComponent
    ],
    imports: [
       CommonModule,
@@ -29,7 +32,8 @@ const exportedComponents: Type<any>[] = [
       EffectsModule.forFeature([MainEffects])
    ],
    exports: [
-      ...exportedComponents
+      fromComponents.MainComponent,
+      //...exportedComponents
    ]
 })
 export class MainModule { }

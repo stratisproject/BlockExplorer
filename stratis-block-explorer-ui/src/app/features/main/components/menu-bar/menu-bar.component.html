@@ -1,32 +1,30 @@
-<nav class="navbar fixed-top navbar-expand-md navbar-dark" [ngStyle]="changeBackground()">
-  <a class="navbar-brand mr-0 mr-md-4" href="#">
-    <img src="/assets/images/logo.svg" width="36" height="36" alt="Stratis">
-  </a>
+<mat-toolbar color="primary" [ngStyle]="changeBackground()">
+   <mat-toolbar-row>
+      <img src="/assets/images/logo.svg" alt="logo" class="logo">
 
-  <div class="form-inline col-7 col-sm-10 col-md-5 col-lg-6 px-0" novalidate>
-    <div class="input-group col-12 px-0">
-      <div class="input-group-prepend">
-        <span class="input-group-text">
-          <i class="material-icons md-18">search</i>
-        </span>
+      <h1 class="app-name">{{title}}</h1>
+
+      <mat-form-field fxFlex="grow" class="search">
+         <input matInput [(ngModel)]="searchText" id="search-text" type="search" (keyup.enter)="enterPressed()" class="form-control"
+                placeholder="Search by Address, TxHash, ..." aria-label="" [ngModelOptions]="{standalone: true}"
+                aria-describedby="">
+      </mat-form-field>
+
+      <div fxFlex fxLayoutAlign="end" fxHide.xs>
+         <ul fxLayout fxLayoutGap="10px" class="navigation-items">
+            <li *ngFor="let link of links">
+               <a mat-list-item href="{{link.url}}" class="subheading-2">{{ link.title }}</a>
+            </li>
+         </ul>
       </div>
-      <input [(ngModel)]="searchText" id="search-text" type="search" (keyup.enter)="enterPressed()" class="form-control"
-        placeholder="Search by Address, TxHash, ..." aria-label="" [ngModelOptions]="{standalone: true}"
-        aria-describedby="">
-    </div>
-  </div>
 
-  <div class="collapse navbar-collapse px-0" id="navbarSupportedContent">
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item text-center" [ngClass]="{ active: link.title === chain }" *ngFor="let link of links">
-        <a class="nav-link" href="{{link.url}}">{{link.title}}</a>
-      </li>
-    </ul>
-  </div>
-
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-</nav>
+      <div fxFlex fxLayoutAlign="end" fxHide.gt-xs>
+         <button mat-icon-button (click)="onToggleSidenav()">
+            <mat-icon>menu</mat-icon>
+         </button>
+      </div>
+   </mat-toolbar-row>
+   <mat-toolbar-row>
+      <app-breadcrumb></app-breadcrumb>
+   </mat-toolbar-row>
+</mat-toolbar>
