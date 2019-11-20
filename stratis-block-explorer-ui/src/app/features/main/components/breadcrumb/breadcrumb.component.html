@@ -1,6 +1,6 @@
-<mat-toolbar class="sidenav-breadcrumbs">
+<mat-toolbar class="sidenav-breadcrumbs" color="accent">
    <span class="sidenav-breadcrumb-span" *ngFor="let breadcrumb of breadcrumbs$ | async; let last = last;" style="color: white;">
-      <a mat-button [disabled]="last" class="sidenav-breadbutton" [routerLink]="[breadcrumb.url]">{{breadcrumb.label}}</a>
+      <a mat-button [disabled]="last" [ngClass]="{ last: last }" class="sidenav-breadbutton" [routerLink]="[breadcrumb.url]">{{breadcrumb.label}}</a>
       <mat-icon *ngIf="!last" class="sidenav-breaddiv">keyboard_arrow_right</mat-icon>
    </span>
 </mat-toolbar>

@@ -1,20 +1,19 @@
-<mat-toolbar color="primary" [ngStyle]="changeBackground()">
+<mat-toolbar color="primary">
    <mat-toolbar-row>
       <div fxLayoutAlign="start">
          <img src="/assets/images/logo.svg" alt="logo" class="logo" width="36" height="36">
          <span>{{title}}</span>
       </div>
 
-      <mat-form-field fxFlex="grow" class="search" floatLabel="never">
+      <mat-form-field fxFlex="grow" fxShow fxHide.lt-sm class="search" floatLabel="never" appearance="legacy">
          <mat-icon matPrefix inline="true">search</mat-icon>
          <input matInput type="search" (keyup.enter)="enterPressed()"
                 placeholder="Searches Addresses, Blocks, Smart Contracts, TxHash, ..."
                 [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}">
          <mat-icon matSuffix inline="true">close</mat-icon>
-
       </mat-form-field>
 
-      <div fxFlex fxLayoutAlign="end" fxHide.xs>
+      <div fxFlex fxLayoutAlign="end" fxShow fxHide.lt-md>
          <ul fxLayout fxLayoutGap="10px" class="navigation-items">
             <li *ngFor="let link of links">
                <a mat-list-item href="{{link.url}}" class="subheading-2">{{ link.title }}</a>
@@ -22,10 +21,19 @@
          </ul>
       </div>
 
-      <div fxFlex fxLayoutAlign="end" fxHide.gt-xs>
+      <div fxFlex fxLayoutAlign="end" fxHide.gt-sm>
          <button mat-icon-button (click)="onToggleSidenav()">
             <mat-icon>menu</mat-icon>
          </button>
       </div>
+   </mat-toolbar-row>
+   <mat-toolbar-row fxHide="true" fxShow.lt-sm>
+      <mat-form-field fxFlex="grow" class="search" floatLabel="never">
+         <mat-icon matPrefix inline="true">search</mat-icon>
+         <input matInput type="search" (keyup.enter)="enterPressed()"
+                placeholder="Searches Addresses, Blocks, Smart Contracts, TxHash, ..."
+                [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}">
+         <mat-icon matSuffix inline="true">close</mat-icon>
+      </mat-form-field>
    </mat-toolbar-row>
 </mat-toolbar>

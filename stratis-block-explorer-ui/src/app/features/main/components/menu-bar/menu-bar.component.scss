@@ -2,7 +2,18 @@
    margin-right: 8px;
 }
 
+/*.search ::ng-deep .mat-form-field-label-wrapper {
+   font-size: 0.8em;
+   padding: 0.1em 0 0.1em 0;
+}*/
 
+.mat-form-field.search ::ng-deep .mat-form-field-flex {
+   transition: background-color 0.5s ease;
+
+   &:hover {
+      background-color: var(--primary-darker-color);
+   }
+}
 
 .navigation-items {
    list-style-type: none;
@@ -22,15 +33,14 @@
 
 mat-form-field.search {
    padding: 0 20px;
-
-   & ::ng-deep {
+   /*& ::ng-deep {
       .mat-form-field-flex {
          padding: 0 10px;
-         background-color: rgba(0,0,0,0.2);
+         background-color: var(--primary-darker-color);
       }
 
       .mat-form-field-label {
          color: #AAA;
       }
-   }
+   }*/
 }

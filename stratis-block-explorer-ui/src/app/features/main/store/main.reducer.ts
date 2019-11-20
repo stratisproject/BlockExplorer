@@ -1,5 +1,5 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import * as MainActions from '../actions/main.actions';
+import * as MainActions from './main.actions';
 
 export const mainFeatureKey = 'main';
 
@@ -11,7 +11,7 @@ export interface MainState {
 }
 
 export const initialState: MainState = {
-   loaded: false,
+   loaded: true,
    identifiedType: undefined,
    identifiedEntity: undefined
 };
@@ -28,7 +28,7 @@ const mainReducer = createReducer(
 
    on(MainActions.identificationError, (state, action) => ({
       ...state,
-      //error: action.error,
+      error: action.error,
       identifiedEntity: null,
       identifiedType: null,
       loaded: true
@@ -36,6 +36,7 @@ const mainReducer = createReducer(
 
    on(MainActions.identifyEntity, (state, action) => ({
       ...state,
+      error: null,
       loaded: false,
       identifiedEntity: undefined,
    }))

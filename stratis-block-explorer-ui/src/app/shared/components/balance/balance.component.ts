@@ -22,7 +22,7 @@ export class BalanceComponent implements OnInit {
   }
 
   get symbol() {
-    return this.appConfig.Config.symbol;
+    return this.appConfig.getConfiguration().symbol;
   }
 
   get whole() {

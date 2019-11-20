@@ -6,7 +6,7 @@ import {
    MetaReducer
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import * as fromMain from '../features/main/store/reducers/main.reducer';
+import * as fromMain from '../features/main/store/main.reducer';
 import * as fromRouter from '@ngrx/router-store';
 
 export const appStoreFeatureKey = 'appStore';

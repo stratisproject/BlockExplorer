@@ -8,11 +8,9 @@
 }
 
 .sidenav-breadcrumbs {
-   background-color: #00adef;
    height: 45px;
    font-size: 16px;
    font-weight: bold;
-   color: #E6E8EA;
 }
 
 .sidenav-breadcrumb-span {
@@ -23,9 +21,10 @@
    align-self: center;
 }
 
-.sidenav-breadbutton {
-   display: flex;
-   min-width: 32px !important;
+::ng-deep .sidenav-breadbutton[disabled].last {
+   font-style: italic;
+   color: currentColor;
+   font-weight: normal;
 }
 
 .sidenav-text {

@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { MainState } from '../../store/reducers/main.reducer';
+import { MainState } from '../../store/main.reducer';
 import { Router } from '@angular/router';
 import { Observable, ReplaySubject } from 'rxjs';
-import * as action from '../../store/actions/main.actions';
-import * as selector from '../../store/selectors/main.selectors';
+import * as action from '../../store/main.actions';
+import * as selector from '../../store/main.selectors';
 import { takeUntil } from 'rxjs/operators';
 import { AppConfigService } from '@core/services/app-config.service';
 
@@ -27,14 +27,12 @@ export class MainComponent implements OnDestroy {
 
    @Output() public sidenavToggle = new EventEmitter();
 
-   links = [
-      { title: "Stratis Mainnet", url: this.appConfig.Config.stratMainUrl || "https://stratisinttestbe-mainnet.azurewebsites.net/" },
-      { title: "Cirrus Mainnet", url: this.appConfig.Config.sidechainMainUrl || "https://stratisinttestbe.azurewebsites.net/" },
-      { title: "Stratis Testnet", url: this.appConfig.Config.stratTestUrl || "https://stratisinttestbe-testnet.azurewebsites.net/" },
-      { title: "Cirrus Testnet", url: this.appConfig.Config.sidechainTestUrl || "https://stratisinttestbe-testnet.azurewebsites.net/" }
-   ];
+   public links: { title: string, url: string }[];
 
-   constructor(private appConfig: AppConfigService, private store: Store<MainState>, private router: Router) {
+   constructor(appConfig: AppConfigService, private store: Store<MainState>, private router: Router) {
+
+      this.links = appConfig.getKnownLinks();
+
       this.found$ = this.store.pipe(select(selector.getLoaded));
       this.found$
          .pipe(takeUntil(this.destroyed$))
@@ -84,7 +82,7 @@ export class MainComponent implements OnDestroy {
       this.destroyed$.complete();
    }
 
-   find(text: string) {
+   public find(text: string) {
       this.text = text;
       this.store.dispatch(action.identifyEntity({ text }));
    }

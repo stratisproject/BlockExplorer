@@ -16,17 +16,11 @@ export class MenuBarComponent implements OnInit {
    @Output() public find = new EventEmitter<string>();
    @Output() public sidenavToggle = new EventEmitter();
 
-   constructor(private appConfig: AppConfigService, private log: Log) { }
+   constructor(private appConfig: AppConfigService, private log: Log) {
+      this.title = `${appConfig.getConfiguration().networkName} Explorer`;
+   }
 
    ngOnInit(): void {
-   }
-
-   get chain() {
-      return this.appConfig.Config.chain;
-   }
-
-   changeBackground() {
-      //return { 'background-color': this.chain.indexOf('Cirrus') >= 0 ? this.appConfig.Config.sidechainColor : this.appConfig.Config.stratColor };
    }
 
    enterPressed() {

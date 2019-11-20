@@ -3,8 +3,8 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, concatMap, debounceTime, switchMap } from 'rxjs/operators';
 import { EMPTY, of, asyncScheduler } from 'rxjs';
 
-import * as MainActions from '../actions/main.actions';
-import { FinderService } from '../../finder.service';
+import * as MainActions from './main.actions';
+import { FinderService } from '../finder.service';
 
 
 
@@ -28,9 +28,7 @@ export class MainEffects {
                      return MainActions.identificationError({ error: "Not found" });
                   }
                }),
-               catchError(error =>
-                  of(MainActions.identificationError({ error }))
-               )
+               catchError(error => of(MainActions.identificationError({ error: error.toString() })))
             );
          })
       )

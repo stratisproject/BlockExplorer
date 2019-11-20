@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import * as fromMain from '../reducers/main.reducer';
+import * as fromMain from './main.reducer';
 
 export const selectMainState = createFeatureSelector<fromMain.MainState>(
    fromMain.mainFeatureKey

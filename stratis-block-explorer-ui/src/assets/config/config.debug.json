@@ -1,11 +1,34 @@
 {
-  "apiBaseUrl": "http://localhost:54678",
-  "symbol": "CRS",
-  "chain": "Cirrus Mainnet",
-  "sidechainColor": "#3bafba",
-  "stratColor": "#158bcf",
-  "stratMainUrl": "https://stratisinttestbe-mainnet.azurewebsites.net/",
-  "stratTestUrl": "https://stratisinttestbe-testnet.azurewebsites.net/",
-  "sidechainMainUrl": "https://cirrusmainexplorer1.azurewebsites.net/",
-  "sidechainTestUrl": "https://cirrusmainexplorer1.azurewebsites.net/"
+   "currentCoin": "CRS",
+
+   "coins": {
+      "STRAT": {
+         "apiBaseUrl": "http://localhost:54678",
+         "networkName": "Stratis Main",
+         "symbol": "STRAT",
+         "url": "https://stratisexplorer.stratisplatform.com/",
+         "themeName": "stratis-theme"
+      },
+      "TSTRAT": {
+         "apiBaseUrl": "http://localhost:54678",
+         "networkName": "Stratis Testnet",
+         "symbol": "STRAT",
+         "url": "https://test-stratisexplorer.stratisplatform.com/",
+         "themeName": "stratis-test-theme"
+      },
+      "CRS": {
+         "apiBaseUrl": "http://localhost:54678",
+         "networkName": "Cirrus Main",
+         "symbol": "CRS",
+         "url": "https://cirrusexplorer.stratisplatform.com/",
+         "themeName": "stratis-theme"
+      },
+      "TCRS": {
+         "apiBaseUrl": "http://localhost:54678",
+         "networkName": "Cirrus Testnet",
+         "symbol": "TCRS",
+         "url": "https://test-cirrusexplorer.stratisplatform.com/",
+         "themeName": "cirrus-test-theme"
+      }
+   }
 }

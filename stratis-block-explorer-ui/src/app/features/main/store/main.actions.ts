@@ -7,7 +7,7 @@ export const identifyEntity = createAction(
 
 export const identificationError = createAction(
    '[Main] Identification Error',
-   props<{ error: Error | any }>()
+   props<{ error: Error | string }>()
 );
 
 export const identified = createAction(

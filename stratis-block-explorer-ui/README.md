@@ -9,5 +9,11 @@ This project has been made using following libraries:
 [**Angular Material**](https://material.angular.io/) to have a modern and responsive look and feel.
 
 
-
+---
 The project structure groups features by module to achieve a better and scalable architecture and makes use of a shared module and a core module.
+
+---
+
+Theme has been built using Material Theme Generator  
+- [github repo](https://github.com/arciisine/MaterialThemeGenerator)  
+- [live app](https://materialtheme.arcsine.dev/)

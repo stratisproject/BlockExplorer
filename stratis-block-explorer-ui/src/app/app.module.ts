@@ -26,8 +26,7 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
       BrowserAnimationsModule,
       AppRoutingModule,
       HttpClientModule,
-      CoreModule,
-      MainModule, BlockModule, DashboardModule,
+      CoreModule, MainModule, BlockModule, DashboardModule,
       StoreModule.forRoot(reducers, {
          runtimeChecks: {
             strictStateImmutability: true,
