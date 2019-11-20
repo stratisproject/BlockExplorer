@@ -1,13 +1,17 @@
 <mat-toolbar color="primary" [ngStyle]="changeBackground()">
    <mat-toolbar-row>
-      <img src="/assets/images/logo.svg" alt="logo" class="logo">
+      <div fxLayoutAlign="start">
+         <img src="/assets/images/logo.svg" alt="logo" class="logo" width="36" height="36">
+         <span>{{title}}</span>
+      </div>
 
-      <h1 class="app-name">{{title}}</h1>
+      <mat-form-field fxFlex="grow" class="search" floatLabel="never">
+         <mat-icon matPrefix inline="true">search</mat-icon>
+         <input matInput type="search" (keyup.enter)="enterPressed()"
+                placeholder="Searches Addresses, Blocks, Smart Contracts, TxHash, ..."
+                [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}">
+         <mat-icon matSuffix inline="true">close</mat-icon>
 
-      <mat-form-field fxFlex="grow" class="search">
-         <input matInput [(ngModel)]="searchText" id="search-text" type="search" (keyup.enter)="enterPressed()" class="form-control"
-                placeholder="Search by Address, TxHash, ..." aria-label="" [ngModelOptions]="{standalone: true}"
-                aria-describedby="">
       </mat-form-field>
 
       <div fxFlex fxLayoutAlign="end" fxHide.xs>
@@ -23,8 +27,5 @@
             <mat-icon>menu</mat-icon>
          </button>
       </div>
-   </mat-toolbar-row>
-   <mat-toolbar-row>
-      <app-breadcrumb></app-breadcrumb>
    </mat-toolbar-row>
 </mat-toolbar>

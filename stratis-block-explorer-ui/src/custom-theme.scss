@@ -2,6 +2,8 @@
 
 //https://material.angular.io/guide/typography
 
+/*@import '@angular/material/prebuilt-themes/deeppurple-amber.css';*/
+
 @include mat-core();
 
 $app-theme-primary: mat-palette($mat-indigo);

@@ -1,11 +1,9 @@
 @import "custom-theme.scss";
-//@import 'assets/styles/bootstrap.css';
 
-$primary: map-get($app-theme, primary);
-$accent: map-get($app-theme, accent);
 
 /* for sidenav to take whole page */
 html, body {
    margin: 0;
    height: 100%;
+   /*background: mat-color($primary);*/
 }

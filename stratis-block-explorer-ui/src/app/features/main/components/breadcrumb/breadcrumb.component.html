@@ -1,8 +1,6 @@
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs$ | async; let last = last;">
-      <a *ngIf="!last" [routerLink]="[breadcrumb.url]">{{breadcrumb.label}}</a>
-      <span *ngIf="!!last">{{breadcrumb.label}}</span>
-    </li>
-  </ol>
-</nav>
+<mat-toolbar class="sidenav-breadcrumbs">
+   <span class="sidenav-breadcrumb-span" *ngFor="let breadcrumb of breadcrumbs$ | async; let last = last;" style="color: white;">
+      <a mat-button [disabled]="last" class="sidenav-breadbutton" [routerLink]="[breadcrumb.url]">{{breadcrumb.label}}</a>
+      <mat-icon *ngIf="!last" class="sidenav-breaddiv">keyboard_arrow_right</mat-icon>
+   </span>
+</mat-toolbar>

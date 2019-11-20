@@ -1,0 +1,51 @@
+.sidenav {
+   margin-top: 40px;
+   min-width: 250px;
+}
+
+.sidenav-title {
+   color: white;
+}
+
+.sidenav-breadcrumbs {
+   background-color: #00adef;
+   height: 45px;
+   font-size: 16px;
+   font-weight: bold;
+   color: #E6E8EA;
+}
+
+.sidenav-breadcrumb-span {
+   display: flex;
+}
+
+.sidenav-breaddiv {
+   align-self: center;
+}
+
+.sidenav-breadbutton {
+   display: flex;
+   min-width: 32px !important;
+}
+
+.sidenav-text {
+   padding-right: 20px;
+   padding-left: 20px;
+   max-width: 360px;
+   word-wrap: normal;
+}
+
+.sidenav-icons {
+   position: absolute;
+   left: 5px;
+}
+
+.sidenav-fixfa {
+   max-width: 24px;
+   font-size: 1.5em;
+}
+
+.sidenav-arrow {
+   position: absolute;
+   right: 5px;
+}

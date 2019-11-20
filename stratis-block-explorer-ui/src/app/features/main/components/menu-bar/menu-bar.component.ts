@@ -26,7 +26,7 @@ export class MenuBarComponent implements OnInit {
    }
 
    changeBackground() {
-      return { 'background-color': this.chain.indexOf('Cirrus') >= 0 ? this.appConfig.Config.sidechainColor : this.appConfig.Config.stratColor };
+      //return { 'background-color': this.chain.indexOf('Cirrus') >= 0 ? this.appConfig.Config.sidechainColor : this.appConfig.Config.stratColor };
    }
 
    enterPressed() {

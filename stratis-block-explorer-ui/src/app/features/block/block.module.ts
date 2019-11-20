@@ -1,7 +1,7 @@
 import { NgModule, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Route, RouterModule, provideRoutes } from '@angular/router';
-import * as fromBlock from './components';
+import { Route } from '@angular/router';
+import * as fromComponents from './components';
 
 export const blockRoutes: Route[] = [
    //{
@@ -9,13 +9,18 @@ export const blockRoutes: Route[] = [
    //      { path: ':blockHeight', component: fromBlock.BlockComponent }
    //   ]
    //}
-   { path: 'blocks', component: fromBlock.BlocksComponent },
-   { path: 'block/:blockHeight', component: fromBlock.BlockComponent }
+   { path: 'blocks', component: fromComponents.BlocksComponent, data: { breadcrumb: 'Blocks' } },
+   {
+      path: 'block', data: { breadcrumb: 'Block'}, children: [
+         { path: '', redirectTo: '/blocks', pathMatch: "full" },
+         { path: ':blockHeight', component: fromComponents.BlockComponent }
+      ]
+   }
 ];
 
 const exportedComponents: Type<any>[] = [
-   fromBlock.BlockComponent,
-   fromBlock.BlocksComponent
+   fromComponents.BlockComponent,
+   fromComponents.BlocksComponent
 ];
 
 @NgModule({

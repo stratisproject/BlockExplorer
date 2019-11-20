@@ -1,17 +1,8 @@
 .logo {
-   width: 36px;
-   height: 36px;
-   padding-right: 8px;
+   margin-right: 8px;
 }
 
-a {
-   text-decoration: none;
-   color: white;
-}
 
-a:hover, a:active {
-   color: lightgray;
-}
 
 .navigation-items {
    list-style-type: none;
@@ -20,24 +11,26 @@ a:hover, a:active {
 
    a {
       font-size: 15px !important;
+      text-decoration: none;
+      color: white;
+
+      :hover, :active {
+         color: lightgray;
+      }
    }
 }
 
-.search {
+mat-form-field.search {
    padding: 0 20px;
-}
 
-mat-toolbar {
-   border-radius: 3px;
-}
+   & ::ng-deep {
+      .mat-form-field-flex {
+         padding: 0 10px;
+         background-color: rgba(0,0,0,0.2);
+      }
 
-@media(max-width: 959px) {
-   mat-toolbar {
-      border-radius: 0px;
+      .mat-form-field-label {
+         color: #AAA;
+      }
    }
-}
-
-.nav-caption {
-   display: inline-block;
-   padding-left: 6px;
 }

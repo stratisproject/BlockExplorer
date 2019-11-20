@@ -2,9 +2,11 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { StoreRouterConnectingModule, routerReducer, RouterState } from '@ngrx/router-store';
 import { blockRoutes } from './features/block/block.module';
+import { dashboardRoutes } from './features/dashboard/dashboard.module';
 
 
 const routes: Routes = [
+   ...dashboardRoutes,
    ...blockRoutes
 ];
 

@@ -15,10 +15,11 @@ import { environment } from '../environments/environment';
 import { reducers } from './reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { BlockModule } from './features/block/block.module';
+import { DashboardModule } from './features/dashboard/dashboard.module';
 
 @NgModule({
    declarations: [
-      AppComponent
+      AppComponent,
    ],
    imports: [
       BrowserModule,
@@ -26,8 +27,7 @@ import { BlockModule } from './features/block/block.module';
       AppRoutingModule,
       HttpClientModule,
       CoreModule,
-      MainModule,
-      BlockModule,
+      MainModule, BlockModule, DashboardModule,
       StoreModule.forRoot(reducers, {
          runtimeChecks: {
             strictStateImmutability: true,
