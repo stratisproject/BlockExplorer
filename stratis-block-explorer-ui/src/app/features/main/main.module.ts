@@ -7,7 +7,7 @@ import * as fromMain from './store/main.reducer';
 import { MainEffects } from './store/main.effects';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 
 const exportedComponents: Type<any>[] = [

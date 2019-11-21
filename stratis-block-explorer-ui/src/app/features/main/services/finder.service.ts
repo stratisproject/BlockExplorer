@@ -2,14 +2,13 @@ import { mergeMap, catchError } from 'rxjs/operators';
 import { Observable, throwError, of } from 'rxjs';
 import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { AppConfigService } from '../../core/services/app-config.service';
+import { AppConfigService } from '@core/services/app-config.service';
 import *  as utils from '@shared/utils';
 
 @Injectable({
    providedIn: "root"
 })
 export class FinderService {
-   protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
    public apiBaseUrl: string;
 
    constructor(private appConfig: AppConfigService, private http: HttpClient) {
@@ -40,11 +39,9 @@ export class FinderService {
          })
       };
 
-      return this.http.request("get", url_, options_)
-         .pipe(mergeMap((response_: any) => {
-            return this.processWhatIsIt(response_);
-         }))
+      return this.http.get(url_, options_)
          .pipe(
+            mergeMap((response_: any) => this.processWhatIsIt(response_)),
             catchError((response_: any) => {
                if (response_ instanceof HttpResponseBase) {
                   try {
@@ -65,14 +62,18 @@ export class FinderService {
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
       const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); } };
+
       if (status === 200) {
-         return utils.blobToText(responseBlob).pipe(mergeMap(_responseText => {
-            return of<any>(<any>JSON.parse(_responseText));
-         }));
-      } else if (status !== 200 && status !== 204) {
-         return utils.blobToText(responseBlob).pipe(mergeMap(_responseText => {
-            return utils.throwException("An unexpected server error occurred.", status, _responseText, _headers);
-         }));
+         return utils.blobToText(responseBlob)
+            .pipe(
+               mergeMap(_responseText => of<any>(<any>JSON.parse(_responseText)))
+            );
+      }
+      else if (status !== 200 && status !== 204) {
+         return utils.blobToText(responseBlob)
+            .pipe(
+               mergeMap(_responseText => utils.throwException("An unexpected server error occurred.", status, _responseText, _headers))
+            );
       }
       return of<any>(<any>responseBlob);
    }

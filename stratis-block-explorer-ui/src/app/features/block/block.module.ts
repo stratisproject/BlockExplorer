@@ -2,16 +2,12 @@ import { NgModule, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Route } from '@angular/router';
 import * as fromComponents from './components';
+import { SharedModule } from '@shared/shared.module';
 
 export const blockRoutes: Route[] = [
-   //{
-   //   path: 'blocks', component: fromBlock.BlocksComponent, children: [
-   //      { path: ':blockHeight', component: fromBlock.BlockComponent }
-   //   ]
-   //}
    { path: 'blocks', component: fromComponents.BlocksComponent, data: { breadcrumb: 'Blocks' } },
    {
-      path: 'block', data: { breadcrumb: 'Block'}, children: [
+      path: 'block', data: { breadcrumb: 'Block' }, children: [
          { path: '', redirectTo: '/blocks', pathMatch: "full" },
          { path: ':blockHeight', component: fromComponents.BlockComponent }
       ]
@@ -20,13 +16,15 @@ export const blockRoutes: Route[] = [
 
 const exportedComponents: Type<any>[] = [
    fromComponents.BlockComponent,
-   fromComponents.BlocksComponent
+   fromComponents.BlocksComponent,
+   fromComponents.LatestBlocksComponent
 ];
 
 @NgModule({
    declarations: [...exportedComponents],
    imports: [
-      CommonModule
+      CommonModule,
+      SharedModule
    ],
    exports: [...exportedComponents]
 })
