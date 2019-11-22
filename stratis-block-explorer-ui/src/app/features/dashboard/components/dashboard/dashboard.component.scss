@@ -1,0 +1,10 @@
+@import '~@angular/material/theming';
+
+.row {
+   display: block;
+   margin-bottom: 15px;
+
+   &:not([class*=mat-elevation-z]) {
+      @include mat-elevation(2);
+   }
+}

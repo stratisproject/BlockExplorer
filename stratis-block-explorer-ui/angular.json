@@ -48,11 +48,16 @@
                         "input": "src/styles/themes/test-theme.scss",
                         "bundleName": "assets/styles/test-theme",
                         "lazy": true
+                     },
+                     {
+                        "input": "src/styles/themes/standard-theme.scss",
+                        "bundleName": "assets/styles/standard-theme",
+                        "lazy": true
                      }
                   ],
                   "stylePreprocessorOptions": {
                      "includePaths": [
-                        "src/custom-theme.scss"
+                        "src/styles/mixins"
                      ]
                   },
                   "scripts": []

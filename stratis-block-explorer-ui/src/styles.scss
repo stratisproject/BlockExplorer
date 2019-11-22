@@ -3,4 +3,14 @@ html, body {
    margin: 0;
    height: 100%;
    /*background: mat-color($primary);*/
+   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+@media (min-width: 1200px) {
+   .row {
+      width: 1170px;
+      margin-right: auto;
+      margin-left: auto;
+   }
 }

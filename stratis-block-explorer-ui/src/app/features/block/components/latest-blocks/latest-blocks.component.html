@@ -1,1 +1,29 @@
-<p>latest-blocks works!</p>
+<mat-card>
+   <mat-card-title>
+      <span class="mat-display-2">Last {{records}} blocks</span>
+   </mat-card-title>
+   <mat-card-subtitle>
+      <app-busy-indicator [hidden]="blocksLoaded$ | async"></app-busy-indicator>
+   </mat-card-subtitle>
+   <mat-card-content class="container">
+      <table mat-table [dataSource]="blocks$ | async">
+         <ng-container matColumnDef="height">
+            <th mat-header-cell *matHeaderCellDef>Height</th>
+            <td mat-cell *matCellDef="let block"><a [routerLink]="['/block', block.hash]">{{block.height}}</a></td>
+         </ng-container>
+
+         <mat-text-column name="age"></mat-text-column>
+         <mat-text-column name="confirmations"></mat-text-column>
+         <mat-text-column name="transactionsCount" headerText="Transactions"></mat-text-column>
+         <mat-text-column name="hash"></mat-text-column>
+
+         <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+         <!--<mat-text-column name="height"></mat-text-column>-->
+      </table>
+   </mat-card-content>
+   <mat-card-actions fxLayout="row" fxLayoutAlign="center">
+      <button mat-raised-button [routerLink]="['/blocks']">Show more blocks</button>
+   </mat-card-actions>
+</mat-card>

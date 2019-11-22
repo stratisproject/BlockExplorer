@@ -1,0 +1,88 @@
+@mixin mat-table-columns($columns) {
+   .mat-column- {
+      @each $colName, $props in $columns {
+
+         $width: map-get($props, 'width');
+
+         &#{$colName} {
+            @if map-has-key($props, 'flex') {
+               flex: map-get($props, 'flex');
+            }
+            @else {
+               flex: $width;
+            }
+
+            @if map-has-key($props, 'min-width') {
+               min-width: map-get($props, 'min-width');
+            }
+            @else {
+               min-width: $width;
+            }
+
+            @if map-has-key($props, 'color') {
+               color: map-get($props, 'color');
+            }
+         }
+      }
+   }
+}
+
+@mixin mat-table-autosize() {
+   min-width: auto !important;
+   width: 100% !important;
+
+   .mat-header-row, .mat-footer-row, .mat-row {
+      display: inline-flex;
+      width: 100%;
+   }
+}
+
+
+@mixin mat-table-size-column($columnName, $flex, $minWidth) {
+   .mat-column-#{$columnName} {
+      flex: $flex !important;
+      min-width: $minWidth !important;
+
+      @content;
+   }
+}
+
+@mixin mat-table-column($column) {
+   .mat-column- {
+      $name: map-get($column, 'name');
+      $width: map-get($column, 'width');
+      $flex: map-get($column, 'flex');
+
+      &#{$name} {
+         @if map-has-key($column, 'flex') {
+            flex: map-get($column, 'flex');
+         }
+         @else {
+            flex: $width;
+         }
+
+         @if map-has-key($column, 'min-width') {
+            min-width: map-get($column, 'min-width');
+         }
+         @else {
+            min-width: $width;
+         }
+
+         @if map-has-key($column, 'color') {
+            color: map-get($column, 'color');
+         }
+      }
+   }
+}
+
+@mixin mat-row-alternate($matRowClass, $evenColor, $oddColor) {
+   .mat-row#{$matRowClass} {
+      &:nth-child(even) {
+         background: var(--accent-lighter-color);
+      }
+
+      &:nth-child(odd) {
+         background: var(--accent-darker-color);
+      }
+   }
+}

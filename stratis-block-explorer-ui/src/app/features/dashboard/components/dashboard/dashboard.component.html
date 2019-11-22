@@ -1,6 +1,12 @@
-<mat-card color="accent" >
-   <mat-card-title>Welcome</mat-card-title>
-   <mat-card-content>
-      Use search box in the top right corner to search addresses, transactions and smart contracts.
-   </mat-card-content>
-</mat-card>
+<div class="row mat-elevation-z20">
+   <mat-card color="accent">
+      <mat-card-title>Welcome</mat-card-title>
+      <mat-card-content>
+         Use search box in the top right corner to search addresses, transactions and smart contracts.
+      </mat-card-content>
+   </mat-card>
+</div>
+
+<div class="row">
+   <app-latest-blocks [records]="10" [autorefresh]="50"></app-latest-blocks>
+</div>

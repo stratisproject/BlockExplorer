@@ -3,7 +3,7 @@ import { BlockResponseModel } from '../models/block-response.model';
 
 export const loadLastBlocks = createAction(
    '[Block] Load Last Blocks',
-   props<{ records: number }>()
+   (records: number) => ({ records })
 );
 
 export const lastBlocksLoadedError = createAction(

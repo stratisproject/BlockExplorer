@@ -8,7 +8,9 @@ import { BlockResponseModel } from '../models/block-response.model';
 import { BlockHeaderResponseModel } from '../models/block-header-response.model';
 import { StatsModel } from '../models/stats.model';
 
-@Injectable()
+@Injectable({
+   providedIn: "root"
+})
 export class BlocksService {
    public apiBaseUrl: string;
 

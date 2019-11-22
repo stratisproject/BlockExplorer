@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import * as fromComponents from './components';
-import * as fromMain from './store/main.reducer';
-import { MainEffects } from './store/main.effects';
+import * as fromStore from './store';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '@shared/shared.module';
@@ -28,8 +27,8 @@ const exportedComponents: Type<any>[] = [
       FormsModule,
       RouterModule,
       SharedModule,
-      StoreModule.forFeature(fromMain.mainFeatureKey, fromMain.reducer),
-      EffectsModule.forFeature([MainEffects])
+      StoreModule.forFeature(fromStore.mainFeatureKey, fromStore.reducer),
+      EffectsModule.forFeature([fromStore.MainEffects])
    ],
    exports: [
       fromComponents.MainComponent,

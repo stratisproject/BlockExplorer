@@ -1,8 +1,11 @@
 import { NgModule, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Route } from '@angular/router';
+import { Route, RouterModule } from '@angular/router';
 import * as fromComponents from './components';
+import * as fromStore from './store';
 import { SharedModule } from '@shared/shared.module';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 export const blockRoutes: Route[] = [
    { path: 'blocks', component: fromComponents.BlocksComponent, data: { breadcrumb: 'Blocks' } },
@@ -23,8 +26,11 @@ const exportedComponents: Type<any>[] = [
 @NgModule({
    declarations: [...exportedComponents],
    imports: [
+      RouterModule,
       CommonModule,
-      SharedModule
+      SharedModule,
+      StoreModule.forFeature(fromStore.blockFeatureKey, fromStore.reducer),
+      EffectsModule.forFeature([fromStore.BlockEffects])
    ],
    exports: [...exportedComponents]
 })
