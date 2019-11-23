@@ -68,10 +68,7 @@ export class BlockComponent implements OnInit, OnDestroy {
 
     constructor(private route: ActivatedRoute, private store: Store<fromStore.BlockState>, private log: Log) { }
 
-    everysecond$: Observable<number> = timer(0, 1000);
-
     ngOnInit() {
-        this.everysecond$.pipe(takeUntilDestroyed(this)).subscribe(second => console.log(second));
         this.loadBlockDetails();
     }
 
