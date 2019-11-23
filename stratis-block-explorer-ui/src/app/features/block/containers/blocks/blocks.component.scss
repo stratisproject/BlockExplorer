@@ -1,0 +1,30 @@
+@import '_all.scss';
+
+.mat-table {
+   width: 100%;
+
+   ::ng-deep {
+      td.mat-cell, th.mat-header-cell {
+         white-space: nowrap;
+         padding: 0 5px;
+      }
+
+      th.mat-header-cell {
+         text-align: left;
+      }
+
+      tr.mat-footer-row, tr.mat-row {
+         height: 36px;
+      }
+   }
+}
+
+.container {
+   overflow: auto;
+}
+
+/*@media only screen and (max-width: 736px) and (orientation:portrait) {
+   mat-header-row, mat-row {
+      width: 200%;
+   }
+}*/

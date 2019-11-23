@@ -1,3 +1,4 @@
+@import 'base';
 /**
 * Generated theme by Material Theme Generator
 * https://materialtheme.arcsine.dev/
@@ -129,3 +130,5 @@ $altTheme: mat-dark-theme($theme-primary, $theme-accent, $theme-warn);
    padding: .5em .85em;
    min-height: 2.5em;
 }
+
+@include apply-common-style($theme);

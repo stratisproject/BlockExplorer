@@ -2,7 +2,6 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import * as fromStore from '../../store';
 import { Observable, interval, ReplaySubject, of } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { BlockState } from '../../store';
 import { startWith, takeUntil, switchMap } from 'rxjs/operators';
 import { BlockSummaryModel } from '../../models/block-summary.model';
 
@@ -16,16 +15,15 @@ export class LatestBlocksComponent implements OnInit, OnDestroy {
     @Input() autorefresh: number = 0;
 
     destroyed$ = new ReplaySubject<boolean>();
-    displayedColumns = ['height', 'age', 'confirmations', 'transactionsCount', 'hash'];
-    //dataSource;
+    displayedColumns = ['height', 'age', 'confirmations', 'transactions', 'hash'];
 
-    blocksLoaded$: Observable<boolean>;
+    areLastBlockLoaded$: Observable<boolean>;
     blocks$: Observable<BlockSummaryModel[]>;
 
-    constructor(private store: Store<BlockState>) { }
+    constructor(private store: Store<fromStore.BlockState>) { }
 
     ngOnInit() {
-        this.blocksLoaded$ = this.store.pipe(select(fromStore.getLastBlocksLoaded));
+        this.areLastBlockLoaded$ = this.store.pipe(select(fromStore.getAreLastBlocksLoaded));
         this.blocks$ = this.store.pipe(
             select(fromStore.getLastBlocks),
             switchMap(blocks => {
@@ -38,7 +36,7 @@ export class LatestBlocksComponent implements OnInit, OnDestroy {
                 startWith(0),
                 takeUntil(this.destroyed$)
             ).subscribe(() => {
-                if (this.blocksLoaded$)
+                if (this.areLastBlockLoaded$)
                     this.store.dispatch(fromStore.loadLastBlocks(this.records));
             });
         }

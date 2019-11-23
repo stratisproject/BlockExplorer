@@ -21,3 +21,4 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 })
 export class SharedModule { }
 
+export { takeUntilDestroyed } from './rxjs/operators/take-until-destroyed';

@@ -1,0 +1,50 @@
+<mat-card>
+   <mat-card-header>
+      <mat-card-title><h1>Block #{{block?.additionalInformation?.height}}</h1></mat-card-title>
+   </mat-card-header>
+   <mat-card-subtitle>
+      <b>Block Hash</b> {{block?.additionalInformation?.blockId}}
+   </mat-card-subtitle>
+
+   <mat-card-content gdAreas="header header | side content | footer footer"
+                     gdGap="16px"
+                     gdRows="auto auto auto">
+      <div gdArea="header">
+         Header
+      </div>
+      <div gdArea="side">
+         Side
+      </div>
+      <div gdArea="content">
+         Content
+      </div>
+      <div gdArea="footer">
+         Footer
+      </div>
+   </mat-card-content>
+</mat-card>
+<!--<h4 class="">Summary</h4>
+<div class="list-group-item my-4-x">
+   <table class="table table-striped">
+      <tbody>
+         <tr>
+            <th><label>Block Reward</label></th>
+            <td>
+               <blockexplorer-balance [balance]="totalBlockReward"></blockexplorer-balance>
+            </td>
+         </tr>
+         <tr>
+            <th><label>Confirmations</label></th>
+            <td>{{confirmations}}</td>
+         </tr>
+         <tr>
+            <th><label>Height</label></th>
+            <td>{{height}}</td>
+         </tr>
+         <tr>
+            <th><label>Date</label></th>
+            <td>{{time}}</td>
+         </tr>
+      </tbody>
+   </table>
+</div>-->

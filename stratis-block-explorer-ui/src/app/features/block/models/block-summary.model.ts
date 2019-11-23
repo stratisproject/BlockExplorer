@@ -8,7 +8,7 @@ export interface IBlockSummaryModel {
     size: number;
     age: string;
     time: string;
-    transactionCount: number;
+    transactions: number;
 }
 
 export class BlockSummaryModel implements IBlockSummaryModel {
@@ -18,7 +18,7 @@ export class BlockSummaryModel implements IBlockSummaryModel {
     size: number;
     age: string;
     time: string;
-    transactionCount: number;
+    transactions: number;
 
     constructor(data?: IBlockSummaryModel) {
         if (data) {
@@ -28,22 +28,14 @@ export class BlockSummaryModel implements IBlockSummaryModel {
 
     public static fromBlockResponseModel(block?: BlockResponseModel): BlockSummaryModel {
         if (block) {
-            let time = 'Unknown';
-
-            if (block && block.block.header.time) {
-                time = new Date(1000 * block.block.header.time).toString();
-                // TODO: decide which format we want to show date in.
-                // time = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-            }
-
             return {
+                height: block.additionalInformation.height || 0,
+                time: block.additionalInformation.blockTime.toLocaleTimeString(),
                 age: moment(block.additionalInformation.blockTime).fromNow(),
                 confirmations: block.additionalInformation.confirmations || 0,
                 hash: block.additionalInformation.blockId || '',
-                height: block.additionalInformation.height || 0,
-                size: block.extendedInformation.size || 0,
-                time: time,
-                transactionCount: block.block.transactionIds.length || 0
+                size: block.block.blockSize || 0,//block.extendedInformation.size || 0,
+                transactions: block.block.transactionIds.length || 0
             };
         }
         else {

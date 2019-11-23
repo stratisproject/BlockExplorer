@@ -5481,6 +5481,11 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
+observable-profiler@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/observable-profiler/-/observable-profiler-0.1.1.tgz#033c8622729f85fd4069791e704524911ce38bbf"
+  integrity sha512-MhUzV7CqrnlKn69Okqx7IIH2nnKl+ZYAEekD4tnwAOTePtbQwR5+TLnHsHLl5zcYanMRDw9ff36vlRmv04fF7Q==
+
 obuf@^1.0.0, obuf@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"

@@ -31,8 +31,8 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
          runtimeChecks: {
             strictStateImmutability: true,
             strictActionImmutability: true,
-            strictStateSerializability: true,
-            strictActionSerializability: true,
+            strictStateSerializability: false,
+            strictActionSerializability: false,
          }
       }),
       EffectsModule.forRoot([]),

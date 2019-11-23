@@ -1,0 +1,51 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+@mixin link-color($theme) {
+   $accent: map-get($theme, accent);
+
+   a {
+      color: mat-color($accent, text);
+   }
+}
+
+
+@mixin setup-var($theme) {
+   $primary: map-get($theme, primary);
+   $accent: map-get($theme, accent);
+   $warn: map-get($theme, warn);
+
+   body {
+      --primary-color: #{mat-color($primary)};
+      --primary-lighter-color: #{mat-color($primary, lighter)};
+      --primary-darker-color: #{mat-color($primary, darker)};
+      --text-primary-color: #{mat-color($primary, default-contrast)};
+      --text-primary-lighter-color: #{mat-color($primary, lighter-contrast)};
+      --text-primary-darker-color: #{mat-color($primary, darker-contrast)};
+   }
+
+   body {
+      --accent-color: #{mat-color($accent)};
+      --accent-lighter-color: #{mat-color($accent, lighter-contrast)};
+      --accent-darker-color: #{mat-color($accent, darker-contrast)};
+      --text-accent-color: #{mat-color($accent, default-contrast)};
+      --text-accent-lighter-color: #{mat-color($accent, lighter-contrast)};
+      --text-accent-darker-color: #{mat-color($accent, darker-contrast)};
+   }
+
+   body {
+      --warn-color: #{mat-color($warn)};
+      --warn-lighter-color: #{mat-color($warn, "lighter-contrast")};
+      --warn-darker-color: #{mat-color($warn, "darker-contrast")};
+      --text-warn-color: #{mat-color($warn, default-contrast)};
+      --text-warn-lighter-color: #{mat-color($warn, "lighter-contrast")};
+      --text-warn-darker-color: #{mat-color($warn, "darker-contrast")};
+   }
+}
+
+
+@mixin apply-common-style($theme) {
+   @include link-color($theme);
+   @include setup-var($theme);
+}

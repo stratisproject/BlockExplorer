@@ -1,0 +1,15 @@
+<ng-container *ngIf="{selectedBlock$: selectedBlock$ | async} as data">
+   <div class="row mat-elevation-z0" fxLayout="row" [attr.disabled]="!data.selectedBlock$">
+      <button color="accent" fxFlexAlign="end start" mat-raised-button [routerLink]="['/block', data.selectedBlock$?.additionalInformation.blockHeader.hashPrevBlock]">Prev. Block</button>
+      <div fxFlex></div>
+      <button color="accent" fxFlexAlign="end" mat-raised-button [routerLink]="['/block', (data.selectedBlock$?.additionalInformation.height || 0)+1]">Next. Block</button>
+   </div>
+
+   <div class="row">
+      <app-block-summary *ngIf="isSelectedBlockLoaded$ | async" [block]="data.selectedBlock$"></app-block-summary>
+   </div>
+
+   <div class="row">
+      <app-block-transactions [transactions]="data.selectedBlock$?.block.transactions"></app-block-transactions>
+   </div>
+</ng-container>

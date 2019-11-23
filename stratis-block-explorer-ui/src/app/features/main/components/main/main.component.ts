@@ -14,10 +14,7 @@ import { AppConfigService } from '@core/services/app-config.service';
    styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnDestroy {
-   private mobileQueryListener: () => void;
-
    title = 'Stratis Block Explorer';
-   mobileQuery: MediaQueryList;
 
    identifiedEntity$: Observable<any>;
    found$: Observable<boolean>;
@@ -76,8 +73,6 @@ export class MainComponent implements OnDestroy {
    }
 
    ngOnDestroy(): void {
-      this.mobileQuery.removeListener(this.mobileQueryListener);
-
       this.destroyed$.next(true);
       this.destroyed$.complete();
    }
