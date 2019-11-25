@@ -6,20 +6,20 @@
       <b>Block Hash</b> {{block?.additionalInformation?.blockId}}
    </mat-card-subtitle>
 
-   <mat-card-content gdAreas="header header | side content | footer footer"
-                     gdGap="16px"
-                     gdRows="auto auto auto">
-      <div gdArea="header">
-         Header
+   <mat-card-content class="block-stats-summary"
+                     fxLayout="row wrap" fxLayoutGap="16px"
+                     fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
+      <div fxFlex>
+         <h3 class="title">Time</h3>
       </div>
-      <div gdArea="side">
-         Side
+      <div fxFlex>
+         <h3 class="title">Total Amount</h3>
       </div>
-      <div gdArea="content">
-         Content
+      <div fxFlex>
+         <h3 class="title">Total Fees</h3>
       </div>
-      <div gdArea="footer">
-         Footer
+      <div fxFlex>
+         <h3 class="title">Confirmations</h3>
       </div>
    </mat-card-content>
 </mat-card>

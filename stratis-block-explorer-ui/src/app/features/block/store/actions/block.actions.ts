@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { BlockResponseModel } from '../models/block-response.model';
+import { BlockResponseModel } from '../../models/block-response.model';
 
 export const loadLastBlocks = createAction(
     '[Block] Load Last Blocks',

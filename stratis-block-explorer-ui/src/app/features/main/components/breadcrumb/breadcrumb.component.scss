@@ -1,50 +1,25 @@
-.sidenav {
-   margin-top: 40px;
-   min-width: 250px;
-}
-
-.sidenav-title {
-   color: white;
-}
-
 .sidenav-breadcrumbs {
-   height: 45px;
+   height: 35px;
    font-size: 16px;
    font-weight: bold;
-}
+   overflow: auto;
+   padding: 0 5px 0 5px;
 
-.sidenav-breadcrumb-span {
-   display: flex;
-}
+   .sidenav-breadcrumb-span {
+      display: flex;
 
-.sidenav-breaddiv {
-   align-self: center;
-}
+      .sidenav-breadbutton {
+         padding: 0 5px 0 0;
 
-::ng-deep .sidenav-breadbutton[disabled].last {
-   font-style: italic;
-   color: currentColor;
-   font-weight: normal;
-}
+         &[disabled].last {
+            font-style: italic;
+            color: currentColor;
+            font-weight: normal;
+         }
+      }
 
-.sidenav-text {
-   padding-right: 20px;
-   padding-left: 20px;
-   max-width: 360px;
-   word-wrap: normal;
-}
-
-.sidenav-icons {
-   position: absolute;
-   left: 5px;
-}
-
-.sidenav-fixfa {
-   max-width: 24px;
-   font-size: 1.5em;
-}
-
-.sidenav-arrow {
-   position: absolute;
-   right: 5px;
+      .sidenav-breaddiv {
+         align-self: center;
+      }
+   }
 }

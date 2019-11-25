@@ -12,41 +12,52 @@ import { MainModule } from '@features/main/main.module';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
-import { reducers } from './reducers';
+import { AppEffects } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { BlockModule } from './features/block/block.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { ROOT_REDUCERS, metaReducers } from './core/store/reducers';
 
 @NgModule({
-   declarations: [
-      AppComponent,
-   ],
-   imports: [
-      BrowserModule,
-      BrowserAnimationsModule,
-      AppRoutingModule,
-      HttpClientModule,
-      CoreModule, MainModule, BlockModule, DashboardModule,
-      StoreModule.forRoot(reducers, {
-         runtimeChecks: {
-            strictStateImmutability: true,
-            strictActionImmutability: true,
-            strictStateSerializability: false,
-            strictActionSerializability: false,
-         }
-      }),
-      EffectsModule.forRoot([]),
-      !environment.production ? StoreDevtoolsModule.instrument() : []
-   ],
-   providers: [
-      AppConfigService,
-      { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppConfigService], multi: true }
-   ],
-   bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        HttpClientModule,
+        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule,
+        //StoreModule.forRoot(reducers, {
+        //    runtimeChecks: {
+        //        strictStateImmutability: true,
+        //        strictActionImmutability: true,
+        //        strictStateSerializability: false,
+        //        strictActionSerializability: false,
+        //    },
+        //    metaReducers: metaReducers
+        //}),
+        StoreModule.forRoot(ROOT_REDUCERS, {
+            metaReducers: metaReducers,
+            runtimeChecks: {
+                strictStateImmutability: true,
+                strictActionImmutability: true
+            }
+        }),
+        EffectsModule.forRoot([AppEffects]), //todo gestire gli alert in core
+        !environment.production ? StoreDevtoolsModule.instrument() : []
+    ],
+    providers: [
+        AppConfigService,
+        { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppConfigService], multi: true },
+        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } }
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
 
 
 export function init_app(appLoadService: AppConfigService) {
-   return () => appLoadService.load();
+    return () => appLoadService.load();
 }
