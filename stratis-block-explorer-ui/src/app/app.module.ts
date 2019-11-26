@@ -29,15 +29,6 @@ import { ROOT_REDUCERS, metaReducers } from './core/store/reducers';
         AppRoutingModule,
         HttpClientModule,
         CoreModule.forRoot(), MainModule, BlockModule, DashboardModule,
-        //StoreModule.forRoot(reducers, {
-        //    runtimeChecks: {
-        //        strictStateImmutability: true,
-        //        strictActionImmutability: true,
-        //        strictStateSerializability: false,
-        //        strictActionSerializability: false,
-        //    },
-        //    metaReducers: metaReducers
-        //}),
         StoreModule.forRoot(ROOT_REDUCERS, {
             metaReducers: metaReducers,
             runtimeChecks: {

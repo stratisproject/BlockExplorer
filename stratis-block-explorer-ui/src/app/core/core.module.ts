@@ -13,8 +13,6 @@ import { CoreStoreFacade } from './store/core-store.facade';
     declarations: [],
     imports: [
         CommonModule,
-        StoreModule.forFeature("core", fromCore.ROOT_REDUCERS),
-        EffectsModule.forFeature([])
     ]
     , exports: [
     ],

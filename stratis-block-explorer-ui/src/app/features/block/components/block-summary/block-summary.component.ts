@@ -15,4 +15,12 @@ export class BlockSummaryComponent implements OnInit {
 
     ngOnInit() {
     }
+
+    getTotalAmount(block: BlockResponseModel) {
+        return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.amount.satoshi, 0)
+    }
+
+    getTotalFee(block: BlockResponseModel) {
+        return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.fee.satoshi, 0)
+    }
 }

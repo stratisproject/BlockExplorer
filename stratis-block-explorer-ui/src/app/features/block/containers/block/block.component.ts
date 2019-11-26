@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BlockResponseModel } from '../../models/block-response.model';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Log } from '@shared/logger.service';
 import { BlockStoreFacade } from '../../store/block-store.facade';

@@ -1,28 +1,42 @@
-<mat-card>
+<mat-card *ngIf="block; else nullBlock">
    <mat-card-header>
-      <mat-card-title><h1>Block #{{block?.additionalInformation?.height}}</h1></mat-card-title>
+      <mat-card-title><h1>Block #{{block.additionalInformation.height}}</h1></mat-card-title>
    </mat-card-header>
    <mat-card-subtitle>
-      <b>Block Hash</b> {{block?.additionalInformation?.blockId}}
+      <div ngClass.lt-sm="ellipsed">
+         <b>Block Hash</b> {{block.additionalInformation.blockId}}
+      </div>
    </mat-card-subtitle>
 
    <mat-card-content class="block-stats-summary"
                      fxLayout="row wrap" fxLayoutGap="16px"
                      fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
-      <div fxFlex>
-         <h3 class="title">Time</h3>
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Time</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{block.additionalInformation.blockHeader.blockTime | date:'medium'}}</div>
       </div>
-      <div fxFlex>
-         <h3 class="title">Total Amount</h3>
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Total Amount</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="getTotalAmount(block)"></app-balance></div>
       </div>
-      <div fxFlex>
-         <h3 class="title">Total Fees</h3>
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Total Fees</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="getTotalFee(block)"></app-balance></div>
       </div>
-      <div fxFlex>
-         <h3 class="title">Confirmations</h3>
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Confirmations</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{block.additionalInformation.confirmations}}</div>
       </div>
    </mat-card-content>
 </mat-card>
+
+<ng-template #nullBlock>
+   <mat-card>
+      <mat-card-header>
+         <mat-card-title><h1>Block not found</h1></mat-card-title>
+      </mat-card-header>
+   </mat-card>
+</ng-template>
 <!--<h4 class="">Summary</h4>
 <div class="list-group-item my-4-x">
    <table class="table table-striped">

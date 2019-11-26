@@ -32,7 +32,7 @@ const selectedBlockReducer = createReducer(
 
     on(BlockActions.loadBlockError, (state, action) => ({
         ...state,
-        isSelected: true,
+        isSelected: false,
         block: null,
         error: action.error
     }))

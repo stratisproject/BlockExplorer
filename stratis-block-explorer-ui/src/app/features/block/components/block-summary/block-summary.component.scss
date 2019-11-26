@@ -1,11 +1,27 @@
+.ellipsed {
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
 .block-stats-summary {
    .title {
       text-align: center;
    }
 
+   .value {
+      text-align: center;
+   }
+
    &.as-column {
-      .title {
+      > div {
+         border-bottom: dashed 1px var(--accent-color);
+      }
+
+      .title, .value {
          text-align: left;
+      }
+
+      .value {
       }
    }
 }
