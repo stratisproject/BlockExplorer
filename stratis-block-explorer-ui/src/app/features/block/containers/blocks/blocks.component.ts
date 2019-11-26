@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ReplaySubject, Observable, of } from 'rxjs';
 import { BlockSummaryModel } from '../../models/block-summary.model';
-import { select, Store } from '@ngrx/store';
+import { select } from '@ngrx/store';
 import * as fromStore from '../../store';
 import { switchMap } from 'rxjs/operators';
+import { BlockStoreFacade } from '../../store/block-store.facade';
 
 @Component({
     selector: 'app-blocks',
@@ -19,18 +20,18 @@ export class BlocksComponent implements OnInit {
 
     @Input() records: number = 25;
 
-    constructor(private store: Store<fromStore.BlockState>) { }
+    constructor(private facade: BlockStoreFacade) { }
 
     ngOnInit() {
-        this.areBlocksLoaded$ = this.store.pipe(select(fromStore.getAreBlocksLoaded));
-        this.blocks$ = this.store.pipe(
-            select(fromStore.getBlocks),
-            switchMap(blocks => {
-                return of(blocks.map<BlockSummaryModel>((block, index) => BlockSummaryModel.fromBlockResponseModel(block)));
-            })
-        );
+        this.areBlocksLoaded$ = this.facade.areBlocksLoaded$;
+        this.blocks$ = this.facade.blocks$
+            .pipe(
+                switchMap(blocks => {
+                    return of(blocks.map<BlockSummaryModel>((block, index) => BlockSummaryModel.fromBlockResponseModel(block)));
+                })
+            );
 
-        this.store.dispatch(fromStore.loadBlocks(this.records));
+        this.facade.loadBlocks(this.records);
     }
 
 }
