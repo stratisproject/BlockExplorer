@@ -1,12 +1,12 @@
 <mat-card *ngIf="block; else nullBlock">
-   <mat-card-header>
+   <mat-card-header class="overflow-hidden">
       <mat-card-title><h1>Block #{{block.additionalInformation.height}}</h1></mat-card-title>
+      <mat-card-subtitle>
+         <div ngClass.lt-sm="ellipsed">
+            <app-hash-view [label]="'Block Hash'" [hash]="block.additionalInformation.blockId"></app-hash-view>
+         </div>
+      </mat-card-subtitle>
    </mat-card-header>
-   <mat-card-subtitle>
-      <div ngClass.lt-sm="ellipsed">
-         <b>Block Hash</b> {{block.additionalInformation.blockId}}
-      </div>
-   </mat-card-subtitle>
 
    <mat-card-content class="block-stats-summary"
                      fxLayout="row wrap" fxLayoutGap="16px"

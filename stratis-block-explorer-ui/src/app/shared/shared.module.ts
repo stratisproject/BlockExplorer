@@ -4,20 +4,23 @@ import * as components from './components';
 import { MatIconModule } from '@angular/material/icon';
 import { CustomMaterialModuleModule } from './custom-material-module.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
-   declarations: [components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent],
-   imports: [
-      MatIconModule,
-      CustomMaterialModuleModule,
-      CommonModule,
-      FlexLayoutModule
-   ],
-   exports: [
-      components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent,
-      CustomMaterialModuleModule,
-      FlexLayoutModule
-   ]
+    declarations: [components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent, components.HashViewComponent],
+    imports: [
+        MatIconModule,
+        CustomMaterialModuleModule,
+        CommonModule,
+        FlexLayoutModule,
+        ClipboardModule
+    ],
+    exports: [
+        components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent, components.HashViewComponent,
+        CustomMaterialModuleModule,
+        FlexLayoutModule,
+        ClipboardModule
+    ]
 })
 export class SharedModule { }
 

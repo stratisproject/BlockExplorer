@@ -1,0 +1,25 @@
+:host {
+   overflow: hidden;
+
+   .label {
+      display: inline-block;
+      font-weight: bold;
+      padding-right: 8px;
+   }
+
+   .hash {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   button {
+      display: inline-block;
+      float: right;
+   }
+}
+
+.ellipsed {
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
