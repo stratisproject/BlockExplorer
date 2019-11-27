@@ -12,12 +12,12 @@ import { MainModule } from '@features/main/main.module';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
-import { AppEffects } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { BlockModule } from './features/block/block.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { ROOT_REDUCERS, metaReducers } from './core/store/reducers';
+import { ROOT_REDUCERS, metaReducers } from '@core/store/reducers';
+import * as fromCoreEffects from '@core/store/effects';
 
 @NgModule({
     declarations: [
@@ -36,7 +36,7 @@ import { ROOT_REDUCERS, metaReducers } from './core/store/reducers';
                 strictActionImmutability: true
             }
         }),
-        EffectsModule.forRoot([AppEffects]), //todo gestire gli alert in core
+        EffectsModule.forRoot([fromCoreEffects.AlertEffects]),
         !environment.production ? StoreDevtoolsModule.instrument() : []
     ],
     providers: [

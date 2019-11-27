@@ -13,4 +13,20 @@ export class CoreStoreFacade {
     establishSignalRConnection() {
         this.store.dispatch(fromActions.signalrEstablishConnection());
     }
+
+    showSuccess(text: string) {
+        this.store.dispatch(fromActions.showSuccess(text));
+    }
+
+    showInformation(text: string) {
+        this.store.dispatch(fromActions.showInformation(text));
+    }
+
+    showWarning(text: string) {
+        this.store.dispatch(fromActions.showWarning(text));
+    }
+
+    showError(text: string, error?: Error | any) {
+        this.store.dispatch(fromActions.showError(text, error));
+    }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { takeUntilDestroyed } from '../../rxjs/operators/take-until-destroyed';
+import { CoreStoreFacade } from '@core/store/core-store.facade';
 
 @Component({
     selector: 'app-hash-view',
@@ -12,7 +13,7 @@ export class HashViewComponent implements OnInit, OnDestroy {
     @Input() label: string = null;
     isCopied$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    constructor() { }
+    constructor(private coreFacade: CoreStoreFacade) { }
 
     ngOnInit() {
         this.isCopied$
@@ -21,7 +22,7 @@ export class HashViewComponent implements OnInit, OnDestroy {
             )
             .subscribe(value => {
                 if (value) {
-                    alert("copied");
+                    this.coreFacade.showSuccess("Hash copied to clipboard!");
                 }
             });
     }

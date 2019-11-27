@@ -1,6 +1,6 @@
 <div class="hash-view" fxLayout="row">
    <button mat-icon-button fxFlex="0 0 auto">
-      <mat-icon ngxClipboard *ngxClipboardIfSupported [cbContent]="hash" (cbOnSuccess)="isCopied = true">content_copy</mat-icon>
+      <mat-icon ngxClipboard *ngxClipboardIfSupported [cbContent]="hash" (cbOnSuccess)="isCopied$.next(true)">content_copy</mat-icon>
    </button>
    <div fxFlex="0 1" fxLayout="column">
       <div class="label" *ngIf="label">{{label}}</div>
