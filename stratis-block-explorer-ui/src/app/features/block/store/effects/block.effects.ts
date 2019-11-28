@@ -24,18 +24,6 @@ export class BlockEffects {
         )
     );
 
-    //loadLastBlocksError$ = createEffect(() =>
-    //    this.actions$.pipe(
-    //        ofType(BlockActions.loadLastBlocksError),
-    //        switchMap(action => {
-    //            return this.blocksService.blocks(action.records).pipe(
-    //                map(blocks => BlockActions.lastBlocksLoaded({ blocks: blocks })),
-    //                catchError(error => of(BlockActions.loadLastBlocksError({ error: error.toString() })))
-    //            );
-    //        })
-    //    )
-    //);
-
     loadBlocks$ = createEffect(() =>
         this.actions$.pipe(
             ofType(BlockActions.loadBlocks),
@@ -54,7 +42,7 @@ export class BlockEffects {
             switchMap(action => {
                 return this.blocksService.block(action.blockHash, false, true).pipe(
                     map(block => BlockActions.blockLoaded({ block: block })),
-                    catchError(error => of(BlockActions.loadBlockError({ error: error.toString() })))
+                    catchError(error => of(BlockActions.loadBlockError({ error: (<Error>error).message })))
                 );
             })
         )

@@ -1,9 +1,15 @@
-<div class="hash-view" fxLayout="row">
+<div class="hash-view" fxLayout="row" fxLayoutAlign="center center">
    <button mat-icon-button fxFlex="0 0 auto">
       <mat-icon ngxClipboard *ngxClipboardIfSupported [cbContent]="hash" (cbOnSuccess)="isCopied$.next(true)">content_copy</mat-icon>
    </button>
-   <div fxFlex="0 1" fxLayout="column">
+   <div fxFlex="0 1" fxLayout="column" class="content-block">
       <div class="label" *ngIf="label">{{label}}</div>
-      <div class="hash">{{hash}}</div>
+      <div *ngIf="enableRoute==true; else noRoute" class="hash">
+         <a [routerLink]="['/' + hashType , hash]">{{hash}}</a>
+      </div>
    </div>
 </div>
+
+<ng-template #noRoute>
+   {{hash}}
+</ng-template>

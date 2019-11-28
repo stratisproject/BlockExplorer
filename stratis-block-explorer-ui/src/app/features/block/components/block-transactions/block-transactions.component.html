@@ -1,20 +1,20 @@
 <mat-card>
    <mat-card-header>
       <mat-card-title>
-         <h3>{{title}} <span [hidden]="!showCount">( {{ !!transactions ? transactions.length : 0 }} )</span></h3>
+         <span [hidden]="!showCount" [matBadge]="transactions.length" matBadgePosition="above after" [matBadgeOverlap]="false">{{title}}</span>
       </mat-card-title>
    </mat-card-header>
    <mat-card-content>
-      <ng-container *ngIf="transactions?.length > 0; else noTransactions">
+      <ng-container *ngIf="transactionsOnCurrentPage?.length > 0; else noTransactions">
          <ng-template [ngTemplateOutlet]="pagination"></ng-template>
-         <div *ngIf="transactionsOnCurrentPage?.length==0">
-            <i>No transactions to show</i>
-         </div>
+
+         <ng-template *ngIf="transactionsOnCurrentPage?.length==0" [ngTemplateOutlet]="noTransactions"></ng-template>
+
          <div *ngFor="let transactionItem of transactionsOnCurrentPage;let isOdd=odd;" [class.mat-elevation-z6]="isOdd">
             <app-block-transactions-item [showHeader]="showTransactionHeader" [transaction]="transactionItem"></app-block-transactions-item>
          </div>
-         <ng-template [ngTemplateOutlet]="pagination"></ng-template>
 
+         <ng-template [ngTemplateOutlet]="pagination"></ng-template>
       </ng-container>
    </mat-card-content>
 </mat-card>
@@ -26,4 +26,8 @@
                   [pageSizeOptions]="[20, 25, 50, 100]"
                   (page)="onPageEvent">
    </mat-paginator>
+</ng-template>
+
+<ng-template #noTransactions>
+   <i>No transactions to show</i>
 </ng-template>

@@ -1,18 +1,17 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { takeUntilDestroyed } from '../../rxjs/operators/take-until-destroyed';
+import { BehaviorSubject } from 'rxjs';
 import { CoreStoreFacade } from '@core/store/core-store.facade';
+import { takeUntilDestroyed } from '../../shared.module';
 
 @Component({
-    selector: 'app-hash-view',
-    templateUrl: './hash-view.component.html',
-    styleUrls: ['./hash-view.component.scss']
+    selector: 'app-address-view',
+    templateUrl: './address-view.component.html',
+    styleUrls: ['./address-view.component.scss']
 })
-export class HashViewComponent implements OnInit, OnDestroy {
-    @Input() hash: string = null;
+export class AddressViewComponent implements OnInit, OnDestroy {
+    @Input() address: string = null;
     @Input() label: string = null;
-    @Input() enableRoute: boolean;
-    @Input() hashType: "address" | "block" | "transaction" | "smartcontract" = "transaction";
+    @Input() enableRoute: boolean = false;
 
     isCopied$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -27,7 +26,7 @@ export class HashViewComponent implements OnInit, OnDestroy {
             )
             .subscribe(value => {
                 if (value) {
-                    this.coreFacade.showSuccess("Hash copied to clipboard!");
+                    this.coreFacade.showSuccess("Address copied to clipboard!");
                 }
             });
     }

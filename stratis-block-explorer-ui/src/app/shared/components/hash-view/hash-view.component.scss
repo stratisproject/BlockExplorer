@@ -17,6 +17,12 @@
       display: inline-block;
       float: right;
    }
+
+   .content-block {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
 }
 
 .ellipsed {

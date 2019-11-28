@@ -14,8 +14,19 @@
    </div>
 </ng-container>
 
+<ng-container *ngIf="selectedBlockError$ | async as error">
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Error</h1></mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+         <div>{{error}}</div>
+      </mat-card-content>
+   </mat-card>
+</ng-container>
+
 <ng-template #nullBlock>
-   <mat-card>
+   <mat-card class="row">
       <mat-card-header>
          <mat-card-title><h1>Block not found</h1></mat-card-title>
       </mat-card-header>

@@ -1,0 +1,15 @@
+<div class="address-view" fxLayout="row" fxLayoutAlign="center center">
+   <button mat-icon-button fxFlex="0 0 auto">
+      <mat-icon ngxClipboard *ngxClipboardIfSupported [cbContent]="address" (cbOnSuccess)="isCopied$.next(true)">content_copy</mat-icon>
+   </button>
+   <div fxFlex="0 1" fxLayout="column" class="content-block">
+      <div class="label" *ngIf="label">{{label}}</div>
+      <div *ngIf="enableRoute==route; else noRoute" class="address">
+         <a [routerLink]="['/addresses', address]">{{address}}</a>
+      </div>
+   </div>
+</div>
+
+<ng-template #noRoute>
+   {{address}}
+</ng-template>

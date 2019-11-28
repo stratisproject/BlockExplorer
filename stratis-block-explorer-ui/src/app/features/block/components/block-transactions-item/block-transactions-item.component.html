@@ -1,13 +1,16 @@
 <mat-card>
-   <mat-card-header *ngIf="showHeader" fxLayout="row wrap">
-      <app-hash-view [label]="'Tx Id'" [hash]="transaction.txId"></app-hash-view>
-      <div>{{transaction.time}}</div>
-   </mat-card-header>
+   <div *ngIf="showHeader" fxLayout="row wrap" class="header background accent">
+      <app-hash-view fxFlex="0 1 auto"
+                     [label]="'Tx Id'" [hash]="transaction.hash"
+                     hashType="transaction" enableRoute="true"></app-hash-view>
+      <span fxFlex fxFill></span>
+      <div fxFlex="0 0 auto">{{transaction.firstSeen.toLocaleString()}}</div>
+   </div>
    <mat-card-content>
       <div class="tx-input">
          <div *ngFor="let input of transaction.inputs">
             <div class="address">
-               <a *ngIf="!!input.address" [routerLink]="['/addresses', input.address]">{{input.address}}</a>
+               <app-address-view [address]="input.address"></app-address-view>
             </div>
             <div class="amount"><app-balance></app-balance></div>
             <div class="previous-output">PREVIOUS_OUTPUT</div>

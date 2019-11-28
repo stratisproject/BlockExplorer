@@ -76,16 +76,19 @@
    .background.primary {
       background-color: $primary;
       color: $primary-contrast;
+      @include anchor-color(currentColor);
    }
 
    .background.accent {
       background-color: $accent;
       color: $accent-contrast;
+      @include anchor-color(currentColor);
    }
 
    .background.warn {
       background-color: $warn;
       color: $warn-contrast;
+      @include anchor-color(currentColor);
    }
 
    .background.card {
@@ -101,6 +104,11 @@
    }
 }
 
+@mixin anchor-color($color) {
+   a {
+      color: $color;
+   }
+}
 
 @mixin apply-common-style($theme) {
    @include link-color($theme);
