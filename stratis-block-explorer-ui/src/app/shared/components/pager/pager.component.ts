@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 
 @Component({
-  selector: 'blockexplorer-pager',
+  selector: 'app-pager',
   templateUrl: './pager.component.html',
   styleUrls: ['./pager.component.css']
 })

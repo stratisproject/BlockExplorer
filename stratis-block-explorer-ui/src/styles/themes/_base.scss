@@ -44,8 +44,66 @@
    }
 }
 
+@mixin setup-basic-styles($theme) {
+   $p: map-get($theme, primary);
+   $a: map-get($theme, accent);
+   $w: map-get($theme, warn);
+   $b: map-get($theme, background);
+   $f: map-get($theme, foreground);
+
+   $primary: mat-color($p);
+   $accent: mat-color($a);
+   $warn: mat-color($w);
+   $primary-contrast: mat-color($p, default-contrast);
+   $accent-contrast: mat-color($a, default-contrast);
+   $warn-contrast: mat-color($w, default-contrast);
+
+   $background: mat-color($b, background);
+   $background-card: mat-color($b, card);
+
+   .color.primary {
+      color: $primary;
+   }
+
+   .color.accent {
+      color: $accent;
+   }
+
+   .color.warn {
+      color: $warn;
+   }
+
+   .background.primary {
+      background-color: $primary;
+      color: $primary-contrast;
+   }
+
+   .background.accent {
+      background-color: $accent;
+      color: $accent-contrast;
+   }
+
+   .background.warn {
+      background-color: $warn;
+      color: $warn-contrast;
+   }
+
+   .background.card {
+      background-color: $background-card;
+   }
+
+   .background.stacked {
+      background-color: $background;
+   }
+
+   mat-paginator.mat-paginator {
+      background-color: $background;
+   }
+}
+
 
 @mixin apply-common-style($theme) {
    @include link-color($theme);
    @include setup-var($theme);
+   @include setup-basic-styles($theme);
 }

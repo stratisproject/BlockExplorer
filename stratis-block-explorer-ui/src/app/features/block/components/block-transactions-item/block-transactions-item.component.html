@@ -1,1 +1,31 @@
-<p>block-transactions-item works!</p>
+<mat-card>
+   <mat-card-header *ngIf="showHeader" fxLayout="row wrap">
+      <app-hash-view [label]="'Tx Id'" [hash]="transaction.txId"></app-hash-view>
+      <div>{{transaction.time}}</div>
+   </mat-card-header>
+   <mat-card-content>
+      <div class="tx-input">
+         <div *ngFor="let input of transaction.inputs">
+            <div class="address">
+               <a *ngIf="!!input.address" [routerLink]="['/addresses', input.address]">{{input.address}}</a>
+            </div>
+            <div class="amount"><app-balance></app-balance></div>
+            <div class="previous-output">PREVIOUS_OUTPUT</div>
+         </div>
+      </div>
+      <div class="arrow"><mat-icon>arrow_forward</mat-icon></div>
+      <div class="tx-output">
+         <div *ngFor="let output of transaction.outputs">
+            <div class="address">
+               <a *ngIf="!!output.address" [routerLink]="['/addresses', output.address]">{{output.address}}</a>
+            </div>
+            <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
+            <div class="spent-output">SPENT / UNSPENT</div>
+         </div>
+      </div>
+   </mat-card-content>
+   <mat-card-footer fxLayout="row">
+      <div><span>Total Spent</span><app-balance [balance]="transaction.totalSpent"></app-balance></div>
+      <div><span>Fee</span><app-balance [balance]="transaction.fee"></app-balance></div>
+   </mat-card-footer>
+</mat-card>
