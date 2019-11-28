@@ -17,7 +17,7 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
     @Input() showCount = true;
 
     transactionsOnCurrentPage: TransactionSummaryModel[] = [];
-    currentPage = 1;
+    currentPageIndex = 0;
 
     // MatPaginator Output
     pageEvent: PageEvent;
@@ -29,17 +29,13 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        for (let propName in changes) {
-            if (propName === 'pageSize') {
-                this.currentPage = 1;
-                this.loadCurrentPage();
-            }
+        if (changes.transactions) {
+            this.loadCurrentPage();
         }
     }
 
     loadCurrentPage() {
-        const pageNumber = this.currentPage - 1;
-        this.transactionsOnCurrentPage = this.transactions.slice(pageNumber * this.pageSize, (pageNumber + 1) * this.pageSize);
+        this.transactionsOnCurrentPage = this.transactions.slice(this.currentPageIndex * this.pageSize, (this.currentPageIndex + 1) * this.pageSize);
     }
 
     get totalPages() {
@@ -54,9 +50,11 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
         return pages + 1;
     }
 
-    onPageEvent($event: PageEvent) {
-        this.pageSize = $event.pageSize;
-        this.currentPage = $event.pageIndex;
+    public onPageEvent(event: PageEvent): PageEvent {
+        this.pageSize = event.pageSize;
+        this.currentPageIndex = event.pageIndex;
         this.loadCurrentPage();
+
+        return event;
     }
 }

@@ -23,8 +23,8 @@
    <mat-paginator *ngIf="showPaging"
                   [length]="transactions.length"
                   [pageSize]="pageSize"
-                  [pageSizeOptions]="[20, 25, 50, 100]"
-                  (page)="onPageEvent">
+                  [pageSizeOptions]="[10, 25, 50, 100]"
+                  (page)="onPageEvent($event)">
    </mat-paginator>
 </ng-template>
 
