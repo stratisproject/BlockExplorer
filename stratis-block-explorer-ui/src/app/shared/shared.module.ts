@@ -5,11 +5,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { CustomMaterialModuleModule } from './custom-material-module.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ClipboardModule } from 'ngx-clipboard';
-import { AddressViewComponent } from './components/address-view/address-view.component';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
-    declarations: [components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent, components.HashViewComponent, components.AddressViewComponent],
+    declarations: [
+        components.BalanceComponent,
+        components.BusyIndicatorComponent,
+        components.PagerComponent,
+        components.HashViewComponent,
+        components.AddressViewComponent,
+        components.MatAnimatedIconComponent
+    ],
     imports: [
         MatIconModule,
         CustomMaterialModuleModule,
@@ -19,7 +25,12 @@ import { RouterModule } from '@angular/router';
         ClipboardModule
     ],
     exports: [
-        components.BalanceComponent, components.BusyIndicatorComponent, components.PagerComponent, components.HashViewComponent, components.AddressViewComponent,
+        components.BalanceComponent,
+        components.BusyIndicatorComponent,
+        components.PagerComponent,
+        components.HashViewComponent,
+        components.AddressViewComponent,
+        components.MatAnimatedIconComponent,
         CustomMaterialModuleModule,
         FlexLayoutModule,
         ClipboardModule

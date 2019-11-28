@@ -1,34 +1,70 @@
 <mat-card>
    <div *ngIf="showHeader" fxLayout="row wrap" class="header background accent">
       <app-hash-view fxFlex="0 1 auto"
-                     [label]="'Tx Id'" [hash]="transaction.hash"
-                     hashType="transaction" enableRoute="true"></app-hash-view>
+                     [label]="'Tx Id'" [hash]="transaction.txId"
+                     hashType="transaction" enableRoute></app-hash-view>
       <span fxFlex fxFill></span>
-      <div fxFlex="0 0 auto">{{transaction.firstSeen.toLocaleString()}}</div>
+      <div fxFlex="0 0 auto">{{transaction.firstSeen}}</div>
    </div>
-   <mat-card-content>
-      <div class="tx-input">
+
+   <mat-card-actions>
+      <mat-chip-list>
+         <mat-chip *ngIf="transaction.isCoinbase" color="warn" selected>Coinbase</mat-chip>
+         <mat-chip *ngIf="transaction.isCoinstake" color="warn" selected>Coinstake</mat-chip>
+      </mat-chip-list>
+   </mat-card-actions>
+
+   <mat-card-content fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-evenly stretch"
+                     fxLayout.lt-md="column" fxLayoutAlign.lt-md="center stretch">
+
+      <div class="tx-input"
+           fxFlex.gt-sm="50%">
          <div *ngFor="let input of transaction.inputs">
             <div class="address">
-               <app-address-view [address]="input.address"></app-address-view>
+               <app-address-view [address]="input.address"
+                                 enableRoute></app-address-view>
             </div>
             <div class="amount"><app-balance></app-balance></div>
             <div class="previous-output">PREVIOUS_OUTPUT</div>
          </div>
       </div>
-      <div class="arrow"><mat-icon>arrow_forward</mat-icon></div>
-      <div class="tx-output">
+
+      <div *ngIf="transaction.outputs.length > 0" class="arrow"
+           fxFlexAlign="center" fxFlex="0 0 auto"
+           fxLayout.gt-sm="row"
+           fxLayout.lt-md="column" fxLayoutAlign.lt-md="center">
+         <mat-icon class="background accent"
+                   fxHide.lt-md>arrow_forward</mat-icon>
+         <mat-icon class="background accent"
+                   fxHide fxShow.lt-md>arrow_downward</mat-icon>
+      </div>
+
+      <div *ngIf="transaction.outputs.length > 0" class="tx-output"
+           fxFlexAlign="end"
+           fxFlex.gt-sm="50%" class.gt-sm="">
          <div *ngFor="let output of transaction.outputs">
             <div class="address">
-               <a *ngIf="!!output.address" [routerLink]="['/addresses', output.address]">{{output.address}}</a>
+               <app-address-view [address]="output.address"
+                                 enableRoute></app-address-view>
             </div>
             <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
             <div class="spent-output">SPENT / UNSPENT</div>
          </div>
       </div>
    </mat-card-content>
-   <mat-card-footer fxLayout="row">
-      <div><span>Total Spent</span><app-balance [balance]="transaction.totalSpent"></app-balance></div>
-      <div><span>Fee</span><app-balance [balance]="transaction.fee"></app-balance></div>
-   </mat-card-footer>
+
+   <mat-divider></mat-divider>
+
+   <mat-card-actions fxLayout="row">
+      <div class="transaction-amount"
+           fxFlex fxLayout="column">
+         <div>Total Spent</div>
+         <app-balance [balance]="transaction.totalSpent"></app-balance>
+      </div>
+      <div class="transaction-fees"
+           fxFlex fxLayout="column">
+         <div>Fees</div>
+         <app-balance [balance]="transaction.fee"></app-balance>
+      </div>
+   </mat-card-actions>
 </mat-card>

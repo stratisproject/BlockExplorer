@@ -14,19 +14,19 @@ export class CoreStoreFacade {
         this.store.dispatch(fromActions.signalrEstablishConnection());
     }
 
-    showSuccess(text: string) {
-        this.store.dispatch(fromActions.showSuccess(text));
+    showSuccess(text: string, onDismiss: () => void = null) {
+        this.store.dispatch(fromActions.showSuccess(text, 2000, onDismiss));
     }
 
-    showInformation(text: string) {
-        this.store.dispatch(fromActions.showInformation(text));
+    showInformation(text: string, onDismiss: () => void = null) {
+        this.store.dispatch(fromActions.showInformation(text, 2000, onDismiss));
     }
 
-    showWarning(text: string) {
-        this.store.dispatch(fromActions.showWarning(text));
+    showWarning(text: string, onDismiss: () => void = null) {
+        this.store.dispatch(fromActions.showWarning(text, 2000, onDismiss));
     }
 
-    showError(text: string, error?: Error | any) {
-        this.store.dispatch(fromActions.showError(text, error));
+    showError(text: string, error?: Error | any, onDismiss: () => void = null) {
+        this.store.dispatch(fromActions.showError(text, error, 2000, onDismiss));
     }
 }

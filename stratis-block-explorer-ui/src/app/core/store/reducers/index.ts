@@ -30,4 +30,4 @@ export function logger(reducer: ActionReducer<RootState>): ActionReducer<RootSta
     };
 }
 
-export const metaReducers: MetaReducer<RootState>[] = !environment.production ? [logger] : [];
+export const metaReducers: MetaReducer<RootState>[] = !environment.production ? [/*logger*/] : [];

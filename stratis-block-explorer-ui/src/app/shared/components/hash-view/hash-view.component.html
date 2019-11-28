@@ -1,10 +1,14 @@
 <div class="hash-view" fxLayout="row" fxLayoutAlign="center center">
-   <button mat-icon-button fxFlex="0 0 auto">
-      <mat-icon ngxClipboard *ngxClipboardIfSupported [cbContent]="hash" (cbOnSuccess)="isCopied$.next(true)">content_copy</mat-icon>
+   <button mat-icon-button fxFlex="0 0 auto"
+           ngxClipboard *ngxClipboardIfSupported
+           [cbContent]="hash" (cbOnSuccess)="isCopied$.next(true)">
+      <mat-animated-icon [animateFromParent]="true" [animate]="isCopied$ | async"
+                         start="content_copy" end="done_outline"
+                         colorStart="primary" colorEnd="primary"></mat-animated-icon>
    </button>
    <div fxFlex="0 1" fxLayout="column" class="content-block">
       <div class="label" *ngIf="label">{{label}}</div>
-      <div *ngIf="enableRoute==true; else noRoute" class="hash">
+      <div *ngIf="enableRoute; else noRoute" class="hash">
          <a [routerLink]="['/' + hashType , hash]">{{hash}}</a>
       </div>
    </div>

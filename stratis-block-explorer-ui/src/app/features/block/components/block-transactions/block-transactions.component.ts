@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
 import { TransactionSummaryModel } from '@shared/models/transaction-summary.model';
 import { PageEvent } from '@angular/material/paginator';
+import * as fromModels from '../../models';
+import { BlockTransaction } from '../../models';
 
 @Component({
     selector: 'app-block-transactions',
@@ -16,7 +18,7 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
     @Input() showTransactionHeader = true;
     @Input() showCount = true;
 
-    transactionsOnCurrentPage: TransactionSummaryModel[] = [];
+    transactionsOnCurrentPage: BlockTransaction[] = [];
     currentPageIndex = 0;
 
     // MatPaginator Output
@@ -35,7 +37,10 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
     }
 
     loadCurrentPage() {
-        this.transactionsOnCurrentPage = this.transactions.slice(this.currentPageIndex * this.pageSize, (this.currentPageIndex + 1) * this.pageSize);
+
+        this.transactionsOnCurrentPage = this.transactions
+            .slice(this.currentPageIndex * this.pageSize, (this.currentPageIndex + 1) * this.pageSize)
+            .map((transaction, index) => fromModels.BlockTransaction.fromTransactionModel(transaction), []);
     }
 
     get totalPages() {
