@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+@import 'common_layout';
 
 @include mat-core();
 
@@ -110,8 +111,10 @@
    }
 }
 
+
 @mixin apply-common-style($theme) {
    @include link-color($theme);
    @include setup-var($theme);
    @include setup-basic-styles($theme);
+//   @include common-styles($theme);
 }

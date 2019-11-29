@@ -1,5 +1,5 @@
 <mat-card>
-   <div *ngIf="showHeader" fxLayout="row wrap" class="header background accent">
+   <div *ngIf="showHeader" fxLayout="row wrap" class="header">
       <app-hash-view fxFlex="0 1 auto"
                      [label]="'Tx Id'" [hash]="transaction.txId"
                      hashType="transaction" enableRoute></app-hash-view>
@@ -7,12 +7,10 @@
       <div fxFlex="0 0 auto">{{transaction.firstSeen}}</div>
    </div>
 
-   <mat-card-actions>
-      <mat-chip-list>
-         <mat-chip *ngIf="transaction.isCoinbase" color="warn" selected>Coinbase</mat-chip>
-         <mat-chip *ngIf="transaction.isCoinstake" color="warn" selected>Coinstake</mat-chip>
-      </mat-chip-list>
-   </mat-card-actions>
+   <mat-chip-list class="transaction-attributes">
+      <mat-chip *ngIf="transaction.isCoinbase" color="warn" selected>Coinbase</mat-chip>
+      <mat-chip *ngIf="transaction.isCoinstake" color="warn" selected>Coinstake</mat-chip>
+   </mat-chip-list>
 
    <mat-card-content fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-evenly stretch"
                      fxLayout.lt-md="column" fxLayoutAlign.lt-md="center stretch">
@@ -21,7 +19,8 @@
            fxFlex.gt-sm="50%">
          <div *ngFor="let input of transaction.inputs">
             <div class="address">
-               <app-address-view [address]="input.address"
+               <app-address-view fxFlex="0 1 auto"
+                                 [address]="input.address"
                                  enableRoute></app-address-view>
             </div>
             <div class="amount"><app-balance></app-balance></div>
@@ -40,15 +39,17 @@
       </div>
 
       <div *ngIf="transaction.outputs.length > 0" class="tx-output"
-           fxFlexAlign="end"
+           fxFlex.lt-md="1 1 auto"
            fxFlex.gt-sm="50%" class.gt-sm="">
-         <div *ngFor="let output of transaction.outputs">
-            <div class="address">
-               <app-address-view [address]="output.address"
+         <div *ngFor="let output of transaction.outputs"
+              fxLayout="column" fxLayoutAlign="end">
+            <div class="address" fxLayout="row" fxLayoutAlign="end">
+               <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-end"
+                                 [address]="output.address"
                                  enableRoute></app-address-view>
             </div>
             <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
-            <div class="spent-output">SPENT / UNSPENT</div>
+            <!--<div class="spent-output">SPENT / UNSPENT</div>-->
          </div>
       </div>
    </mat-card-content>

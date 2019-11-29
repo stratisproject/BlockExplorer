@@ -56,7 +56,7 @@ export class BlockTransaction implements IBlockTransaction {
             }
         });
 
-        let outputs = transaction.out.map(out => <IBlockTransactionIn>{
+        let outputs = transaction.out.map(out => <IBlockTransactionOut>{
             address: out.hash,
             amount: out.amount.satoshi,
             prevOut: {

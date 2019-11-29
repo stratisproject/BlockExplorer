@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { takeUntilDestroyed } from '../../rxjs/operators/take-until-destroyed';
 import { CoreStoreFacade } from '@core/store/core-store.facade';
 
@@ -7,7 +7,6 @@ import { CoreStoreFacade } from '@core/store/core-store.facade';
     selector: 'app-hash-view',
     templateUrl: './hash-view.component.html',
     styleUrls: ['./hash-view.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Default
 })
 export class HashViewComponent implements OnInit, OnDestroy {
     @Input() hash: string = null;

@@ -26,7 +26,7 @@ export class AddressViewComponent implements OnInit, OnDestroy {
             )
             .subscribe(value => {
                 if (value) {
-                    this.coreFacade.showSuccess("Address copied to clipboard!");
+                    this.coreFacade.showSuccess("Address copied to clipboard!", () => setTimeout(() => this.isCopied$.next(false), 10));
                 }
             });
     }

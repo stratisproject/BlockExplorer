@@ -1,0 +1,27 @@
+:host {
+   display: inline-block;
+   overflow: hidden;
+
+   .label {
+      display: inline-block;
+      font-weight: bold;
+      padding-right: 8px;
+   }
+
+   .address {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   button {
+      display: inline-block;
+      float: right;
+   }
+
+   .content-block {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+}
