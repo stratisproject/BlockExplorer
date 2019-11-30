@@ -98,7 +98,6 @@ body {
 $mat-warn: ( main: #ff0000, lighter: #ffb3b3, darker: #ff0000, 200: #ff0000, // For slide toggle,
 contrast : ( main: $light-primary-text, lighter: $dark-primary-text, darker: $light-primary-text, ) );
 $theme-warn: mat-palette($mat-warn, main, lighter, darker);
-;
 
 $theme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 $altTheme: mat-dark-theme($theme-primary, $theme-accent, $theme-warn);

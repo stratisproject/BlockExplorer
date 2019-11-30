@@ -1,0 +1,38 @@
+@import '~@angular/material/theming';
+
+@function build-colors($theme) {
+   $primary-palette: map-get($theme, primary);
+   $accent-palette: map-get($theme, accent);
+   $warn-palette: map-get($theme, warn);
+
+   $background-palette: map-get($theme, background);
+   $foreground-palette: map-get($theme, foreground);
+
+   $colors: (
+      primary: mat-color($primary-palette),
+      primary-lighter: mat-color($primary-palette, lighter),
+      primary-darker: mat-color($primary-palette, darker),
+      primary-contrast: mat-color($primary-palette, default-contrast),
+      primary-contrast-lighter: mat-color($primary-palette, lighter-contrast),
+      primary-contrast-darker: mat-color($primary-palette, darker-contrast),
+
+      accent: mat-color($accent-palette),
+      accent-lighter: mat-color($accent-palette, lighter),
+      accent-darker: mat-color($accent-palette, darker),
+      accent-contrast: mat-color($accent-palette, default-contrast),
+      accent-contrast-lighter: mat-color($accent-palette, lighter-contrast),
+      accent-contrast-darker: mat-color($accent-palette, darker-contrast),
+
+      warn: mat-color($warn-palette),
+      warn-lighter: mat-color($warn-palette, lighter),
+      warn-darker: mat-color($warn-palette, darker),
+      warn-contrast: mat-color($warn-palette, default-contrast),
+      warn-contrast-lighter: mat-color($warn-palette, lighter-contrast),
+      warn-contrast-darker: mat-color($warn-palette, darker-contrast),
+
+      background: mat-color($background-palette, background),
+      background-card: mat-color($background-palette, card)
+   );
+
+   @return $colors;
+}

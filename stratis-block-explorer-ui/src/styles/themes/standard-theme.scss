@@ -6,5 +6,11 @@ $accent: mat-palette($mat-pink, A200, A100, A400);
 
 $theme: mat-light-theme($primary, $accent);
 @include angular-material-theme($theme);
-
 @include apply-common-style($theme);
+
+.dark-theme {
+   $theme-dark: mat-dark-theme($primary, $accent);
+
+   @include angular-material-theme($theme-dark);
+   @include apply-common-style($theme-dark);
+}

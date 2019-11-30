@@ -1,5 +1,6 @@
 @import '~@angular/material/theming';
 @import 'common_layout';
+@import 'colors';
 
 @include mat-core();
 
@@ -11,110 +12,49 @@
    }
 }
 
-
-@mixin setup-var($theme) {
-   $primary: map-get($theme, primary);
-   $accent: map-get($theme, accent);
-   $warn: map-get($theme, warn);
+@mixin setup-basic-styles($colors: ()) {
+   $colorList: primary, accent, warn;
+   $variants: "", "-lighter", "-darker";
 
    body {
-      --primary-color: #{mat-color($primary)};
-      --primary-lighter-color: #{mat-color($primary, lighter)};
-      --primary-darker-color: #{mat-color($primary, darker)};
-      --text-primary-color: #{mat-color($primary, default-contrast)};
-      --text-primary-lighter-color: #{mat-color($primary, lighter-contrast)};
-      --text-primary-darker-color: #{mat-color($primary, darker-contrast)};
+      @each $color in $colorList {
+         @each $variant in $variants {
+            #{"--" + $color + $variant + "-color"}: #{map-get($colors, $color + $variant)};
+            #{"--text-" + $color + $variant + "-color"}: #{map-get($colors, $color + "-contrast" + $variant)};
+         }
+      }
    }
 
-   body {
-      --accent-color: #{mat-color($accent)};
-      --accent-lighter-color: #{mat-color($accent, lighter-contrast)};
-      --accent-darker-color: #{mat-color($accent, darker-contrast)};
-      --text-accent-color: #{mat-color($accent, default-contrast)};
-      --text-accent-lighter-color: #{mat-color($accent, lighter-contrast)};
-      --text-accent-darker-color: #{mat-color($accent, darker-contrast)};
-   }
+   @each $color in $colorList {
+      @each $variant in $variants {
+         .color.#{$color + $variant} {
+            color: #{map-get($colors, $color + $variant)};
+         }
 
-   body {
-      --warn-color: #{mat-color($warn)};
-      --warn-lighter-color: #{mat-color($warn, "lighter-contrast")};
-      --warn-darker-color: #{mat-color($warn, "darker-contrast")};
-      --text-warn-color: #{mat-color($warn, default-contrast)};
-      --text-warn-lighter-color: #{mat-color($warn, "lighter-contrast")};
-      --text-warn-darker-color: #{mat-color($warn, "darker-contrast")};
-   }
-}
+         .background.#{$color + $variant} {
+            background-color: #{map-get($colors, $color + $variant)};
+            color: #{map-get($colors, $color + "-contrast" + $variant)};
 
-@mixin setup-basic-styles($theme) {
-   $p: map-get($theme, primary);
-   $a: map-get($theme, accent);
-   $w: map-get($theme, warn);
-   $b: map-get($theme, background);
-   $f: map-get($theme, foreground);
-
-   $primary: mat-color($p);
-   $accent: mat-color($a);
-   $warn: mat-color($w);
-   $primary-contrast: mat-color($p, default-contrast);
-   $accent-contrast: mat-color($a, default-contrast);
-   $warn-contrast: mat-color($w, default-contrast);
-
-   $background: mat-color($b, background);
-   $background-card: mat-color($b, card);
-
-   .color.primary {
-      color: $primary;
-   }
-
-   .color.accent {
-      color: $accent;
-   }
-
-   .color.warn {
-      color: $warn;
-   }
-
-   .background.primary {
-      background-color: $primary;
-      color: $primary-contrast;
-      @include anchor-color(currentColor);
-   }
-
-   .background.accent {
-      background-color: $accent;
-      color: $accent-contrast;
-      @include anchor-color(currentColor);
-   }
-
-   .background.warn {
-      background-color: $warn;
-      color: $warn-contrast;
-      @include anchor-color(currentColor);
+            a {
+               color: currentColor;
+            }
+         }
+      }
    }
 
    .background.card {
-      background-color: $background-card;
+      background-color: map-get($colors, background-card);
    }
 
-   .background.stacked {
-      background-color: $background;
-   }
-
+   .background.stacked,
    mat-paginator.mat-paginator {
-      background-color: $background;
+      background-color: map-get($colors, background);
    }
 }
-
-@mixin anchor-color($color) {
-   a {
-      color: $color;
-   }
-}
-
 
 @mixin apply-common-style($theme) {
+   $colors: build-colors($theme);
+
    @include link-color($theme);
-   @include setup-var($theme);
-   @include setup-basic-styles($theme);
-//   @include common-styles($theme);
+   @include setup-basic-styles($colors);
 }
