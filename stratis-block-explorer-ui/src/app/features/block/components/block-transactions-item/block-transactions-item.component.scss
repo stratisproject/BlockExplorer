@@ -50,20 +50,40 @@ mat-card {
 .tx-inputs {
    margin-left: -8px;
    padding-left: 4px;
-   border-left: solid 3px var(--primary-color);
-   /*border-bottom: solid 3px var(--primary-color);*/
-   border-radius: 0 0 0 10px;
+   position: relative;
+   counter-reset: in-index -1;
+
+   &:before {
+      counter-increment: in-index;
+      content: "#" counter(in-index);
+      font-size: 0.8em;
+      opacity: 0.4;
+      float: left;
+      padding-right: 4px;
+      margin-left: -2px;
+   }
 }
 
 .tx-outputs {
    margin-right: -8px;
    padding-right: 4px;
    text-align: end;
-   /*border-top: solid 3px var(--accent-color);*/
-   border-right: solid 3px var(--accent-color);
-   border-radius: 0 10px 0 0;
+   position: relative;
+   counter-reset: out-index -1;
 
-   .tx-output:not(:last-child) {
-      margin-bottom: 5px;
+   .tx-output {
+      &:after {
+         counter-increment: out-index;
+         content: "#" counter(out-index);
+         font-size: 0.8em;
+         opacity: 0.4;
+         float: right;
+         padding-left: 4px;
+         margin-right: -2px;
+      }
+
+      &:not(:last-child) {
+         margin-bottom: 5px;
+      }
    }
 }

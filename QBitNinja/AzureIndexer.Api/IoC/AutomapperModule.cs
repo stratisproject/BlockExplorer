@@ -15,6 +15,7 @@ namespace AzureIndexer.Api.IoC
     using NBitcoin.DataEncoders;
     using NBitcoin.OpenAsset;
     using NBitcoin.Protocol;
+    using Stratis.SmartContracts.Core;
 
     public class AutomapperModule : Module
     {
@@ -118,6 +119,7 @@ namespace AzureIndexer.Api.IoC
                     Hash = source.ToString(),
                     IsPushOnly = source.IsPushOnly,
                     IsUnspendable = source.IsUnspendable,
+                    IsSmartContract = source.IsSmartContractExec(),
                     IsValid = source.IsValid,
                     Length = source.Length,
                     PaymentScriptHash = source.PaymentScript?.ToString()
@@ -154,7 +156,8 @@ namespace AzureIndexer.Api.IoC
                             Address = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(),
                             Amount = coin.TxOut.Value.Satoshi,
                             N = index,
-                            IsUnspendable = coin.TxOut.ScriptPubKey.IsUnspendable.GetValueOrDefault(false)
+                            IsUnspendable = coin.TxOut.ScriptPubKey.IsUnspendable.GetValueOrDefault(false),
+                            IsSmartContract = coin.TxOut.ScriptPubKey.IsSmartContract.GetValueOrDefault(false),
                         };
                     }).ToList(),
                     FirstSeen = source.FirstSeen

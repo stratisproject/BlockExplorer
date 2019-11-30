@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CoreStoreFacade } from '@core/store/core-store.facade';
 import { takeUntilDestroyed } from '../../shared.module';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'app-address-view',
@@ -18,7 +19,7 @@ export class AddressViewComponent implements OnInit, OnDestroy {
     constructor(private coreFacade: CoreStoreFacade) { }
 
     ngOnInit() {
-        this.enableRoute = this.enableRoute !== undefined;
+        this.enableRoute = coerceBooleanProperty(this.enableRoute);
 
         this.isCopied$
             .pipe(

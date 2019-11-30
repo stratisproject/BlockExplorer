@@ -128,6 +128,7 @@ export interface IBlockTransactionOut {
     address?: string;
     amount: number;
     n: number;
-    isUnspendable?: string;
+    isUnspendable?: boolean;
+    isSmartContract?: boolean;
     spentDetails?: ISpentDetails;
 }

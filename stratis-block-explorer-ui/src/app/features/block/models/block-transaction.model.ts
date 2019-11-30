@@ -31,7 +31,8 @@ export interface IBlockTransactionOut {
     address?: string;
     amount: number;
     n: number;
-    isUnspendable?: string;
+    isUnspendable?: boolean;
+    isSmartContract?: boolean;
     spentDetails?: ISpentDetails;
 }
 
@@ -48,24 +49,6 @@ export class BlockTransaction implements IBlockTransaction {
     outputs: IBlockTransactionOut[];
 
     static fromTransactionModel(transaction: models.TransactionSummaryModel): IBlockTransaction {
-
-        //let inputs = transaction.in.map(out => <IBlockTransactionIn>{
-        //    address: out.hash,
-        //    amount: out.amount.satoshi,
-        //    prevOut: {
-        //        n: out.n,
-        //        txId: null //missing out.hash
-        //    }
-        //});
-
-        //let outputs = transaction.out.map(out => <IBlockTransactionOut>{
-        //    address: out.hash,
-        //    amount: out.amount.satoshi,
-        //    n: out.n,
-        //    spentDetails: null,
-        //    isUnspendable: out.isUnspendable
-        //});
-
         return {
             fee: transaction.fee.satoshi,
             isCoinbase: transaction.isCoinbase,

@@ -44,15 +44,22 @@
          <div *ngFor="let output of transaction.outputs" class="tx-output"
               fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="end center">
             <div class="address">
-               <ng-container *ngIf="output.address; then address else noAddress"></ng-container>
-               <ng-template #address>
-                  <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-end"
+               <ng-container [ngSwitch]="getOutputType(output)">
+
+                  <div *ngSwitchCase="outputType.SmartContract"
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end">
+                     <div>SMART CONTRACT</div>
+                     <a [routerLink]="['/smartcontract', transaction.txId]">View Details</a>
+                  </div>
+
+                  <div *ngSwitchCase="outputType.Unspendable"
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end">UNSPENDABLE</div>
+
+                  <app-address-view *ngSwitchDefault
+                                    fxFlex="0 1 auto" fxFlexAlign="flex-end"
                                     [address]="output.address"
                                     enableRoute></app-address-view>
-               </ng-template>
-               <ng-template #noAddress>
-                  <div fxFlex="0 1 auto" fxFlexAlign="flex-end">UNSPENDABLE</div>
-               </ng-template>
+               </ng-container>
             </div>
             <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
             <!--<div class="spent-output">SPENT / UNSPENT</div>-->

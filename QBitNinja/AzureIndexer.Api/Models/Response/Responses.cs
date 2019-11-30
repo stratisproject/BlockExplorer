@@ -238,6 +238,9 @@
         [JsonProperty("isUnspendable", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool? IsUnspendable { get; set; }
 
+        [JsonProperty("isSmartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool? IsSmartContract { get; set; }
+
         [JsonProperty("addresses", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public ICollection<string> Addresses { get; set; }
 
@@ -386,6 +389,9 @@
 
         [JsonProperty("isUnspendable", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public bool IsUnspendable { get; set; }
+
+        [JsonProperty("isSmartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsSmartContract { get; set; }
     }
 
     public class InsertWalletAddressModel {

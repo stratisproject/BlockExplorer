@@ -1,10 +1,15 @@
 <mat-card *ngIf="block; else nullBlock">
-   <mat-card-title>Block #{{block.additionalInformation.height}}</mat-card-title>
+   <mat-card-title class="mat-display-1">Block #{{block.additionalInformation.height}}</mat-card-title>
    <mat-card-subtitle>
       <app-hash-view fxFlex="0 1 auto"
                      [hash]="block.additionalInformation.blockId"
                      hashType="block"></app-hash-view>
    </mat-card-subtitle>
+   <div fxFlexAlign="row">
+      <button fxFlex="100px" color="accent" mat-raised-button [routerLink]="['/block', block.additionalInformation.blockHeader.hashPrevBlock]">Previous</button>
+      <div fxFlex></div>
+      <button fxFlex="100px" color="accent" mat-raised-button [routerLink]="['/block', (block.additionalInformation.height || 0)+1]">Next</button>
+   </div>
    <mat-card-content class="block-stats-summary"
                      fxLayout="row wrap" fxLayoutGap="16px"
                      fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">

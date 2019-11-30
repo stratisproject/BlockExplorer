@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppConfigService } from '@core/services/app-config.service';
 import { Log } from '@shared/logger.service';
 import { MatSelectChange } from '@angular/material/select';
-import { MatAnimatedIconComponent } from '../../../../shared/components';
+import { MatAnimatedIconComponent } from '@shared/components';
 
 @Component({
     selector: 'app-menu-bar',
     templateUrl: './menu-bar.component.html',
     styleUrls: ['./menu-bar.component.scss']
 })
-export class MenuBarComponent implements OnInit, AfterViewInit {
+export class MenuBarComponent implements OnInit {
     title = 'Stratis Explorer';
 
     @Input() public searchText = '';
@@ -26,9 +26,6 @@ export class MenuBarComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.loadTheme();
-    }
-
-    ngAfterViewInit(): void {
     }
 
     enterPressed() {

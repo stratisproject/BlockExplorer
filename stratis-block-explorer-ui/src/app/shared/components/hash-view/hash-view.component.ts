@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { takeUntilDestroyed } from '../../rxjs/operators/take-until-destroyed';
 import { CoreStoreFacade } from '@core/store/core-store.facade';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'app-hash-view',
@@ -19,7 +20,7 @@ export class HashViewComponent implements OnInit, OnDestroy {
     constructor(private coreFacade: CoreStoreFacade) { }
 
     ngOnInit() {
-        this.enableRoute = this.enableRoute !== undefined;
+        this.enableRoute = coerceBooleanProperty(this.enableRoute);
 
         this.isCopied$
             .pipe(
