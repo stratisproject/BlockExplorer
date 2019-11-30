@@ -12,8 +12,8 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
    height?: number | undefined;
    time?: number | undefined;
    spent?: boolean | undefined;
-   in?: LineItemModel[] | undefined;
-   out?: LineItemModel[] | undefined;
+   in?: IBlockTransactionIn[] | undefined;
+   out?: IBlockTransactionOut[] | undefined;
    confirmations?: number | undefined;
    firstSeen?: Date | undefined;
    smartContract?: SmartContractModel | undefined;
@@ -48,12 +48,12 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
          if (data["in"] && data["in"].constructor === Array) {
             this.in = [];
             for (const item of data["in"])
-               this.in.push(LineItemModel.fromJS(item));
+               this.in.push(<IBlockTransactionIn>(item));
          }
          if (data["out"] && data["out"].constructor === Array) {
             this.out = [];
             for (const item of data["out"])
-               this.out.push(LineItemModel.fromJS(item));
+               this.out.push(<IBlockTransactionOut>(item));
          }
          this.confirmations = data["confirmations"];
          this.smartContract = data["smartContract"] ? SmartContractModel.fromJS(data["smartContract"]) : <any>undefined;
@@ -75,12 +75,12 @@ export class TransactionSummaryModel implements ITransactionSummaryModel {
       if (this.in && this.in.constructor === Array) {
          data["in"] = [];
          for (const item of this.in)
-            data["in"].push(item.toJSON());
+             data["in"].push({ ...item });
       }
       if (this.out && this.out.constructor === Array) {
          data["out"] = [];
          for (const item of this.out)
-            data["out"].push(item.toJSON());
+             data["out"].push({ ...item });
       }
       data["confirmations"] = this.confirmations;
 
@@ -100,9 +100,34 @@ export interface ITransactionSummaryModel {
    height?: number | undefined;
    time?: number | undefined;
    spent?: boolean | undefined;
-   in?: LineItemModel[] | undefined;
-   out?: LineItemModel[] | undefined;
+   in?: IBlockTransactionIn[] | undefined;
+   out?: IBlockTransactionOut[] | undefined;
    confirmations?: number | undefined;
    firstSeen?: Date | undefined;
    smartContract?: SmartContractModel | undefined;
+}
+
+
+export interface IPreviousOutput {
+    txId?: string;
+    n?: number;
+}
+
+export interface IBlockTransactionIn {
+    address: string;
+    amount: number;
+    prevOut?: IPreviousOutput;
+}
+
+export interface ISpentDetails {
+    txId: string;
+    n: number;
+}
+
+export interface IBlockTransactionOut {
+    address?: string;
+    amount: number;
+    n: number;
+    isUnspendable?: string;
+    spentDetails?: ISpentDetails;
 }

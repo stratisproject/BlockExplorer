@@ -18,7 +18,7 @@ export interface IPreviousOutput {
 
 export interface IBlockTransactionIn {
     address: string;
-    amount?: number;
+    amount: number;
     prevOut?: IPreviousOutput;
 }
 
@@ -29,7 +29,9 @@ export interface ISpentDetails {
 
 export interface IBlockTransactionOut {
     address?: string;
-    amount?: number;
+    amount: number;
+    n: number;
+    isUnspendable?: string;
     spentDetails?: ISpentDetails;
 }
 
@@ -47,23 +49,22 @@ export class BlockTransaction implements IBlockTransaction {
 
     static fromTransactionModel(transaction: models.TransactionSummaryModel): IBlockTransaction {
 
-        let inputs = transaction.in.map(out => <IBlockTransactionIn>{
-            address: out.hash,
-            amount: out.amount.satoshi,
-            prevOut: {
-                n: out.n,
-                txId: null //missing out.hash
-            }
-        });
+        //let inputs = transaction.in.map(out => <IBlockTransactionIn>{
+        //    address: out.hash,
+        //    amount: out.amount.satoshi,
+        //    prevOut: {
+        //        n: out.n,
+        //        txId: null //missing out.hash
+        //    }
+        //});
 
-        let outputs = transaction.out.map(out => <IBlockTransactionOut>{
-            address: out.hash,
-            amount: out.amount.satoshi,
-            prevOut: {
-                n: out.n,
-                txId: out.hash
-            }
-        });
+        //let outputs = transaction.out.map(out => <IBlockTransactionOut>{
+        //    address: out.hash,
+        //    amount: out.amount.satoshi,
+        //    n: out.n,
+        //    spentDetails: null,
+        //    isUnspendable: out.isUnspendable
+        //});
 
         return {
             fee: transaction.fee.satoshi,
@@ -71,9 +72,9 @@ export class BlockTransaction implements IBlockTransaction {
             isCoinstake: transaction.isCoinstake,
             firstSeen: transaction.firstSeen.toLocaleString(),
             txId: transaction.hash,
-            totalSpent: transaction.out.reduce((accumulator, item) => accumulator + item.amount.satoshi, 0),
-            inputs: inputs,
-            outputs: outputs
+            totalSpent: transaction.out.reduce((accumulator, item) => accumulator + item.amount, 0),
+            inputs: transaction.in,
+            outputs: transaction.out
         };
 
     }

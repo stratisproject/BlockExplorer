@@ -10,7 +10,7 @@
 
          <ng-template *ngIf="transactionsOnCurrentPage?.length==0" [ngTemplateOutlet]="noTransactions"></ng-template>
 
-         <div *ngFor="let transactionItem of transactionsOnCurrentPage;let isOdd=odd;" [class.mat-elevation-z6]="isOdd">
+         <div *ngFor="let transactionItem of transactionsOnCurrentPage;let isOdd=odd;" [ngClass]="{'mat-elevation-z12':isOdd, 'mat-elevation-z3':!isOdd}">
             <app-block-transactions-item [showHeader]="showTransactionHeader" [transaction]="transactionItem"></app-block-transactions-item>
          </div>
 

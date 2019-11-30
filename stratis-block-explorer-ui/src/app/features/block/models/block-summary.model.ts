@@ -28,14 +28,22 @@ export class BlockSummaryModel implements IBlockSummaryModel {
 
     public static fromBlockResponseModel(block?: BlockResponseModel): BlockSummaryModel {
         if (block) {
+
+            let size = 0;
+            let transactions = 0;
+            if (block.block) {
+                size = block.block.blockSize;
+                transactions = block.block.transactionIds.length;
+            }
+
             return {
                 height: block.additionalInformation.height || 0,
                 time: block.additionalInformation.blockTime.toLocaleTimeString(),
                 age: moment(block.additionalInformation.blockTime).fromNow(),
                 confirmations: block.additionalInformation.confirmations || 0,
                 hash: block.additionalInformation.blockId || '',
-                size: block.block.blockSize || 0,//block.extendedInformation.size || 0,
-                transactions: block.block.transactionIds.length || 0
+                size: size,
+                transactions: transactions
             };
         }
         else {

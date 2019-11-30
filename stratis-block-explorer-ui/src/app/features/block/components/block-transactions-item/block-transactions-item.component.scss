@@ -1,7 +1,9 @@
+mat-card {
+   background: inherit !important;
+}
+
 .header {
    padding: 5px 3px;
-   background: var(--primary-lighter-color);
-   color: var(--text-primary-lighter-color);
 }
 
 .transaction-attributes {
@@ -45,7 +47,7 @@
    overflow: hidden;
 }
 
-.tx-input {
+.tx-inputs {
    margin-left: -8px;
    padding-left: 4px;
    border-left: solid 3px var(--primary-color);
@@ -53,11 +55,15 @@
    border-radius: 0 0 0 10px;
 }
 
-.tx-output {
+.tx-outputs {
    margin-right: -8px;
    padding-right: 4px;
    text-align: end;
    /*border-top: solid 3px var(--accent-color);*/
    border-right: solid 3px var(--accent-color);
    border-radius: 0 10px 0 0;
+
+   .tx-output:not(:last-child) {
+      margin-bottom: 5px;
+   }
 }

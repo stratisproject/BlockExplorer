@@ -1,6 +1,6 @@
 <mat-toolbar color="primary">
-   <mat-toolbar-row>
-      <div fxLayoutAlign="start" class="overflow-hidden">
+   <mat-toolbar-row fxLayoutAlign="start center">
+      <div fxLayoutAlign="start center" class="overflow-hidden" fxFlex="0 0 auto">
          <img src="/assets/images/logo.svg" alt="logo" class="logo" width="36" height="36">
          <span>{{title}}</span>
       </div>
@@ -12,12 +12,19 @@
                 [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
 
-      <div fxFlex fxLayoutAlign="end" fxShow fxHide.lt-md>
-         <ul fxLayout fxLayoutGap="10px" class="navigation-items">
-            <li *ngFor="let link of links">
-               <a mat-list-item href="{{link.url}}" class="subheading-2">{{ link.title }}</a>
-            </li>
-         </ul>
+      <mat-form-field floatLabel="never" appearance="legacy" fxFlex="auto" fxShow fxHide.lt-md>
+         <mat-select placeholder="Network" (selectionChange)="navigateTo($event)">
+            <mat-option *ngFor="let link of links" [value]="link.url">{{link.title}}</mat-option>
+         </mat-select>
+      </mat-form-field>
+
+      <span fxFlex="100%" fxHide fxShow.lt-sm></span>
+
+      <div fxFlex="0 0 auto" fxAligh="stretch">
+         <button mat-icon-button class="background primary-darker" (click)="toggleTheme(themeButton)">
+            <mat-animated-icon #themeButton animateFromParent="true"
+                               start="wb_sunny" end="nights_stay"></mat-animated-icon>
+         </button>
       </div>
 
       <div fxFlex fxLayoutAlign="end" fxHide.gt-sm>

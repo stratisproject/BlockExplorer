@@ -1,5 +1,5 @@
 {
-   "currentCoin": "DEV",
+   "currentCoin": "CRS",
 
    "coins": {
       "STRAT": {
@@ -21,7 +21,7 @@
          "networkName": "Cirrus Main",
          "symbol": "CRS",
          "url": "https://cirrusexplorer.stratisplatform.com/",
-         "themeName": "cirrus-theme"
+         "themeName": "test-theme"
       },
       "TCRS": {
          "apiBaseUrl": "http://localhost:54678",

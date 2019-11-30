@@ -1,5 +1,5 @@
 <mat-card>
-   <div *ngIf="showHeader" fxLayout="row wrap" class="header">
+   <div *ngIf="showHeader" fxLayout="row wrap" class="header background stacked">
       <app-hash-view fxFlex="0 1 auto"
                      [label]="'Tx Id'" [hash]="transaction.txId"
                      hashType="transaction" enableRoute></app-hash-view>
@@ -15,10 +15,10 @@
    <mat-card-content fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-evenly stretch"
                      fxLayout.lt-md="column" fxLayoutAlign.lt-md="center stretch">
 
-      <div class="tx-input"
+      <div class="tx-inputs background stacked"
            fxFlex.gt-sm="50%">
          <div *ngFor="let input of transaction.inputs">
-            <div class="address">
+            <div class="address" *ngIf="input.address">
                <app-address-view fxFlex="0 1 auto"
                                  [address]="input.address"
                                  enableRoute></app-address-view>
@@ -38,23 +38,27 @@
                    fxHide fxShow.lt-md>arrow_downward</mat-icon>
       </div>
 
-      <div *ngIf="transaction.outputs.length > 0" class="tx-output"
+      <div *ngIf="transaction.outputs.length > 0" class="tx-outputs background stacked"
            fxFlex.lt-md="1 1 auto"
            fxFlex.gt-sm="50%" class.gt-sm="">
-         <div *ngFor="let output of transaction.outputs"
-              fxLayout="column" fxLayoutAlign="end">
-            <div class="address" fxLayout="row" fxLayoutAlign="end">
-               <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-end"
-                                 [address]="output.address"
-                                 enableRoute></app-address-view>
+         <div *ngFor="let output of transaction.outputs" class="tx-output"
+              fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="end center">
+            <div class="address">
+               <ng-container *ngIf="output.address; then address else noAddress"></ng-container>
+               <ng-template #address>
+                  <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-end"
+                                    [address]="output.address"
+                                    enableRoute></app-address-view>
+               </ng-template>
+               <ng-template #noAddress>
+                  <div fxFlex="0 1 auto" fxFlexAlign="flex-end">UNSPENDABLE</div>
+               </ng-template>
             </div>
             <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
             <!--<div class="spent-output">SPENT / UNSPENT</div>-->
          </div>
       </div>
    </mat-card-content>
-
-   <mat-divider></mat-divider>
 
    <mat-card-actions fxLayout="row">
       <div class="transaction-amount"
