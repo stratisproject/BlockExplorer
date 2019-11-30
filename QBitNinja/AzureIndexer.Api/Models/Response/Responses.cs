@@ -351,10 +351,10 @@
         public bool Spent { get; set; }
 
         [JsonProperty("in", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<LineItemModel> In { get; set; }
+        public ICollection<BlockTransactionIn> In { get; set; }
 
         [JsonProperty("out", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public ICollection<LineItemModel> Out { get; set; }
+        public ICollection<BlockTransactionOut> Out { get; set; }
 
         [JsonProperty("confirmations", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public int Confirmations { get; set; }
@@ -363,15 +363,29 @@
         public SmartContractModel SmartContract { get; set; }
     }
 
-    public class LineItemModel {
+    public class BlockTransactionIn {
         [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public string Hash { get; set; }
+        public string Address { get; set; }
 
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public MoneyModel Amount { get; set; }
+        public long? Amount { get; set; }
+
+        [JsonProperty("prevOut", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public OutPointModel PrevOut { get; set; }
+    }
+
+    public class BlockTransactionOut {
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Address { get; set; }
+
+        [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public long? Amount { get; set; }
 
         [JsonProperty("n", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public long N { get; set; }
+        public long? N { get; set; }
+
+        [JsonProperty("isUnspendable", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public bool IsUnspendable { get; set; }
     }
 
     public class InsertWalletAddressModel {

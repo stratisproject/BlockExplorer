@@ -129,11 +129,9 @@ namespace AzureIndexer.Api.IoC
 
         public class TransactionResponseSummaryConverter : ITypeConverter<TransactionResponseModel, TransactionSummaryModel>
         {
-            public TransactionSummaryModel Convert(TransactionResponseModel source, TransactionSummaryModel destination, ResolutionContext context)
-            {
+            public TransactionSummaryModel Convert(TransactionResponseModel source, TransactionSummaryModel destination, ResolutionContext context) {
                 var chain = ServiceLocator.Current.GetInstance<ChainIndexer>();
-                var summary = new TransactionSummaryModel
-                {
+                var summary = new TransactionSummaryModel {
                     Hash = source.TransactionId,
                     Time = source.Block?.BlockHeader?.Time ?? source.Transaction.Time,
                     Confirmations = (chain.Tip.Height - source.Block?.Height ?? 0) + 1,
@@ -144,8 +142,21 @@ namespace AzureIndexer.Api.IoC
                     IsCoinbase = source.Transaction.IsCoinBase ?? false,
                     IsCoinstake = source.Transaction.IsCoinStake ?? false,
                     IsSmartContract = source.IsSmartContract,
-                    In = source.SpentCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), N = coin.Outpoint.N ?? 0, Amount = coin.TxOut.Value }).Where(t => t.Amount.Satoshi != 0).ToList(),
-                    Out = source.ReceivedCoins.Select(coin => new LineItemModel { Hash = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(), Amount = coin.TxOut.Value, N = coin.Outpoint.N ?? 0 }).Where(t => t.Amount.Satoshi != 0).ToList(),
+                    In = source.SpentCoins.Select(coin => {
+                        return new BlockTransactionIn {
+                            Address = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(),
+                            PrevOut = coin.Outpoint,
+                            Amount = coin.TxOut.Value.Satoshi
+                        };
+                    }).ToList(),
+                    Out = source.ReceivedCoins.Select((coin, index) => {
+                        return new BlockTransactionOut {
+                            Address = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(),
+                            Amount = coin.TxOut.Value.Satoshi,
+                            N = index,
+                            IsUnspendable = coin.TxOut.ScriptPubKey.IsUnspendable.GetValueOrDefault(false)
+                        };
+                    }).ToList(),
                     FirstSeen = source.FirstSeen
                 };
 
