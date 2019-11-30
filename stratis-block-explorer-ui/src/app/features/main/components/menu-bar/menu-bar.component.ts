@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
 import { AppConfigService } from '@core/services/app-config.service';
 import { Log } from '@shared/logger.service';
 import { MatSelectChange } from '@angular/material/select';
@@ -9,7 +9,7 @@ import { MatAnimatedIconComponent } from '../../../../shared/components';
     templateUrl: './menu-bar.component.html',
     styleUrls: ['./menu-bar.component.scss']
 })
-export class MenuBarComponent implements OnInit {
+export class MenuBarComponent implements OnInit, AfterViewInit {
     title = 'Stratis Explorer';
 
     @Input() public searchText = '';
@@ -18,11 +18,17 @@ export class MenuBarComponent implements OnInit {
     @Output() public find = new EventEmitter<string>();
     @Output() public sidenavToggle = new EventEmitter();
 
+    @ViewChild('themeButton', { static: true }) animatedIcon: MatAnimatedIconComponent;
+
     constructor(private appConfig: AppConfigService, private log: Log) {
         this.title = `${appConfig.getConfiguration().networkName} Explorer`;
     }
 
     ngOnInit(): void {
+        this.loadTheme();
+    }
+
+    ngAfterViewInit(): void {
     }
 
     enterPressed() {
@@ -38,16 +44,36 @@ export class MenuBarComponent implements OnInit {
         window.location.href = $event.value;
     }
 
-    public toggleTheme(animatedIcon: MatAnimatedIconComponent) {
-        animatedIcon.animate = !animatedIcon.animate;
+    public toggleTheme() {
+        this.animatedIcon.animate = !this.animatedIcon.animate;
 
         // if animate, shown icon is "end" (dark theme), otherwise it's "start" (light theme)
-        if (animatedIcon.animate) {
-            document.body.classList.remove("dark-theme"); //in case it was already there previously
-            document.body.classList.add("dark-theme");
+        if (this.animatedIcon.animate) {
+            this.setDarkTheme();
         }
         else {
-            document.body.classList.remove("dark-theme");
+            this.setLightTheme();
         }
+    }
+
+    private loadTheme() {
+        let darkThemeEnabled = localStorage.getItem("dark-theme");
+        if (darkThemeEnabled === "true") {
+            document.body.classList.add("dark-theme");
+            this.animatedIcon.animate = true;
+        } else {
+            this.animatedIcon.animate = false;
+        }
+    }
+
+    private setDarkTheme() {
+        localStorage.setItem("dark-theme", "true");
+        document.body.classList.remove("dark-theme"); //in case it was already there previously
+        document.body.classList.add("dark-theme");
+    }
+
+    private setLightTheme() {
+        localStorage.setItem("dark-theme", "false");
+        document.body.classList.remove("dark-theme");
     }
 }

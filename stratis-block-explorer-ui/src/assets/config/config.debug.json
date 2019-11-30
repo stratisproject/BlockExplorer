@@ -21,7 +21,7 @@
          "networkName": "Cirrus Main",
          "symbol": "CRS",
          "url": "https://cirrusexplorer.stratisplatform.com/",
-         "themeName": "test-theme"
+         "themeName": "cirrus-theme"
       },
       "TCRS": {
          "apiBaseUrl": "http://localhost:54678",
