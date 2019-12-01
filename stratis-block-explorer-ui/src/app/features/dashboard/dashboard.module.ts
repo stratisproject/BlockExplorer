@@ -4,6 +4,7 @@ import { Route, RouterModule } from '@angular/router';
 import * as fromContainers from './containers';
 import { SharedModule } from '../../shared/shared.module';
 import { BlockModule } from '../block/block.module';
+import { TransactionModule } from '../transaction/transaction.module';
 
 export const dashboardRoutes: Route[] = [
     { path: '', component: fromContainers.DashboardComponent, data: { breadcrumb: 'Dashboard' } }
@@ -15,7 +16,8 @@ export const dashboardRoutes: Route[] = [
         RouterModule.forChild(dashboardRoutes),
         CommonModule,
         SharedModule,
-        BlockModule
+        BlockModule,
+        TransactionModule
     ]
 })
 export class DashboardModule { }

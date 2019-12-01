@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
-import { TransactionSummaryModel } from '@shared/models/transaction-summary.model';
 import { StatsModel } from '../../../block/models/stats.model';
 import { Log } from '@shared/logger.service';
+import { TransactionSummaryModel } from '../../../transaction/models/transaction-summary.model';
 
 @Component({
    selector: 'app-dashboard',
