@@ -17,7 +17,8 @@
          "themeName": "stratis-test-theme"
       },
       "CRS": {
-         "apiBaseUrl": "https://stratisinttestindx-cirrus.azurewebsites.net/",
+         "apiBaseUrl": "https://cirrustestindexer1.azurewebsites.net",
+         "apiBaseUrl_tobeused": "https://stratisinttestindx-cirrus.azurewebsites.net",
          "networkName": "Cirrus Main",
          "symbol": "CRS",
          "url": "https://stratisinttestbe-cirrus.azurewebsites.net",

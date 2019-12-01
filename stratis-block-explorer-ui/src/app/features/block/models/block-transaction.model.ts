@@ -2,6 +2,7 @@ import { TransactionSummaryModel } from '../../transaction/models/transaction-su
 
 export interface IBlockTransaction {
     txId: string;
+    blockHeight?: number;
     firstSeen: string;
     totalSpent: number;
     fee: number;
@@ -38,6 +39,7 @@ export interface IBlockTransactionOut {
 
 export class BlockTransaction implements IBlockTransaction {
     txId: string;
+    blockHeight?: number;
     firstSeen: string;
     totalSpent: number;
     fee: number;

@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { TransactionModel, TransactionResponseModel } from '../../models';
+import { Transaction } from '../../models';
 
 export const loadTransaction = createAction(
     '[Transaction] Load Transaction',
@@ -13,5 +13,5 @@ export const loadTransactionError = createAction(
 
 export const transactionLoaded = createAction(
     '[Transaction] Transaction Loaded',
-    props<{ transaction: TransactionResponseModel }>()
+    props<{ transaction: Transaction }>()
 );

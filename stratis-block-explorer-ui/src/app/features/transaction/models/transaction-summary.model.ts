@@ -1,4 +1,5 @@
 import { MoneyModel } from '@shared/models/money.model';
+import { ScriptModel } from './script-model';
 
 export class TransactionSummaryModel implements ITransactionSummaryModel {
     hash?: string | undefined;
@@ -40,6 +41,7 @@ export interface IPreviousOutput {
 
 export interface ITransactionIn {
     address: string;
+    scriptSig: ScriptModel
     amount: number;
     prevOut?: IPreviousOutput;
 }
@@ -51,6 +53,7 @@ export interface ISpentDetails {
 
 export interface ITransactionOut {
     address?: string;
+    scriptPubKey: ScriptModel
     amount: number;
     n: number;
     isUnspendable?: boolean;

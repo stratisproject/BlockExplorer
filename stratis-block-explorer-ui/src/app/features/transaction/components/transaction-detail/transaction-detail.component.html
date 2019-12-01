@@ -1,0 +1,82 @@
+<mat-card>
+   <div *ngIf="showHeader" fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
+      <app-hash-view fxFlex="0 1 auto"
+                     [label]="'Tx Id'" [hash]="transaction.txId"
+                     hashType="transaction" enableRoute></app-hash-view>
+      <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
+   </div>
+
+   <mat-card-content fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-evenly stretch"
+                     fxLayout.lt-md="column" fxLayoutAlign.lt-md="center stretch">
+
+      <div class="tx-inputs background stacked"
+           fxFlex.gt-sm="50%">
+         <div *ngFor="let input of transaction.inputs" class="tx-input">
+            <div class="amount">
+               <app-balance></app-balance>
+            </div>
+            <div class="address" *ngIf="input.address">
+               <app-address-view fxFlex="0 1 auto"
+                                 label="address" [address]="input.address"
+                                 enableRoute></app-address-view>
+            </div>
+            <div class="previous-output">
+               <app-hash-view fxFlex="0 1 auto"
+                              label="previous output" [hash]="input.prevOut?.hash"
+                              hashType="transaction" enableRoute></app-hash-view>
+            </div>
+         </div>
+      </div>
+
+      <div *ngIf="transaction.outputs.length > 0" class="arrow"
+           fxFlexAlign="center" fxFlex="0 0 auto"
+           fxLayout.gt-sm="row"
+           fxLayout.lt-md="column" fxLayoutAlign.lt-md="center">
+         <mat-icon class="background accent"
+                   fxHide.lt-md>arrow_forward</mat-icon>
+         <mat-icon class="background accent"
+                   fxHide fxShow.lt-md>arrow_downward</mat-icon>
+      </div>
+
+      <div *ngIf="transaction.outputs.length > 0" class="tx-outputs background stacked"
+           fxFlex.lt-md="1 1 auto"
+           fxFlex.gt-sm="50%" class.gt-sm="">
+         <div *ngFor="let output of transaction.outputs" class="tx-output"
+              fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="end center">
+            <div class="address">
+               <ng-container [ngSwitch]="getOutputType(output)">
+
+                  <div *ngSwitchCase="outputType.SmartContract"
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end">
+                     <div>SMART CONTRACT</div>
+                     <a [routerLink]="['/smartcontract', transaction.txId]">View Details</a>
+                  </div>
+
+                  <div *ngSwitchCase="outputType.Unspendable"
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end" matTooltip="{{output.scriptPubKey.hash}}">OP_RETURN</div>
+
+                  <app-address-view *ngSwitchDefault
+                                    fxFlex="0 1 auto" fxFlexAlign="flex-end"
+                                    [address]="output.address"
+                                    enableRoute></app-address-view>
+               </ng-container>
+            </div>
+            <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
+            <!--<div class="spent-output">SPENT / UNSPENT</div>-->
+         </div>
+      </div>
+   </mat-card-content>
+
+   <mat-card-actions fxLayout="row">
+      <div class="transaction-amount"
+           fxFlex fxLayout="column">
+         <div>Total Spent</div>
+         <app-balance [balance]="transaction.totalSpent"></app-balance>
+      </div>
+      <div class="transaction-fees"
+           fxFlex fxLayout="column">
+         <div>Fees</div>
+         <app-balance [balance]="transaction.fee"></app-balance>
+      </div>
+   </mat-card-actions>
+</mat-card>

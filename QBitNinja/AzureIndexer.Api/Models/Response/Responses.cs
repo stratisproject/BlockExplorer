@@ -370,6 +370,9 @@
         [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
 
+        [JsonProperty("scriptSig", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ScriptModel ScriptSig { get; set; }
+
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? Amount { get; set; }
 
@@ -380,6 +383,9 @@
     public class BlockTransactionOut {
         [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
+
+        [JsonProperty("scriptPubKey", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public ScriptModel ScriptPubKey { get; set; }
 
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public long? Amount { get; set; }

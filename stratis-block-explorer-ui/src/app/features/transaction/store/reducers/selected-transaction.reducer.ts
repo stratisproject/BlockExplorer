@@ -1,9 +1,9 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as TransactionActions from '../actions/transaction.actions';
-import { TransactionResponseModel } from '../../models';
+import { Transaction } from '../../models';
 
 export interface SelectedTransactionState {
-    transaction: TransactionResponseModel,
+    transaction: Transaction,
     isSelected,
     error: Error | string
 }

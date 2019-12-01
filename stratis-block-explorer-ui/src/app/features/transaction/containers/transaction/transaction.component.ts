@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Log } from '@shared/logger.service';
 import { TransactionStoreFacade } from '../../store/transaction-store.facade';
-import * as fromModel from '../../models/transaction-response-model';
+import * as fromModel from '../../models';
 
 @Component({
     selector: 'app-transaction',
@@ -12,7 +12,7 @@ import * as fromModel from '../../models/transaction-response-model';
 })
 export class TransactionComponent implements OnInit {
     isSelectedTransactionLoaded$: Observable<boolean>;
-    selectedTransaction$: Observable<fromModel.TransactionResponseModel>;
+    selectedTransaction$: Observable<fromModel.Transaction>;
     selectedTransactionError$: Observable<string | Error>;
 
     constructor(private route: ActivatedRoute, private facade: TransactionStoreFacade, private log: Log) { }

@@ -147,6 +147,7 @@ namespace AzureIndexer.Api.IoC
                     In = source.SpentCoins.Select(coin => {
                         return new BlockTransactionIn {
                             Address = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(),
+                            ScriptSig = coin.TxOut.ScriptPubKey,
                             PrevOut = coin.Outpoint,
                             Amount = coin.TxOut.Value.Satoshi
                         };
@@ -154,6 +155,7 @@ namespace AzureIndexer.Api.IoC
                     Out = source.ReceivedCoins.Select((coin, index) => {
                         return new BlockTransactionOut {
                             Address = coin.TxOut.ScriptPubKey.Addresses.FirstOrDefault(),
+                            ScriptPubKey = coin.TxOut.ScriptPubKey,
                             Amount = coin.TxOut.Value.Satoshi,
                             N = index,
                             IsUnspendable = coin.TxOut.ScriptPubKey.IsUnspendable.GetValueOrDefault(false),

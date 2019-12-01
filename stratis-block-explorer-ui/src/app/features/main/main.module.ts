@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '@shared/shared.module';
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
+import { mainRoutes } from './main.routing';
 
 
 @NgModule({
@@ -17,18 +18,20 @@ import { SidenavListComponent } from './components/sidenav-list/sidenav-list.com
         fromComponents.BreadcrumbComponent,
         fromComponents.SidenavListComponent,
         fromContainers.MainComponent,
+        fromContainers.NotFoundPageComponent,
         SidenavListComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
-        RouterModule,
+        RouterModule.forChild(mainRoutes),
         SharedModule,
         StoreModule.forFeature(fromStore.mainFeatureKey, fromStore.reducer),
         EffectsModule.forFeature([fromStore.MainEffects])
     ],
     exports: [
         fromContainers.MainComponent,
+        fromContainers.NotFoundPageComponent
     ]
 })
 export class MainModule { }

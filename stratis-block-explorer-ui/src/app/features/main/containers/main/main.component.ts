@@ -54,16 +54,16 @@ export class MainComponent implements OnDestroy {
             switch (type) {
                case 'PUBKEY_ADDRESS':
                case 'SCRIPT_ADDRESS':
-                  this.router.navigate(['addresses', this.text]);
+                  this.router.navigate(['addresse', this.text]);
                   break;
                case 'TRANSACTION':
-                  this.router.navigate(['transactions', this.text]);
+                  this.router.navigate(['transaction', this.text]);
                   break;
                case 'BLOCK':
                   this.router.navigate(['block', this.text]);
                   break;
                case 'SMART_CONTRACT':
-                  this.router.navigate(['smartcontracts', this.text]);
+                  this.router.navigate(['smartcontract', this.text]);
                   break;
                default:
                   this.router.navigate(['search', 'not-found']);

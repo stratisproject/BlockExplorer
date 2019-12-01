@@ -1,0 +1,52 @@
+<mat-card *ngIf="transaction; else nullTransaction">
+   <mat-card-title class="mat-display-1">Transaction</mat-card-title>
+   <mat-card-subtitle>
+      <app-hash-view fxFlex="0 1 auto"
+                     hashType="transaction" [hash]="transaction.txId"></app-hash-view>
+   </mat-card-subtitle>
+
+   <mat-card-content class="transaction-stats-summary"
+                     fxLayout="row wrap" fxLayoutGap="16px"
+                     fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
+
+      <div fxFlex fxLayout="column" fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Height</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">
+            <app-hash-view enableRoute [hash]="transaction.blockHeight" hashType="block"></app-hash-view>
+         </div>
+      </div>
+
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Amount</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="transaction.totalSpent"></app-balance></div>
+      </div>
+
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Fees</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="transaction.fee"></app-balance></div>
+      </div>
+
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Date</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{transaction.firstSeen | date:'medium'}}</div>
+      </div>
+
+      <div fxFlex fxLayout.lt-sm="row">
+         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Tags</h3>
+         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">
+            <mat-chip-list class="transaction-tags">
+               <mat-chip *ngFor="let tag of getTransactionTags(transaction)"
+                         selected [color]="tag.color">{{tag.text}}</mat-chip>
+            </mat-chip-list>
+         </div>
+      </div>
+   </mat-card-content>
+</mat-card>
+
+<ng-template #nullTransaction>
+   <mat-card>
+      <mat-card-header>
+         <mat-card-title><h1>Transaction not found</h1></mat-card-title>
+      </mat-card-header>
+   </mat-card>
+</ng-template>
