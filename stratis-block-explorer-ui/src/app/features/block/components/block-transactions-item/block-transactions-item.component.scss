@@ -53,14 +53,16 @@ mat-card {
    position: relative;
    counter-reset: in-index -1;
 
-   &:before {
-      counter-increment: in-index;
-      content: "#" counter(in-index);
-      font-size: 0.8em;
-      opacity: 0.4;
-      float: left;
-      padding-right: 4px;
-      margin-left: -2px;
+   .tx-input {
+      &:before {
+         counter-increment: in-index;
+         content: "#" counter(in-index);
+         font-size: 0.8em;
+         opacity: 0.4;
+         float: left;
+         padding-right: 4px;
+         margin-left: -2px;
+      }
    }
 }
 

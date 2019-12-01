@@ -367,7 +367,7 @@
     }
 
     public class BlockTransactionIn {
-        [JsonProperty("hash", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
 
         [JsonProperty("amount", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]

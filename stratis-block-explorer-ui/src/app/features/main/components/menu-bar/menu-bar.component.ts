@@ -18,6 +18,8 @@ export class MenuBarComponent implements OnInit {
     @Output() public find = new EventEmitter<string>();
     @Output() public sidenavToggle = new EventEmitter();
 
+    selectedNetwork: string;
+
     @ViewChild('themeButton', { static: true }) animatedIcon: MatAnimatedIconComponent;
 
     constructor(private appConfig: AppConfigService, private log: Log) {
@@ -26,6 +28,7 @@ export class MenuBarComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadTheme();
+        this.selectedNetwork = this.appConfig.getConfiguration().url;
     }
 
     enterPressed() {

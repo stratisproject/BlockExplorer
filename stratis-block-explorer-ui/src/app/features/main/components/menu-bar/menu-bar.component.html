@@ -13,7 +13,7 @@
       </mat-form-field>
 
       <mat-form-field floatLabel="never" appearance="legacy" fxFlex="auto" fxShow fxHide.lt-md>
-         <mat-select placeholder="Network" (selectionChange)="navigateTo($event)">
+         <mat-select placeholder="Network" (selectionChange)="navigateTo($event)" [value]="selectedNetwork">
             <mat-option *ngFor="let link of links" [value]="link.url">{{link.title}}</mat-option>
          </mat-select>
       </mat-form-field>

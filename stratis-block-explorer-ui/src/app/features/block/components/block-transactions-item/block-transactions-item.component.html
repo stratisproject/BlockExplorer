@@ -1,9 +1,8 @@
 <mat-card>
-   <div *ngIf="showHeader" fxLayout="row wrap" class="header background stacked">
+   <div *ngIf="showHeader" fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
       <app-hash-view fxFlex="0 1 auto"
                      [label]="'Tx Id'" [hash]="transaction.txId"
                      hashType="transaction" enableRoute></app-hash-view>
-      <span fxFlex fxFill></span>
       <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
    </div>
 
@@ -17,14 +16,20 @@
 
       <div class="tx-inputs background stacked"
            fxFlex.gt-sm="50%">
-         <div *ngFor="let input of transaction.inputs">
+         <div *ngFor="let input of transaction.inputs" class="tx-input">
+            <div class="amount">
+               <app-balance></app-balance>
+            </div>
             <div class="address" *ngIf="input.address">
                <app-address-view fxFlex="0 1 auto"
-                                 [address]="input.address"
+                                 label="address" [address]="input.address"
                                  enableRoute></app-address-view>
             </div>
-            <div class="amount"><app-balance></app-balance></div>
-            <div class="previous-output">PREVIOUS_OUTPUT</div>
+            <div class="previous-output">
+               <app-hash-view fxFlex="0 1 auto"
+                              label="previous output" [hash]="input.prevOut?.hash"
+                              hashType="transaction" enableRoute></app-hash-view>
+            </div>
          </div>
       </div>
 

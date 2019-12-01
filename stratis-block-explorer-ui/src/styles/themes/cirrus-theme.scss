@@ -67,8 +67,8 @@ $accent-palette: (
 );
 
 // Define the light theme.
-$primary: mat-palette($primary-palette);
-$accent: mat-palette($accent-palette, 500, 100, 800);
+$primary: mat-palette($accent-palette);
+$accent: mat-palette($primary-palette, 500, 100, 800);
 
 $theme: mat-light-theme($primary, $accent);
 @include angular-material-theme($theme);
