@@ -1,0 +1,44 @@
+<!--<ng-container *ngIf="(selectedBlock$ | async) as block">
+   <ng-container *ngIf="isSelectedBlockLoaded$ | async; else fetchingBlock">
+      <div class="row">
+         <app-block-summary [block]="block"></app-block-summary>
+      </div>
+
+      <div class="row">
+         <app-block-transactions [transactions]="block.block.transactions" pageSize="25"></app-block-transactions>
+      </div>
+   </ng-container>
+</ng-container>
+
+<ng-container *ngIf="selectedBlockError$ | async as error">
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Error</h1></mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+         <div>{{error}}</div>
+      </mat-card-content>
+   </mat-card>
+</ng-container>
+
+
+
+
+<ng-template #fetchingBlock>
+   <div class="row">
+      <mat-card>
+         <mat-card-title>Fetching block</mat-card-title>
+         <mat-card-subtitle>
+            <app-busy-indicator #loading></app-busy-indicator>
+         </mat-card-subtitle>
+      </mat-card>
+   </div>
+</ng-template>
+
+<ng-template #nullBlock>
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Block not found</h1></mat-card-title>
+      </mat-card-header>
+   </mat-card>
+</ng-template>-->

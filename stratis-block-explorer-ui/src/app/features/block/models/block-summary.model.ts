@@ -38,7 +38,7 @@ export class BlockSummaryModel implements IBlockSummaryModel {
 
             return {
                 height: block.additionalInformation.height || 0,
-                time: block.additionalInformation.blockTime.toLocaleTimeString(),
+                time: moment(block.additionalInformation.blockTime).toLocaleString(), //block.additionalInformation.blockTime.toLocaleTimeString(),
                 age: moment(block.additionalInformation.blockTime).fromNow(),
                 confirmations: block.additionalInformation.confirmations || 0,
                 hash: block.additionalInformation.blockId || '',

@@ -1,4 +1,4 @@
-import * as models from '@shared/models/transaction-summary.model';
+import { TransactionSummaryModel } from '../../transaction/models/transaction-summary.model';
 
 export interface IBlockTransaction {
     txId: string;
@@ -36,8 +36,6 @@ export interface IBlockTransactionOut {
     spentDetails?: ISpentDetails;
 }
 
-
-
 export class BlockTransaction implements IBlockTransaction {
     txId: string;
     firstSeen: string;
@@ -48,7 +46,7 @@ export class BlockTransaction implements IBlockTransaction {
     inputs: IBlockTransactionIn[];
     outputs: IBlockTransactionOut[];
 
-    static fromTransactionModel(transaction: models.TransactionSummaryModel): IBlockTransaction {
+    static fromTransactionModel(transaction: TransactionSummaryModel): IBlockTransaction {
         return {
             fee: transaction.fee.satoshi,
             isCoinbase: transaction.isCoinbase,

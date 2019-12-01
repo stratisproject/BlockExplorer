@@ -7,10 +7,9 @@ import * as fromStore from './store/reducers';
 import { SharedModule } from '@shared/shared.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { BlockTransactionsComponent } from './components/block-transactions/block-transactions.component';
-import { BlockTransactionsItemComponent } from './components/block-transactions-item/block-transactions-item.component';
 import { BlockEffects } from './store/effects/block.effects';
 import { blockRoutes } from './block.routing';
+import { TransactionModule } from '../transaction/transaction.module';
 
 const exportedComponents: Type<any>[] = [
     fromContainers.BlockComponent,
@@ -20,11 +19,12 @@ const exportedComponents: Type<any>[] = [
 ];
 
 @NgModule({
-    declarations: [...exportedComponents, BlockTransactionsComponent, BlockTransactionsItemComponent],
+    declarations: [...exportedComponents, fromComponents.BlockTransactionsComponent, fromComponents.BlockTransactionsItemComponent],
     imports: [
         RouterModule.forChild(blockRoutes),
         CommonModule,
         SharedModule,
+        TransactionModule,
         StoreModule.forFeature(fromStore.blockFeatureKey, fromStore.reducers),
         EffectsModule.forFeature([BlockEffects])
     ],

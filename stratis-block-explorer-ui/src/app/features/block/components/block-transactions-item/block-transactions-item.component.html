@@ -4,7 +4,7 @@
                      [label]="'Tx Id'" [hash]="transaction.txId"
                      hashType="transaction" enableRoute></app-hash-view>
       <span fxFlex fxFill></span>
-      <div fxFlex="0 0 auto">{{transaction.firstSeen}}</div>
+      <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
    </div>
 
    <mat-chip-list class="transaction-attributes">
@@ -53,7 +53,7 @@
                   </div>
 
                   <div *ngSwitchCase="outputType.Unspendable"
-                       fxFlex="0 1 auto" fxFlexAlign="flex-end">UNSPENDABLE</div>
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end">OP_RETURN</div>
 
                   <app-address-view *ngSwitchDefault
                                     fxFlex="0 1 auto" fxFlexAlign="flex-end"

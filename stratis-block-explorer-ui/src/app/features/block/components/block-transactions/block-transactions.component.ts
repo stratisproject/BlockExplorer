@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
-import { TransactionSummaryModel } from '@shared/models/transaction-summary.model';
 import { PageEvent } from '@angular/material/paginator';
 import * as fromModels from '../../models';
 import { BlockTransaction } from '../../models';
+import { TransactionSummaryModel } from '../../../transaction/models/transaction-summary.model';
 
 @Component({
     selector: 'app-block-transactions',

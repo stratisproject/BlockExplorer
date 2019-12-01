@@ -18,6 +18,7 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { ROOT_REDUCERS, metaReducers } from '@core/store/reducers';
 import * as fromCoreEffects from '@core/store/effects';
+import { TransactionModule } from './features/transaction/transaction.module';
 
 @NgModule({
     declarations: [
@@ -28,7 +29,7 @@ import * as fromCoreEffects from '@core/store/effects';
         BrowserAnimationsModule,
         AppRoutingModule,
         HttpClientModule,
-        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule,
+        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule, TransactionModule,
         StoreModule.forRoot(ROOT_REDUCERS, {
             metaReducers: metaReducers,
             runtimeChecks: {
