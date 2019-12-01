@@ -17,10 +17,10 @@
          "themeName": "stratis-test-theme"
       },
       "CRS": {
-         "apiBaseUrl": "https://cirrusmainindexer1.azurewebsites.net",
+         "apiBaseUrl": "https://stratisinttestindx-cirrus.azurewebsites.net/",
          "networkName": "Cirrus Main",
          "symbol": "CRS",
-         "url": "https://cirrusexplorer.stratisplatform.com/",
+         "url": "https://stratisinttestbe-cirrus.azurewebsites.net",
          "themeName": "cirrus-theme"
       },
       "TCRS": {
