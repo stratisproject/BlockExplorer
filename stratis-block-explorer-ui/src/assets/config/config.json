@@ -3,10 +3,12 @@
 
    "coins": {
       "STRAT": {
-         "apiBaseUrl": "https://stratismainindexer1.azurewebsites.net",
+         "apiBaseUrl_legacy": "https://stratismainindexer1.azurewebsites.net",
+         "apiBaseUrl_tobeused": "https://stratisinttestindx-stratis.azurewebsites.net",
+         "apiBaseUrl": "https://stratisinttestindx-stratis.azurewebsites.net",
          "networkName": "Stratis Main",
          "symbol": "STRAT",
-         "url": "https://stratisexplorer.stratisplatform.com/",
+         "url": "https://stratisinttestbe-strat.azurewebsites.net",
          "themeName": "stratis-theme"
       },
       "TSTRAT": {
@@ -17,8 +19,9 @@
          "themeName": "stratis-test-theme"
       },
       "CRS": {
-         "apiBaseUrl": "https://cirrustestindexer1.azurewebsites.net",
+         "apiBaseUrl_legacy": "https://cirrustestindexer1.azurewebsites.net",
          "apiBaseUrl_tobeused": "https://stratisinttestindx-cirrus.azurewebsites.net",
+         "apiBaseUrl": "https://stratisinttestindx-cirrus.azurewebsites.net",
          "networkName": "Cirrus Main",
          "symbol": "CRS",
          "url": "https://stratisinttestbe-cirrus.azurewebsites.net",
