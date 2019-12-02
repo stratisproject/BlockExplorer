@@ -11,7 +11,7 @@
          <ng-template *ngIf="transactionsOnCurrentPage?.length==0" [ngTemplateOutlet]="noTransactions"></ng-template>
 
          <div *ngFor="let transactionItem of transactionsOnCurrentPage;let isOdd=odd;" class="mat-elevation-z10">
-            <app-block-transactions-item [showHeader]="showTransactionHeader" [transaction]="transactionItem"></app-block-transactions-item>
+            <transaction-detail [showHeader]="showTransactionHeader" [transaction]="transactionItem"></transaction-detail>
          </div>
 
          <ng-template [ngTemplateOutlet]="pagination"></ng-template>

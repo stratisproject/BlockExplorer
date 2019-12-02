@@ -11,9 +11,10 @@ import { TransactionEffects } from './store/effects/transaction.effects';
 import { transactionRoutes } from './transaction.routing';
 
 const exportedComponents: Type<any>[] = [
-    fromComponents.TransactionSummaryComponent,
-    fromComponents.TransactionDetail,
     fromContainers.TransactionComponent,
+    fromComponents.TransactionDetail,
+    fromComponents.TransactionListComponent,
+    fromComponents.TransactionSummaryComponent,
 ];
 
 @NgModule({

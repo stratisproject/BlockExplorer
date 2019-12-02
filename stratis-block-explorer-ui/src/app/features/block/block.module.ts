@@ -14,12 +14,12 @@ import { TransactionModule } from '../transaction/transaction.module';
 const exportedComponents: Type<any>[] = [
     fromContainers.BlockComponent,
     fromContainers.BlocksComponent,
-    fromComponents.LatestBlocksComponent,
-    fromComponents.BlockSummaryComponent
+    fromComponents.BlockSummaryComponent,
+    fromComponents.LatestBlocksComponent
 ];
 
 @NgModule({
-    declarations: [...exportedComponents, fromComponents.BlockTransactionsComponent, fromComponents.BlockTransactionsItemComponent],
+    declarations: [...exportedComponents],
     imports: [
         RouterModule.forChild(blockRoutes),
         CommonModule,

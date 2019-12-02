@@ -11,7 +11,6 @@ import { RouterModule } from '@angular/router';
     declarations: [
         components.BalanceComponent,
         components.BusyIndicatorComponent,
-        components.PagerComponent,
         components.HashViewComponent,
         components.AddressViewComponent,
         components.MatAnimatedIconComponent
@@ -27,7 +26,6 @@ import { RouterModule } from '@angular/router';
     exports: [
         components.BalanceComponent,
         components.BusyIndicatorComponent,
-        components.PagerComponent,
         components.HashViewComponent,
         components.AddressViewComponent,
         components.MatAnimatedIconComponent,

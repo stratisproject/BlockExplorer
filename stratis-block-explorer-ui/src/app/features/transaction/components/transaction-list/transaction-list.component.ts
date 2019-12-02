@@ -1,15 +1,14 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, SimpleChange } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import * as fromModels from '../../models';
-import { BlockTransaction } from '../../models';
-import { TransactionSummaryModel } from '../../../transaction/models/transaction-summary.model';
+import { Transaction, TransactionSummaryModel } from '../../models';
 
 @Component({
-    selector: 'app-block-transactions',
-    templateUrl: './block-transactions.component.html',
-    styleUrls: ['./block-transactions.component.scss']
+    selector: 'transaction-list',
+    templateUrl: './transaction-list.component.html',
+    styleUrls: ['./transaction-list.component.scss']
 })
-export class BlockTransactionsComponent implements OnInit, OnChanges {
+export class TransactionListComponent implements OnInit, OnChanges {
 
     @Input() title = 'Transactions';
     @Input() transactions: TransactionSummaryModel[] = null;
@@ -18,7 +17,7 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
     @Input() showTransactionHeader = true;
     @Input() showCount = true;
 
-    transactionsOnCurrentPage: BlockTransaction[] = [];
+    transactionsOnCurrentPage: Transaction[] = [];
     currentPageIndex = 0;
 
     // MatPaginator Output
@@ -40,7 +39,7 @@ export class BlockTransactionsComponent implements OnInit, OnChanges {
 
         this.transactionsOnCurrentPage = this.transactions
             .slice(this.currentPageIndex * this.pageSize, (this.currentPageIndex + 1) * this.pageSize)
-            .map((transaction, index) => fromModels.BlockTransaction.fromTransactionModel(transaction), []);
+            .map((transaction, index) => fromModels.Transaction.fromTransactionSummaryModel(transaction), []);
     }
 
     get totalPages() {
