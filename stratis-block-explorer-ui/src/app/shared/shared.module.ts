@@ -6,6 +6,7 @@ import { CustomMaterialModuleModule } from './custom-material-module.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ClipboardModule } from 'ngx-clipboard';
 import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
     declarations: [
@@ -13,7 +14,8 @@ import { RouterModule } from '@angular/router';
         components.BusyIndicatorComponent,
         components.HashViewComponent,
         components.AddressViewComponent,
-        components.MatAnimatedIconComponent
+        components.MatAnimatedIconComponent,
+        components.FaAnimatedIconComponent
     ],
     imports: [
         MatIconModule,
@@ -21,7 +23,8 @@ import { RouterModule } from '@angular/router';
         CommonModule,
         RouterModule,
         FlexLayoutModule,
-        ClipboardModule
+        ClipboardModule,
+        FontAwesomeModule
     ],
     exports: [
         components.BalanceComponent,
@@ -29,9 +32,11 @@ import { RouterModule } from '@angular/router';
         components.HashViewComponent,
         components.AddressViewComponent,
         components.MatAnimatedIconComponent,
+        components.FaAnimatedIconComponent,
         CustomMaterialModuleModule,
         FlexLayoutModule,
-        ClipboardModule
+        ClipboardModule,
+        FontAwesomeModule
     ]
 })
 export class SharedModule { }

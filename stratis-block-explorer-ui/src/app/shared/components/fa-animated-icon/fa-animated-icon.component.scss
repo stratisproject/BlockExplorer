@@ -1,0 +1,14 @@
+@import '../../styles/mixins';
+
+:host {
+   @include mat-design-icon-mixin();
+
+   fa-icon {
+      display: block;
+      transition: transform .5s;
+
+      &.animate {
+         transform: rotate(360deg);
+      }
+   }
+}

@@ -7,10 +7,10 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class MatAnimatedIconComponent implements OnInit {
 
-    @Input() start: String;
-    @Input() end: String;
-    @Input() colorStart: String;
-    @Input() colorEnd: String;
+    @Input() start: string;
+    @Input() end: string;
+    @Input() colorStart: string;
+    @Input() colorEnd: string;
     @Input() animate: boolean;
     @Input() animateFromParent?: boolean = false;
 

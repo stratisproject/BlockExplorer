@@ -53,7 +53,35 @@
                   </div>
 
                   <div *ngSwitchCase="outputType.Unspendable"
-                       fxFlex="0 1 auto" fxFlexAlign="flex-end" matTooltip="{{output.scriptPubKey.hash}}">OP_RETURN</div>
+                       fxFlex="0 1 auto" fxFlexAlign="flex-end"
+                       class="op-return">
+                     <mat-expansion-panel class="overflow-scroll-x">
+                        <mat-expansion-panel-header>
+                           <mat-panel-title>OP_RETURN</mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div matExpansionPanelContent class="op-return-content">
+                           {{output.scriptPubKey.hash}}
+                        </div>
+                        <mat-action-row>
+                           <button mat-icon-button>
+                              <fa-animated-icon [animateFromParent]="true" [animate]="shareOpReturnOnTwitter == true"
+                                                (click)="shareOnTwitter()"
+                                                startColor="primary" endColor="primary"
+                                                [startIcon]="faTwitter" [endIcon]="faFacebook"
+                                                startClass="fa-idle" endClass="fa-pressed"></fa-animated-icon>
+                           </button>
+                           <button mat-icon-button
+                                   ngxClipboard *ngxClipboardIfSupported
+                                   [cbContent]="output.scriptPubKey.hash" (cbOnSuccess)="onOpReturnCopied()">
+                              <mat-animated-icon [animateFromParent]="true" [animate]="opReturnCopied == true"
+                                                 start="content_copy" end="done_outline"
+                                                 colorStart="primary" colorEnd="primary"></mat-animated-icon>
+                           </button>
+                        </mat-action-row>
+                     </mat-expansion-panel>
+                  </div>
+
+
 
                   <app-address-view *ngSwitchDefault
                                     fxFlex="0 1 auto" fxFlexAlign="flex-end"

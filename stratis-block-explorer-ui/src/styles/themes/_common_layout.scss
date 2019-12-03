@@ -1,5 +1,39 @@
+/* for sidenav to take whole page */
+html, body {
+   margin: 0;
+   height: 100%;
+   /*background: mat-color($primary);*/
+   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+.row {
+   display: block;
+   margin-bottom: 15px;
+
+   &:not([class*=mat-elevation-z]) {
+      @include mat-elevation(3);
+   }
+}
+
+@media (min-width: 1200px) {
+   .row {
+      width: 1170px;
+      margin-right: auto;
+      margin-left: auto;
+   }
+}
+
 .overflow-hidden {
    overflow: hidden;
+}
+
+.overflow-scroll-x {
+   overflow-x: scroll;
+}
+
+.overflow-scroll-y {
+   overflow-y: scroll;
 }
 
 .no-margin {

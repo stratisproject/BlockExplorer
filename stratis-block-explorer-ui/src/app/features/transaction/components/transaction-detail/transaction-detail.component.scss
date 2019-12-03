@@ -87,5 +87,21 @@ mat-card {
       &:not(:last-child) {
          margin-bottom: 5px;
       }
+
+      .op-return {
+         overflow: hidden;
+
+         ::ng-deep .mat-expansion-panel-body {
+            overflow-x: scroll;
+         }
+
+         mat-action-row {
+            padding: 0;
+         }
+
+         .op-return-content {
+            white-space: nowrap;
+         }
+      }
    }
 }
