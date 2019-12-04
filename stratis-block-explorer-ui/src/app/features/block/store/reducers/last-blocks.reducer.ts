@@ -1,39 +1,41 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import * as BlockActions from '../actions/block.actions';
+import * as LastBlockActions from '../actions/last-blocks.actions';
 import { BlockResponseModel } from '../../models/block-response.model';
-
-export const blockFeatureKey = 'block';
 
 export interface LastBlocksState {
     blocks: BlockResponseModel[],
-    areLoaded: boolean,
-    lastBlocksError: Error | string
+    loaded: boolean,
+    error: Error | string
 }
 
 export const initialState: LastBlocksState = {
     blocks: [],
-    areLoaded: false,
-    lastBlocksError: null
+    loaded: false,
+    error: null
 };
 
 const lastBlocksReducer = createReducer(
     initialState,
 
-    on(BlockActions.loadLastBlocks, state => state = ({
+    on(LastBlockActions.loadLastBlocks, state => state = ({
         ...state,
-        areLoaded: false,
+        blocks: [],
+        loaded: false,
+        error: null
     })),
 
-    on(BlockActions.lastBlocksLoaded, (state, action) => state = ({
+    on(LastBlockActions.lastBlocksLoaded, (state, action) => state = ({
         ...state,
-        areLoaded: true,
         blocks: action.blocks,
+        loaded: true,
+        error: null
     })),
 
-    on(BlockActions.loadLastBlocksError, (state, action) => state = ({
+    on(LastBlockActions.loadLastBlocksError, (state, action) => state = ({
         ...state,
-        areLoaded: true,
+        loaded: true,
         blocks: null,
+        error: action.error
     }))
 );
 

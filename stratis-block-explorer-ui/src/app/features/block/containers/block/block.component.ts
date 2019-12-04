@@ -3,7 +3,7 @@ import { BlockResponseModel } from '../../models/block-response.model';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Log } from '@shared/logger.service';
-import { BlockStoreFacade } from '../../store/block-store.facade';
+import { SelectedBlockFacade } from '../../store/selected-block.facade';
 
 @Component({
     selector: 'app-block',
@@ -15,7 +15,7 @@ export class BlockComponent implements OnInit {
     selectedBlock$: Observable<BlockResponseModel>;
     selectedBlockError$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private facade: BlockStoreFacade, private log: Log) { }
+    constructor(private route: ActivatedRoute, private selectedBlocksFacade: SelectedBlockFacade, private log: Log) { }
 
     ngOnInit() {
         this.loadBlockDetails();
@@ -30,12 +30,12 @@ export class BlockComponent implements OnInit {
             .subscribe((paramMap: any) => {
                 if (!!paramMap.params.blockHash) {
                     let hash = paramMap.params.blockHash;
-                    this.facade.loadBlock(hash);
+                    this.selectedBlocksFacade.loadBlock(hash);
                 }
             });
 
-        this.isSelectedBlockLoaded$ = this.facade.isSelectedBlockLoaded$;
-        this.selectedBlockError$ = this.facade.selectedBlockError$;
-        this.selectedBlock$ = this.facade.selectedBlock$;
+        this.isSelectedBlockLoaded$ = this.selectedBlocksFacade.loaded$;
+        this.selectedBlockError$ = this.selectedBlocksFacade.error$;
+        this.selectedBlock$ = this.selectedBlocksFacade.block$;
     }
 }

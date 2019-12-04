@@ -1,6 +1,6 @@
 import { ActionReducerMap,  Action } from '@ngrx/store';
 import * as fromBlocks from './blocks.reducer';
-import * as fromLastBlock from './last-block.reducer';
+import * as fromLastBlock from './last-blocks.reducer';
 import * as fromSelectedBlock from './selected-block.reducer';
 
 export const blockFeatureKey = 'block';
@@ -16,7 +16,3 @@ export const reducers: ActionReducerMap<BlockState> = {
     lastBlock: fromLastBlock.reducer,
     selectedBlock: fromSelectedBlock.reducer
 };
-
-//export function reducers(state: BlockState | undefined, action: Action) {
-//    return blockReducers(state, action);
-//}

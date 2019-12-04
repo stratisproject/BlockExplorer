@@ -1,11 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import * as fromStore from '../../store/reducers';
-import { Observable, interval, ReplaySubject, of } from 'rxjs';
-import { Store, select } from '@ngrx/store';
-import { startWith, takeUntil, switchMap, tap } from 'rxjs/operators';
+import { Observable, interval, of } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 import { BlockSummaryModel } from '../../models/block-summary.model';
-import { BlockStoreFacade } from '../../store/block-store.facade';
-import { takeUntilDestroyed } from '../../../../shared/shared.module';
+import { LastBlocksFacade } from '../../store/last-blocks.facade';
+import { takeUntilDestroyed } from '@shared/shared.module';
 
 @Component({
     selector: 'app-latest-blocks',
@@ -21,16 +19,16 @@ export class LatestBlocksComponent implements OnInit, OnDestroy {
     areLastBlockLoaded$: Observable<boolean>;
     blocks$: Observable<BlockSummaryModel[]>;
 
-    constructor(private facade: BlockStoreFacade) { }
+    constructor(private lastBlocksFacade: LastBlocksFacade) { }
 
     ngOnInit() {
-        this.areLastBlockLoaded$ = this.facade.areLastBlocksLoaded$;
-        this.blocks$ = this.facade.lastBlocks$.pipe(
+        this.areLastBlockLoaded$ = this.lastBlocksFacade.loaded$;
+        this.blocks$ = this.lastBlocksFacade.blocks$.pipe(
             switchMap(blocks => {
                 if (blocks == null) return of(null);
                 return of(blocks.map<BlockSummaryModel>((block, index) => BlockSummaryModel.fromBlockResponseModel(block)));
             })
-            ,takeUntilDestroyed(this)
+            , takeUntilDestroyed(this)
         );
 
         if (this.autorefresh > 0) {
@@ -40,12 +38,12 @@ export class LatestBlocksComponent implements OnInit, OnDestroy {
                     takeUntilDestroyed(this)
                 ).subscribe(() => {
                     if (this.areLastBlockLoaded$) {
-                        this.facade.loadLastBlocks(this.records);
+                        this.lastBlocksFacade.loadLastBlocks(this.records);
                     }
                 });
         }
         else {
-            this.facade.loadLastBlocks(this.records);
+            this.lastBlocksFacade.loadLastBlocks(this.records);
         }
     }
 

@@ -1,29 +1,41 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import * as BlockActions from '../actions/block.actions';
+import * as BlocksActions from '../actions/blocks.actions';
 import { BlockResponseModel } from '../../models/block-response.model';
 
 export interface BlocksState {
     blocks: BlockResponseModel[],
-    areLoaded: boolean
+    loaded: boolean,
+    error: Error | string
 }
 
 export const initialState: BlocksState = {
     blocks: [],
-    areLoaded: false,
+    loaded: false,
+    error: null
 };
 
 const blocksReducer = createReducer(
     initialState,
 
-    on(BlockActions.loadLastBlocks, state => state = ({
+    on(BlocksActions.loadBlocks, state => state = ({
         ...state,
-        areLoaded: false,
+        blocks: [],
+        loaded: false,
+        error: null
     })),
 
-    on(BlockActions.blocksLoaded, (state, action) => state = ({
+    on(BlocksActions.blocksLoaded, (state, action) => state = ({
         ...state,
-        areLoaded: true,
         blocks: action.blocks,
+        loaded: true,
+        error: null
+    })),
+
+    on(BlocksActions.loadBlocksError, (state, action) => state = ({
+        ...state,
+        loaded: true,
+        blocks: null,
+        error: action.error
     }))
 );
 
