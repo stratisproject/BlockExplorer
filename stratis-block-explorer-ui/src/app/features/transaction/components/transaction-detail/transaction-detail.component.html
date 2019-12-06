@@ -1,3 +1,5 @@
+<!--ugly fix for chips, add an hidden mat-chip-list to be able to add mat-chip without including them in the list-->
+<mat-chip-list style="display:none"></mat-chip-list>
 <mat-card>
    <mat-card-subtitle *ngIf="showHeader">
       <div fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
@@ -88,9 +90,9 @@
       <div class="amount">
          <app-balance [balance]="output.amount"></app-balance>
       </div>
-      <div class="address" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-         <span>Smart Contract</span>
-         <button mat-raised-button class="previous-output" [routerLink]="['/smartcontract', transaction.txId]">View Details</button>
+      <div class="smart-contract-detail" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+         <mat-chip selected>Smart Contract</mat-chip>
+         <button mat-raised-button [routerLink]="['/smartcontract', transaction.txId]">View Details</button>
       </div>
    </div>
 </ng-template>
@@ -106,7 +108,7 @@
             <mat-panel-title fxLayout="row" fxLayoutAlign="space-between center">
                <div>
                   <copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>
-                  OP_RETURN
+                  <mat-chip selected disabled>OP_RETURN</mat-chip>
                </div>
             </mat-panel-title>
          </mat-expansion-panel-header>
