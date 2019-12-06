@@ -1,0 +1,41 @@
+<ng-container *ngIf="(selectedTransaction$ | async) as transaction">
+   <ng-container *ngIf="isSelectedTransactionLoaded$ | async; else fetchingTransaction">
+      <div class="row">
+         <app-transaction-summary [transaction]="transaction"></app-transaction-summary>
+      </div>
+
+      <div class="row">
+         <transaction-detail [showHeader]="false" [transaction]="transaction"></transaction-detail>
+      </div>
+   </ng-container>
+</ng-container>
+
+<ng-container *ngIf="selectedTransactionError$ | async as error">
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Error</h1></mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+         <div>{{error}}</div>
+      </mat-card-content>
+   </mat-card>
+</ng-container>
+
+<ng-template #fetchingTransaction>
+   <div class="row">
+      <mat-card>
+         <mat-card-title>Fetching transaction</mat-card-title>
+         <mat-card-subtitle>
+            <app-busy-indicator #loading></app-busy-indicator>
+         </mat-card-subtitle>
+      </mat-card>
+   </div>
+</ng-template>
+
+<ng-template #nullTransaction>
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Transaction not found</h1></mat-card-title>
+      </mat-card-header>
+   </mat-card>
+</ng-template>

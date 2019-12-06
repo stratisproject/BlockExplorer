@@ -19,6 +19,7 @@ import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { ROOT_REDUCERS, metaReducers } from '@core/store/reducers';
 import * as fromCoreEffects from '@core/store/effects';
 import { TransactionModule } from './features/transaction/transaction.module';
+import { SmartcontractModule } from './features/smartcontract/smartcontract.module';
 
 @NgModule({
     declarations: [
@@ -29,7 +30,7 @@ import { TransactionModule } from './features/transaction/transaction.module';
         BrowserAnimationsModule,
         AppRoutingModule,
         HttpClientModule,
-        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule, TransactionModule,
+        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule, TransactionModule, SmartcontractModule,
         StoreModule.forRoot(ROOT_REDUCERS, {
             metaReducers: metaReducers,
             runtimeChecks: {
