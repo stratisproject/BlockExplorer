@@ -20,7 +20,7 @@
 </mat-card>
 
 <ng-template #pagination>
-   <mat-paginator *ngIf="showPaging"
+   <mat-paginator *ngIf="showPaging && transactions.length > pageSize"
                   hidePageSize="true"
                   [length]="transactions.length"
                   [pageSize]="pageSize"

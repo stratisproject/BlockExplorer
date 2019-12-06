@@ -67,6 +67,7 @@ mat-card {
 
 .address {
    overflow: hidden;
+   width: 100%;
 }
 
 .tx-inputs {
@@ -118,6 +119,10 @@ mat-card {
             border-left: 1px currentcolor solid;
             border-left: 1px currentcolor solid;
          }
+      }
+
+      .pre {
+         white-space: pre;
       }
 
       &:not(:last-child) {

@@ -9,14 +9,15 @@
    <div class="wrapper overflow-hidden" fxFlex="0 1">
       <div fxLayout="column" class="content-block">
          <div class="label" *ngIf="label">{{label}}</div>
-         <div *ngIf="enableRoute; else noRoute" class="hash">
-            <a [routerLink]="['/' + hashType , hash]">{{hash}}</a>
+         <div class="hash">
+            <ng-container *ngIf="enableRoute; else noRoute">
+               <a [routerLink]="['/' + hashType , hash]">{{hash}}</a>
+            </ng-container>
+            <ng-template #noRoute>
+               {{hash}}
+            </ng-template>
          </div>
       </div>
       <ng-content></ng-content>
    </div>
 </div>
-
-<ng-template #noRoute>
-   {{hash}}
-</ng-template>

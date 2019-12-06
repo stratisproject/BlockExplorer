@@ -75,7 +75,7 @@
          <app-balance [balance]="transaction.totalSpent"></app-balance>
       </div>
       <div class="transaction-fees"
-           fxFlex fxLayout="column"  fxLayoutAlign="start end">
+           fxFlex fxLayout="column" fxLayoutAlign="start end">
          <div>Fees</div>
          <app-balance [balance]="transaction.fee"></app-balance>
       </div>
@@ -84,13 +84,13 @@
 
 
 <ng-template #smartContractOutput let-output="output">
-   <div class="smart-contract-output" fxFlexLayout="row wrap" fxLayoutAlign="end center" fxLayoutGap="20px">
-      <div class="address">
-         <div>SMART CONTRACT</div>
-         <a [routerLink]="['/smartcontract', transaction.txId]">View Details</a>
-      </div>
+   <div class="wrapper smart-contract-output" fxLayout="column" fxLayoutAlign="start end">
       <div class="amount">
          <app-balance [balance]="output.amount"></app-balance>
+      </div>
+      <div class="address" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+         <span>Smart Contract</span>
+         <button mat-raised-button class="previous-output" [routerLink]="['/smartcontract', transaction.txId]">View Details</button>
       </div>
    </div>
 </ng-template>
@@ -99,11 +99,11 @@
 <ng-template #unspendableOutput let-output="output">
    <div class="wrapper overflow-hidden op-return" fxLayout="column" fxLayoutAlign="start end">
       <div class="burnt">
-         <app-balance [balance]="output.amount"><pre> burnt</pre></app-balance>
+         <app-balance [balance]="output.amount"><span class="pre"> burnt</span></app-balance>
       </div>
       <mat-expansion-panel class="overflow-scroll-x">
          <mat-expansion-panel-header>
-            <mat-panel-title fxFlexLayout="row" fxLayoutAlign="space-between center">
+            <mat-panel-title fxLayout="row" fxLayoutAlign="space-between center">
                <div>
                   <copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>
                   OP_RETURN
@@ -135,7 +135,7 @@
       <div class="amount">
          <app-balance [balance]="output.amount"></app-balance>
       </div>
-      <div class="address" fxLayout="row" fxLayoutAlign="start center">
+      <div class="address" fxFlex="0 0 auto" fxLayout="row" fxLayoutAlign="start center">
          <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-start"
                            [address]="output.address"
                            enableRoute></app-address-view>
