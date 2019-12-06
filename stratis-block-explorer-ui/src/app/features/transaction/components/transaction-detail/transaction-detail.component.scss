@@ -1,3 +1,26 @@
+@mixin counter($counterName) {
+   counter-increment: $counterName;
+   content: "#" counter($counterName);
+   font-size: 0.8em;
+   opacity: 0.4;
+   display: flex;
+   flex: 0 0 auto;
+   justify-content: center;
+   flex-direction: column;
+   margin: 5px 0;
+   @content;
+}
+
+@mixin counter-base-style() {
+   flex-direction: row;
+   box-sizing: border-box;
+   display: flex;
+   align-items: stretch;
+   max-height: 100%;
+   @content;
+}
+
+
 mat-card {
    background: inherit !important;
 }
@@ -28,7 +51,6 @@ mat-card {
    text-align: right;
 }
 
-
 .arrow {
    text-align: center;
    margin: 10px;
@@ -49,39 +71,53 @@ mat-card {
 
 .tx-inputs {
    margin-left: -8px;
-   padding-left: 4px;
    position: relative;
    counter-reset: in-index -1;
 
    .tx-input {
+      @include counter-base-style() {
+         place-content: stretch flex-start;
+      }
+
+
+      > * {
+         margin-left: 3px;
+      }
+
       &:before {
-         counter-increment: in-index;
-         content: "#" counter(in-index);
-         font-size: 0.8em;
-         opacity: 0.4;
-         float: left;
-         padding-right: 4px;
-         margin-left: -2px;
+         @include counter(in-index) {
+            padding-right: 2px;
+            border-right: 1px currentcolor solid;
+         }
+      }
+
+      &:not(:last-child) {
+         margin-bottom: 5px;
       }
    }
 }
 
 .tx-outputs {
    margin-right: -8px;
-   padding-right: 4px;
    text-align: end;
    position: relative;
    counter-reset: out-index -1;
 
    .tx-output {
+      @include counter-base-style() {
+         place-content: stretch flex-end;
+      }
+
+      > * {
+         margin-right: 3px;
+      }
+
       &:after {
-         counter-increment: out-index;
-         content: "#" counter(out-index);
-         font-size: 0.8em;
-         opacity: 0.4;
-         float: right;
-         padding-left: 4px;
-         margin-right: -2px;
+         @include counter(out-index) {
+            padding-left: 2px;
+            border-left: 1px currentcolor solid;
+            border-left: 1px currentcolor solid;
+         }
       }
 
       &:not(:last-child) {
@@ -89,14 +125,25 @@ mat-card {
       }
 
       .op-return {
-         overflow: hidden;
+         user-select: none;
 
-         ::ng-deep .mat-expansion-panel-body {
-            overflow-x: scroll;
-         }
+         ::ng-deep {
+            mat-tab-body {
+               padding-bottom: 5px;
+               user-select: text;
+            }
 
-         mat-action-row {
-            padding: 0;
+            .mat-expansion-panel {
+               background: transparent;
+            }
+
+            .mat-expansion-panel-body {
+               overflow-x: auto;
+            }
+
+            .mat-tab-label {
+               height: auto !important;
+            }
          }
 
          .op-return-content {

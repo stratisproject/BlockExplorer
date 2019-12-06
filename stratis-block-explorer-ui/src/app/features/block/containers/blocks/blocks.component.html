@@ -4,7 +4,7 @@
          <span class="mat-display-2">Latest {{(blocks$ | async)?.length}} blocks</span>
       </mat-card-title>
       <mat-card-subtitle>
-         <app-busy-indicator [hidden]="areBlocksLoaded$ | async"></app-busy-indicator>
+         <app-busy-indicator [hidden]="loaded$ | async"></app-busy-indicator>
       </mat-card-subtitle>
       <mat-card-content class="container">
          <table mat-table [dataSource]="blocks$ | async">
@@ -28,7 +28,7 @@
    </mat-card>
 </div>
 
-<ng-container *ngIf="selectedBlockError$ | async as error">
+<ng-container *ngIf="error$ | async as error">
    <mat-card class="row">
       <mat-card-header>
          <mat-card-title><h1>Error</h1></mat-card-title>

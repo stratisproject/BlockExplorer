@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 //import * as fromBlocks from '../reducers/blocks.reducer';
 import { blockFeatureKey, BlockState } from '../reducers';
 
-export const selectBlockState = createFeatureSelector<BlockState>(blockFeatureKey);
+const selectBlockState = createFeatureSelector<BlockState>(blockFeatureKey);
 const getBlocksState = createSelector(selectBlockState, (state: BlockState) => state.blocks);
 
 export const getBlocks = createSelector(

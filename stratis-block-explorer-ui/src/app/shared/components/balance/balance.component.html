@@ -1,1 +1,8 @@
-<strong>{{whole}}</strong><small>{{decimal}} {{symbol}}</small>
+<div fxLayout="row" fxLayoutAlign="start center">
+   <div class="balance">
+      <span class="whole">{{wholePart}}</span>
+      <span class="decimal">{{decimalPart}}</span>
+   </div>
+   <div class="symbol" Flex="0 0 auto"> {{symbol}}</div>
+   <ng-content></ng-content>
+</div>

@@ -1,0 +1,18 @@
+%smallFont {
+   font-size: 0.80em;
+}
+
+.balance {
+   .whole {
+      font-weight: bold;
+   }
+
+   .decimal {
+      @extend %smallFont;
+   }
+}
+
+.symbol {
+   @extend %smallFont;
+   white-space: pre;
+}

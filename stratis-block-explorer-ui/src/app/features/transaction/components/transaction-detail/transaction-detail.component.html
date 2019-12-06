@@ -1,10 +1,13 @@
 <mat-card>
-   <div *ngIf="showHeader" fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
-      <app-hash-view fxFlex="0 1 auto"
-                     [label]="'Tx Id'" [hash]="transaction.txId"
-                     hashType="transaction" enableRoute></app-hash-view>
-      <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
-   </div>
+   <mat-card-subtitle *ngIf="showHeader">
+      <div fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
+         <app-hash-view fxFlex="0 1 auto"
+                        [label]="'Tx Id'" [hash]="transaction.txId"
+                        hashType="transaction" enableRoute></app-hash-view>
+         <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
+      </div>
+      <mat-divider [inset]="true"></mat-divider>
+   </mat-card-subtitle>
 
    <mat-card-content fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-evenly stretch"
                      fxLayout.lt-md="column" fxLayoutAlign.lt-md="center stretch">
@@ -12,18 +15,29 @@
       <div class="tx-inputs background stacked"
            fxFlex.gt-sm="50%">
          <div *ngFor="let input of transaction.inputs" class="tx-input">
-            <div class="amount">
-               <app-balance></app-balance>
-            </div>
-            <div class="address" *ngIf="input.address">
-               <app-address-view fxFlex="0 1 auto"
-                                 label="address" [address]="input.address"
-                                 enableRoute></app-address-view>
-            </div>
-            <div class="previous-output">
-               <app-hash-view fxFlex="0 1 auto"
-                              label="previous output" [hash]="input.prevOut?.hash"
-                              hashType="transaction" enableRoute></app-hash-view>
+            <div class="wrapper overflow-hidden" fxLayout="column">
+               <div class="amount">
+                  <app-balance [balance]="input.amount"></app-balance>
+               </div>
+               <div class="from">
+                  <div class="address" *ngIf="input.address; else noInputAddress">
+                     <app-address-view fxFlex="0 1 auto"
+                                       [address]="input.address"
+                                       enableRoute>
+                     </app-address-view>
+                  </div>
+                  <div>
+                     <copy-to-clipboard [cbContent]="input.prevOut?.hash" successMessage="Previous transaction hash has been copied to clipboard!"></copy-to-clipboard>
+                     <button mat-raised-button class="previous-output" [routerLink]="['/transaction', input.prevOut?.hash]">Previous output</button>
+                  </div>
+                  <ng-template #noInputAddress>
+                     <div class="previous-output">
+                        <app-hash-view fxFlex="0 1 auto"
+                                       label="previous output" [hash]="input.prevOut?.hash"
+                                       hashType="transaction" enableRoute></app-hash-view>
+                     </div>
+                  </ng-template>
+               </div>
             </div>
          </div>
       </div>
@@ -40,57 +54,16 @@
 
       <div *ngIf="transaction.outputs.length > 0" class="tx-outputs background stacked"
            fxFlex.lt-md="1 1 auto"
-           fxFlex.gt-sm="50%" class.gt-sm="">
-         <div *ngFor="let output of transaction.outputs" class="tx-output"
-              fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="end center">
-            <div class="address">
-               <ng-container [ngSwitch]="getOutputType(output)">
-
-                  <div *ngSwitchCase="outputType.SmartContract"
-                       fxFlex="0 1 auto" fxFlexAlign="flex-end">
-                     <div>SMART CONTRACT</div>
-                     <a [routerLink]="['/smartcontract', transaction.txId]">View Details</a>
-                  </div>
-
-                  <div *ngSwitchCase="outputType.Unspendable"
-                       fxFlex="0 1 auto" fxFlexAlign="flex-end"
-                       class="op-return">
-                     <mat-expansion-panel class="overflow-scroll-x">
-                        <mat-expansion-panel-header>
-                           <mat-panel-title>OP_RETURN</mat-panel-title>
-                        </mat-expansion-panel-header>
-                        <div matExpansionPanelContent class="op-return-content">
-                           {{output.scriptPubKey.hash}}
-                        </div>
-                        <mat-action-row>
-                           <button mat-icon-button>
-                              <fa-animated-icon [animateFromParent]="true" [animate]="shareOpReturnOnTwitter == true"
-                                                (click)="shareOnTwitter()"
-                                                startColor="primary" endColor="primary"
-                                                [startIcon]="faTwitter" [endIcon]="faFacebook"
-                                                startClass="fa-idle" endClass="fa-pressed"></fa-animated-icon>
-                           </button>
-                           <button mat-icon-button
-                                   ngxClipboard *ngxClipboardIfSupported
-                                   [cbContent]="output.scriptPubKey.hash" (cbOnSuccess)="onOpReturnCopied()">
-                              <mat-animated-icon [animateFromParent]="true" [animate]="opReturnCopied == true"
-                                                 start="content_copy" end="done_outline"
-                                                 colorStart="primary" colorEnd="primary"></mat-animated-icon>
-                           </button>
-                        </mat-action-row>
-                     </mat-expansion-panel>
-                  </div>
-
-
-
-                  <app-address-view *ngSwitchDefault
-                                    fxFlex="0 1 auto" fxFlexAlign="flex-end"
-                                    [address]="output.address"
-                                    enableRoute></app-address-view>
-               </ng-container>
-            </div>
-            <div class="amount"><app-balance [balance]="output.amount"></app-balance></div>
-            <!--<div class="spent-output">SPENT / UNSPENT</div>-->
+           fxFlex.gt-sm="50%">
+         <div *ngFor="let output of transaction.outputs" class="tx-output">
+            <ng-container [ngSwitch]="getOutputType(output)">
+               <ng-container *ngSwitchCase="outputType.SmartContract"
+                             [ngTemplateOutlet]="smartContractOutput" [ngTemplateOutletContext]="{ output: output}"></ng-container>
+               <ng-container *ngSwitchCase="outputType.Unspendable"
+                             [ngTemplateOutlet]="unspendableOutput" [ngTemplateOutletContext]="{ output: output}"></ng-container>
+               <ng-container *ngSwitchDefault
+                             [ngTemplateOutlet]="spendableOutput" [ngTemplateOutletContext]="{ output: output}"></ng-container>
+            </ng-container>
          </div>
       </div>
    </mat-card-content>
@@ -102,9 +75,70 @@
          <app-balance [balance]="transaction.totalSpent"></app-balance>
       </div>
       <div class="transaction-fees"
-           fxFlex fxLayout="column">
+           fxFlex fxLayout="column"  fxLayoutAlign="start end">
          <div>Fees</div>
          <app-balance [balance]="transaction.fee"></app-balance>
       </div>
    </mat-card-actions>
 </mat-card>
+
+
+<ng-template #smartContractOutput let-output="output">
+   <div class="smart-contract-output" fxFlexLayout="row wrap" fxLayoutAlign="end center" fxLayoutGap="20px">
+      <div class="address">
+         <div>SMART CONTRACT</div>
+         <a [routerLink]="['/smartcontract', transaction.txId]">View Details</a>
+      </div>
+      <div class="amount">
+         <app-balance [balance]="output.amount"></app-balance>
+      </div>
+   </div>
+</ng-template>
+
+
+<ng-template #unspendableOutput let-output="output">
+   <div class="wrapper overflow-hidden op-return" fxLayout="column" fxLayoutAlign="start end">
+      <div class="burnt">
+         <app-balance [balance]="output.amount"><pre> burnt</pre></app-balance>
+      </div>
+      <mat-expansion-panel class="overflow-scroll-x">
+         <mat-expansion-panel-header>
+            <mat-panel-title fxFlexLayout="row" fxLayoutAlign="space-between center">
+               <div>
+                  <copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>
+                  OP_RETURN
+               </div>
+            </mat-panel-title>
+         </mat-expansion-panel-header>
+
+         <div matExpansionPanelContent>
+            <mat-tab-group headerPosition="below" color="accent">
+               <mat-tab label="Raw">
+                  <div class="op-return-content">
+                     {{output.scriptPubKey.hash}}
+                  </div>
+               </mat-tab>
+               <mat-tab label="Data" matTooltip="OP_RETURN data converted from HEX to ASCII">
+                  <div class="op-return-content">
+                     {{getOpReturnHexToAscii(output)}}
+                  </div>
+               </mat-tab>
+            </mat-tab-group>
+
+         </div>
+      </mat-expansion-panel>
+   </div>
+</ng-template>
+
+<ng-template #spendableOutput let-output="output">
+   <div class="wrapper overflow-hidden" fxLayout="column" fxLayoutAlign="start end">
+      <div class="amount">
+         <app-balance [balance]="output.amount"></app-balance>
+      </div>
+      <div class="address" fxLayout="row" fxLayoutAlign="start center">
+         <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-start"
+                           [address]="output.address"
+                           enableRoute></app-address-view>
+      </div>
+   </div>
+</ng-template>

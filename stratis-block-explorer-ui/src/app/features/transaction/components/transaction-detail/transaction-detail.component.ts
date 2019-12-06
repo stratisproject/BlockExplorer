@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Transaction, ITransactionOut } from '../../models';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { CoreStoreFacade } from '@core/store/core-store.facade';
 import { faTwitter, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faExchangeAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 enum OutputType {
     SmartContract,
@@ -15,7 +15,7 @@ enum OutputType {
     templateUrl: './transaction-detail.component.html',
     styleUrls: ['./transaction-detail.component.scss']
 })
-export class TransactionDetail implements OnInit, OnDestroy {
+export class TransactionDetail {
     @Input() transaction: Transaction;
     @Input() showHeader = true;
 
@@ -25,15 +25,10 @@ export class TransactionDetail implements OnInit, OnDestroy {
     outputType = OutputType;
 
     faTwitter = faTwitter;
-    faFacebook = faFacebook;
+    faExchangeAlt = faExchangeAlt;
+    faCheck = faCheck;
 
-    constructor(private coreFacade: CoreStoreFacade, private changeDetectorRef: ChangeDetectorRef, private ngZone: NgZone) { }
-
-    ngOnInit() {
-    }
-
-    ngOnDestroy(): void {
-    }
+    constructor() { }
 
     getOutputType(output: ITransactionOut): OutputType {
         let value: OutputType;
@@ -48,23 +43,16 @@ export class TransactionDetail implements OnInit, OnDestroy {
         return value;
     }
 
-    shareOnTwitter() {
-        if (!this.shareOpReturnOnTwitter) {
-            this.shareOpReturnOnTwitter = true;
-            this.coreFacade.showSuccess("Share on twitter!", () => {
-                this.shareOpReturnOnTwitter = false;
-                this.changeDetectorRef.detectChanges();
-            });
+    /**
+     * Converts hex to string
+     * @param hex
+     */
+    getOpReturnHexToAscii(txOut: ITransactionOut): string {
+        let hexData = txOut.scriptPubKey.hash.substr(9); //removes "OP_RETURN " part before decode
+        var str = '';
+        for (var n = 0; n < hexData.length; n += 2) {
+            str += String.fromCharCode(parseInt(hexData.substr(n, 2), 16));
         }
-    }
-
-    onOpReturnCopied() {
-        if (!this.opReturnCopied) {
-            this.opReturnCopied = true;
-            this.coreFacade.showSuccess("OP_RETURN content has been copied to clipboard!", () => {
-                this.opReturnCopied = false;
-                this.changeDetectorRef.detectChanges();
-            });
-        }
+        return str;
     }
 }

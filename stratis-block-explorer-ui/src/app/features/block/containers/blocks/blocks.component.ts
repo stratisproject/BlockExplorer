@@ -14,15 +14,17 @@ export class BlocksComponent implements OnInit {
     destroyed$ = new ReplaySubject<boolean>();
     displayedColumns = ['height', 'age', 'confirmations', 'transactions', 'hash'];
 
-    areBlocksLoaded$: Observable<boolean>;
+    loaded$: Observable<boolean>;
     blocks$: Observable<BlockSummaryModel[]>;
+    error$: Observable<string | Error>;
 
     @Input() records: number = 25;
 
     constructor(private blocksFacade: BlocksFacade) { }
 
     ngOnInit() {
-        this.areBlocksLoaded$ = this.blocksFacade.loaded$;
+        this.loaded$ = this.blocksFacade.loaded$;
+        this.error$ = this.blocksFacade.error$
         this.blocks$ = this.blocksFacade.blocks$
             .pipe(
                 switchMap(blocks => {

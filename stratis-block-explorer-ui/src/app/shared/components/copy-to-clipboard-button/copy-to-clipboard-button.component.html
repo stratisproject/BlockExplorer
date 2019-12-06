@@ -1,0 +1,7 @@
+<button mat-icon-button
+        ngxClipboard *ngxClipboardIfSupported
+        [cbContent]="cbContent" (cbOnSuccess)="onCopied()">
+   <mat-animated-icon [animateFromParent]="true" [animate]="copied == true"
+                      start="content_copy" end="done_outline"
+                      colorStart="primary" colorEnd="primary"></mat-animated-icon>
+</button>
