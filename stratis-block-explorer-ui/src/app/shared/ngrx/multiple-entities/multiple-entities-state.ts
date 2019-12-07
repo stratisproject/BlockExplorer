@@ -3,6 +3,6 @@
  * */
 export interface MultipleEntitiesState<T> {
     entities: T[],
-    loaded,
+    loaded: boolean,
     error: Error | string
 }

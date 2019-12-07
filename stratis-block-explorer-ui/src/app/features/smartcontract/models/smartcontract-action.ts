@@ -1,19 +1,29 @@
 export interface ISmartContractAction {
+    address: string;
     txId: string;
     opCode: string;
-    successful: boolean;
     gasPrice: number;
     methodName: string;
-    contractAddress: string;
+    isSuccessful: boolean;
     errorMessage: string;
+
+    isStandardToken?: boolean;
+    code: string;
+    contractName: string;
+    contractSymbol: string;
 }
 
 export class SmartContractAction implements ISmartContractAction {
+    address: string;
     txId: string;
     opCode: string;
-    successful: boolean;
     gasPrice: number;
     methodName: string;
-    contractAddress: string;
+    isSuccessful: boolean;
     errorMessage: string;
+
+    isStandardToken?: boolean;
+    code: string;
+    contractName: string;
+    contractSymbol: string;
 }

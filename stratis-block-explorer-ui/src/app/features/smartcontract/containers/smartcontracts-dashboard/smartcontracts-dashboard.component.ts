@@ -1,39 +1,32 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
-import { Log } from '@shared/logger.service';
-import { TransactionStoreFacade } from '../../store/transaction-store.facade';
+import { Component, OnInit, Input } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { SmartContractFacade } from '../../store/smartcontract-facade';
 import * as fromModel from '../../models';
 
 @Component({
-    selector: 'smartcontract-dashboard',
-    templateUrl: './smartcontract-dashboard.component.html',
-    styleUrls: ['./smartcontract-dashboard.component.scss']
+    selector: 'smartcontracts-dashboard',
+    templateUrl: './smartcontracts-dashboard.component.html',
+    styleUrls: ['./smartcontracts-dashboard.component.scss']
 })
 export class SmartContractsDashboardComponent implements OnInit {
-    isSelectedTransactionLoaded$: Observable<boolean>;
-    selectedTransaction$: Observable<fromModel.Transaction>;
-    selectedTransactionError$: Observable<string | Error>;
+    loaded$: Observable<boolean>;
+    tokens$: Observable<fromModel.StandardToken[]>;
+    error$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private facade: TransactionStoreFacade, private log: Log) { }
+    displayedColumns = ['address', 'name', 'symbol'];
+    @Input() records: number = 50;
+
+    constructor(private facade: SmartContractFacade) { }
 
     ngOnInit() {
-        this.loadTransactionDetails();
+        this.loadTokens();
     }
 
-    private loadTransactionDetails() {
-        // note: when the component is destroyed, ActivatedRoute instance dies with it, so there is no need to unsubscribe
-        // see https://angular.io/guide/router#observable-parammap-and-component-reuse
-        this.route.paramMap
-            .subscribe((paramMap: any) => {
-                if (!!paramMap.params.txId) {
-                    let txId = paramMap.params.txId;
-                    this.facade.loadTransaction(txId);
-                }
-            });
+    private loadTokens() {
+        this.loaded$ = this.facade.tokensLoaded$;
+        this.error$ = this.facade.tokensError$
+        this.tokens$ = this.facade.tokens$;
 
-        this.isSelectedTransactionLoaded$ = this.facade.isSelectedTransactionLoaded$;
-        this.selectedTransactionError$ = this.facade.selectedTransactionError$;
-        this.selectedTransaction$ = this.facade.selectedTransaction$;
+        this.facade.getTokens(this.records);
     }
 }

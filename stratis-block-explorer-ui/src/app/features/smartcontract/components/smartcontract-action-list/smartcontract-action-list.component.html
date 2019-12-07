@@ -1,0 +1,34 @@
+<mat-card>
+   <mat-card-header>
+      <mat-card-title>
+         <span [hidden]="!showCount" [matBadge]="smartContractActions.length" matBadgePosition="above after" matBadgeSize="large" [matBadgeOverlap]="false">{{title}}</span>
+      </mat-card-title>
+   </mat-card-header>
+   <mat-card-content>
+      <ng-container *ngIf="smartContractActionsOnCurrentPage?.length > 0; else noSmartContractActions">
+         <ng-template [ngTemplateOutlet]="pagination"></ng-template>
+
+         <ng-template *ngIf="smartContractActionsOnCurrentPage?.length==0" [ngTemplateOutlet]="noSmartContractActions"></ng-template>
+
+         <div *ngFor="let item of smartContractActionsOnCurrentPage;let isOdd=odd;" class="mat-elevation-z10">
+            <smartcontract-action-detail [showHeader]="showHeader" [smartContractAction]="item"></smartcontract-action-detail>
+         </div>
+
+         <ng-template [ngTemplateOutlet]="pagination"></ng-template>
+      </ng-container>
+   </mat-card-content>
+</mat-card>
+
+<ng-template #pagination>
+   <mat-paginator *ngIf="showPaging && smartContractActions.length > pageSize"
+                  hidePageSize="true"
+                  [length]="smartContractActions.length"
+                  [pageSize]="pageSize"
+                  [pageSizeOptions]="[10, 25, 50, 100]"
+                  (page)="onPageEvent($event)">
+   </mat-paginator>
+</ng-template>
+
+<ng-template #noSmartContractActions>
+   <i>No Smart Contract Actions to show</i>
+</ng-template>

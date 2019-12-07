@@ -5,12 +5,12 @@ import { SingleEntityState, SingleEntityReducersHelper } from '@shared/ngrx';
 
 export interface SelectedSmartContractActionState extends SingleEntityState<fromModels.SmartContractAction> { }
 
-let reducerHelper = new SingleEntityReducersHelper<fromModels.SmartContractAction>();
+let reducerHelper = new SingleEntityReducersHelper<fromModels.SmartContractAction, SelectedSmartContractActionState>();
 
 const selectedBlockReducer = createReducer(
-    reducerHelper.getInitialState<SelectedSmartContractActionState>(),
+    reducerHelper.getInitialState(),
 
-    ...reducerHelper.getDefaultReducers(Actions.actionHelper)
+    ...reducerHelper.getDefaultReducers(Actions.SmartContractActionActionHelper)
 
     //on(Actions.load, state => reducerHelper.applyLoadReducer(state)),
     //on(Actions.loaded, (state, action) => reducerHelper.applyLoadedReducer(state, action.entity)),

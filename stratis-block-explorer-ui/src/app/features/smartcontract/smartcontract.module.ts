@@ -13,9 +13,8 @@ import * as fromEffects from './store/effects';
 const exportedComponents: Type<any>[] = [
     fromContainers.SmartContractCallComponent,
     fromContainers.SmartContractsDashboardComponent,
-    fromComponents.TransactionDetail,
-    fromComponents.TransactionListComponent,
-    fromComponents.TransactionSummaryComponent,
+    fromComponents.SmartContractActionDetail,
+    fromComponents.SmartContractActionListComponent,
 ];
 
 @NgModule({
@@ -26,7 +25,7 @@ const exportedComponents: Type<any>[] = [
         SharedModule,
         StoreModule.forFeature(fromStore.smartContractFeatureKey, fromStore.reducers),
         EffectsModule.forFeature([
-            fromEffects.TokensEffects,
+            fromEffects.StandardTokensEffects,
             fromEffects.SmartContractActionEffects
         ])
     ],

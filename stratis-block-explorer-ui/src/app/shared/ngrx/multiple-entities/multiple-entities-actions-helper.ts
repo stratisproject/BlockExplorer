@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-export class MultipleEntitiesActionsHelper<T> {
+export class MultipleEntitiesActionsHelper<TEntity> {
     public readonly loadAction = this.load();
     public readonly loadErrorAction = this.loadError();
     public readonly loadedAction = this.loaded();
@@ -26,7 +26,7 @@ export class MultipleEntitiesActionsHelper<T> {
     private loaded() {
         return createAction(
             `[${this.context}] entity Loaded`,
-            props<{ entities: T[] }>()
+            props<{ entities: TEntity[] }>()
         );
     }
 }

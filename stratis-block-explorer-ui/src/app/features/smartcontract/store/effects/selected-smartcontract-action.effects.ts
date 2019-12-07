@@ -14,11 +14,11 @@ export class SmartContractActionEffects {
 
     loadTokens$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(SmartContractActionActions.load),
+            ofType(SmartContractActionActions.loadSmartContractAction),
             switchMap(action => {
                 return this.smartContractService.getSmartContractAction(action.id.toString()).pipe(
-                    map(smartContractAction => SmartContractActionActions.loaded({ entity: smartContractAction })),
-                    catchError(error => of(SmartContractActionActions.loadError({ error: error.toString() })))
+                    map(smartContractAction => SmartContractActionActions.smartContractActionLoaded({ entity: smartContractAction })),
+                    catchError(error => of(SmartContractActionActions.smartContractActionLoadError({ error: error.toString() })))
                 );
             })
         )

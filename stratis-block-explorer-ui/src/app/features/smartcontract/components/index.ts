@@ -1,3 +1,2 @@
-export * from './transaction-summary/transaction-summary.component';
-export * from './transaction-list/transaction-list.component';
-export * from './transaction-detail/transaction-detail.component';
+export * from './smartcontract-action-list/smartcontract-action-list.component';
+export * from './smartcontract-action-detail/smartcontract-action-detail.component';

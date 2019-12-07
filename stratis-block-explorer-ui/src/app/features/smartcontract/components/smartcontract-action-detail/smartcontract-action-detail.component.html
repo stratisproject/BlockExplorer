@@ -1,0 +1,15 @@
+<!--ugly fix for chips, add an hidden mat-chip-list to be able to add mat-chip without including them in the list-->
+<mat-chip-list style="display:none"></mat-chip-list>
+<!--<mat-card>
+   <mat-card-subtitle *ngIf="showHeader">
+      <div fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
+         <app-hash-view fxFlex="0 1 auto"
+                        [label]="'Tx Id'" [hash]="transaction.txId"
+                        hashType="transaction" enableRoute></app-hash-view>
+         <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
+      </div>
+      <mat-divider [inset]="true"></mat-divider>
+   </mat-card-subtitle>
+</mat-card>-->
+
+<!--<copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>-->

@@ -3,22 +3,22 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import * as TokensAction from '../actions/tokens.actions';
+import * as StandardTokensActions from '../actions/standard-tokens.actions';
 import { SmartContractService } from '../../services/smartcontract.service';
 
 
 @Injectable()
-export class TokensEffects {
+export class StandardTokensEffects {
 
     constructor(private actions$: Actions, private smartContractService: SmartContractService) { }
 
     loadTokens$ = createEffect(() =>
         this.actions$.pipe(
-            ofType(TokensAction.load),
+            ofType(StandardTokensActions.loadStandardTokens),
             switchMap(action => {
-                return this.smartContractService.getTokens(action.from, action.records).pipe(
-                    map(tokens => TokensAction.loaded({ entities: tokens })),
-                    catchError(error => of(TokensAction.loadError({ error: error.toString() })))
+                return this.smartContractService.getStandardTokens(action.from, action.records).pipe(
+                    map(tokens => StandardTokensActions.standardTokensLoaded({ entities: tokens })),
+                    catchError(error => of(StandardTokensActions.standardTokensLoadError({ error: error.toString() })))
                 );
             })
         )

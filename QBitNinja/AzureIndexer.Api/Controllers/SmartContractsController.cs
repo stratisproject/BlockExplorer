@@ -9,7 +9,7 @@ using NBitcoin;
 
 namespace AzureIndexer.Api.Controllers
 {
-    [Route("api/v1/smart-contracts")]
+    [Route("api/v1/smartcontracts")]
     public class SmartContractsController : ControllerBase
     {
         private readonly IMapper mapper;

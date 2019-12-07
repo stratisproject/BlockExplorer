@@ -1,2 +1,2 @@
-export * from './tokens.effects';
+export * from './standard-tokens.effects';
 export * from './selected-smartcontract-action.effects';

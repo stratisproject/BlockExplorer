@@ -1,2 +1,2 @@
 export * from './smartcontract-action';
-export * from './token';
+export * from './standard-token';

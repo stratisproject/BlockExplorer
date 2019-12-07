@@ -1,16 +1,29 @@
-<ng-container *ngIf="(selectedTransaction$ | async) as transaction">
-   <ng-container *ngIf="isSelectedTransactionLoaded$ | async; else fetchingTransaction">
-      <div class="row">
-         <app-transaction-summary [transaction]="transaction"></app-transaction-summary>
-      </div>
+<div class="row mat-elevation-z20">
+   <mat-card *ngIf="(tokens$ | async) as tokens">
+      <mat-card-title>
+         <span class="mat-display-2">Available Standard Tokens</span>
+      </mat-card-title>
+      <mat-card-subtitle>
+         <app-busy-indicator [hidden]="loaded$ | async"></app-busy-indicator>
+      </mat-card-subtitle>
+      <mat-card-content class="container" *ngIf="loaded$">
+         <div *ngFor="let token of tokens"
+              class="mat-elevation-z1 overflow-hidden"
+              fxLayout="row wrap" fxLayoutAlign="space-around center" fxLayoutGap="15px"
+              fxLayout.lt-sm="column" fxLayoutAlign.lt-sm="start start" fxLayoutGap.lt-sm="2px">
+            <app-hash-view fxFlex
+                           fxFlex.lt-sm="0 0 auto"
+                           class="overflow-hidden"
+                           [hash]="token.address"
+                           hashType="smartcontract" enableRoute></app-hash-view>
+            <div fxFlex>{{token.name}}</div>
+            <div fxFlex>{{token.symbol}}</div>
+         </div>
+      </mat-card-content>
+   </mat-card>
+</div>
 
-      <div class="row">
-         <transaction-detail [showHeader]="false" [transaction]="transaction"></transaction-detail>
-      </div>
-   </ng-container>
-</ng-container>
-
-<ng-container *ngIf="selectedTransactionError$ | async as error">
+<ng-container *ngIf="error$ | async as error">
    <mat-card class="row">
       <mat-card-header>
          <mat-card-title><h1>Error</h1></mat-card-title>
@@ -20,22 +33,3 @@
       </mat-card-content>
    </mat-card>
 </ng-container>
-
-<ng-template #fetchingTransaction>
-   <div class="row">
-      <mat-card>
-         <mat-card-title>Fetching transaction</mat-card-title>
-         <mat-card-subtitle>
-            <app-busy-indicator #loading></app-busy-indicator>
-         </mat-card-subtitle>
-      </mat-card>
-   </div>
-</ng-template>
-
-<ng-template #nullTransaction>
-   <mat-card class="row">
-      <mat-card-header>
-         <mat-card-title><h1>Transaction not found</h1></mat-card-title>
-      </mat-card-header>
-   </mat-card>
-</ng-template>

@@ -4,7 +4,7 @@ import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 import { AppConfigService } from '@core/services/app-config.service';
 import *  as utils from '@shared/utils';
-import { SmartContractAction, Token } from '../models';
+import { SmartContractAction, StandardToken } from '../models';
 
 @Injectable({
     providedIn: "root"
@@ -25,7 +25,7 @@ export class SmartContractService {
      * @return Success
      */
     getSmartContractAction(txId: string): Observable<SmartContractAction> {
-        let url_ = this.apiBaseUrl + "{txId}?";
+        let url_ = this.apiBaseUrl + "action/{txId}?";
 
         if (txId === undefined || txId === null)
             throw new Error("The parameter 'txId' must be defined.");
@@ -57,7 +57,7 @@ export class SmartContractService {
             );
     }
 
-    getTokens(from: number = 0, take: number = 10): Observable<Token[]> {
+    getStandardTokens(from: number = 0, take: number = 10): Observable<StandardToken[]> {
         let url_ = this.apiBaseUrl + `?from=${from}&take=${take}`;
         url_ = url_.replace(/[?&]$/, "");
 
@@ -71,16 +71,16 @@ export class SmartContractService {
 
         return this.http.request("get", url_, options_)
             .pipe(
-                mergeMap((response_: any) => this.processToken(response_)),
+                mergeMap((response_: any) => this.processStandardToken(response_)),
                 catchError((response_: any) => {
                     if (response_ instanceof HttpResponseBase) {
                         try {
-                            return this.processToken(<any>response_);
+                            return this.processStandardToken(<any>response_);
                         } catch (e) {
-                            return <Observable<Token[]>><any>throwError(e);
+                            return <Observable<StandardToken[]>><any>throwError(e);
                         }
                     } else
-                        return <Observable<Token[]>><any>throwError(response_);
+                        return <Observable<StandardToken[]>><any>throwError(response_);
                 })
             );
     }
@@ -111,7 +111,7 @@ export class SmartContractService {
         return of<SmartContractAction>(<any>null);
     }
 
-    protected processToken(response: HttpResponseBase): Observable<Token[]> {
+    protected processStandardToken(response: HttpResponseBase): Observable<StandardToken[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -125,7 +125,7 @@ export class SmartContractService {
                         let result200: any = null;
                         const resultData200 = _responseText === "" ? null : JSON.parse(_responseText);
 
-                        result200 = resultData200 ? resultData200.map(r => <Token>r) : [];
+                        result200 = resultData200 ? resultData200.map(r => <StandardToken>r) : [];
                         return of(result200);
                     })
                 );
@@ -135,6 +135,6 @@ export class SmartContractService {
                     mergeMap(_responseText => utils.throwException("An unexpected server error occurred.", status, _responseText, _headers))
                 );
         }
-        return of<Token[]>(<any>null);
+        return of<StandardToken[]>(<any>null);
     }
 }
