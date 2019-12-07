@@ -1,15 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using AzureIndexer.Api.Infrastructure;
+using AzureIndexer.Api.Models.Response;
+using Microsoft.AspNetCore.Mvc;
+using NBitcoin;
 
 namespace AzureIndexer.Api.Controllers
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using Infrastructure;
-    using Microsoft.AspNetCore.Mvc;
-    using Models.Response;
-    using NBitcoin;
-
     [Route("api/v1/smart-contracts")]
     public class SmartContractsController : ControllerBase
     {
@@ -32,25 +31,39 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<List<TransactionSummaryModel>> SmartContracts(bool loadDetails = false, int take = 10)
+        public async Task<IEnumerable<SmartContractStandardTokenModel>> SmartContracts(int from = 0, int take = 10)
         {
-            var txs = new List<TransactionSummaryModel>();
-            if (!this.configuration.Indexer.IsSidechain) return txs;
-            var lastSmartContracts = await this.smartContractSearchService.GetAllSmartContracts(null, loadDetails);
-            if (lastSmartContracts == null)
+            if (!this.configuration.Indexer.IsSidechain)
             {
-                return txs;
+                return Enumerable.Empty<SmartContractStandardTokenModel>();
             }
 
-            foreach (var smartContractModel in lastSmartContracts.Take(take))
+            var standardTokens = await this.smartContractSearchService.GetAllSmartContractStandardTokens(from, take);
+            return standardTokens ?? Enumerable.Empty<SmartContractStandardTokenModel>();
+        }
+
+        [HttpGet]
+        [Route("{address}")]
+        public async Task<SmartContractStandardTokenModel> SmartContracts(string address)
+        {
+            if (!this.configuration.Indexer.IsSidechain)
             {
-                var response = await this.transactionSearchService.FindTransaction(uint256.Parse(smartContractModel.TxId), false);
-                var mappedResponse = this.mapper.Map<TransactionSummaryModel>(response);
-                mappedResponse.SmartContract = smartContractModel;
-                txs.Add(mappedResponse);
+                return null;
             }
 
-            return txs;
+            return await this.smartContractSearchService.GetSmartContractStandardToken(uint256.Parse(address));
+        }
+
+        [HttpGet]
+        [Route("action/{txId}")]
+        public async Task<SmartContractModel> SmartContractAction(string txId, bool includeDetails = false)
+        {
+            if (!this.configuration.Indexer.IsSidechain)
+            {
+                return null;
+            }
+
+            return await this.smartContractSearchService.FindSmartContract(uint256.Parse(txId), includeDetails);
         }
     }
 }

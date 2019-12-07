@@ -84,6 +84,8 @@
 
         public SmartContactDetailsEntry(DynamicTableEntity entity)
         {
+            this.Address = entity.RowKey;
+
             if (entity.Properties.ContainsKey("CSharpCode"))
             {
                 this.Code = entity.Properties["CSharpCode"].StringValue;
@@ -116,5 +118,7 @@
         public string ContractName { get; private set; }
 
         public string ContractSymbol { get; private set; }
+
+        public string Address { get; set; }
     }
 }

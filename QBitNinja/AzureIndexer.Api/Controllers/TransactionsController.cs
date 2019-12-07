@@ -44,7 +44,7 @@
             if (loadSmartContractIfExists) // TODO: put this in once we have real data && mappedResponse.IsSmartContract)
             {
                 mappedResponse.SmartContract =
-                    await this.smartContractSearchService.FindSmartContract(uint256.Parse(response.TransactionId));
+                    await this.smartContractSearchService.FindSmartContract(uint256.Parse(response.TransactionId), true);
             }
 
             return mappedResponse;

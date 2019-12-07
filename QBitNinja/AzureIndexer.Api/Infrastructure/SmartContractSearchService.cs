@@ -16,7 +16,7 @@ namespace AzureIndexer.Api.Infrastructure
             this.configuration = configuration;
         }
 
-        public async Task<SmartContractModel> FindSmartContract(uint256 txId)
+        public async Task<SmartContractModel> FindSmartContract(uint256 txId, bool includeDetails)
         {
             var client = this.configuration.Indexer.CreateIndexerClient();
             var smartContract = await client.GetSmartContractAsync(txId);
@@ -36,13 +36,16 @@ namespace AzureIndexer.Api.Infrastructure
                 ErrorMessage = smartContract.ErrorMessage
             };
 
-            var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);
-            if (smartContractDetails != null)
+            if (includeDetails)
             {
-                smartContractModel.Code = smartContractDetails.Code;
-                smartContractModel.ContractName = smartContractDetails.ContractName;
-                smartContractModel.ContractSymbol = smartContractDetails.ContractSymbol;
-                smartContractModel.IsStandardToken = smartContractDetails.IsStandardToken;
+                var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContract.Id);
+                if (smartContractDetails != null)
+                {
+                    smartContractModel.Code = smartContractDetails.Code;
+                    smartContractModel.ContractName = smartContractDetails.ContractName;
+                    smartContractModel.ContractSymbol = smartContractDetails.ContractSymbol;
+                    smartContractModel.IsStandardToken = smartContractDetails.IsStandardToken;
+                }
             }
 
             return smartContractModel;
@@ -68,7 +71,11 @@ namespace AzureIndexer.Api.Infrastructure
                 ErrorMessage = smartContract.ErrorMessage
             }).ToList();
 
-            if (!loadDetails) return smartContractModels;
+            if (!loadDetails)
+            {
+                return smartContractModels;
+            }
+
             foreach (var smartContractModel in smartContractModels)
             {
                 var smartContractDetails = await client.GetSmartContractDetailsAsync(smartContractModel.Hash);
@@ -82,6 +89,48 @@ namespace AzureIndexer.Api.Infrastructure
             }
 
             return smartContractModels;
+        }
+
+        public async Task<List<SmartContractStandardTokenModel>> GetAllSmartContractStandardTokens(int? from = 0, int? take = 100)
+        {
+            //todo. pagination isn't used right now
+
+            var client = this.configuration.Indexer.CreateIndexerClient();
+            var smartContractDetails = await client.GetAllSmartContractDetailsAsync(take.Value);
+            if (smartContractDetails == null)
+            {
+                return null;
+            }
+
+            var smartContractModels = smartContractDetails
+                .OrderByDescending(r => r.ContractName)
+                .Select(smartContract => new SmartContractStandardTokenModel
+                {
+                    Address = smartContract.Address,
+                    Name = smartContract.ContractName,
+                    Symbol = smartContract.ContractSymbol,
+                    Code = null // code shouldn't be sent by default because it's too big
+                }).ToList();
+
+            return smartContractModels;
+        }
+
+        public async Task<SmartContractStandardTokenModel> GetSmartContractStandardToken(uint256 contractAddress)
+        {
+            var client = this.configuration.Indexer.CreateIndexerClient();
+            var smartContract = await client.GetSmartContractDetailsAsync(contractAddress.ToString());
+            if (smartContract == null)
+            {
+                return null;
+            }
+
+            return new SmartContractStandardTokenModel
+            {
+                Address = smartContract.Address,
+                Name = smartContract.ContractName,
+                Symbol = smartContract.ContractSymbol,
+                Code = smartContract.Code
+            };
         }
     }
 }

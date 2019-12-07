@@ -1286,7 +1286,7 @@ namespace AzureIndexer.Api.Models.Response
         public string ErrorMessage { get; set; }
 
         [JsonProperty("isStandardToken", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public bool IsStandardToken { get; set; }
+        public bool? IsStandardToken { get; set; }
 
         [JsonProperty("code", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Code { get; set; }
