@@ -4,5 +4,5 @@
 export interface SingleEntityState<T> {
     entity: T,
     loaded,
-    error: Error | string
+    error: string
 }

@@ -8,7 +8,7 @@ export const loadLastBlocks = createAction(
 
 export const loadLastBlocksError = createAction(
     '[LastBlocks] Load Last Blocks Error',
-    props<{ error: Error | string }>()
+    props<{ error: string }>()
 );
 
 export const lastBlocksLoaded = createAction(

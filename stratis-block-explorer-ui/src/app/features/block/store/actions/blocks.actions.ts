@@ -1,18 +1,12 @@
-import { createAction, props } from '@ngrx/store';
+import { EntityActionsHelper } from '@shared/ngrx';
 import { BlockResponseModel } from '../../models/block-response.model';
 
+export const blockActionHelper = new EntityActionsHelper<BlockResponseModel>("Block");
 
-export const loadBlocks = createAction(
-    '[Blocks] Load Blocks',
-    (records: number) => ({ records })
-);
+export const loadBlock = blockActionHelper.loadEntityAction;
+export const blockLoadError = blockActionHelper.entityLoadErrorAction;
+export const blockLoaded = blockActionHelper.entityLoadedAction;
 
-export const loadBlocksError = createAction(
-    '[Blocks] Load Blocks Error',
-    props<{ error: Error | string }>()
-);
-
-export const blocksLoaded = createAction(
-    '[Blocks] Blocks Loaded',
-    props<{ blocks: BlockResponseModel[] }>()
-);
+export const loadBlocks = blockActionHelper.loadEntitiesAction;
+export const blocksLoadError = blockActionHelper.entitiesLoadErrorAction;
+export const blocksLoaded = blockActionHelper.entitiesLoadedAction;

@@ -5,9 +5,9 @@ import { StandardToken } from '../../models';
 import { StandardTokenState } from '../reducers/standard-tokens.reducer';
 
 const selectFeature = createFeatureSelector<SmartContractState>(smartContractFeatureKey);
-const selectSelectedSmartContractAction = createSelector(selectFeature, (state: SmartContractState) => state.standardTokens);
+const selectState = createSelector(selectFeature, (state: SmartContractState) => state.standardTokens);
 
-const selectorHelper = new EntitySelectorsHelper<StandardToken, StandardTokenState>(selectSelectedSmartContractAction);
+const selectorHelper = new EntitySelectorsHelper<StandardToken, StandardTokenState>(selectState);
 
 export const getStandardToken$ = selectorHelper.getEntity;
 export const getStandardTokenError$ = selectorHelper.getEntityLoadError;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import * as TransactionActions from '../actions/transaction.actions';
@@ -18,7 +18,7 @@ export class TransactionEffects {
             switchMap(action => {
                 return this.transactionService.transaction(action.txId, false, true).pipe(
                     map(transaction => TransactionActions.transactionLoaded({ transaction: transaction })),
-                    catchError(error => of(TransactionActions.loadTransactionError({ error: (<Error>error).message })))
+                    catchError(error => of(TransactionActions.loadTransactionError({ error: error })))
                 );
             })
         )

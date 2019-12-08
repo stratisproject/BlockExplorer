@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ReplaySubject, Observable, of } from 'rxjs';
 import { BlockSummaryModel } from '../../models/block-summary.model';
-import { select } from '@ngrx/store';
 import { switchMap } from 'rxjs/operators';
 import { BlocksFacade } from '../../store/blocks.facade';
 
@@ -23,8 +22,8 @@ export class BlocksComponent implements OnInit {
     constructor(private blocksFacade: BlocksFacade) { }
 
     ngOnInit() {
-        this.loaded$ = this.blocksFacade.loaded$;
-        this.error$ = this.blocksFacade.error$
+        this.loaded$ = this.blocksFacade.blocksLoaded$;
+        this.error$ = this.blocksFacade.blocksError$
         this.blocks$ = this.blocksFacade.blocks$
             .pipe(
                 switchMap(blocks => {
@@ -32,7 +31,7 @@ export class BlocksComponent implements OnInit {
                 })
             );
 
-        this.blocksFacade.loadBlocks(this.records);
+        this.blocksFacade.getBlocks(this.records);
     }
 
 }

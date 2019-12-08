@@ -18,7 +18,7 @@ export class LastBlockEffects {
             switchMap(action => {
                 return this.blocksService.blocks(action.records).pipe(
                     map(blocks => LastBlockActions.lastBlocksLoaded({ blocks: blocks })),
-                    catchError(error => of(LastBlockActions.loadLastBlocksError({ error: error.toString() })))
+                    catchError(error => of(LastBlockActions.loadLastBlocksError({ error: error })))
                 );
             })
         )

@@ -28,8 +28,7 @@ const exportedComponents: Type<any>[] = [
         StoreModule.forFeature(fromStore.blockFeatureKey, fromStore.reducers),
         EffectsModule.forFeature([
             fromEffects.BlocksEffects,
-            fromEffects.LastBlockEffects,
-            fromEffects.SelectedBlockEffects
+            fromEffects.LastBlockEffects
         ])
     ],
     exports: [...exportedComponents]

@@ -4,9 +4,9 @@
 export interface EntityState<T> {
     entity: T,
     entityLoaded,
-    entityLoadError: Error | string,
+    entityLoadError: string,
 
     entities: T[],
     entitiesLoaded: boolean,
-    entitiesLoadError: Error | string
+    entitiesLoadError: string
 }

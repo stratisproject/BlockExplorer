@@ -4,5 +4,5 @@
 export interface MultipleEntitiesState<T> {
     entities: T[],
     loaded: boolean,
-    error: Error | string
+    error: string
 }

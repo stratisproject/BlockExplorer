@@ -39,8 +39,8 @@ export class EntityReducersHelper<TEntity, TEntityState extends EntityState<TEnt
     public applyEntityLoadErrorReducer(state: TEntityState, error: Error | string): TEntityState {
         return ({
             ...state,
-            entity: [],
-            entityLoaded: false,
+            entity: null,
+            entityLoaded: true,
             entityLoadError: error
         });
     }
@@ -67,7 +67,7 @@ export class EntityReducersHelper<TEntity, TEntityState extends EntityState<TEnt
         return ({
             ...state,
             entities: [],
-            entitiesLoaded: false,
+            entitiesLoaded: true,
             entitiesLoadError: error
         });
     }

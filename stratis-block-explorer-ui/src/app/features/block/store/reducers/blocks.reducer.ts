@@ -1,44 +1,18 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import * as BlocksActions from '../actions/blocks.actions';
-import { BlockResponseModel } from '../../models/block-response.model';
+import * as Actions from '../actions/blocks.actions';
+import * as fromModels from '../../models';
+import { EntityState, EntityReducersHelper } from '@shared/ngrx';
 
-export interface BlocksState {
-    blocks: BlockResponseModel[],
-    loaded: boolean,
-    error: Error | string
-}
+export interface BlocksState extends EntityState<fromModels.BlockResponseModel> { }
 
-export const initialState: BlocksState = {
-    blocks: [],
-    loaded: false,
-    error: null
-};
+let reducerHelper = new EntityReducersHelper<fromModels.BlockResponseModel, BlocksState>();
 
-const blocksReducer = createReducer(
-    initialState,
+const innerReducer = createReducer(
+    reducerHelper.getInitialState(),
 
-    on(BlocksActions.loadBlocks, state => state = ({
-        ...state,
-        blocks: [],
-        loaded: false,
-        error: null
-    })),
-
-    on(BlocksActions.blocksLoaded, (state, action) => state = ({
-        ...state,
-        blocks: action.blocks,
-        loaded: true,
-        error: null
-    })),
-
-    on(BlocksActions.loadBlocksError, (state, action) => state = ({
-        ...state,
-        loaded: true,
-        blocks: null,
-        error: action.error
-    }))
+    ...reducerHelper.getDefaultReducers(Actions.blockActionHelper)
 );
 
 export function reducer(state: BlocksState | undefined, action: Action) {
-    return blocksReducer(state, action);
+    return innerReducer(state, action);
 }

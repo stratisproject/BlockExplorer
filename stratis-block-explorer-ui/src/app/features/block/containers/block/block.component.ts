@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BlockResponseModel } from '../../models/block-response.model';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { SelectedBlockFacade } from '../../store/selected-block.facade';
+import { BlocksFacade } from '../../store/blocks.facade';
 
 @Component({
     selector: 'app-block',
@@ -10,11 +10,11 @@ import { SelectedBlockFacade } from '../../store/selected-block.facade';
     styleUrls: ['./block.component.scss']
 })
 export class BlockComponent implements OnInit {
-    isSelectedBlockLoaded$: Observable<boolean>;
-    selectedBlock$: Observable<BlockResponseModel>;
-    selectedBlockError$: Observable<string | Error>;
+    blockLoaded$: Observable<boolean>;
+    block$: Observable<BlockResponseModel>;
+    blockError$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private selectedBlocksFacade: SelectedBlockFacade) { }
+    constructor(private route: ActivatedRoute, private blocksFacade: BlocksFacade) { }
 
     ngOnInit() {
         this.loadBlockDetails();
@@ -29,12 +29,12 @@ export class BlockComponent implements OnInit {
             .subscribe((paramMap: any) => {
                 if (!!paramMap.params.blockHash) {
                     let hash = paramMap.params.blockHash;
-                    this.selectedBlocksFacade.loadBlock(hash);
+                    this.blocksFacade.getBlock(hash);
                 }
             });
 
-        this.isSelectedBlockLoaded$ = this.selectedBlocksFacade.loaded$;
-        this.selectedBlockError$ = this.selectedBlocksFacade.error$;
-        this.selectedBlock$ = this.selectedBlocksFacade.block$;
+        this.blockLoaded$ = this.blocksFacade.blockLoaded$;
+        this.blockError$ = this.blocksFacade.blockError$;
+        this.block$ = this.blocksFacade.block$;
     }
 }

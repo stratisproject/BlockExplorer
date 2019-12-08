@@ -6,13 +6,21 @@ import { BlocksState } from './reducers/blocks.reducer';
 
 @Injectable({ providedIn: 'root' })
 export class BlocksFacade {
-    blocks$ = this.store.pipe(select(fromSelectors.getBlocks));
-    loaded$ = this.store.pipe(select(fromSelectors.getAreBlocksLoaded));
-    error$ = this.store.pipe(select(fromSelectors.getSelectedBlockError$));
+    blocksLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlocksLoaded$));
+    blocksError$ = this.blocksStore.pipe(select(fromSelectors.getBlocksError$));
+    blocks$ = this.blocksStore.pipe(select(fromSelectors.getBlocks$));
 
-    constructor(private store: Store<BlocksState>) { }
+    blockLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlockLoaded$));
+    blockError$ = this.blocksStore.pipe(select(fromSelectors.getBlockError$));
+    block$ = this.blocksStore.pipe(select(fromSelectors.getBlock$));
 
-    loadBlocks(records: number) {
-        this.store.dispatch(fromActions.loadBlocks(records));
+    constructor(private blocksStore: Store<BlocksState>) { }
+
+    getBlocks(from: number = 0, records: number = 10) {
+        this.blocksStore.dispatch(fromActions.loadBlocks(from, records));
+    }
+
+    getBlock(id: string | number) {
+        this.blocksStore.dispatch(fromActions.loadBlock(id));
     }
 }

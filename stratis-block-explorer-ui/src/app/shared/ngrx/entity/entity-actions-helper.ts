@@ -24,7 +24,7 @@ export class EntityActionsHelper<TEntity> {
     private entityLoadError() {
         return createAction(
             `[${this.context}] Entity Load Error`,
-            props<{ error: Error | string }>()
+            props<{ error: string }>()
         );
     }
 

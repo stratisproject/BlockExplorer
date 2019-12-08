@@ -56,7 +56,7 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("action/{txId}")]
-        public async Task<SmartContractModel> SmartContractAction(string txId, bool includeDetails = false)
+        public async Task<SmartContractActionModel> SmartContractAction(string txId, bool includeDetails = false)
         {
             if (!this.configuration.Indexer.IsSidechain)
             {

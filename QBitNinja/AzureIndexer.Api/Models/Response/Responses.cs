@@ -386,7 +386,7 @@ namespace AzureIndexer.Api.Models.Response
         public int Confirmations { get; set; }
 
         [JsonProperty("smartContract", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-        public SmartContractModel SmartContract { get; set; }
+        public SmartContractActionModel SmartContract { get; set; }
     }
 
     public class BlockTransactionIn

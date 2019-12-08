@@ -1,21 +1,18 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-//import * as fromBlocks from '../reducers/blocks.reducer';
 import { blockFeatureKey, BlockState } from '../reducers';
+import { BlocksState } from '../reducers/blocks.reducer';
+import { EntitySelectorsHelper } from '@shared/ngrx';
+import { BlockResponseModel } from '../../models';
 
-const selectBlockState = createFeatureSelector<BlockState>(blockFeatureKey);
-const getBlocksState = createSelector(selectBlockState, (state: BlockState) => state.blocks);
+const selectFeature = createFeatureSelector<BlockState>(blockFeatureKey);
+const selectState = createSelector(selectFeature, (state: BlockState) => state.blocks);
 
-export const getBlocks = createSelector(
-    getBlocksState,
-    (state) => state.blocks
-);
+const selectorHelper = new EntitySelectorsHelper<BlockResponseModel, BlocksState>(selectState);
 
-export const getAreBlocksLoaded = createSelector(
-    getBlocksState,
-    (state) => state.loaded
-);
+export const getBlock$ = selectorHelper.getEntity;
+export const getBlockError$ = selectorHelper.getEntityLoadError;
+export const getBlockLoaded$ = selectorHelper.getEntityLoaded;
 
-export const getLoadBlocksError$ = createSelector(
-    getBlocksState,
-    (state) => state.error
-);
+export const getBlocks$ = selectorHelper.getEntities;
+export const getBlocksError$ = selectorHelper.getEntitiesLoadError;
+export const getBlocksLoaded$ = selectorHelper.getEntitiesLoaded;

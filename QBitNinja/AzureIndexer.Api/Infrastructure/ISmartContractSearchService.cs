@@ -7,7 +7,7 @@ namespace AzureIndexer.Api.Infrastructure
 {
     public interface ISmartContractSearchService
     {
-        Task<SmartContractModel> FindSmartContract(uint256 txId, bool includeDetails);
+        Task<SmartContractActionModel> FindSmartContract(uint256 txId, bool includeDetails);
 
         Task<List<SmartContractModel>> GetAllSmartContracts(int? take = 100, bool loadDetails = false);
 

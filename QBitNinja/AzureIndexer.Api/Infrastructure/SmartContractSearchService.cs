@@ -16,7 +16,7 @@ namespace AzureIndexer.Api.Infrastructure
             this.configuration = configuration;
         }
 
-        public async Task<SmartContractModel> FindSmartContract(uint256 txId, bool includeDetails)
+        public async Task<SmartContractActionModel> FindSmartContract(uint256 txId, bool includeDetails)
         {
             var client = this.configuration.Indexer.CreateIndexerClient();
             var smartContract = await client.GetSmartContractAsync(txId);
@@ -25,13 +25,13 @@ namespace AzureIndexer.Api.Infrastructure
                 return null;
             }
 
-            var smartContractModel = new SmartContractModel
+            var smartContractModel = new SmartContractActionModel
             {
-                Hash = smartContract.Id,
+                Address = smartContract.Id,
                 TxId = smartContract.TxId,
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
-                GasPrice = new MoneyModel { Satoshi = (long?)smartContract.GasPrice },
+                GasPrice = (long)smartContract.GasPrice,
                 IsSuccessful = smartContract.IsSuccessful,
                 ErrorMessage = smartContract.ErrorMessage
             };

@@ -19,7 +19,7 @@ export class MultipleEntitiesActionsHelper<TEntity> {
     private loadError() {
         return createAction(
             `[${this.context}] Load entity Error`,
-            props<{ error: Error | string }>()
+            props<{ error: string }>()
         );
     }
 

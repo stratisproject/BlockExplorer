@@ -8,7 +8,7 @@ export const loadTransaction = createAction(
 
 export const loadTransactionError = createAction(
     '[Transaction] Load Transaction Error',
-    props<{ error: Error | string }>()
+    props<{ error: string }>()
 );
 
 export const transactionLoaded = createAction(
