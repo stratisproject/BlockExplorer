@@ -5,3 +5,4 @@ export * from './copy-to-clipboard-button/copy-to-clipboard-button.component';
 export * from './hash-view/hash-view.component';
 export * from './mat-animated-icon/mat-animated-icon.component';
 export * from './fa-animated-icon/fa-animated-icon.component';
+export * from './chip/chip.component';

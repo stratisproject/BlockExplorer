@@ -16,7 +16,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         components.AddressViewComponent,
         components.MatAnimatedIconComponent,
         components.FaAnimatedIconComponent,
-        components.CopyToClipboardButtonComponent
+        components.CopyToClipboardButtonComponent,
+        components.ChipComponent
     ],
     imports: [
         MatIconModule,
@@ -35,6 +36,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         components.MatAnimatedIconComponent,
         components.FaAnimatedIconComponent,
         components.CopyToClipboardButtonComponent,
+        components.ChipComponent,
         CustomMaterialModuleModule,
         FlexLayoutModule,
         ClipboardModule,
