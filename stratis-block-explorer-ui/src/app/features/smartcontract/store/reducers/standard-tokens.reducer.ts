@@ -1,11 +1,11 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Actions from '../actions/standard-tokens.actions';
 import * as fromModels from '../../models';
-import { MultipleEntitiesState, MultipleEntitiesReducersHelper } from '@shared/ngrx';
+import { EntityState, EntityReducersHelper } from '@shared/ngrx';
 
-export interface StandardTokenState extends MultipleEntitiesState<fromModels.StandardToken> { }
+export interface StandardTokenState extends EntityState<fromModels.StandardToken> { }
 
-let reducerHelper = new MultipleEntitiesReducersHelper<fromModels.StandardToken, StandardTokenState>();
+let reducerHelper = new EntityReducersHelper<fromModels.StandardToken, StandardTokenState>();
 
 const innerReducer = createReducer(
     reducerHelper.getInitialState(),

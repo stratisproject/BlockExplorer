@@ -27,6 +27,6 @@ export class SmartContractsDashboardComponent implements OnInit {
         this.error$ = this.facade.tokensError$
         this.tokens$ = this.facade.tokens$;
 
-        this.facade.getTokens(this.records);
+        this.facade.getStandardTokens(this.records);
     }
 }

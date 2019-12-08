@@ -6,11 +6,11 @@ import { SmartContractFacade } from '../../store/smartcontract-facade';
 import * as fromModel from '../../models';
 
 @Component({
-    selector: 'smartcontract-call',
-    templateUrl: './smartcontract-call.component.html',
-    styleUrls: ['./smartcontract-call.component.scss']
+    selector: 'smartcontract-action',
+    templateUrl: './smartcontract-action.component.html',
+    styleUrls: ['./smartcontract-action.component.scss']
 })
-export class SmartContractCallComponent implements OnInit {
+export class SmartContractActionComponent implements OnInit {
     loaded$: Observable<boolean>;
     smartContractAction$: Observable<fromModel.SmartContractAction>;
     error$: Observable<string | Error>;
@@ -27,8 +27,8 @@ export class SmartContractCallComponent implements OnInit {
         this.route.paramMap
             .subscribe((paramMap: any) => {
                 if (!!paramMap.params.txId) {
-                    let contractAddress = paramMap.params.address;
-                    this.facade.getSmartContractAction(contractAddress);
+                    let txId = paramMap.params.txId;
+                    this.facade.getSmartContractAction(txId);
                 }
             });
 

@@ -1,0 +1,41 @@
+<ng-container *ngIf="(smartContractAction$ | async) as scAction">
+   <ng-container *ngIf="loaded$ | async; else fetching">
+      <!--<div class="row">
+         <app-transaction-summary [transaction]="transaction"></app-transaction-summary>
+      </div>-->
+
+      <div class="row">
+         <smartcontract-action-detail [showHeader]="false" [smartContractAction]="scAction"></smartcontract-action-detail>
+      </div>
+   </ng-container>
+</ng-container>
+
+<ng-container *ngIf="error$ | async as error">
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Error</h1></mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+         <div>{{error}}</div>
+      </mat-card-content>
+   </mat-card>
+</ng-container>
+
+<ng-template #fetching>
+   <div class="row">
+      <mat-card>
+         <mat-card-title>Fetching smart contract action</mat-card-title>
+         <mat-card-subtitle>
+            <app-busy-indicator #loading></app-busy-indicator>
+         </mat-card-subtitle>
+      </mat-card>
+   </div>
+</ng-template>
+
+<ng-template #nullTransaction>
+   <mat-card class="row">
+      <mat-card-header>
+         <mat-card-title><h1>Smart contract action not found</h1></mat-card-title>
+      </mat-card-header>
+   </mat-card>
+</ng-template>

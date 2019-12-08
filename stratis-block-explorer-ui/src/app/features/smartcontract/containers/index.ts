@@ -1,2 +1,2 @@
-export * from './smartcontract-call/smartcontract-call.component';
+export * from './smartcontract-action/smartcontract-action.component';
 export * from './smartcontracts-dashboard/smartcontracts-dashboard.component';

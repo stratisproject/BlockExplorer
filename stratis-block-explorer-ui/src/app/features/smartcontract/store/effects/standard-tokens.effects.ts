@@ -17,8 +17,20 @@ export class StandardTokensEffects {
             ofType(StandardTokensActions.loadStandardTokens),
             switchMap(action => {
                 return this.smartContractService.getStandardTokens(action.from, action.records).pipe(
-                    map(tokens => StandardTokensActions.standardTokensLoaded({ entities: tokens })),
+                    map(standardTokens => StandardTokensActions.standardTokensLoaded({ entities: standardTokens })),
                     catchError(error => of(StandardTokensActions.standardTokensLoadError({ error: error.toString() })))
+                );
+            })
+        )
+    );
+
+    loadToken$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(StandardTokensActions.loadStandardToken),
+            switchMap(action => {
+                return this.smartContractService.getStandardToken(action.id.toString()).pipe(
+                    map(standardToken => StandardTokensActions.standardTokenLoaded({ entity: standardToken })),
+                    catchError(error => of(StandardTokensActions.standardTokenLoadError({ error: error.toString() })))
                 );
             })
         )

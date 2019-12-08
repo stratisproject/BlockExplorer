@@ -44,7 +44,7 @@ namespace AzureIndexer.Api.Controllers
 
         [HttpGet]
         [Route("{address}")]
-        public async Task<SmartContractStandardTokenModel> SmartContracts(string address)
+        public async Task<SmartContractStandardTokenModel> SmartContract(string address)
         {
             if (!this.configuration.Indexer.IsSidechain)
             {
@@ -65,5 +65,19 @@ namespace AzureIndexer.Api.Controllers
 
             return await this.smartContractSearchService.FindSmartContract(uint256.Parse(txId), includeDetails);
         }
+
+        //TODO
+        //[HttpGet]
+        //[Route("")]
+        //public async Task<IEnumerable<SmartContractModel>> SmartContractActions(int from = 0, int take = 10)
+        //{
+        //    if (!this.configuration.Indexer.IsSidechain)
+        //    {
+        //        return Enumerable.Empty<SmartContractModel>();
+        //    }
+
+        //    var standardTokens = await this.smartContractSearchService.FindSmartContracts(from, take);
+        //    return standardTokens ?? Enumerable.Empty<SmartContractModel>();
+        //}
     }
 }

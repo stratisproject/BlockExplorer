@@ -11,7 +11,7 @@ import { smartContractRoutes } from './smartcontract.routing';
 import * as fromEffects from './store/effects';
 
 const exportedComponents: Type<any>[] = [
-    fromContainers.SmartContractCallComponent,
+    fromContainers.SmartContractActionComponent,
     fromContainers.SmartContractsDashboardComponent,
     fromComponents.SmartContractActionDetail,
     fromComponents.SmartContractActionListComponent,

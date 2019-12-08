@@ -1,9 +1,13 @@
 import { createAction, props } from '@ngrx/store';
-import { MultipleEntitiesActionsHelper } from '@shared/ngrx';
+import { EntityActionsHelper } from '@shared/ngrx';
 import * as fromModels from '../../models';
 
-export const standardTokenActionHelper = new MultipleEntitiesActionsHelper<fromModels.StandardToken>("StandardToken");
+export const standardTokenActionHelper = new EntityActionsHelper<fromModels.StandardToken>("StandardToken");
 
-export const loadStandardTokens = standardTokenActionHelper.loadAction;
-export const standardTokensLoadError = standardTokenActionHelper.loadErrorAction;
-export const standardTokensLoaded = standardTokenActionHelper.loadedAction;
+export const loadStandardToken = standardTokenActionHelper.loadEntityAction;
+export const standardTokenLoadError = standardTokenActionHelper.entityLoadErrorAction;
+export const standardTokenLoaded = standardTokenActionHelper.entityLoadedAction;
+
+export const loadStandardTokens = standardTokenActionHelper.loadEntitiesAction;
+export const standardTokensLoadError = standardTokenActionHelper.entitiesLoadErrorAction;
+export const standardTokensLoaded = standardTokenActionHelper.entitiesLoadedAction;

@@ -71,16 +71,44 @@ export class SmartContractService {
 
         return this.http.request("get", url_, options_)
             .pipe(
+                mergeMap((response_: any) => this.processStandardTokens(response_)),
+                catchError((response_: any) => {
+                    if (response_ instanceof HttpResponseBase) {
+                        try {
+                            return this.processStandardTokens(<any>response_);
+                        } catch (e) {
+                            return <Observable<StandardToken[]>><any>throwError(e);
+                        }
+                    } else
+                        return <Observable<StandardToken[]>><any>throwError(response_);
+                })
+            );
+    }
+
+    getStandardToken(address: string): Observable<StandardToken> {
+        let url_ = this.apiBaseUrl + `?address=${address}`;
+        url_ = url_.replace(/[?&]$/, "");
+
+        const options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_)
+            .pipe(
                 mergeMap((response_: any) => this.processStandardToken(response_)),
                 catchError((response_: any) => {
                     if (response_ instanceof HttpResponseBase) {
                         try {
                             return this.processStandardToken(<any>response_);
                         } catch (e) {
-                            return <Observable<StandardToken[]>><any>throwError(e);
+                            return <Observable<StandardToken>><any>throwError(e);
                         }
                     } else
-                        return <Observable<StandardToken[]>><any>throwError(response_);
+                        return <Observable<StandardToken>><any>throwError(response_);
                 })
             );
     }
@@ -111,7 +139,7 @@ export class SmartContractService {
         return of<SmartContractAction>(<any>null);
     }
 
-    protected processStandardToken(response: HttpResponseBase): Observable<StandardToken[]> {
+    protected processStandardTokens(response: HttpResponseBase): Observable<StandardToken[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -136,5 +164,32 @@ export class SmartContractService {
                 );
         }
         return of<StandardToken[]>(<any>null);
+    }
+
+    protected processStandardToken(response: HttpResponseBase): Observable<StandardToken> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+                (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); } };
+        if (status === 200) {
+            return utils.blobToText(responseBlob)
+                .pipe(
+                    mergeMap(_responseText => {
+                        let result200: any = null;
+                        const resultData200 = _responseText === "" ? null : JSON.parse(_responseText);
+
+                        result200 = resultData200 ? resultData200.map(r => <StandardToken>r) : null;
+                        return of(result200);
+                    })
+                );
+        } else if (status !== 200 && status !== 204) {
+            return utils.blobToText(responseBlob)
+                .pipe(
+                    mergeMap(_responseText => utils.throwException("An unexpected server error occurred.", status, _responseText, _headers))
+                );
+        }
+        return of<StandardToken>(<any>null);
     }
 }

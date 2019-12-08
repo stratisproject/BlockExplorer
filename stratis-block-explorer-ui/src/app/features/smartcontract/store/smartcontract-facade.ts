@@ -18,8 +18,12 @@ export class SmartContractFacade {
 
     constructor(private tokenStore: Store<StandardTokenState>, private selectedSmartContractActionStore: Store<SelectedSmartContractActionState>) { }
 
-    getTokens(from: number = 0, records: number = 10) {
+    getStandardTokens(from: number = 0, records: number = 10) {
         this.tokenStore.dispatch(fromActions.loadStandardTokens(from, records));
+    }
+
+    getStandardToken(contractAddress: string) {
+        this.tokenStore.dispatch(fromActions.loadStandardToken(contractAddress));
     }
 
     getSmartContractAction(txId: string) {
