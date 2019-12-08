@@ -1,10 +1,10 @@
-import { Injectable, InjectionToken, Inject } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { Injectable, InjectionToken } from '@angular/core';
+import { environment } from '@app/../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Log {
+export class LogService {
   private env: string;
 
   constructor() {

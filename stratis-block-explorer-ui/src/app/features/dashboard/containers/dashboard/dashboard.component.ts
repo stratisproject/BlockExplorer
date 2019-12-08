@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { StatsModel } from '../../../block/models/stats.model';
-import { Log } from '@shared/logger.service';
 import { TransactionSummaryModel } from '../../../transaction/models/transaction-summary.model';
 
 @Component({
@@ -23,7 +22,7 @@ export class DashboardComponent implements OnInit {
    blockRecords = 10;
    scRecords = 10;
 
-   constructor(private log: Log) { }
+   constructor() { }
 
    ngOnInit() {
       //interval(30 * 1000).pipe(

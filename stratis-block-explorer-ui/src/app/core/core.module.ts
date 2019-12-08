@@ -4,9 +4,6 @@ import { AppConfigService } from './services/app-config.service';
 import { StyleManagerService } from './services/style-manager.service';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { StandardHeaderInterceptor } from './interceptors';
-import { StoreModule } from '@ngrx/store';
-import * as fromCore from './store/reducers'
-import { EffectsModule } from '@ngrx/effects';
 import { CoreStoreFacade } from './store/core-store.facade';
 
 @NgModule({
@@ -18,8 +15,7 @@ import { CoreStoreFacade } from './store/core-store.facade';
     ],
     providers: [
         AppConfigService,
-        StyleManagerService,
-        { provide: HTTP_INTERCEPTORS, useClass: StandardHeaderInterceptor, multi: true, }
+        StyleManagerService
     ]
 })
 export class CoreModule {

@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BlockResponseModel } from '../../models/block-response.model';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Log } from '@shared/logger.service';
 import { SelectedBlockFacade } from '../../store/selected-block.facade';
 
 @Component({
@@ -15,7 +14,7 @@ export class BlockComponent implements OnInit {
     selectedBlock$: Observable<BlockResponseModel>;
     selectedBlockError$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private selectedBlocksFacade: SelectedBlockFacade, private log: Log) { }
+    constructor(private route: ActivatedRoute, private selectedBlocksFacade: SelectedBlockFacade) { }
 
     ngOnInit() {
         this.loadBlockDetails();

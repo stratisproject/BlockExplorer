@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Log } from '@shared/logger.service';
 import { TransactionStoreFacade } from '../../store/transaction-store.facade';
 import * as fromModel from '../../models';
 
@@ -15,7 +14,7 @@ export class TransactionComponent implements OnInit {
     selectedTransaction$: Observable<fromModel.Transaction>;
     selectedTransactionError$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private facade: TransactionStoreFacade, private log: Log) { }
+    constructor(private route: ActivatedRoute, private facade: TransactionStoreFacade) { }
 
     ngOnInit() {
         this.loadTransactionDetails();

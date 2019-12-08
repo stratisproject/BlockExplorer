@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Log } from '@shared/logger.service';
 import { SmartContractFacade } from '../../store/smartcontract-facade';
 import * as fromModel from '../../models';
 
@@ -15,7 +14,7 @@ export class SmartContractActionComponent implements OnInit {
     smartContractAction$: Observable<fromModel.SmartContractAction>;
     error$: Observable<string | Error>;
 
-    constructor(private route: ActivatedRoute, private facade: SmartContractFacade, private log: Log) { }
+    constructor(private route: ActivatedRoute, private facade: SmartContractFacade) { }
 
     ngOnInit() {
         this.loadSmartContractAction();

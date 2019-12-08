@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppConfigService } from '@core/services/app-config.service';
-import { Log } from '@shared/logger.service';
 import { MatSelectChange } from '@angular/material/select';
 import { MatAnimatedIconComponent } from '@shared/components';
 
@@ -22,7 +21,7 @@ export class MenuBarComponent implements OnInit {
 
     @ViewChild('themeButton', { static: true }) animatedIcon: MatAnimatedIconComponent;
 
-    constructor(private appConfig: AppConfigService, private log: Log) {
+    constructor(private appConfig: AppConfigService) {
         this.title = `${appConfig.getConfiguration().networkName} Explorer`;
     }
 
@@ -32,7 +31,6 @@ export class MenuBarComponent implements OnInit {
     }
 
     enterPressed() {
-        this.log.info("search for", this.searchText);
         this.find.emit(this.searchText);
     }
 

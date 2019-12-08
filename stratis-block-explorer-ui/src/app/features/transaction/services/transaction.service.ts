@@ -1,88 +1,26 @@
-import { mergeMap, catchError } from 'rxjs/operators';
-import { Observable, throwError, of } from 'rxjs';
-import { Injectable, Inject, Optional } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
-import { AppConfigService } from '@core/services/app-config.service';
-import *  as utils from '@shared/utils';
-import { Transaction } from '../models';
+import { Injectable } from '@angular/core';
+import { ApiServiceBase } from '@core/services';
+import { Transaction, ITransactionSummaryModel } from '../models';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
     providedIn: "root"
 })
-export class TransactionService {
-    public apiBaseUrl: string;
-
-    constructor(private appConfig: AppConfigService, private http: HttpClient) {
-        appConfig.$configurationLoaded.subscribe(value => {
-            if (value === true) {
-                this.apiBaseUrl = this.appConfig.getConfiguration().apiBaseUrl + "/api/v1/transactions/"
-            }
-        });
-    }
-
+export class TransactionService extends ApiServiceBase {
     /**
      * @param txId (transaction hash)
      * @return Success
      */
-    transaction(txId: string, colored: boolean | null | undefined, loadSmartContractIfExists: boolean | null | undefined): Observable<Transaction> {
-        let url_ = this.apiBaseUrl + "{txId}?";
-
+    transaction(txId: string, colored: boolean = false, loadSmartContractIfExists: boolean = false): Observable<Transaction> {
         if (txId === undefined || txId === null)
             throw new Error("The parameter 'txId' must be defined.");
-        url_ = url_.replace("{txId}", encodeURIComponent("" + txId));
-        if (colored !== undefined)
-            url_ += "colored=" + encodeURIComponent("" + colored) + "&";
-        if (loadSmartContractIfExists !== undefined)
-            url_ += "loadSmartContractIfExists=" + encodeURIComponent("" + loadSmartContractIfExists) + "&";
-        url_ = url_.replace(/[?&]$/, "");
 
-        const options_: any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.get(url_, options_)
-            .pipe(
-                mergeMap((response_: any) => this.processTransaction(response_)),
-                catchError((response_: any) => {
-                    if (response_ instanceof HttpResponseBase) {
-                        try {
-                            return this.processTransaction(<any>response_);
-                        } catch (e) {
-                            return <Observable<Transaction>><any>throwError(e);
-                        }
-                    } else
-                        return <Observable<Transaction>><any>throwError(response_);
-                })
-            );
-    }
-
-    protected processTransaction(response: HttpResponseBase): Observable<Transaction> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-                (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        const _headers: any = {}; if (response.headers) { for (const key of response.headers.keys()) { _headers[key] = response.headers.get(key); } };
-        if (status === 200) {
-            return utils.blobToText(responseBlob)
-                .pipe(
-                    mergeMap(_responseText => {
-                        let result200: Transaction = null;
-                        const resultData200 = _responseText === "" ? null : JSON.parse(_responseText);
-                        result200 = resultData200 ? Transaction.fromTransactionSummaryModel(resultData200) : new Transaction();
-                        return of(result200);
-                    })
-                );
-        } else if (status !== 200 && status !== 204) {
-            return utils.blobToText(responseBlob)
-                .pipe(
-                    mergeMap(_responseText => utils.throwException("An unexpected server error occurred.", status, _responseText, _headers))
-                );
-        }
-        return of<Transaction>(<any>null);
+        return this.get<ITransactionSummaryModel>(`transactions/${txId}`, {
+            "colored": colored.toString(),
+            "loadSmartContractIfExists": loadSmartContractIfExists.toString()
+        }).pipe(
+            map(data => Transaction.fromTransactionSummaryModel(data))
+        );
     }
 }
