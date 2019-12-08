@@ -7,3 +7,8 @@ export * from './multiple-entities/multiple-entities-reducers-helper';
 export * from './multiple-entities/multiple-entities-actions-helper';
 export * from './multiple-entities/multiple-entities-selectors-helper';
 export * from './multiple-entities/multiple-entities-state';
+
+export * from './entity/entity-reducers-helper';
+export * from './entity/entity-actions-helper';
+export * from './entity/entity-selectors-helper';
+export * from './entity/entity-state';
