@@ -34,10 +34,8 @@
       <div fxFlex fxLayout.lt-sm="row">
          <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Tags</h3>
          <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">
-            <mat-chip-list class="transaction-tags">
-               <mat-chip *ngFor="let tag of getTransactionTags(transaction)"
-                         selected [color]="tag.color">{{tag.text}}</mat-chip>
-            </mat-chip-list>
+            <chip *ngFor="let tag of getTransactionTags(transaction)"
+                      [color]="tag.color">{{tag.text}}</chip>
          </div>
       </div>
    </mat-card-content>
