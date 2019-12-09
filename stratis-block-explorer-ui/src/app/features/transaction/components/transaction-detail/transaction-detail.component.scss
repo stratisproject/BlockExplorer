@@ -20,7 +20,6 @@
    @content;
 }
 
-
 mat-card {
    background: inherit !important;
 }
@@ -142,6 +141,7 @@ mat-card {
 
             .mat-expansion-panel {
                background: transparent;
+               max-width: 100%;
             }
 
             .mat-expansion-panel-body {
@@ -154,7 +154,8 @@ mat-card {
          }
 
          .op-return-content {
-            white-space: nowrap;
+            white-space: wrap;
+            text-align: left;
          }
       }
    }

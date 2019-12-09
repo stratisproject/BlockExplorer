@@ -13,21 +13,21 @@
    <mat-card-content class="block-stats-summary"
                      fxLayout="row wrap" fxLayoutGap="16px"
                      fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
-      <div fxFlex fxLayout.lt-sm="row">
-         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Time</h3>
-         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{block.additionalInformation.blockHeader.blockTime | date:'medium'}}</div>
+      <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
+         <h3 class="title" fxFlex.lt-sm >Time</h3>
+         <div class="value" fxFlex.lt-sm >{{block.additionalInformation.blockHeader.blockTime | date:'medium'}}</div>
       </div>
-      <div fxFlex fxLayout.lt-sm="row">
-         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Total Amount</h3>
-         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="getTotalAmount(block)"></app-balance></div>
+      <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
+         <h3 class="title" fxFlex.lt-sm >Total Amount</h3>
+         <div class="value" fxFlex.lt-sm ><app-balance [balance]="getTotalAmount(block)"></app-balance></div>
       </div>
-      <div fxFlex fxLayout.lt-sm="row">
-         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Total Fees</h3>
-         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center"><app-balance [balance]="getTotalFee(block)"></app-balance></div>
+      <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
+         <h3 class="title" fxFlex.lt-sm >Total Fees</h3>
+         <div class="value" fxFlex.lt-sm ><app-balance [balance]="getTotalFee(block)"></app-balance></div>
       </div>
-      <div fxFlex fxLayout.lt-sm="row">
-         <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Confirmations</h3>
-         <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{block.additionalInformation.confirmations}}</div>
+      <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
+         <h3 class="title" fxFlex.lt-sm >Confirmations</h3>
+         <div class="value" fxFlex.lt-sm >{{block.additionalInformation.confirmations}}</div>
       </div>
    </mat-card-content>
 </mat-card>

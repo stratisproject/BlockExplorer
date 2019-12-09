@@ -1,4 +1,4 @@
-<div class="address-view" fxLayout="row" fxLayoutAlign="center center">
+<div class="address-view" fxLayout="row inline" fxLayoutAlign="center center">
    <button mat-icon-button fxFlex="0 0 auto"
            ngxClipboard *ngxClipboardIfSupported
            [cbContent]="address" (cbOnSuccess)="isCopied$.next(true)">

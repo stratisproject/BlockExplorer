@@ -2,17 +2,21 @@
    font-size: 0.80em;
 }
 
-.balance {
-   .whole {
-      font-weight: bold;
+:host {
+   font-size: 1.2em;
+
+   .balance {
+      .whole {
+         font-weight: bold;
+      }
+
+      .decimal {
+         @extend %smallFont;
+      }
    }
 
-   .decimal {
+   .symbol {
       @extend %smallFont;
+      white-space: pre;
    }
-}
-
-.symbol {
-   @extend %smallFont;
-   white-space: pre;
 }

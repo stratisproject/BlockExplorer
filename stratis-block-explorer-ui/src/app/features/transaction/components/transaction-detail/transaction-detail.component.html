@@ -17,7 +17,7 @@
          <div *ngFor="let input of transaction.inputs" class="tx-input">
             <div class="wrapper overflow-hidden" fxLayout="column">
                <div class="amount">
-                  <app-balance [balance]="input.amount"></app-balance>
+                  <app-balance [balance]="input.amount"></app-balance> from
                </div>
                <div class="from">
                   <div class="address" *ngIf="input.address; else noInputAddress">
@@ -102,7 +102,7 @@
       </div>
       <mat-expansion-panel class="overflow-scroll-x">
          <mat-expansion-panel-header>
-            <mat-panel-title fxLayout="row" fxLayoutAlign="space-between center">
+            <mat-panel-title fxLayout="row" fxLayoutAlign="end center">
                <div>
                   <copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>
                   <chip>OP_RETURN</chip>
@@ -132,7 +132,7 @@
 <ng-template #spendableOutput let-output="output">
    <div class="wrapper overflow-hidden" fxLayout="column" fxLayoutAlign="start end">
       <div class="amount">
-         <app-balance [balance]="output.amount"></app-balance>
+         <app-balance [balance]="output.amount"></app-balance> to
       </div>
       <div class="address" fxFlex="0 0 auto" fxLayout="row" fxLayoutAlign="start center">
          <app-address-view fxFlex="0 1 auto" fxFlexAlign="flex-start"
