@@ -1,33 +1,47 @@
 <mat-card *ngIf="block; else nullBlock">
-   <mat-card-title class="mat-display-1">Block #{{block.additionalInformation.height}}</mat-card-title>
+   <mat-card-content class="overflow-hidden" fxLayout="row wrap" fxLayoutAlign="start center"
+                     fxLayoutAlign.lt-md="space-between center">
+      <button color="accent" mat-raised-button
+              fxFlex="100px" fxFlexOrder="1"
+              fxFlexOrder.lt-md="2"
+              [routerLink]="['/block', block.additionalInformation.blockHeader.hashPrevBlock]">
+         Previous
+      </button>
+      <div fxFlex fxFlexOrder="2" fxLayout="column" fxLayoutAlign="start center"
+           fxFlex.lt-md="100%" fxLayoutAlign.lt-md="start start" fxFlexOrder.lt-md="1">
+         <div class="mat-h1 no-margin">Block #{{block.additionalInformation.height}}</div>
+         <app-hash-view fxFlex="0 1 auto"
+                        [hash]="block.additionalInformation.blockId"
+                        hashType="block"></app-hash-view>
+      </div>
+      <button color="accent" mat-raised-button
+              fxFlex="100px" fxFlexOrder="3"
+              fxFlexOrder.lt-md="2"
+              [routerLink]="['/block', (block.additionalInformation.height || 0)+1]">
+         Next
+      </button>
+   </mat-card-content>
    <mat-card-subtitle>
-      <app-hash-view fxFlex="0 1 auto"
-                     [hash]="block.additionalInformation.blockId"
-                     hashType="block"></app-hash-view>
+
    </mat-card-subtitle>
-   <div fxFlexAlign="row">
-      <button fxFlex="100px" color="accent" mat-raised-button [routerLink]="['/block', block.additionalInformation.blockHeader.hashPrevBlock]">Previous</button>
-      <div fxFlex></div>
-      <button fxFlex="100px" color="accent" mat-raised-button [routerLink]="['/block', (block.additionalInformation.height || 0)+1]">Next</button>
-   </div>
    <mat-card-content class="block-stats-summary"
                      fxLayout="row wrap" fxLayoutGap="16px"
                      fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
       <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
-         <h3 class="title" fxFlex.lt-sm >Time</h3>
-         <div class="value" fxFlex.lt-sm >{{block.additionalInformation.blockHeader.blockTime | date:'medium'}}</div>
+         <h3 class="title" fxFlex.lt-sm>Time</h3>
+         <div class="value" fxFlex.lt-sm>{{block.additionalInformation.blockHeader.blockTime | date:'medium'}}</div>
       </div>
       <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
-         <h3 class="title" fxFlex.lt-sm >Total Amount</h3>
-         <div class="value" fxFlex.lt-sm ><app-balance [balance]="getTotalAmount(block)"></app-balance></div>
+         <h3 class="title" fxFlex.lt-sm>Total Amount</h3>
+         <div class="value" fxFlex.lt-sm><app-balance [balance]="getTotalAmount(block)"></app-balance></div>
       </div>
       <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
-         <h3 class="title" fxFlex.lt-sm >Total Fees</h3>
-         <div class="value" fxFlex.lt-sm ><app-balance [balance]="getTotalFee(block)"></app-balance></div>
+         <h3 class="title" fxFlex.lt-sm>Total Fees</h3>
+         <div class="value" fxFlex.lt-sm><app-balance [balance]="getTotalFee(block)"></app-balance></div>
       </div>
       <div fxFlex fxLayout.lt-sm="row" fxLayoutAlign.lt-sm="start center">
-         <h3 class="title" fxFlex.lt-sm >Confirmations</h3>
-         <div class="value" fxFlex.lt-sm >{{block.additionalInformation.confirmations}}</div>
+         <h3 class="title" fxFlex.lt-sm>Confirmations</h3>
+         <div class="value" fxFlex.lt-sm>{{block.additionalInformation.confirmations}}</div>
       </div>
    </mat-card-content>
 </mat-card>
