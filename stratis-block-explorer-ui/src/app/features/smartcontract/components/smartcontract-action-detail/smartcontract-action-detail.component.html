@@ -1,13 +1,54 @@
-<!--<mat-card>
-   <mat-card-subtitle *ngIf="showHeader">
-      <div fxLayout="row wrap" class="header" fxLayoutAlign="space-between center">
-         <app-hash-view fxFlex="0 1 auto"
-                        [label]="'Tx Id'" [hash]="transaction.txId"
-                        hashType="transaction" enableRoute></app-hash-view>
-         <div fxFlex="0 0 auto">{{transaction.firstSeen | date:'medium'}}</div>
-      </div>
-      <mat-divider [inset]="true"></mat-divider>
-   </mat-card-subtitle>
-</mat-card>-->
+<ng-container *ngIf="smartContractAction as sc">
+   <mat-card class="mat-card-flat">
+      <mat-card-content class="smart-contractaction"
+                        fxLayout="row wrap" fxLayoutGap="16px"
+                        fxLayout.lt-sm="column" fxLayoutGap.lt-sm="10px" ngClass.lt-sm="as-column">
 
-<!--<copy-to-clipboard [cbContent]="output.scriptPubKey.hash" successMessage="OP_RETURN content has been copied to clipboard!"></copy-to-clipboard>-->
+         <div fxFlex fxLayout="column" fxLayout.lt-sm="row">
+            <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">OP_CODE</h3>
+            <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{sc.opCode}}</div>
+         </div>
+
+         <div fxFlex fxLayout="column" fxLayout.lt-sm="row">
+            <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Gas Price</h3>
+            <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{sc.gasPrice}}</div>
+         </div>
+
+         <div fxFlex fxLayout="column" fxLayout.lt-sm="row">
+            <h3 class="title" fxFlex.lt-sm fxFlexAlign.lt-sm="center">Method Name</h3>
+            <div class="value" fxFlex.lt-sm fxFlexAlign.lt-sm="center">{{sc.methodName}}</div>
+         </div>
+      </mat-card-content>
+   </mat-card>
+
+
+   <ng-container *ngIf="!sc.isSuccessful">
+      <mat-card class="mat-elevation-z12">
+         <mat-card-subtitle *ngIf="!sc.isSuccessful">Action Result: <chip color="warn">Error</chip></mat-card-subtitle>
+         <mat-card-content>
+            <mat-divider inset></mat-divider>
+            <div class="error-message">{{sc.errorMessage}}</div>
+         </mat-card-content>
+      </mat-card>
+   </ng-container>
+
+   <ng-container *ngIf="sc.isSuccessful">
+      <mat-card class="mat-elevation-z12">
+         <mat-card-subtitle *ngIf="sc.isSuccessful">Action Result: <chip color="primary">Success</chip></mat-card-subtitle>
+         <mat-card-content>
+            <mat-divider inset></mat-divider>
+            <i>TODO: insert smart contract call log</i>
+         </mat-card-content>
+      </mat-card>
+   </ng-container>
+
+   <mat-card class="mat-card-flat">
+      <mat-card-content>
+         <app-hash-view label="Generated in transaction"
+                        hashType="transaction" [hash]="sc.txId"
+                        enableRoute></app-hash-view>
+      </mat-card-content>
+   </mat-card>
+
+
+</ng-container>

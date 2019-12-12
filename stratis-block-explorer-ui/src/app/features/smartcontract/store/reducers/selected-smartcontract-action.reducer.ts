@@ -8,15 +8,15 @@ export interface SelectedSmartContractActionState extends SingleEntityState<from
 let reducerHelper = new SingleEntityReducersHelper<fromModels.SmartContractAction, SelectedSmartContractActionState>();
 
 const selectedBlockReducer = createReducer(
-    reducerHelper.getInitialState(),
+   reducerHelper.getInitialState(),
 
-    ...reducerHelper.getDefaultReducers(Actions.SmartContractActionActionHelper)
+   ...reducerHelper.getDefaultReducers(Actions.SmartContractActionActionHelper)
 
-    //on(Actions.load, state => reducerHelper.applyLoadReducer(state)),
-    //on(Actions.loaded, (state, action) => reducerHelper.applyLoadedReducer(state, action.entity)),
-    //on(Actions.loadError, (state, action) => reducerHelper.applyLoadErrorReducer(state, action.error)),
+   //on(Actions.load, state => reducerHelper.applyLoadReducer(state)),
+   //on(Actions.loaded, (state, action) => reducerHelper.applyLoadedReducer(state, action.entity)),
+   //on(Actions.loadError, (state, action) => reducerHelper.applyLoadErrorReducer(state, action.error)),
 );
 
 export function reducer(state: SelectedSmartContractActionState | undefined, action: Action) {
-    return selectedBlockReducer(state, action);
+   return selectedBlockReducer(state, action);
 }
