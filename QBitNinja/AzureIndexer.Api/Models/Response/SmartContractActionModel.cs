@@ -7,6 +7,9 @@ namespace AzureIndexer.Api.Models.Response
         [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string Address { get; set; }
 
+        [JsonProperty("address", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string AddressBase58 { get; set; }
+
         [JsonProperty("txId", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string TxId { get; set; }
 
@@ -36,5 +39,8 @@ namespace AzureIndexer.Api.Models.Response
 
         [JsonProperty("contractSymbol", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
         public string ContractSymbol { get; set; }
+
+        [JsonProperty("contractSymbol", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
+        public string Logs { get; internal set; }
     }
 }

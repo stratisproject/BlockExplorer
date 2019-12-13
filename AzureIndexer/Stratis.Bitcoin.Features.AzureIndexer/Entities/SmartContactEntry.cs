@@ -1,17 +1,20 @@
 ﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Entities
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
+    using Newtonsoft.Json;
     using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
     using Stratis.SmartContracts.CLR;
     using Stratis.SmartContracts.Core;
+    using Stratis.SmartContracts.Core.Receipts;
 
     public class SmartContactEntry
     {
         public class Entity : IIndexed
         {
-            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, string errorMessage, uint160 smartContractAddress, SmartContractOperations smartContractOperations)
+            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, string errorMessage, uint160 smartContractAddress, SmartContractOperations smartContractOperations, Receipt receipt)
             {
                 this.TxId = txId;
                 this.ContractTxData = contractTxData;
@@ -24,6 +27,17 @@
                 {
                     // ensures the creation was successful
                     this.Child = new SmartContactDetailsEntry.Entity(this, smartContractOperations);
+                }
+
+                // if receipt contains logs, parse them and store in Json format
+                if (receipt?.Logs?.Length > 0)
+                {
+                    List<LogResponse> logs = smartContractOperations.MapLogResponses(receipt);
+
+                    if (logs != null)
+                    {
+                        this.SmartContractOperationLog = JsonConvert.SerializeObject(logs);
+                    }
                 }
             }
 
@@ -79,9 +93,12 @@
             public string ContractCode { get; set; }
 
             public bool IsSuccessful { get; }
+
             public string ErrorMessage { get; }
 
             public uint160 SmartContractAddress { get; }
+
+            public string SmartContractOperationLog { get; }
 
             public ITableEntity CreateTableEntity()
             {
@@ -103,6 +120,7 @@
                 entity.Properties.AddOrReplace("IsSuccessful", new EntityProperty(this.IsSuccessful));
                 entity.Properties.AddOrReplace("SmartContractAddress", new EntityProperty(this.SmartContractAddress?.ToString()));
                 entity.Properties.AddOrReplace("ErrorMessage", new EntityProperty(this.ErrorMessage));
+                entity.Properties.AddOrReplace("SmartContractOperationLog", new EntityProperty(this.SmartContractOperationLog));
 
                 return entity;
             }
@@ -176,6 +194,11 @@
             {
                 this.ErrorMessage = entity.Properties[nameof(this.ErrorMessage)].StringValue;
             }
+
+            if (entity.Properties.ContainsKey(nameof(this.SmartContractOperationLog)))
+            {
+                this.SmartContractOperationLog = entity.Properties[nameof(this.SmartContractOperationLog)].StringValue;
+            }
         }
 
         public string Id { get; set; }
@@ -195,5 +218,7 @@
         public string SmartContractAddress { get; private set; }
 
         public string ErrorMessage { get; private set; }
+
+        public string SmartContractOperationLog { get; private set; }
     }
 }

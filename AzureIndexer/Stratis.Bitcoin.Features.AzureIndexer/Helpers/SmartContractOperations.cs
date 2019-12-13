@@ -14,6 +14,10 @@ using System.Linq;
 using Stratis.SmartContracts.Core.State;
 using Stratis.SmartContracts;
 using Microsoft.Extensions.Logging;
+using Nethereum.RLP;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Dynamic;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
@@ -30,6 +34,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
         private readonly IReceiptRepository receiptRepository;
         private readonly ISerializer serializer;
         private readonly ICallDataSerializer smartContractSerializer;
+        private readonly IContractPrimitiveSerializer primitiveSerializer;
         private readonly IMethodParameterStringSerializer methodParameterStringSerializer;
         private readonly ILocalExecutor localExecutor;
         private ILogger logger;
@@ -42,6 +47,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
             IReceiptRepository receiptRepository,
             ISerializer serializer,
             ICallDataSerializer callDataSerializer,
+            IContractPrimitiveSerializer primitiveSerializer,
             IMethodParameterStringSerializer methodParameterStringSerializer,
             ILocalExecutor localExecutor)
         {
@@ -52,6 +58,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
             this.receiptRepository = receiptRepository;
             this.serializer = serializer;
             this.smartContractSerializer = callDataSerializer;
+            this.primitiveSerializer = primitiveSerializer;
             this.methodParameterStringSerializer = methodParameterStringSerializer;
             this.localExecutor = localExecutor;
 
@@ -230,6 +237,101 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
             }
 
             return null;
+        }
+
+        public List<LogResponse> MapLogResponses(Receipt receipt)
+        {
+            uint160 contractAddress = receipt.NewContractAddress ?? receipt.To;
+            byte[] contractCode = this.stateRepositoryRoot.GetCode(contractAddress);
+
+            var assembly = Assembly.Load(contractCode);
+            var logResponses = new List<LogResponse>();
+
+            foreach (Log log in receipt.Logs)
+            {
+                var logResponse = new LogResponse(log, this.network);
+
+                logResponses.Add(logResponse);
+
+                if (log.Topics.Count == 0)
+                    continue;
+
+                // Get receipt struct name
+                string eventTypeName = Encoding.UTF8.GetString(log.Topics[0]);
+
+                // Find the type in the module def
+                Type eventType = assembly.DefinedTypes.FirstOrDefault(t => t.Name == eventTypeName);
+
+                if (eventType == null)
+                {
+                    // Couldn't match the type, continue?
+                    continue;
+                }
+
+                // Deserialize it
+                dynamic deserialized = this.DeserializeLogData(log.Data, eventType);
+
+                logResponse.Log = deserialized;
+            }
+
+            return logResponses;
+        }
+
+        /// <summary>
+        /// Deserializes event log data. Uses the supplied type to determine field information and attempts to deserialize these
+        /// fields from the supplied data. For <see cref="Address"/> types, an additional conversion to a base58 string is applied.
+        /// </summary>
+        /// <param name="bytes">The raw event log data.</param>
+        /// <param name="type">The type to attempt to deserialize.</param>
+        /// <returns>An <see cref="ExpandoObject"/> containing the fields of the Type and its deserialized values.</returns>
+        private dynamic DeserializeLogData(byte[] bytes, Type type)
+        {
+            RLPCollection collection = (RLPCollection)RLP.Decode(bytes)[0];
+
+            var instance = new ExpandoObject() as IDictionary<string, object>;
+
+            FieldInfo[] fields = type.GetFields();
+
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldInfo field = fields[i];
+                byte[] fieldBytes = collection[i].RLPData;
+                Type fieldType = field.FieldType;
+
+                if (fieldType == typeof(Address))
+                {
+                    string base58Address = new uint160(fieldBytes).ToBase58Address(this.network);
+
+                    instance[field.Name] = base58Address;
+                }
+                else
+                {
+                    object fieldValue = this.primitiveSerializer.Deserialize(fieldType, fieldBytes);
+
+                    instance[field.Name] = fieldValue;
+                }
+            }
+
+            return instance;
+        }
+    }
+
+
+    public class LogResponse
+    {
+        public string Address { get; }
+
+        public string[] Topics { get; }
+
+        public string Data { get; }
+
+        public object Log { get; set; }
+
+        public LogResponse(Log log, Network network)
+        {
+            this.Address = log.Address.ToBase58Address(network);
+            this.Topics = log.Topics.Select(x => x.ToHexString()).ToArray();
+            this.Data = log.Data.ToHexString();
         }
     }
 }

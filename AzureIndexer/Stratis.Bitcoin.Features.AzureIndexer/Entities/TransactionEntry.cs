@@ -329,7 +329,8 @@
                         isSuccessful: receipt.Success,
                         errorMessage: receipt.ErrorMessage,
                         smartContractAddress: contractAddress,
-                        smartContractOperations: smartContractOperations
+                        smartContractOperations: smartContractOperations,
+                        receipt
                         );
             }
 
