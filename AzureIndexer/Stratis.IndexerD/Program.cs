@@ -61,7 +61,7 @@ namespace Stratis.IndexerD
                         .UseSmartContractWallet()
                         .UseApi()
                         .UseMempool()
-                        .UseAzureIndexer()
+                        .UseAzureIndexer(useSmartContract: isSideChain)
                         .Build();
                 }
                 else
@@ -77,7 +77,7 @@ namespace Stratis.IndexerD
                         .UseMempool()
                         .UseApi()
                         .AddRPC()
-                        .UseAzureIndexer()
+                        .UseAzureIndexer(useSmartContract: isSideChain)
                         .Build();
                 }
 

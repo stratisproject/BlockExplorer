@@ -10,7 +10,7 @@
     /// </summary>
     public static class IFullNodeBuilderExtensions
     {
-        public static IFullNodeBuilder UseAzureIndexer(this IFullNodeBuilder fullNodeBuilder, Action<AzureIndexerSettings> setup = null)
+        public static IFullNodeBuilder UseAzureIndexer(this IFullNodeBuilder fullNodeBuilder, bool useSmartContract = false, Action<AzureIndexerSettings> setup = null)
         {
             LoggingConfiguration.RegisterFeatureNamespace<AzureIndexerFeature>("azindex");
 
@@ -24,7 +24,7 @@
                     {
                         services.AddSingleton<AzureIndexerLoop>();
                         services.AddSingleton<AzureIndexerSettings>(settings);
-                        if (settings.IsSidechain)
+                        if (useSmartContract)
                         {
                             services.AddSingleton<ISmartContractOperations, SmartContractOperations>();
                         }
