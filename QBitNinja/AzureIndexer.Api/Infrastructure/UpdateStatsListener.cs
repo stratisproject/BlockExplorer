@@ -13,7 +13,7 @@ namespace AzureIndexer.Api.Infrastructure
 
     public class Stats
     {
-        public class BlocksStat
+        public class BlockStat
         {
             public long Size { get; set; }
 
@@ -24,11 +24,11 @@ namespace AzureIndexer.Api.Infrastructure
             public int OutputCounts { get; set; }
         }
 
-        public List<BlocksStat> BlocksStats { get; set; }
+        public List<BlockStat> BlocksStats { get; set; }
 
         public Stats()
         {
-            this.BlocksStats = new List<BlocksStat>();
+            this.BlocksStats = new List<BlockStat>();
         }
     }
 
@@ -98,7 +98,7 @@ namespace AzureIndexer.Api.Infrastructure
             var currentTip = this.chain.Tip;
             var dayAgo = DateTime.UtcNow.AddHours(-24);
 
-            List<Stats.BlocksStat> newStats = new List<Stats.BlocksStat>();
+            List<Stats.BlockStat> newStats = new List<Stats.BlockStat>();
 
             while (currentTip != null && currentTip.Header.BlockTime.DateTime >= dayAgo)
             {
@@ -106,7 +106,7 @@ namespace AzureIndexer.Api.Infrastructure
 
                 if (blockData?.Block != null)
                 {
-                    Stats.BlocksStat blockStat = new Stats.BlocksStat();
+                    Stats.BlockStat blockStat = new Stats.BlockStat();
 
                     newStats.Add(blockStat);
 
