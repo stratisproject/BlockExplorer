@@ -25,7 +25,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
     /// <summary>
     /// Utility class meant to be singleton, that allow to perform operations against deployed smart contracts.
     /// </summary>
-    public class SmartContractOperations
+    public class SmartContractOperations : ISmartContractOperations
     {
         private readonly Network network;
         private readonly ILoggerFactory loggerFactory;

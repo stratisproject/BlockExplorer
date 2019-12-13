@@ -94,7 +94,7 @@ namespace AzureIndexer.Api.Notifications
         private readonly IConnectionManager connectionManager;
         private readonly IPeerBanning peerBanning;
         private readonly ILoggerFactory loggerFactory;
-        private readonly SmartContractOperations smartContractOperations;
+        private readonly ISmartContractOperations smartContractOperations;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -122,7 +122,7 @@ namespace AzureIndexer.Api.Notifications
             IConnectionManager connectionManager,
             IPeerBanning peerBanning,
             ILoggerFactory loggerFactory,
-            SmartContractOperations smartContractOperations)
+            ISmartContractOperations smartContractOperations)
         {
             _Configuration = configuration;
             this.initialBlockDownloadState = initialBlockDownloadState;

@@ -38,7 +38,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILoggerFactory loggerFactory;
 
         /// <summary>The smart contract operations helper, used to collect information about an eventual smart contract that need to be indexed.</summary>
-        private readonly SmartContractOperations smartContractOperations;
+        private readonly ISmartContractOperations smartContractOperations;
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
@@ -85,7 +85,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="fullNode">The full node that will be indexed.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="receiptRepository">The smart contract receipt repository.</param>
-        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, SmartContractOperations smartContractOperations)
+        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, ISmartContractOperations smartContractOperations)
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;

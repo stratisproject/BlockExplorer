@@ -12,14 +12,14 @@
         {
             private SmartContactEntry.Entity entity;
 
-            public Entity(SmartContactEntry.Entity entity, SmartContractOperations smartContractOperations)
+            public Entity(SmartContactEntry.Entity entity, ISmartContractOperations smartContractOperations)
             {
                 this.entity = entity;
 
                 this.LoadSmartContractDetails(smartContractOperations, entity.SmartContractAddress);
             }
 
-            private void LoadSmartContractDetails(SmartContractOperations smartContractOperations, uint160 smartContractAddress)
+            private void LoadSmartContractDetails(ISmartContractOperations smartContractOperations, uint160 smartContractAddress)
             {
                 var contractDetail = smartContractOperations.GetContractDetail(smartContractAddress);
 

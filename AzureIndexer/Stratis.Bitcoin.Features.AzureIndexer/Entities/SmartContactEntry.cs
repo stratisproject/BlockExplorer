@@ -14,7 +14,7 @@
     {
         public class Entity : IIndexed
         {
-            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, string errorMessage, uint160 smartContractAddress, SmartContractOperations smartContractOperations, Receipt receipt)
+            public Entity(uint256 txId, ContractTxData contractTxData, bool isSuccessful, string errorMessage, uint160 smartContractAddress, ISmartContractOperations smartContractOperations, Receipt receipt)
             {
                 this.TxId = txId;
                 this.ContractTxData = contractTxData;

@@ -26,7 +26,7 @@
                         services.AddSingleton<AzureIndexerSettings>(settings);
                         if (settings.IsSidechain)
                         {
-                            services.AddSingleton<SmartContractOperations>();
+                            services.AddSingleton<ISmartContractOperations, SmartContractOperations>();
                         }
                     });
             });

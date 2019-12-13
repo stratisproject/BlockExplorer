@@ -106,7 +106,7 @@
         {
             private readonly bool checkSmartContract = false;
 
-            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool checkSmartContract = false, SmartContractOperations smartContractOperations = null)
+            public Entity(uint256 txId, Transaction tx, uint256 blockId, Network network, bool checkSmartContract = false, ISmartContractOperations smartContractOperations = null)
             {
                 if (txId == null)
                 {
@@ -311,7 +311,7 @@
             /// <param name="smartContractOperations">Helper class to obtain smart contract information related to this transaction.</param>
             /// <remarks>A transaction can contain only one output that call/creates a transaction.</remarks>
             /// <returns>True or False</returns>
-            private SmartContactEntry.Entity GetSmartContractEntry(Transaction transaction, SmartContractOperations smartContractOperations)
+            private SmartContactEntry.Entity GetSmartContractEntry(Transaction transaction, ISmartContractOperations smartContractOperations)
             {
                 var smartContractExecution = smartContractOperations.GetSmartContractExecution(transaction);
                 if (!smartContractExecution.hasSmartContractExecution)

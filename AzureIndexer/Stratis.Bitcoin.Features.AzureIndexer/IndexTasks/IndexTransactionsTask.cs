@@ -17,10 +17,10 @@
     {
         private readonly ILogger logger;
         private readonly IndexerConfiguration config;
-        private readonly SmartContractOperations smartContractOperations;
+        private readonly ISmartContractOperations smartContractOperations;
         private IndexTableEntitiesTaskBase<TransactionEntry.Entity> _indexTableEntitiesTaskBaseImplementation;
 
-        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, SmartContractOperations smartContractOperations)
+        public IndexTransactionsTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, ISmartContractOperations smartContractOperations)
             : base(configuration, loggerFactory)
         {
             this.config = configuration;
