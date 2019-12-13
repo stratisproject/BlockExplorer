@@ -109,7 +109,7 @@ namespace AzureIndexer.Api.Controllers
         }
 
         [HttpGet]
-        [Route("last24")]
+        [Route("last24stats")]
         public async Task<Stats> BlocksLast24Hours()
         {
             return this.stats;

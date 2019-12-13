@@ -3,6 +3,7 @@
 namespace AzureIndexer.Api.Infrastructure
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Hosting;
@@ -12,9 +13,23 @@ namespace AzureIndexer.Api.Infrastructure
 
     public class Stats
     {
-        public int BlockCount { get; set; }
+        public class BlocksStat
+        {
+            public long Size { get; set; }
 
-        public int TxInputsCount { get; set; }
+            public int TransactionCount { get; set; }
+
+            public int InputsCount { get; set; }
+
+            public int OutputCounts { get; set; }
+        }
+
+        public List<BlocksStat> BlocksStats { get; set; }
+
+        public Stats()
+        {
+            this.BlocksStats = new List<BlocksStat>();
+        }
     }
 
     public class UpdateStatsListener : BackgroundService
@@ -82,21 +97,28 @@ namespace AzureIndexer.Api.Infrastructure
         {
             var currentTip = this.chain.Tip;
             var dayAgo = DateTime.UtcNow.AddHours(-24);
-            var blocksCount = 0;
-            var transactionInputCounts = 0;
+
+            List<Stats.BlocksStat> newStats = new List<Stats.BlocksStat>();
 
             while (currentTip != null && currentTip.Header.BlockTime.DateTime >= dayAgo)
             {
-                blocksCount++;
-                if (!this.indexer.Configuration.IsSidechain)
+                var blockData = this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), false, false);
+
+                if (blockData?.Block != null)
                 {
-                    var blockData =
-                        this.blockSearchService.GetBlock(currentTip.Height.ToString().ToBlockFeature(), false, false);
-                    if (blockData?.Block?.Transactions?.Count > 0)
+                    Stats.BlocksStat blockStat = new Stats.BlocksStat();
+
+                    newStats.Add(blockStat);
+
+                    blockStat.Size = blockData.Block.BlockSize ?? 0;
+                    blockStat.TransactionCount = blockData.Block.Transactions?.Count ?? 0;
+
+                    if (blockStat.TransactionCount > 0)
                     {
-                        foreach (var transaction in blockData.Block.Transactions)
+                        foreach (Transaction transaction in blockData.Block.Transactions)
                         {
-                            transactionInputCounts += transaction.Inputs.Count;
+                            blockStat.InputsCount = transaction.Inputs.Count;
+                            blockStat.OutputCounts = transaction.Outputs.Count;
                         }
                     }
                 }
@@ -104,8 +126,7 @@ namespace AzureIndexer.Api.Infrastructure
                 currentTip = currentTip.Previous;
             }
 
-            this.stats.BlockCount = blocksCount;
-            this.stats.TxInputsCount = transactionInputCounts;
+            this.stats.BlocksStats = newStats;
         }
     }
 }
