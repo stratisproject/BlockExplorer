@@ -11,7 +11,7 @@
          <ng-template *ngIf="smartContractActionsOnCurrentPage?.length==0" [ngTemplateOutlet]="noSmartContractActions"></ng-template>
 
          <div *ngFor="let item of smartContractActionsOnCurrentPage;let isOdd=odd;" class="mat-elevation-z10">
-            <smartcontract-action-detail [showHeader]="showHeader" [smartContractAction]="item"></smartcontract-action-detail>
+            <smartcontract-action-detail [smartContractAction]="item"></smartcontract-action-detail>
          </div>
 
          <ng-template [ngTemplateOutlet]="pagination"></ng-template>

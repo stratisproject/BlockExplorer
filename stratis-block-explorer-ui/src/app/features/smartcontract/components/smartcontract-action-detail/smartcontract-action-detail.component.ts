@@ -9,7 +9,6 @@ import { CoreStoreFacade } from '@core/store/core-store.facade';
 })
 export class SmartContractActionDetail {
     @Input() smartContractAction: SmartContractAction;
-    @Input() showHeader = true;
 
     constructor() { }
 }

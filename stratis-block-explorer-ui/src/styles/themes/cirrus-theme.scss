@@ -1,82 +1,20 @@
 @import 'base';
 
-$primary-palette: (
-    50: #e0f6f7,
-    100: #b3e8ea,
-    200: #80d9dd,
-    300: #4dc9cf,
-    400: #26bec4,
-    500: #00b2ba,
-    600: #00abb3,
-    700: #00a2ab,
-    800: #0099a3,
-    900: #008a94,
-    A100: #bffaff,
-    A200: #8cf6ff,
-    A400: #59f1ff,
-    A700: #40efff,
-    contrast: (
-        50: #000000,
-        100: #000000,
-        200: #000000,
-        300: #000000,
-        400: #000000,
-        500: #ffffff,
-        600: #ffffff,
-        700: #ffffff,
-        800: #ffffff,
-        900: #ffffff,
-        A100: #000000,
-        A200: #000000,
-        A400: #000000,
-        A700: #000000,
-    )
-);
+$primary-palette: ( 50: #e0f6f7, 100: #b3e8ea, 200: #80d9dd, 300: #4dc9cf, 400: #26bec4, 500: #00b2ba, 600: #00abb3, 700: #00a2ab, 800: #0099a3, 900: #008a94, A100: #bffaff, A200: #8cf6ff, A400: #59f1ff, A700: #40efff, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #000000, 400: #000000, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #000000, A400: #000000, A700: #000000, ) );
 
-$accent-palette: (
-    50: #eaeeef,
-    100: #ccd4d7,
-    200: #aab7bd,
-    300: #879aa2,
-    400: #6e848e,
-    500: #546e7a,
-    600: #4d6672,
-    700: #435b67,
-    800: #3a515d,
-    900: #293f4a,
-    A100: #95d9ff,
-    A200: #62c7ff,
-    A400: #2fb5ff,
-    A700: #15acff,
-    contrast: (
-        50: #000000,
-        100: #000000,
-        200: #000000,
-        300: #000000,
-        400: #ffffff,
-        500: #ffffff,
-        600: #ffffff,
-        700: #ffffff,
-        800: #ffffff,
-        900: #ffffff,
-        A100: #000000,
-        A200: #000000,
-        A400: #000000,
-        A700: #000000,
-    )
-);
+$accent-palette: ( 50: #eaeeef, 100: #ccd4d7, 200: #aab7bd, 300: #879aa2, 400: #6e848e, 500: #546e7a, 600: #4d6672, 700: #435b67, 800: #3a515d, 900: #293f4a, A100: #95d9ff, A200: #62c7ff, A400: #2fb5ff, A700: #15acff, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #000000, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #000000, A200: #000000, A400: #000000, A700: #000000, ) );
 
 // Define the light theme.
 $primary: mat-palette($accent-palette);
 $accent: mat-palette($primary-palette, 500, 100, 800);
 
 $theme: mat-light-theme($primary, $accent);
+$theme-dark: mat-dark-theme($primary, $accent);
+
 @include angular-material-theme($theme);
 @include apply-common-style($theme);
 
 .dark-theme {
-   $theme-dark: mat-dark-theme($primary, $accent);
-
    @include angular-material-theme($theme-dark);
    @include apply-common-style($theme-dark);
 }

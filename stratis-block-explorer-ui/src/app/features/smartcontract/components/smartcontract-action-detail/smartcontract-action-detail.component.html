@@ -44,11 +44,26 @@
 
    <mat-card class="mat-card-flat">
       <mat-card-content>
-         <app-hash-view label="Generated in transaction"
+         <app-hash-view fxFlex="0 0 100%"
+                        label="Generated in transaction"
                         hashType="transaction" [hash]="sc.txId"
                         enableRoute></app-hash-view>
       </mat-card-content>
    </mat-card>
 
+
+   <mat-card *ngIf="sc.isStandardToken" class="mat-elevation-z12">
+      <mat-card-title>Smart Contract details</mat-card-title>
+      <mat-card-subtitle>
+         <mat-divider inset></mat-divider>
+      </mat-card-subtitle>
+      <mat-card-content fxLayout="row wrap" fxLayoutGap="15px" fxLayoutAlign="center center">
+         <div class="mat-display-2 smart-contract-name">{{sc.contractName}}</div>
+         <chip color="primary" class="smart-contract-symbol">{{sc.contractSymbol}}</chip>
+      </mat-card-content>
+      <mat-card-content class="overflow-hidden">
+         <pre [highlight]="sc.code" class="overflow-auto"></pre>
+      </mat-card-content>
+   </mat-card>
 
 </ng-container>

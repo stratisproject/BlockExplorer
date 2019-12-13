@@ -3,24 +3,28 @@ import { BlockResponseModel } from '../../models/block-response.model';
 import { ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-    selector: 'app-block-summary',
-    templateUrl: './block-summary.component.html',
-    styleUrls: ['./block-summary.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+   selector: 'app-block-summary',
+   templateUrl: './block-summary.component.html',
+   styleUrls: ['./block-summary.component.scss'],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BlockSummaryComponent implements OnInit {
-    @Input() block: BlockResponseModel = null;
+   @Input() block: BlockResponseModel = null;
 
-    constructor() { }
+   constructor() { }
 
-    ngOnInit() {
-    }
+   ngOnInit() {
+   }
 
-    getTotalAmount(block: BlockResponseModel) {
-        return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.amount.satoshi, 0)
-    }
+   getTotalAmount(block: BlockResponseModel) {
+      return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.amount.satoshi, 0)
+   }
 
-    getTotalFee(block: BlockResponseModel) {
-        return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.fee.satoshi, 0)
-    }
+   getTotalFee(block: BlockResponseModel) {
+      return block.block.transactions.reduce((accumulator, currentValue) => accumulator + currentValue.fee.satoshi, 0)
+   }
+
+   getBlockHeader(block: BlockResponseModel) {
+      return JSON.stringify(block.block.header, null, 2);
+   }
 }

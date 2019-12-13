@@ -30,10 +30,12 @@ html, body {
 
 .overflow-scroll-x {
    overflow-x: auto;
+   overscroll-behavior-x: contain;
 }
 
 .overflow-scroll-y {
    overflow-y: auto;
+   overscroll-behavior-y: contain;
 }
 
 .no-margin {
@@ -42,4 +44,12 @@ html, body {
 
 .no-opacity {
    opacity: 1 !important;
+}
+
+.center-text {
+   text-align: center;
+}
+
+.margin-auto {
+   margin: auto;
 }

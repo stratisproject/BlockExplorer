@@ -22,35 +22,35 @@ import { TransactionModule } from './features/transaction/transaction.module';
 import { SmartcontractModule } from './features/smartcontract/smartcontract.module';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-    ],
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        HttpClientModule,
-        CoreModule.forRoot(), MainModule, BlockModule, DashboardModule, TransactionModule, SmartcontractModule,
-        StoreModule.forRoot(ROOT_REDUCERS, {
-            metaReducers: metaReducers,
-            runtimeChecks: {
-                strictStateImmutability: true,
-                strictActionImmutability: true
-            }
-        }),
-        EffectsModule.forRoot([fromCoreEffects.AlertEffects]),
-        !environment.production ? StoreDevtoolsModule.instrument() : []
-    ],
-    providers: [
-        AppConfigService,
-        { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppConfigService], multi: true },
-        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } }
-    ],
-    bootstrap: [AppComponent]
+   declarations: [
+      AppComponent,
+   ],
+   imports: [
+      BrowserModule,
+      BrowserAnimationsModule,
+      AppRoutingModule,
+      HttpClientModule,
+      CoreModule.forRoot(), MainModule, BlockModule, DashboardModule, TransactionModule, SmartcontractModule,
+      StoreModule.forRoot(ROOT_REDUCERS, {
+         metaReducers: metaReducers,
+         runtimeChecks: {
+            strictStateImmutability: true,
+            strictActionImmutability: true
+         }
+      }),
+      EffectsModule.forRoot([fromCoreEffects.AlertEffects]),
+      !environment.production ? StoreDevtoolsModule.instrument() : []
+   ],
+   providers: [
+      AppConfigService,
+      { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppConfigService], multi: true },
+      { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } }
+   ],
+   bootstrap: [AppComponent]
 })
 export class AppModule { }
 
 
 export function init_app(appLoadService: AppConfigService) {
-    return () => appLoadService.load();
+   return () => appLoadService.load();
 }

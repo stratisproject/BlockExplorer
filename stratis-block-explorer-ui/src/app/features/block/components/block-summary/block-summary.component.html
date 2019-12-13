@@ -44,6 +44,18 @@
          <div class="value" fxFlex.lt-sm>{{block.additionalInformation.confirmations}}</div>
       </div>
    </mat-card-content>
+   <mat-expansion-panel>
+      <mat-expansion-panel-header>
+         <mat-panel-title>
+            Advanced details
+         </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div matExpansionPanelContent class="overflow-hidden">
+         <pre [highlight]="getBlockHeader(block)" class="overflow-auto"></pre>
+      </div>
+
+   </mat-expansion-panel>
 </mat-card>
 
 <ng-template #nullBlock>
