@@ -16,13 +16,18 @@
 
             fullNodeBuilder.ConfigureFeature(features =>
             {
+                var settings = new AzureIndexerSettings(setup);
+
                 features
                     .AddFeature<AzureIndexerFeature>()
                     .FeatureServices(services =>
                     {
                         services.AddSingleton<AzureIndexerLoop>();
-                        services.AddSingleton<AzureIndexerSettings>(new AzureIndexerSettings(setup));
-                        services.AddSingleton<SmartContractOperations>();
+                        services.AddSingleton<AzureIndexerSettings>(settings);
+                        if (settings.IsSidechain)
+                        {
+                            services.AddSingleton<SmartContractOperations>();
+                        }
                     });
             });
 
