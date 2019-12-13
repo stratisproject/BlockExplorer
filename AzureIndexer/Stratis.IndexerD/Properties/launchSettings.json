@@ -15,10 +15,6 @@
     "Stratis.IndexerD - Main": {
       "commandName": "Project",
       "commandLineArgs": "-datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -azemu"
-    },
-    "igorindexer": {
-      "commandName": "Project",
-      "commandLineArgs": "-datadir=\"E:\\Sviluppo\\_Data\\block_explorer\\real\" -sidechain -azureacc=igortestindexer1 -azurekey=BA9xl5vElvBWxk+fwaLFP1wcl7nzKDSsbhcdOMw0MHqaLUO9cfGTYv9m8TXGQJnIz8oj598AbkntZWMnbSxJBA=="
     }
   }
 }
