@@ -10,12 +10,10 @@ namespace AzureIndexer.Api.Infrastructure
     public class SmartContractSearchService : ISmartContractSearchService
     {
         private readonly QBitNinjaConfiguration configuration;
-        private readonly Network network;
 
-        public SmartContractSearchService(QBitNinjaConfiguration configuration, Network network)
+        public SmartContractSearchService(QBitNinjaConfiguration configuration)
         {
             this.configuration = configuration;
-            this.network = network;
         }
 
         public async Task<SmartContractActionModel> FindSmartContract(uint256 txId, bool includeDetails)
@@ -30,7 +28,7 @@ namespace AzureIndexer.Api.Infrastructure
             var smartContractModel = new SmartContractActionModel
             {
                 Address = smartContract.Id,
-                AddressBase58 = uint160.Parse(smartContract.Id).ToBase58Address(this.network),
+                AddressBase58 = uint160.Parse(smartContract.Id).ToBase58Address(this.configuration.Indexer.Network),
                 TxId = smartContract.TxId,
                 OpCode = smartContract.OpCode,
                 MethodName = smartContract.MethodName,
