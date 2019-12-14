@@ -13,6 +13,10 @@ export class SmartContractActionDetail {
    constructor() { }
 
    getSmartContractLogs(smartContractAction: SmartContractAction) {
-      return JSON.stringify(smartContractAction.logs, null, 2);
+      if (smartContractAction.logs == null) {
+         return null;
+      }
+
+      return JSON.stringify(JSON.parse(smartContractAction.logs), null, 2);
    }
 }

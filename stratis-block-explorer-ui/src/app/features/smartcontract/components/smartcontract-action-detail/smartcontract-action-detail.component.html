@@ -37,7 +37,7 @@
          <mat-card-subtitle *ngIf="sc.isSuccessful">Action Result: <chip color="primary">Success</chip></mat-card-subtitle>
          <mat-card-subtitle><mat-divider inset></mat-divider></mat-card-subtitle>
          <mat-card-content>
-            <mat-card-content class="overflow-hidden" *ngIf="!sc.logs">
+            <mat-card-content class="overflow-hidden" *ngIf="sc.logs">
                <div>Logs</div>
                <pre [highlight]="getSmartContractLogs(sc)" class="overflow-auto"></pre>
             </mat-card-content>

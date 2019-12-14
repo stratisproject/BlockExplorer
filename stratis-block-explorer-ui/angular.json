@@ -33,6 +33,7 @@
                      "src/assets"
                   ],
                   "styles": [
+                     "src/styles.scss",
                      {
                         "input": "src/styles/themes/cirrus-theme.scss",
                         "bundleName": "assets/styles/cirrus-theme",
