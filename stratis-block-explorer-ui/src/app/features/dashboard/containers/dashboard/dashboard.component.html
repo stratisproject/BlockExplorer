@@ -8,5 +8,30 @@
 </div>
 
 <div class="row">
+   <mat-card *ngIf="stats$ | async as stats">
+      <mat-card-title>Last 24H Statistics</mat-card-title>
+      <mat-card-subtitle><mat-divider inset></mat-divider></mat-card-subtitle>
+      <mat-card-content fxLayout="row">
+         <div fxFlex fxLayout="column" fxLayoutAlign="start center">
+            <div class="mat-h4">Blocks</div>
+            <div class="block-count">{{stats.blocksStats.length}}</div>
+         </div>
+         <div fxFlex fxLayout="column" fxLayoutAlign="start center">
+            <div class="mat-h4">Transactions</div>
+            <div class="transaction-count">{{stats.transactionCount}}</div>
+         </div>
+         <div fxFlex fxLayout="column" fxLayoutAlign="start center">
+            <div class="mat-h4">Inputs</div>
+            <div class="transaction-count">{{stats.inputsCount}}</div>
+         </div>
+         <div fxFlex fxLayout="column" fxLayoutAlign="start center">
+            <div class="mat-h4">Outputs</div>
+            <div class="outputs-generated">{{stats.outputCounts}}</div>
+         </div>
+      </mat-card-content>
+   </mat-card>
+</div>
+
+<div class="row">
    <app-latest-blocks [records]="10" [autorefresh]="60"></app-latest-blocks>
 </div>

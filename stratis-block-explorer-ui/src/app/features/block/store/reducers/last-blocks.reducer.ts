@@ -17,21 +17,21 @@ export const initialState: LastBlocksState = {
 const lastBlocksReducer = createReducer(
     initialState,
 
-    on(LastBlockActions.loadLastBlocks, state => state = ({
+    on(LastBlockActions.loadLastBlocks, state => ({
         ...state,
         blocks: [],
         loaded: false,
         error: null
     })),
 
-    on(LastBlockActions.lastBlocksLoaded, (state, action) => state = ({
+    on(LastBlockActions.lastBlocksLoaded, (state, action) => ({
         ...state,
         blocks: action.blocks,
         loaded: true,
         error: null
     })),
 
-    on(LastBlockActions.loadLastBlocksError, (state, action) => state = ({
+    on(LastBlockActions.loadLastBlocksError, (state, action) => ({
         ...state,
         loaded: true,
         blocks: null,

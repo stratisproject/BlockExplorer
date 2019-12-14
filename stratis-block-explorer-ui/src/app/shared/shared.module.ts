@@ -59,6 +59,7 @@ export { takeUntilDestroyed } from './rxjs/operators/take-until-destroyed';
  */
 export function getHighlightLanguages() {
    return {
-      csharp: () => import('highlight.js/lib/languages/cs')
+      csharp: () => import('highlight.js/lib/languages/cs'),
+      json: () => import('highlight.js/lib/languages/json')
    };
 }

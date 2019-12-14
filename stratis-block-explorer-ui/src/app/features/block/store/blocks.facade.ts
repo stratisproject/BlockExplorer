@@ -6,21 +6,29 @@ import { BlocksState } from './reducers/blocks.reducer';
 
 @Injectable({ providedIn: 'root' })
 export class BlocksFacade {
-    blocksLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlocksLoaded$));
-    blocksError$ = this.blocksStore.pipe(select(fromSelectors.getBlocksError$));
-    blocks$ = this.blocksStore.pipe(select(fromSelectors.getBlocks$));
+   blocksLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlocksLoaded$));
+   blocksError$ = this.blocksStore.pipe(select(fromSelectors.getBlocksError$));
+   blocks$ = this.blocksStore.pipe(select(fromSelectors.getBlocks$));
 
-    blockLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlockLoaded$));
-    blockError$ = this.blocksStore.pipe(select(fromSelectors.getBlockError$));
-    block$ = this.blocksStore.pipe(select(fromSelectors.getBlock$));
+   blockLoaded$ = this.blocksStore.pipe(select(fromSelectors.getBlockLoaded$));
+   blockError$ = this.blocksStore.pipe(select(fromSelectors.getBlockError$));
+   block$ = this.blocksStore.pipe(select(fromSelectors.getBlock$));
 
-    constructor(private blocksStore: Store<BlocksState>) { }
+   statsLoaded$ = this.blocksStore.pipe(select(fromSelectors.getStatsLoaded$));
+   statsError$ = this.blocksStore.pipe(select(fromSelectors.getStatsError$));
+   stats$ = this.blocksStore.pipe(select(fromSelectors.getStats$));
 
-    getBlocks(from: number = 0, records: number = 10) {
-        this.blocksStore.dispatch(fromActions.loadBlocks(from, records));
-    }
+   constructor(private blocksStore: Store<BlocksState>) { }
 
-    getBlock(id: string | number) {
-        this.blocksStore.dispatch(fromActions.loadBlock(id));
-    }
+   getBlocks(from: number = 0, records: number = 10) {
+      this.blocksStore.dispatch(fromActions.loadBlocks(from, records));
+   }
+
+   getBlock(id: string | number) {
+      this.blocksStore.dispatch(fromActions.loadBlock(id));
+   }
+
+   getStats() {
+      this.blocksStore.dispatch(fromActions.loadStats());
+   }
 }

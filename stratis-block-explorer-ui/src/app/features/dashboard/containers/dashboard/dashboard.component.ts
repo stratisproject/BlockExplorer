@@ -1,60 +1,41 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, BehaviorSubject, ReplaySubject, interval, Subject } from 'rxjs';
 import { StatsModel } from '../../../block/models/stats.model';
 import { TransactionSummaryModel } from '../../../transaction/models/transaction-summary.model';
+import { BlocksFacade } from '../../../block/store/blocks.facade';
+import { startWith, takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@shared/shared.module';
 
 @Component({
    selector: 'app-dashboard',
    templateUrl: './dashboard.component.html',
    styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
-   smartContracts$: Observable<TransactionSummaryModel[]>;
-   smartContractsLoaded$: Observable<boolean>;
-   smartContracts: TransactionSummaryModel[] = [];
+export class DashboardComponent implements OnInit, OnDestroy {
+   destroyed$ = new ReplaySubject<any>();
    stats$: Observable<StatsModel>;
    statsLoaded$: Observable<boolean>;
-   stats: StatsModel = null;
-   destroyed$ = new ReplaySubject<any>();
-   loading = false;
-   loadingMoreScs$ = new BehaviorSubject<boolean>(false);
-   loadingScs = false;
-   blockRecords = 10;
-   scRecords = 10;
+   statsError$: Observable<boolean>;
 
-   constructor() { }
+   statsRefresh: number = 30;
+
+   constructor(private blockFacade: BlocksFacade) { }
 
    ngOnInit() {
-      //interval(30 * 1000).pipe(
-      //   startWith(0),
-      //   takeUntil(this.destroyed$)
-      //).subscribe(() => {
-      //   this.store.dispatch(fromBlockAction.LoadStats());
-      //});
+      this.statsLoaded$ = this.blockFacade.statsLoaded$;
+      this.stats$ = this.blockFacade.stats$;
+      this.statsError$ = this.blockFacade.statsError$;
 
-      //interval(120 * 1000).pipe(
-      //   startWith(0),
-      //   takeUntil(this.destroyed$)
-      //).subscribe(() => {
-      //   if (!this.loadingScs)
-      //      this.transactionsFacade.getLastSmartContracts(this.scRecords);
-      //});
+      interval(this.statsRefresh * 1000).pipe(
+         startWith(0),
+         takeUntil(this.destroyed$)
+      ).subscribe(() => {
+         this.blockFacade.getStats();
+      });
+   }
 
-
-      //this.smartContractsLoaded$ = this.transactionsFacade.loadedSmartContractTransactions$;
-      //this.smartContracts$ = this.transactionsFacade.smartContractTransactions$;
-      //this.smartContracts$.pipe(takeUntil(this.destroyed$))
-      //   .subscribe(smartContracts => {
-      //      this.smartContracts = smartContracts;
-      //      this.loadingScs = false;
-      //      this.loadingMoreScs$.next(false);
-      //   });
-
-      //this.statsLoaded$ = this.transactionsFacade.loadedStats$;
-      //this.stats$ = this.transactionsFacade.stats$;
-      //this.stats$.pipe(takeUntil(this.destroyed$))
-      //   .subscribe(stats => {
-      //      this.stats = stats;
-      //   });
+   ngOnDestroy(): void {
+      this.destroyed$.next(true);
+      this.destroyed$.complete();
    }
 }

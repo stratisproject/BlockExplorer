@@ -1,9 +1,21 @@
-export interface IStatsModel {
-  blockCount?: number | undefined;
-  txInputsCount?: number | undefined;
+export interface IBlockStat {
+   size: number;
+   transactionCount: number;
+   inputsCount: number;
+   outputCounts: number;
 }
 
+export interface IStatsModel {
+   blocksStats: IBlockStat[];
+   transactionCount: number;
+   inputsCount: number;
+   outputCounts: number;
+}
+
+
 export class StatsModel implements IStatsModel {
-  blockCount?: number | undefined;
-  txInputsCount?: number | undefined;
+   blocksStats: IBlockStat[];
+   transactionCount: number;
+   inputsCount: number;
+   outputCounts: number;
 }

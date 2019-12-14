@@ -35,9 +35,12 @@
    <ng-container *ngIf="sc.isSuccessful">
       <mat-card class="mat-elevation-z12">
          <mat-card-subtitle *ngIf="sc.isSuccessful">Action Result: <chip color="primary">Success</chip></mat-card-subtitle>
+         <mat-card-subtitle><mat-divider inset></mat-divider></mat-card-subtitle>
          <mat-card-content>
-            <mat-divider inset></mat-divider>
-            <i>TODO: insert smart contract call log</i>
+            <mat-card-content class="overflow-hidden" *ngIf="!sc.logs">
+               <div>Logs</div>
+               <pre [highlight]="getSmartContractLogs(sc)" class="overflow-auto"></pre>
+            </mat-card-content>
          </mat-card-content>
       </mat-card>
    </ng-container>
@@ -61,6 +64,20 @@
          <div class="mat-display-2 smart-contract-name">{{sc.contractName}}</div>
          <chip color="primary" class="smart-contract-symbol">{{sc.contractSymbol}}</chip>
       </mat-card-content>
+      <mat-card-content fxLayout="row wrap" fxLayoutAlign="space-between center" class="overflow-hidden">
+         <app-address-view fxFlex="0 0 auto"
+                           label="Address (base 58)"
+                           [address]="sc.addressBase58"
+                           enableRoute></app-address-view>
+         <app-address-view fxFlex="0 0 auto"
+                           label="Address (uint160)"
+                           [address]="sc.address"
+                           enableRoute></app-address-view>
+      </mat-card-content>
+      <mat-card-subtitle>
+         <mat-divider inset></mat-divider>
+      </mat-card-subtitle>
+      <div>Code</div>
       <mat-card-content class="overflow-hidden">
          <pre [highlight]="sc.code" class="overflow-auto"></pre>
       </mat-card-content>

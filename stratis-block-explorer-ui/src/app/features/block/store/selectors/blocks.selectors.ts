@@ -16,3 +16,16 @@ export const getBlockLoaded$ = selectorHelper.getEntityLoaded;
 export const getBlocks$ = selectorHelper.getEntities;
 export const getBlocksError$ = selectorHelper.getEntitiesLoadError;
 export const getBlocksLoaded$ = selectorHelper.getEntitiesLoaded;
+
+export const getStats$ = createSelector(
+   selectState,
+   (state) => state.stats
+);
+export const getStatsError$ = createSelector(
+   selectState,
+   (state) => state.statsLoadError
+);
+export const getStatsLoaded$ = createSelector(
+   selectState,
+   (state) => state.statsLoaded
+);

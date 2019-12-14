@@ -4,6 +4,7 @@ namespace AzureIndexer.Api.Infrastructure
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Hosting;
@@ -25,6 +26,12 @@ namespace AzureIndexer.Api.Infrastructure
         }
 
         public List<BlockStat> BlocksStats { get; set; }
+
+        public int TransactionCount { get => this.BlocksStats.Sum(b => b.TransactionCount); }
+
+        public int InputsCount { get => this.BlocksStats.Sum(b => b.InputsCount); }
+
+        public int OutputCounts { get => this.BlocksStats.Sum(b => b.OutputCounts); }
 
         public Stats()
         {

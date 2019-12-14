@@ -1,6 +1,6 @@
 <h1 class="row mat-elevation-z0">Smart Contract Action</h1>
-<ng-container *ngIf="(smartContractAction$ | async) as scAction; else nullSmartContractAction">
-   <ng-container *ngIf="loaded$ | async; else fetching">
+<ng-container *ngIf="loaded$ | async; else fetching">
+   <ng-container *ngIf="(smartContractAction$ | async) as scAction; else nullSmartContractAction">
       <div class="row">
          <smartcontract-action-detail [smartContractAction]="scAction"></smartcontract-action-detail>
       </div>

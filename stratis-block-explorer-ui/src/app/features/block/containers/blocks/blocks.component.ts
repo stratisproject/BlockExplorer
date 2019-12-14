@@ -5,33 +5,33 @@ import { switchMap } from 'rxjs/operators';
 import { BlocksFacade } from '../../store/blocks.facade';
 
 @Component({
-    selector: 'app-blocks',
-    templateUrl: './blocks.component.html',
-    styleUrls: ['./blocks.component.scss']
+   selector: 'app-blocks',
+   templateUrl: './blocks.component.html',
+   styleUrls: ['./blocks.component.scss']
 })
 export class BlocksComponent implements OnInit {
-    destroyed$ = new ReplaySubject<boolean>();
-    displayedColumns = ['height', 'age', 'confirmations', 'transactions', 'hash'];
+   destroyed$ = new ReplaySubject<boolean>();
+   displayedColumns = ['height', 'age', 'confirmations', 'transactions', 'hash'];
 
-    loaded$: Observable<boolean>;
-    blocks$: Observable<BlockSummaryModel[]>;
-    error$: Observable<string | Error>;
+   loaded$: Observable<boolean>;
+   blocks$: Observable<BlockSummaryModel[]>;
+   error$: Observable<string | Error>;
 
-    @Input() records: number = 25;
+   @Input() records: number = 25;
 
-    constructor(private blocksFacade: BlocksFacade) { }
+   constructor(private blocksFacade: BlocksFacade) { }
 
-    ngOnInit() {
-        this.loaded$ = this.blocksFacade.blocksLoaded$;
-        this.error$ = this.blocksFacade.blocksError$
-        this.blocks$ = this.blocksFacade.blocks$
-            .pipe(
-                switchMap(blocks => {
-                    return of(blocks.map<BlockSummaryModel>((block, index) => BlockSummaryModel.fromBlockResponseModel(block)));
-                })
-            );
+   ngOnInit() {
+      this.loaded$ = this.blocksFacade.blocksLoaded$;
+      this.error$ = this.blocksFacade.blocksError$
+      this.blocks$ = this.blocksFacade.blocks$
+         .pipe(
+            switchMap(blocks => {
+               return of(blocks.map<BlockSummaryModel>((block, index) => BlockSummaryModel.fromBlockResponseModel(block)));
+            })
+         );
 
-        this.blocksFacade.getBlocks(this.records);
-    }
+      this.blocksFacade.getBlocks(0, this.records);
+   }
 
 }
