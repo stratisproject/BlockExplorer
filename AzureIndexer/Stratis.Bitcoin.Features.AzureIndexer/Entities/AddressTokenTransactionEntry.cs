@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using NBitcoin;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -16,7 +17,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public long BlockHeight { get; set; } // Long is the maximum supported integer value for table storage
 
-        public static string CreateRowKey(int blockHeight, string txId)
+        public static string CreateRowKey(int blockHeight, uint256 txId)
         {
             return $"{blockHeight}:{txId}";
         }
