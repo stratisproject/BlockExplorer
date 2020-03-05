@@ -195,6 +195,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             minHeight = Math.Min(minHeight, lastTransactions?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastBalances?.Height ?? 0);
             minHeight = Math.Min(minHeight, lastWallets?.Height ?? 0);
+            minHeight = Math.Min(minHeight, lastTokenTransactions?.Height ?? 0);
             this.SetStoreTip(this.chainIndexer.GetHeader(minHeight));
         }
 
