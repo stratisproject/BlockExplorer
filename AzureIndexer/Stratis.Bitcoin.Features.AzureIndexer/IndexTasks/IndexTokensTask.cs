@@ -51,10 +51,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
                 var tokenDetail = tokenEntityMapper.Get(blockHeight, txHash);
 
+                // Ignore non-tokens
+                if (tokenDetail == null)
+                    continue;
+
                 // Hang on, there's actually three addresses involved here:
                 // The sender of the tokens
                 // The recipient of the tokens
                 // The token contract address
+
 
                 var fromEntity = new AddressTokenTransactionEntry
                 {
