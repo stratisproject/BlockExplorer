@@ -1,4 +1,6 @@
 ﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.SmartContracts.Core.Receipts;
+using Stratis.SmartContracts.Core.State;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -34,6 +36,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly INodeLifetime nodeLifetime;
 
         private readonly ILoggerFactory loggerFactory;
+        private readonly IReceiptRepository receiptRepository;
+        private readonly IStateRepositoryRoot state;
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
@@ -79,7 +83,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         /// <param name="fullNode">The full node that will be indexed.</param>
         /// <param name="loggerFactory">The logger factory.</param>
-        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory)
+        /// <param name="state"></param>
+        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IStateRepositoryRoot state)
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
@@ -88,6 +93,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.InitialBlockDownloadState = fullNode.InitialBlockDownloadState.IsInitialBlockDownload();
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.loggerFactory = loggerFactory;
+            this.receiptRepository = receiptRepository;
+            this.state = state;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
@@ -165,6 +172,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             ChainedHeader lastTransactions = this.LastProcessed(IndexerCheckpoints.Transactions);
             ChainedHeader lastBalances = this.LastProcessed(IndexerCheckpoints.Balances);
             ChainedHeader lastWallets = this.LastProcessed(IndexerCheckpoints.Wallets);
+            ChainedHeader lastTokenTransactions = this.LastProcessed(IndexerCheckpoints.TokenTransactions);
 
             if (!this.StatsDictionary.ContainsKey(IndexerCheckpoints.Blocks.ToString()))
             {
@@ -172,6 +180,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.StatsDictionary.Add(IndexerCheckpoints.Transactions.ToString(), lastTransactions?.Height ?? 0);
                 this.StatsDictionary.Add(IndexerCheckpoints.Balances.ToString(), lastBalances?.Height ?? 0);
                 this.StatsDictionary.Add(IndexerCheckpoints.Wallets.ToString(), lastWallets?.Height ?? 0);
+                this.StatsDictionary.Add(IndexerCheckpoints.TokenTransactions.ToString(), lastTokenTransactions?.Height ?? 0);
             }
             else
             {
@@ -179,6 +188,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                 this.StatsDictionary[IndexerCheckpoints.Transactions.ToString()] = lastTransactions?.Height ?? 0;
                 this.StatsDictionary[IndexerCheckpoints.Balances.ToString()] = lastBalances?.Height ?? 0;
                 this.StatsDictionary[IndexerCheckpoints.Wallets.ToString()] = lastWallets?.Height ?? 0;
+                this.StatsDictionary[IndexerCheckpoints.TokenTransactions.ToString()] = lastTokenTransactions?.Height ?? 0;
             }
 
             var minHeight = lastBlocks?.Height ?? 0;
@@ -320,6 +330,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                         case IndexerCheckpoints.Wallets:
                             task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                             break;
+                        case IndexerCheckpoints.TokenTransactions:
+                            task = new IndexTokensTask(this.IndexerConfig, this.loggerFactory, this.receiptRepository, this.state);
+                            break;
                     }
 
                     task.SaveProgression = !this.indexerSettings.IgnoreCheckpoints;
@@ -355,6 +368,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
                     // Index a batch of wallets
                     this.PerformIndexing(IndexerCheckpoints.Wallets, fromHeight, toHeight);
+
+                    // Index tokens transfers.
+                    this.PerformIndexing(IndexerCheckpoints.TokenTransactions, fromHeight, toHeight);
 
                     // Update the StoreTip
                     this.UpdateStoreTip();

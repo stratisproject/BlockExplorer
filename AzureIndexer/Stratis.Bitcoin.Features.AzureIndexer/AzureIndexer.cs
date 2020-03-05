@@ -25,7 +25,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         Wallets,
         Transactions,
         Blocks,
-        Balances
+        Balances,
+        TokenTransactions
     }
 
     public class AzureIndexer

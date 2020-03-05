@@ -23,6 +23,8 @@ using Stratis.Bitcoin.P2P.Peer;
 using Stratis.Bitcoin.P2P.Protocol;
 using Stratis.Bitcoin.P2P.Protocol.Behaviors;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.SmartContracts.Core.Receipts;
+using Stratis.SmartContracts.Core.State;
 using ReaderWriterLock = NBitcoin.ReaderWriterLock;
 
 namespace AzureIndexer.Api.Notifications
@@ -92,6 +94,8 @@ namespace AzureIndexer.Api.Notifications
         private readonly IConnectionManager connectionManager;
         private readonly IPeerBanning peerBanning;
         private readonly ILoggerFactory loggerFactory;
+        private readonly IReceiptRepository receiptRepository;
+        private readonly IStateRepositoryRoot state;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -103,6 +107,7 @@ namespace AzureIndexer.Api.Notifications
         object _LockBlocks = new object();
         object _LockWallets = new object();
         object _LockSubscriptions = new object();
+        object _LockTokenTransactions = new object();
 
         public QBitNinjaConfiguration Configuration
         {
@@ -118,7 +123,9 @@ namespace AzureIndexer.Api.Notifications
             IConsensusManager consensusManager,
             IConnectionManager connectionManager,
             IPeerBanning peerBanning,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IReceiptRepository receiptRepository,
+            IStateRepositoryRoot state)
         {
             _Configuration = configuration;
             this.initialBlockDownloadState = initialBlockDownloadState;
@@ -126,6 +133,8 @@ namespace AzureIndexer.Api.Notifications
             this.connectionManager = connectionManager;
             this.peerBanning = peerBanning;
             this.loggerFactory = loggerFactory;
+            this.receiptRepository = receiptRepository;
+            this.state = state;
         }
 
         private Stratis.Bitcoin.Features.AzureIndexer.AzureIndexer _Indexer;
@@ -606,6 +615,17 @@ namespace AzureIndexer.Api.Notifications
                                     CancellationToken = cancel.Token
                                 }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                             }
+                        });
+                        TryLock(_LockTokenTransactions, () =>
+                        {
+                            new IndexTokensTask(Configuration.Indexer, this.loggerFactory, this.receiptRepository, this.state)
+                                {
+                                    EnsureIsSetup = false
+                                }
+                                .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Transactions), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
+                                {
+                                    CancellationToken = cancel.Token
+                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
                         });
                         cancel.Dispose();
                         Task<bool> unused = _Configuration.Topics.NewBlocks.AddAsync(header);
