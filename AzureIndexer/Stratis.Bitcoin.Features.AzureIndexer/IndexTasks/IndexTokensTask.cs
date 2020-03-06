@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Stratis.Bitcoin.Features.AzureIndexer.Tokens;
+using Stratis.SmartContracts.Core;
 using Stratis.SmartContracts.Core.Receipts;
 using Stratis.SmartContracts.Core.State;
 
@@ -15,13 +16,16 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
     {
         private readonly IReceiptRepository receiptRepository;
         private readonly IStateRepositoryRoot state;
+        private readonly LogDeserializer logDeserializer;
         private readonly ILogger logger;
 
-        public IndexTokensTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IStateRepositoryRoot state) 
+        public IndexTokensTask(IndexerConfiguration configuration, ILoggerFactory loggerFactory,
+            IReceiptRepository receiptRepository, IStateRepositoryRoot state, LogDeserializer logDeserializer) 
             : base(configuration, loggerFactory)
         {
             this.receiptRepository = receiptRepository;
             this.state = state;
+            this.logDeserializer = logDeserializer;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
@@ -47,12 +51,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 }
 
                 // TODO DI
-                var tokenEntityMapper = new TokenDetailProvider(this.receiptRepository, this.state);
+                var tokenEntityMapper = new TokenDetailProvider(this.receiptRepository, this.state, this.logDeserializer);
 
-                var tokenDetail = tokenEntityMapper.Get(blockHeight, txHash);
+                var tokenDetails = tokenEntityMapper.Get(txHash);
 
                 // Ignore non-tokens
-                if (tokenDetail == null)
+                if (!tokenDetails.Any())
                     continue;
 
                 // Hang on, there's actually three addresses involved here:
@@ -60,33 +64,35 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 // The recipient of the tokens
                 // The token contract address
 
-
-                var fromEntity = new AddressTokenTransactionEntry
+                foreach (var tokenDetail in tokenDetails)
                 {
-                    PartitionKey = tokenDetail.From,
-                    RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
-                    BlockHeight = blockHeight,
-                    AddressTo = tokenDetail.To,
-                    Amount = tokenDetail.Amount,
-                    TokenAddress = tokenDetail.TokenAddress,
-                    TokenSymbol = tokenDetail.TokenSymbol
-                };
+                    var fromEntity = new AddressTokenTransactionEntry
+                    {
+                        PartitionKey = tokenDetail.From,
+                        RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
+                        BlockHeight = blockHeight,
+                        AddressTo = tokenDetail.To,
+                        Amount = $"-{tokenDetail.Amount}",  // TODO does this make sense? Relative to the from address the balance has decreased by -amount tokens
+                        TokenAddress = tokenDetail.TokenAddress,
+                        TokenSymbol = tokenDetail.TokenSymbol
+                    };
 
-                bulk.Add(fromEntity.PartitionKey, fromEntity);
+                    bulk.Add(fromEntity.PartitionKey, fromEntity);
 
-                // Add this entity so we can also perform the reverse lookup on the recipient's address
-                var toEntity = new AddressTokenTransactionEntry
-                {
-                    PartitionKey = tokenDetail.To,
-                    RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
-                    BlockHeight = blockHeight,
-                    AddressTo = tokenDetail.From,
-                    Amount = $"-{tokenDetail.Amount}", // TODO does this make sense?
-                    TokenAddress = tokenDetail.TokenAddress,
-                    TokenSymbol = tokenDetail.TokenSymbol
-                };
+                    // Add this entity so we can also perform the reverse lookup on the recipient's address
+                    var toEntity = new AddressTokenTransactionEntry
+                    {
+                        PartitionKey = tokenDetail.To,
+                        RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
+                        BlockHeight = blockHeight,
+                        AddressTo = tokenDetail.From,
+                        Amount = tokenDetail.Amount,
+                        TokenAddress = tokenDetail.TokenAddress,
+                        TokenSymbol = tokenDetail.TokenSymbol
+                    };
 
-                bulk.Add(toEntity.PartitionKey, toEntity);
+                    bulk.Add(toEntity.PartitionKey, toEntity);
+                }
             }
         }
 

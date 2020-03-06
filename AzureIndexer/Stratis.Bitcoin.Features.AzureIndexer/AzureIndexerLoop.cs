@@ -1,4 +1,5 @@
 ﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Bitcoin.Features.AzureIndexer.Tokens;
 using Stratis.SmartContracts.Core.Receipts;
 using Stratis.SmartContracts.Core.State;
 
@@ -38,6 +39,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         private readonly ILoggerFactory loggerFactory;
         private readonly IReceiptRepository receiptRepository;
         private readonly IStateRepositoryRoot state;
+        private readonly LogDeserializer logDeserializer;
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
@@ -84,7 +86,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="fullNode">The full node that will be indexed.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="state"></param>
-        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IStateRepositoryRoot state)
+        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IStateRepositoryRoot state, LogDeserializer logDeserializer)
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
@@ -95,6 +97,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             this.loggerFactory = loggerFactory;
             this.receiptRepository = receiptRepository;
             this.state = state;
+            this.logDeserializer = logDeserializer;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
 
@@ -332,7 +335,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
                             task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                             break;
                         case IndexerCheckpoints.TokenTransactions:
-                            task = new IndexTokensTask(this.IndexerConfig, this.loggerFactory, this.receiptRepository, this.state);
+                            task = new IndexTokensTask(this.IndexerConfig, this.loggerFactory, this.receiptRepository, this.state, this.logDeserializer);
                             break;
                     }
 

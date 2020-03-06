@@ -18,11 +18,13 @@ using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
 using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Bitcoin.Features.AzureIndexer.Tokens;
 using Stratis.Bitcoin.Interfaces;
 using Stratis.Bitcoin.P2P.Peer;
 using Stratis.Bitcoin.P2P.Protocol;
 using Stratis.Bitcoin.P2P.Protocol.Behaviors;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.SmartContracts.CLR.Serialization;
 using Stratis.SmartContracts.Core.Receipts;
 using Stratis.SmartContracts.Core.State;
 using ReaderWriterLock = NBitcoin.ReaderWriterLock;
@@ -96,6 +98,7 @@ namespace AzureIndexer.Api.Notifications
         private readonly ILoggerFactory loggerFactory;
         private readonly IReceiptRepository receiptRepository;
         private readonly IStateRepositoryRoot state;
+        private readonly LogDeserializer logDeserializer;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -125,7 +128,8 @@ namespace AzureIndexer.Api.Notifications
             IPeerBanning peerBanning,
             ILoggerFactory loggerFactory,
             IReceiptRepository receiptRepository,
-            IStateRepositoryRoot state)
+            IStateRepositoryRoot state,
+            LogDeserializer logDeserializer)
         {
             _Configuration = configuration;
             this.initialBlockDownloadState = initialBlockDownloadState;
@@ -135,6 +139,7 @@ namespace AzureIndexer.Api.Notifications
             this.loggerFactory = loggerFactory;
             this.receiptRepository = receiptRepository;
             this.state = state;
+            this.logDeserializer = logDeserializer;
         }
 
         private Stratis.Bitcoin.Features.AzureIndexer.AzureIndexer _Indexer;
@@ -618,7 +623,7 @@ namespace AzureIndexer.Api.Notifications
                         });
                         TryLock(_LockTokenTransactions, () =>
                         {
-                            new IndexTokensTask(Configuration.Indexer, this.loggerFactory, this.receiptRepository, this.state)
+                            new IndexTokensTask(Configuration.Indexer, this.loggerFactory, this.receiptRepository, this.state, this.logDeserializer)
                                 {
                                     EnsureIsSetup = false
                                 }

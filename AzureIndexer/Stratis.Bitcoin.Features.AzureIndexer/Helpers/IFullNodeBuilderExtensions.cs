@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
+﻿using Stratis.Bitcoin.Features.AzureIndexer.Tokens;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer.Helpers
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,7 @@
                     {
                         services.AddSingleton<AzureIndexerLoop>();
                         services.AddSingleton<AzureIndexerSettings>(new AzureIndexerSettings(setup));
+                        services.AddSingleton<LogDeserializer>();
                     });
             });
 
