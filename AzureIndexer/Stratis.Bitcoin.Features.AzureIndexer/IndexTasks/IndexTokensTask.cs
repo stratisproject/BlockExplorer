@@ -68,11 +68,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 {
                     var fromEntity = new AddressTokenTransactionEntry
                     {
-                        PartitionKey = tokenDetail.From,
+                        Address = tokenDetail.From,
                         RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
                         BlockHeight = blockHeight,
                         AddressTo = tokenDetail.To,
-                        Amount = $"-{tokenDetail.Amount}",  // TODO does this make sense? Relative to the from address the balance has decreased by -amount tokens
+                        Amount = tokenDetail.Amount,
                         TokenAddress = tokenDetail.TokenAddress,
                         TokenSymbol = tokenDetail.TokenSymbol
                     };
@@ -80,18 +80,20 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                     bulk.Add(fromEntity.PartitionKey, fromEntity);
 
                     // Add this entity so we can also perform the reverse lookup on the recipient's address
-                    var toEntity = new AddressTokenTransactionEntry
-                    {
-                        PartitionKey = tokenDetail.To,
-                        RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
-                        BlockHeight = blockHeight,
-                        AddressTo = tokenDetail.From,
-                        Amount = tokenDetail.Amount,
-                        TokenAddress = tokenDetail.TokenAddress,
-                        TokenSymbol = tokenDetail.TokenSymbol
-                    };
+                    // This causes duplicate keys due to the same block height: txid combo when sending to ones own address
+                    // Consider adding another table instead
+                    //var toEntity = new AddressTokenTransactionEntry
+                    //{
+                    //    PartitionKey = tokenDetail.To,
+                    //    RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
+                    //    BlockHeight = blockHeight,
+                    //    AddressTo = tokenDetail.From,
+                    //    Amount = tokenDetail.Amount,
+                    //    TokenAddress = tokenDetail.TokenAddress,
+                    //    TokenSymbol = tokenDetail.TokenSymbol
+                    //};
 
-                    bulk.Add(toEntity.PartitionKey, toEntity);
+                    //bulk.Add(toEntity.PartitionKey, toEntity);
                 }
             }
         }

@@ -8,15 +8,15 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// The sender address.
         /// </summary>
-        public string Address
+        public string Address { get; set; }
+
+        public string AddressTo { get; set; }
+
+        public string TokenAddress
         {
             get => this.PartitionKey;
             set => this.PartitionKey = value;
         }
-
-        public string AddressTo { get; set; }
-
-        public string TokenAddress { get; set; }
 
         public string TokenSymbol { get; set; }
 
