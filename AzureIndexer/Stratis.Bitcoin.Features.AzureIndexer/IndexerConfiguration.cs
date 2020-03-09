@@ -27,7 +27,7 @@
         private const string BalancesTableName = "balances";
         private const string ChainTableName = "chain";
         private const string WalletsTableName = "wallets";
-        private const string AddressTokenTransactionTableName = "addresstokens";
+        private const string TokenTransactionsTableName = "tokentxs";
 
         private readonly ILoggerFactory loggerFactory;
 
@@ -236,9 +236,9 @@
             return table;
         }
 
-        public CloudTable GetAddressTokenTransactionTable()
+        public CloudTable GetTokenTransactionTable()
         {
-            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(AddressTokenTransactionTableName));
+            CloudTable table = this.TableClient.GetTableReference(this.GetFullName(TokenTransactionsTableName));
             table.CreateIfNotExistsAsync();
             return table;
         }

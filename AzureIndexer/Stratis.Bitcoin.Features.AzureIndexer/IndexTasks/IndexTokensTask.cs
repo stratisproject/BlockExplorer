@@ -31,7 +31,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
 
         protected override CloudTable GetCloudTable()
         {
-            return this.Configuration.GetAddressTokenTransactionTable();
+            return this.Configuration.GetTokenTransactionTable();
         }
 
         protected override void ProcessBlock(BlockInfo block, BulkImport<AddressTokenTransactionEntry> bulk, Network network, BulkImport<SmartContactEntry.Entity> smartContractBulk = null)
