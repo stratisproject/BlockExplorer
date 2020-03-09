@@ -8,7 +8,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <summary>
         /// The sender address.
         /// </summary>
-        public string Address { get; set; }
+        public string AddressFrom { get; set; }
 
         public string AddressTo { get; set; }
 

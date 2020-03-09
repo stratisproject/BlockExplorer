@@ -68,7 +68,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 {
                     var fromEntity = new AddressTokenTransactionEntry
                     {
-                        Address = tokenDetail.From,
+                        AddressFrom = tokenDetail.From,
                         RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
                         BlockHeight = blockHeight,
                         AddressTo = tokenDetail.To,
