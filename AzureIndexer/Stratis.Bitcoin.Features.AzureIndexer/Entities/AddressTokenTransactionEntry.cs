@@ -26,7 +26,12 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public static string CreateRowKey(int blockHeight, uint256 txId)
         {
-            return $"{blockHeight}:{txId}";
+            // The maximum number of integers in an int string where int.MaxValue = 2,147,483,647
+            const int Int32MaxIntegers = 10;
+
+            // TableStorage returns results sorted by partition key, then rowkey.
+            // We zero-pad the block height to ensure results are ordered when returned.
+            return $"{blockHeight.ToString().PadLeft(Int32MaxIntegers, '0')}:{txId}";
         }
     }
 }
