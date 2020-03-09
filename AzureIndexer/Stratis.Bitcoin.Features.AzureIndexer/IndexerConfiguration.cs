@@ -175,6 +175,7 @@
             yield return this.GetBalanceTable();
             yield return this.GetChainTable();
             yield return this.GetWalletRulesTable();
+            yield return this.GetTokenTransactionTable();
         }
 
         public AzureIndexer CreateIndexer()
