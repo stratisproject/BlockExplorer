@@ -31,7 +31,25 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
             // TableStorage returns results sorted by partition key, then rowkey.
             // We zero-pad the block height to ensure results are ordered when returned.
-            return $"{blockHeight.ToString().PadLeft(Int32MaxIntegers, '0')}:{txId}";
+            // To ensure the results are returned in descending block height, we subtract the actual block height
+            // from Int32.MaxValue
+            return $"{GetDescendingPrefix(blockHeight)}{blockHeight.ToString()}:{txId}";
+        }
+
+        /// <summary>
+        /// Returns the prefix 
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public static char GetDescendingPrefix(int number)
+        {
+            // There should be 10 chars here, which is the maximum number of chars in an integer string.
+            // We use descending order so that a number with 1 character returns 'z', a number with 2 characters returns 'y' etc.
+            char[] prefixChars = { 'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q' };
+
+            var numChars = number.ToString().Length;
+
+            return prefixChars[numChars - 1];
         }
     }
 }
