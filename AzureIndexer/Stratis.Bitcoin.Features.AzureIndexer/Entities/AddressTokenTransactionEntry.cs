@@ -24,6 +24,22 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         public long BlockHeight { get; set; } // Long is the maximum supported integer value for table storage. Duplicated here as well in the rowKey for better querying.
 
+        [IgnoreProperty]
+        public string TxId
+        {
+            get
+            {
+                var split = this.RowKey?.Split(':');
+
+                if (split == null || split.Length < 2)
+                {
+                    return null;
+                }
+
+                return split[1];
+            }
+        }
+
         public static string CreateRowKey(int blockHeight, uint256 txId)
         {
             // The maximum number of integers in an int string where int.MaxValue = 2,147,483,647

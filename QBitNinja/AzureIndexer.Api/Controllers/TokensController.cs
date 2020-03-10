@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.Models.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using Stratis.Bitcoin.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Controllers
 {
@@ -33,7 +36,7 @@ namespace AzureIndexer.Api.Controllers
         {
             var results = await this.tokenSearchService.GetTransactionsForTokenAsync(tokenAddress, from ?? 0);
 
-            return Ok(results);
+            return Ok(MapViewModel(results));
         }
 
         // Get all the transactions for a particular token address
@@ -43,7 +46,21 @@ namespace AzureIndexer.Api.Controllers
         {
             var results = await this.tokenSearchService.GetMostRecentTransactionsForTokenAsync(tokenAddress);
 
-            return Ok(results);
+            return Ok(MapViewModel(results));
+        }
+
+        private static IEnumerable<TokenTransactionResponse> MapViewModel(List<AddressTokenTransactionEntry> results)
+        {
+            var mapped = results.Select(r => new TokenTransactionResponse
+            {
+                Amount = r.Amount,
+                FromAddress = r.AddressFrom,
+                ToAddress = r.AddressTo,
+                TokenAddress = r.TokenAddress,
+                TxId = r.TxId
+            });
+
+            return mapped;
         }
     }
 }
