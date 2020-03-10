@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureIndexer.Api.Models.Response;
-using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.SmartContracts;
 
 namespace AzureIndexer.Api.Infrastructure
 {
+    /// <summary>
+    /// Implements repository-like behaviour for querying the token transactions store.
+    /// </summary>
     public class TokenSearchService
     {
         public TokenSearchService(QBitNinjaConfiguration configuration)
@@ -17,6 +19,36 @@ namespace AzureIndexer.Api.Infrastructure
         }
 
         public IndexerConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Returns the most recent transactions for a token.
+        /// </summary>
+        /// <param name="tokenAddress"></param>
+        /// <param name="count">The number of recent transactions to return. Must be less than 1000.</param>
+        /// <returns></returns>
+        public async Task<List<AddressTokenTransactionEntry>> GetMostRecentTransactionsForTokenAsync(
+            string tokenAddress, int count = 25)
+        {
+            if (count >= 1000)
+            {
+                throw new ArgumentException("Count must be less than 1000");
+            }
+
+            var table = this.Configuration.GetTokenTransactionTable();
+            var query = TokenQueries.LatestTokenTransactions(tokenAddress, count);
+
+            try
+            {
+                // Segmented Query can return a maximum of 1000 results
+                var result = await table.ExecuteQuerySegmentedAsync(query, null);
+
+                return result.Results;
+            }
+            catch (Exception e)
+            {
+                return new List<AddressTokenTransactionEntry>();
+            }
+        }
 
         /// <summary>
         /// Returns all 100 the transactions for a token, beginning at fromBlock.
@@ -30,33 +62,13 @@ namespace AzureIndexer.Api.Infrastructure
             var table = this.Configuration.GetTokenTransactionTable();
 
             // We can implement something similar to pagination that works nicer with table storage by adding block height range queries instead of entity count based queries.
-            var query = new TableQuery<AddressTokenTransactionEntry>();
-
-            var partitionQuery = TableQuery.GenerateFilterCondition(nameof(AddressTokenTransactionEntry.PartitionKey), QueryComparisons.Equal, tokenAddress);
-            var fromBlockQuery = TableQuery.GenerateFilterConditionForLong(nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.GreaterThanOrEqual, fromBlock);
-            var toBlockQuery = TableQuery.GenerateFilterConditionForLong(
-                nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.LessThan, fromBlock + 100);
-            var rangeQuery = TableQuery.CombineFilters(fromBlockQuery, TableOperators.And, toBlockQuery);
-
-            query = query.Where(partitionQuery);
-
-            // We don't need to query all the columns.
-            query = query.Select(new[]
-            {
-                nameof(AddressTokenTransactionEntry.PartitionKey),
-                nameof(AddressTokenTransactionEntry.RowKey),
-                nameof(AddressTokenTransactionEntry.Amount),
-                nameof(AddressTokenTransactionEntry.BlockHeight),
-                nameof(AddressTokenTransactionEntry.AddressFrom),
-                nameof(AddressTokenTransactionEntry.AddressTo)
-            });
+            var query = TokenQueries.PaginatedTokenTransactions(tokenAddress, fromBlock);
 
             try
             {
                 var result = await table.ExecuteQuerySegmentedAsync(query, null);
 
                 return result.Results;
-
             }
             catch (Exception e)
             {

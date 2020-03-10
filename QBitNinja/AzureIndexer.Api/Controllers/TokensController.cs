@@ -28,10 +28,20 @@ namespace AzureIndexer.Api.Controllers
 
         // Get all the transactions for a particular token address
         [HttpGet]
-        [Route("")]
-        public async Task<IActionResult> TransactionsForToken(string tokenAddress, int? from = 0)
+        [Route("{tokenAddress}")]
+        public async Task<IActionResult> TransactionsForToken([FromRoute] string tokenAddress, int? from = 0)
         {
             var results = await this.tokenSearchService.GetTransactionsForTokenAsync(tokenAddress, from ?? 0);
+
+            return Ok(results);
+        }
+
+        // Get all the transactions for a particular token address
+        [HttpGet]
+        [Route("{tokenAddress}/recent")]
+        public async Task<IActionResult> RecentTransactionsForToken([FromRoute] string tokenAddress)
+        {
+            var results = await this.tokenSearchService.GetMostRecentTransactionsForTokenAsync(tokenAddress);
 
             return Ok(results);
         }
