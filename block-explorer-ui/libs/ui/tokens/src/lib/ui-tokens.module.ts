@@ -6,11 +6,14 @@ import { UiSmartContractsModule } from '@blockexplorer/ui/smart-contracts';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrismModule } from '@ngx-prism/core';
 import { ClipboardModule } from 'ngx-clipboard';
+import { TokenSummaryPageComponent } from './containers/token-summary-page/token-summary-page.component';
 
-
+export const uiTokensRoutes: Route[] = [
+  { path: ':address', component: TokenSummaryPageComponent },
+];
 @NgModule({
   imports: [CommonModule, RouterModule, UiLayoutModule, NgbModule, ClipboardModule, PrismModule, UiSmartContractsModule],
-  declarations: [],
-  exports: []
+  declarations: [TokenSummaryPageComponent],
+  exports: [TokenSummaryPageComponent]
 })
 export class UiTokensModule { }

@@ -33,6 +33,8 @@ import { AppEffects } from './+state/app.effects';
 import { AppFacade } from './+state/app.facade';
 import { appReducer, initialState as appInitialState } from './+state/app.reducer';
 import { AppComponent } from './app.component';
+import { StateTokensStateModule } from 'libs/state/tokens-state/src';
+import { uiTokensRoutes, UiTokensModule } from 'libs/ui/tokens/src';
 
 /**
 * Exported function so that it works with AOT
@@ -57,10 +59,12 @@ export function loadConfigService(configService: AppConfigService): Function {
     PrismModule,
     UiTransactionsModule,
     UiSmartContractsModule,
+    UiTokensModule,
     SharedModelsModule,
     SharedUtilsModule.forRoot(),
     StateGlobalStateModule.forRoot(),
     StateTransactionsStateModule.forRoot(),
+    StateTokensStateModule.forRoot(),
     NxModule.forRoot(),
     RouterModule.forRoot(
       [
@@ -68,7 +72,8 @@ export function loadConfigService(configService: AppConfigService): Function {
         { path: 'transactions', children: uiTransactionsRoutes, data: { breadcrumb: 'Transactions' } },
         { path: 'addresses', children: uiAddressesRoutes, data: { breadcrumb: 'Address' } },
         { path: 'blocks', children: uiBlockRoutes, data: { breadcrumb: 'Block' } },
-        { path: 'search', children: uiOtherRoutes, data: { breadcrumb: 'Not Found' } }
+        { path: 'tokens', children: uiTokensRoutes, data: { breadcrumb: 'Tokens' } },
+        { path: 'search', children: uiOtherRoutes, data: { breadcrumb: 'Not Found' } },
       ],
       {
         initialNavigation: 'enabled',
