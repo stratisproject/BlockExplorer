@@ -1,7 +1,17 @@
 {
   "extends": "../../../tslint.json",
   "rules": {
-    "directive-selector": [true, "attribute", "blockexplorer", "camelCase"],
-    "component-selector": [true, "element", "blockexplorer", "kebab-case"]
+    "directive-selector": [
+      true,
+      "attribute",
+      "blockexplorer",
+      "camelCase"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "blockexplorer",
+      "kebab-case"
+    ]
   }
 }

@@ -37,6 +37,9 @@
     },
     "shared-models": {
       "tags": []
+    },
+    "state-tokens-state": {
+      "tags": []
     }
   }
 }

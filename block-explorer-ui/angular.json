@@ -357,6 +357,34 @@
           }
         }
       }
+    },
+    "state-tokens-state": {
+      "root": "libs/state/tokens-state",
+      "sourceRoot": "libs/state/tokens-state/src",
+      "projectType": "library",
+      "prefix": "blockexplorer",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/state/tokens-state/src/test.ts",
+            "tsConfig": "libs/state/tokens-state/tsconfig.spec.json",
+            "karmaConfig": "libs/state/tokens-state/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/state/tokens-state/tsconfig.lib.json",
+              "libs/state/tokens-state/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {

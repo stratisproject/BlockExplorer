@@ -1,59 +1,48 @@
-import { TokensActions, TokensActionTypes } from "./tokens.actions";
+import { TokensAction, TokensActionTypes } from './tokens.actions';
 
 export const TOKENS_FEATURE_KEY = 'tokens';
 
+/**
+ * Interface for the 'Tokens' data used in
+ *  - TokensState, and
+ *  - tokensReducer
+ *
+ *  Note: replace if already defined in another module
+ */
+
+/* tslint:disable:no-empty-interface */
+export interface Entity {
+};
+
 export interface TokensState {
-    // list: TransactionModel[];
-    // lastBlocks: BlockResponseModel[];
-    // smartContractTransactions: TransactionSummaryModel[];
-    // smartContractTransactionsLoaded: boolean;
-    // lastBlocksLoaded: boolean;
-    // statsLoaded: boolean;
-    // selectedId?: string | number;
-    // selectedAddress?: BalanceSummaryModel;
-    // stats?: StatsModel;
-    // selectedTransaction?: TransactionSummaryModel;
-    // selectedBlock?: BlockResponseModel;
-    // selectedBlockHeader?: BlockHeaderResponseModel;
-    // selectedAddressDetails?: BalanceResponseModel;
-    // loadedTransactions: boolean;
-    // loadedAddress: boolean;
-    // loadedBlockData: boolean;
-    // loadedAddressDetails: boolean;
-    // error?: any;
+  list        : Entity[];             // list of Tokens; analogous to a sql normalized table
+  selectedId ?: string | number;      // which Tokens record has been selected
+  loaded      : boolean;              // has the Tokens list been loaded
+  error      ?: any;                  // last none error (if any)
+};
+
+export interface TokensPartialState {
+  readonly [TOKENS_FEATURE_KEY]: TokensState;
+}
+
+export const initialState: TokensState = {
+  list : [ ],
+  loaded : false
+};
+
+export function tokensReducer(
+  state: TokensState = initialState, 
+  action: TokensAction): TokensState
+{
+  switch (action.type) {
+    case TokensActionTypes.TokensLoaded: {
+      state = {
+        ...state,
+        list  : action.payload,
+        loaded: true
+      };
+      break;
+    }
   }
-
-  export interface TokensPartialState {
-    readonly [TOKENS_FEATURE_KEY]: TokensState;
-  }
-
-  export const initialState: TokensState = {
-    // list: [],
-    // lastBlocks: [],
-    // smartContractTransactions: [],
-    // smartContractTransactionsLoaded: false,
-    // lastBlocksLoaded: false,
-    // statsLoaded: false,
-    // selectedAddress: null,
-    // stats: null,
-    // selectedTransaction: null,
-    // selectedBlock: null,
-    // selectedBlockHeader: null,
-    // selectedAddressDetails: null,
-    // loadedTransactions: false,
-    // loadedAddress: false,
-    // loadedAddressDetails: false,
-    // loadedBlockData: false
-  };
-  
-  export function tokensReducer(state: TokensState = initialState, action: TokensActions // TODO
-  ): TokensState {
-
-      switch(action.type) {
-
-        case (TokensActionTypes.LoadTokens):
-            break;
-      }
-
-      return state;
-  }
+  return state;
+}

@@ -39,6 +39,9 @@
       ],
       "@blockexplorer/shared/models": [
         "libs/shared/models/src/index.ts"
+      ],
+      "@blockexplorer/state/tokens-state": [
+        "libs/state/tokens-state/src/index.ts"
       ]
     }
   },
