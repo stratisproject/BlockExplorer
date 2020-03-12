@@ -1,5 +1,5 @@
 import {Action} from '@ngrx/store';
-import {Entity} from './tokens.reducer';
+import { TokenTransactionResponse } from '../services/token-transaction-response';
 
 export enum TokensActionTypes {
  LoadTokens = "[Tokens] Load Tokens",
@@ -19,7 +19,7 @@ export class TokensLoadError implements Action {
 
 export class TokensLoaded implements Action {
  readonly type = TokensActionTypes.TokensLoaded;
- constructor(public payload: Entity[]) { }
+ constructor(public payload: TokenTransactionResponse[]) { }
 }
 
 export class LoadRecentTokenTransactions implements Action {

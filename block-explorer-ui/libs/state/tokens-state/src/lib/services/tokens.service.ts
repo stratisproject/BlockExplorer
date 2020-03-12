@@ -6,7 +6,6 @@ import { ApiConfiguration } from './api-configuration';
 import { StrictHttpResponse } from './strict-http-response';
 import { Observable } from 'rxjs';
 import { map as __map, filter as __filter } from 'rxjs/operators';
-import { APP_CONFIG } from '@blockexplorer/shared/models';
 import { TokenTransactionResponse } from './token-transaction-response';
 
 @Injectable()
@@ -14,7 +13,7 @@ class TokensService extends BaseService {
   constructor(
     http: HttpClient
   ) {
-    super( { rootUrl: APP_CONFIG.apiBaseUrl }, http);
+    super(http);
   }
 
   /**

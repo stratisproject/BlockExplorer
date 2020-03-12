@@ -8,7 +8,7 @@
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator
-                  [hidden]="transactionsLoaded$ | async"
+                  [hidden]="tokensLoaded$ | async"
                 ></blockexplorer-busy-indicator>
                 <!--
                   <blockexplorer-transaction-summary *ngIf="transactionsLoaded$ | async"

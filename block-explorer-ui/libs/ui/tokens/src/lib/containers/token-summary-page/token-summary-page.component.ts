@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Log } from '@blockexplorer/shared/utils';
 import { TokensFacade } from 'libs/state/tokens-state/src';
+import { TokenTransactionResponse } from 'libs/state/tokens-state/src/lib/services/token-transaction-response';
 
 @Component({
   selector: 'blockexplorer-token-summary-page',
@@ -15,13 +16,11 @@ import { TokensFacade } from 'libs/state/tokens-state/src';
   styleUrls: ['./token-summary-page.component.css']
 })
 export class TokenSummaryPageComponent implements OnInit, OnDestroy {
-  transactionsLoaded$: Observable<boolean>;
-  transactions: TransactionSummaryModel[] = [];
-  smartContract: SmartContractModel = null;
+  tokensLoaded$: Observable<boolean>;
+  tokens: TokenTransactionResponse[] = [];
   destroyed$ = new ReplaySubject<any>();
   hash = '';
-  transaction$: Observable<TransactionSummaryModel>;
-  isSmartContract = false;
+  tokens$: Observable<TokenTransactionResponse[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,22 +42,12 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   }
 
   private loadTokenDetails() {
-    // TODO
-    // this.transactionsLoaded$ = this.transactionsFacade.loadedTransactions$;
-    // this.transaction$ = this.transactionsFacade.selectedTransaction$;
-    // this.transaction$.pipe(takeUntil(this.destroyed$))
-    //     .subscribe(transaction => {
-    //       this.isSmartContract = false;
-    //       this.smartContract = null;
-    //       this.transactions.length = 0;
-    //       this.log.info('Found transaction details', transaction);
-    //       if (!transaction) return;
-    //       this.transactions = [transaction];
-    //       if (!!transaction.smartContract) {
-    //         this.isSmartContract = true;
-    //         this.smartContract = transaction.smartContract;
-    //       }
-    //     });
+    this.tokensLoaded$ = this.tokensFacade.loaded$;
+    this.tokens$ = this.tokensFacade.allTokens$;
+    this.tokens$.pipe(takeUntil(this.destroyed$))
+        .subscribe(tokens => {
+          this.tokens = tokens;
+        });
   }
 
   ngOnDestroy(): void {

@@ -1,21 +1,10 @@
 import { TokensAction, TokensActionTypes } from './tokens.actions';
+import { TokenTransactionResponse } from '../services/token-transaction-response';
 
 export const TOKENS_FEATURE_KEY = 'tokens';
 
-/**
- * Interface for the 'Tokens' data used in
- *  - TokensState, and
- *  - tokensReducer
- *
- *  Note: replace if already defined in another module
- */
-
-/* tslint:disable:no-empty-interface */
-export interface Entity {
-};
-
 export interface TokensState {
-  list        : Entity[];             // list of Tokens; analogous to a sql normalized table
+  list        : TokenTransactionResponse[];             // list of Tokens; analogous to a sql normalized table
   selectedId ?: string | number;      // which Tokens record has been selected
   loaded      : boolean;              // has the Tokens list been loaded
   error      ?: any;                  // last none error (if any)
@@ -35,6 +24,14 @@ export function tokensReducer(
   action: TokensAction): TokensState
 {
   switch (action.type) {
+    case TokensActionTypes.LoadRecentTokenTransactions: {
+      state = {
+        ...state,
+        loaded: false
+      }
+      break;
+    }
+    
     case TokensActionTypes.TokensLoaded: {
       state = {
         ...state,
@@ -43,6 +40,16 @@ export function tokensReducer(
       };
       break;
     }
+
+    case TokensActionTypes.TokensLoadError: {
+      state = {
+        ...state,
+        loaded: true,
+        error: action.payload
+      };
+      break;
+    }
   }
+  
   return state;
 }

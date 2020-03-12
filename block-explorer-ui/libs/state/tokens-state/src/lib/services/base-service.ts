@@ -1,6 +1,6 @@
 /* tslint:disable */
 import { HttpClient, HttpParameterCodec, HttpParams } from '@angular/common/http';
-import { ApiConfiguration } from './api-configuration';
+import { APP_CONFIG } from '@blockexplorer/shared/models';
 
 /**
  * Custom parameter codec to correctly handle the plus sign in parameter
@@ -30,7 +30,6 @@ const PARAMETER_CODEC = new ParameterCodec();
  */
 export class BaseService {
   constructor(
-    protected config: any,
     protected http: HttpClient
   ) {
   }
@@ -42,7 +41,7 @@ export class BaseService {
    * service, will fallback to ApiConfiguration.rootUrl.
    */
   get rootUrl(): string {
-    return this._rootUrl || this.config.rootUrl;
+    return this._rootUrl || APP_CONFIG.apiBaseUrl;
   }
 
   /**
