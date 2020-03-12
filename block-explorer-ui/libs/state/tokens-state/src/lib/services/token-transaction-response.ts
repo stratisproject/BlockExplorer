@@ -5,4 +5,5 @@ export interface TokenTransactionResponse {
   toAddress?: string;
   txId?: string;
   amount?: string;
+  time: string;
 }

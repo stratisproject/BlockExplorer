@@ -25,5 +25,7 @@ namespace AzureIndexer.Api.Models.Tokens
         public string TxId { get; set; }
 
         public string Amount { get; set; }
+
+        public uint? Time { get; set; }
     }
 }

@@ -40,6 +40,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
+        public uint Time { get; set; }
+
         public static string CreateRowKey(int blockHeight, uint256 txId)
         {
             // The maximum number of integers in an int string where int.MaxValue = 2,147,483,647
