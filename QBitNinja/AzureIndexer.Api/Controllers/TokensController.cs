@@ -5,7 +5,9 @@ using AutoMapper;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.Models.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using NBitcoin;
 using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.Utilities.JsonConverters;
 
 namespace AzureIndexer.Api.Controllers
 {
@@ -58,7 +60,7 @@ namespace AzureIndexer.Api.Controllers
                 ToAddress = r.AddressTo,
                 TokenAddress = r.TokenAddress,
                 TxId = r.TxId,
-                Time = (uint)r.Time
+                Time = Utils.UnixTimeToDateTime(r.Time)
             });
 
             return mapped;

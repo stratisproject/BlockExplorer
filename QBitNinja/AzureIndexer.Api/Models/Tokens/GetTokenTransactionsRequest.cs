@@ -26,6 +26,6 @@ namespace AzureIndexer.Api.Models.Tokens
 
         public string Amount { get; set; }
 
-        public uint? Time { get; set; }
+        public DateTimeOffset Time { get; set; }
     }
 }
