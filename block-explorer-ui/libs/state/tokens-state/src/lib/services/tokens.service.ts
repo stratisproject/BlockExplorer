@@ -7,6 +7,7 @@ import { StrictHttpResponse } from './strict-http-response';
 import { Observable } from 'rxjs';
 import { map as __map, filter as __filter } from 'rxjs/operators';
 import { TokenTransactionResponse } from './token-transaction-response';
+import { TokenDetail } from './token-detail';
 
 @Injectable()
 class TokensService extends BaseService {
@@ -14,6 +15,37 @@ class TokensService extends BaseService {
     http: HttpClient
   ) {
     super(http);
+  }
+
+  TokenDetailResponse(params: TokensService.TokenDetailParams): Observable<StrictHttpResponse<TokenDetail> {
+    let __params = this.newParams();
+    let __headers = new HttpHeaders();
+    let __body: any = null;
+
+    if (params.from != null) __params = __params.set('from', params.from.toString());
+    console.log(this.rootUrl);
+    let req = new HttpRequest<any>(
+      'GET',
+      this.rootUrl + `/api/v1/tokens/${params.tokenAddress}`,
+      __body,
+      {
+        headers: __headers,
+        params: __params,
+        responseType: 'json'
+      });
+
+    return this.http.request<any>(req).pipe(
+      __filter(_r => _r instanceof HttpResponse),
+      __map((_r) => {
+        return _r as StrictHttpResponse<TokenDetail>;
+      })
+    );
+  }
+
+  TokenDetail(params: TokensService.TransactionsForTokenParams): Observable<TokenDetail> {
+    return this.TokenDetailResponse(params).pipe(
+      __map(_r => _r.body as TokenDetail)
+    );
   }
 
   /**
@@ -108,6 +140,10 @@ module TokensService {
   export interface TransactionsForTokenParams {
     tokenAddress: string;
     from?: number;
+  }
+
+  export interface TokenDetailParams {
+    tokenAddress: string;
   }
 }
 

@@ -19,6 +19,19 @@ namespace AzureIndexer.Api.Controllers
         private readonly ITransactionSearchService transactionSearchService;
         private readonly TokenSearchService tokenSearchService;
 
+        public Dictionary<string, TokenDetail> KnownTokens = new Dictionary<string, TokenDetail>
+        {
+            {"CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS ", new TokenDetail
+                {
+                    Name = "Mediconnect",
+                    Symbol = "MEDI",
+                    Address = "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",
+                    Decimals = 8,
+                    Supply = 500000000
+                }
+            }
+        };
+
         public TokensController(
             IMapper mapper,
             QBitNinjaConfiguration configuration,
@@ -31,9 +44,23 @@ namespace AzureIndexer.Api.Controllers
             this.tokenSearchService = tokenSearchService;
         }
 
-        // Get all the transactions for a particular token address
         [HttpGet]
         [Route("{tokenAddress}")]
+        public async Task<IActionResult> TokenDetail([FromRoute] string tokenAddress)
+        {
+            var known = this.KnownTokens.ContainsKey(tokenAddress);
+
+            if (!known)
+            {
+                return BadRequest();
+            }
+
+            return Ok(this.KnownTokens[tokenAddress]);
+        }
+
+        // Get all the transactions for a particular token address
+        [HttpGet]
+        [Route("{tokenAddress}/transactions")]
         public async Task<IEnumerable<TokenTransactionResponse>> TransactionsForToken([FromRoute] string tokenAddress, int? from = 0)
         {
             var results = await this.tokenSearchService.GetTransactionsForTokenAsync(tokenAddress, from ?? 0);
