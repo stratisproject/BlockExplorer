@@ -5,6 +5,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { TOKENS_FEATURE_KEY, initialState as tokensInitialState, tokensReducer } from './+state/tokens.reducer';
 import { TokensEffects } from './+state/tokens.effects';
 import { TokensFacade } from './+state/tokens.facade';
+import { TokensService } from './services/tokens.service';
         
 @NgModule({
   imports: [
@@ -18,7 +19,7 @@ export class StateTokensStateModule {
     static forRoot(): ModuleWithProviders {
       return {
           ngModule: StateTokensStateModule,
-          providers: []
+          providers: [TokensService]
       };
   }
 }
