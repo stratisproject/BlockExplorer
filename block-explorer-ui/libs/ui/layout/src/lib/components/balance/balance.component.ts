@@ -8,8 +8,16 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class BalanceComponent implements OnInit {
 
+  _symbol: string;
+
   @Input() balance = 0;
   @Input() decimalPlaces = 4;
+  
+  @Input() 
+  set symbol(value: string) {
+    this._symbol = value;
+  }
+
 
   constructor() { }
 
@@ -21,7 +29,7 @@ export class BalanceComponent implements OnInit {
   }
 
   get symbol() {
-    return APP_CONFIG.symbol;
+    return this._symbol || APP_CONFIG.symbol;
   }
 
   get whole() {

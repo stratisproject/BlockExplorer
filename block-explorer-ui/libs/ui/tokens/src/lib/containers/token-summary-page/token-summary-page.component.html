@@ -8,8 +8,13 @@
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
                 <blockexplorer-busy-indicator
-                  [hidden]="tokensLoaded$ | async"
+                  [hidden]="transactionsLoaded$ | async"
                 ></blockexplorer-busy-indicator>
+
+                <div class="list-group-item mb-4">
+                  <blockexplorer-token-transactions-table [transactions]="transactions" *ngIf="transactionsLoaded$ | async">
+                  </blockexplorer-token-transactions-table>
+                </div>
                 <!--
                   <blockexplorer-transaction-summary *ngIf="transactionsLoaded$ | async"
                     [transaction]="transaction$ | async"></blockexplorer-transaction-summary>
@@ -20,6 +25,7 @@
               </ng-template>
             </ngb-tab>
             <ngb-tab title="Code">
+
               <!--
                 <ng-template ngbTabContent>
                   <blockexplorer-smart-contract-summary [smartContract]="smartContract">

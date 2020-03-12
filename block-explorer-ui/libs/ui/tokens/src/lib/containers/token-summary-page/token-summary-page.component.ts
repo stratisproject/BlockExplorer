@@ -16,11 +16,11 @@ import { TokenTransactionResponse } from 'libs/state/tokens-state/src/lib/servic
   styleUrls: ['./token-summary-page.component.css']
 })
 export class TokenSummaryPageComponent implements OnInit, OnDestroy {
-  tokensLoaded$: Observable<boolean>;
-  tokens: TokenTransactionResponse[] = [];
+  transactionsLoaded$: Observable<boolean>;
+  transactions: TokenTransactionResponse[] = [];
   destroyed$ = new ReplaySubject<any>();
   hash = '';
-  tokens$: Observable<TokenTransactionResponse[]>;
+  transactions$: Observable<TokenTransactionResponse[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -42,11 +42,11 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   }
 
   private loadTokenDetails() {
-    this.tokensLoaded$ = this.tokensFacade.loaded$;
-    this.tokens$ = this.tokensFacade.allTokens$;
-    this.tokens$.pipe(takeUntil(this.destroyed$))
+    this.transactionsLoaded$ = this.tokensFacade.loaded$;
+    this.transactions$ = this.tokensFacade.allTokens$;
+    this.transactions$.pipe(takeUntil(this.destroyed$))
         .subscribe(tokens => {
-          this.tokens = tokens;
+          this.transactions = tokens;
         });
   }
 

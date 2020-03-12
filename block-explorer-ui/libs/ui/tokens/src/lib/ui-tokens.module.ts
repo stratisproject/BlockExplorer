@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PrismModule } from '@ngx-prism/core';
 import { ClipboardModule } from 'ngx-clipboard';
 import { TokenSummaryPageComponent } from './containers/token-summary-page/token-summary-page.component';
+import { TokenTransactionsTableComponent } from './components/token-transactions-table/token-transactions-table.component';
 
 export const uiTokensRoutes: Route[] = [
   { path: ':address', component: TokenSummaryPageComponent }
@@ -21,7 +22,7 @@ export const uiTokensRoutes: Route[] = [
     PrismModule,
     UiSmartContractsModule
   ],
-  declarations: [TokenSummaryPageComponent],
+  declarations: [TokenSummaryPageComponent, TokenTransactionsTableComponent],
   exports: [TokenSummaryPageComponent]
 })
 export class UiTokensModule {}
