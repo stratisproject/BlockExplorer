@@ -40,6 +40,9 @@
     },
     "state-tokens-state": {
       "tags": []
+    },
+    "ui-tokens": {
+      "tags": []
     }
   }
 }

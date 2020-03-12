@@ -42,6 +42,9 @@
       ],
       "@blockexplorer/state/tokens-state": [
         "libs/state/tokens-state/src/index.ts"
+      ],
+      "@blockexplorer/ui/tokens": [
+        "libs/ui/tokens/src/index.ts"
       ]
     }
   },

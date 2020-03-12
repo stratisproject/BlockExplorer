@@ -1,6 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
-import { TransactionSummaryModel, SmartContractModel } from '@blockexplorer/shared/models';
+import {
+  TransactionSummaryModel,
+  SmartContractModel
+} from '@blockexplorer/shared/models';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Log } from '@blockexplorer/shared/utils';
@@ -20,18 +23,22 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   transaction$: Observable<TransactionSummaryModel>;
   isSmartContract = false;
 
-  constructor(private route: ActivatedRoute, private tokensFacade: TokensFacade, private log: Log) { }
+  constructor(
+    private route: ActivatedRoute,
+    private tokensFacade: TokensFacade,
+    private log: Log
+  ) {}
 
   ngOnInit() {
     this.route.paramMap
-        .pipe(takeUntil(this.destroyed$))
-        .subscribe((paramMap: any) => {
-          if (!!paramMap.params.address) {
-              this.hash = paramMap.params.address;
-              console.log(this.hash);
-              this.tokensFacade.loadRecent(this.hash);
-          }
-        });
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((paramMap: any) => {
+        if (!!paramMap.params.address) {
+          this.hash = paramMap.params.address;
+          console.log(this.hash);
+          this.tokensFacade.loadRecent(this.hash);
+        }
+      });
     this.loadTokenDetails();
   }
 
@@ -46,7 +53,6 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
     //       this.transactions.length = 0;
     //       this.log.info('Found transaction details', transaction);
     //       if (!transaction) return;
-
     //       this.transactions = [transaction];
     //       if (!!transaction.smartContract) {
     //         this.isSmartContract = true;
