@@ -58,7 +58,7 @@ namespace AzureIndexer.Api.Controllers
                 ToAddress = r.AddressTo,
                 TokenAddress = r.TokenAddress,
                 TxId = r.TxId,
-                Time = r.Time
+                Time = (uint)r.Time
             });
 
             return mapped;

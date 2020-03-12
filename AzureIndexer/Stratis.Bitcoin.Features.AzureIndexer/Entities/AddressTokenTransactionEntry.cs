@@ -40,7 +40,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             }
         }
 
-        public uint Time { get; set; }
+        public long Time { get; set; }
 
         public static string CreateRowKey(int blockHeight, uint256 txId)
         {
