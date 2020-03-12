@@ -29,13 +29,14 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
           if (!!paramMap.params.address) {
               this.hash = paramMap.params.address;
               console.log(this.hash);
-              //this.tokensFacade.getTransaction(this.hash);
+              this.tokensFacade.loadRecent(this.hash);
           }
         });
-    // this.loadTransactionDetails();
+    this.loadTokenDetails();
   }
 
-  private loadTransactionDetails() {
+  private loadTokenDetails() {
+    // TODO
     // this.transactionsLoaded$ = this.transactionsFacade.loadedTransactions$;
     // this.transaction$ = this.transactionsFacade.selectedTransaction$;
     // this.transaction$.pipe(takeUntil(this.destroyed$))
