@@ -13,7 +13,14 @@ export class TokensEffects {
  @Effect() loadTokens$ = this.dataPersistence.fetch(TokensActionTypes.LoadTokens, {
    run: (action: LoadTokens, state: TokensPartialState) => {
      // Your custom REST 'load' logic goes here. For now just return an empty list...
-     return new TokensLoaded([]);
+     let args = {
+      tokenAddress: action.tokenAddress,
+      filterAddress: action.filterAddress
+     } as TokensService.TransactionsForTokenParams;
+
+     return this.tokensService.TransactionsForToken(args).pipe(
+       map(transactions => new TokensLoaded(transactions))
+     );
    },
 
    onError: (action: LoadTokens, error) => {

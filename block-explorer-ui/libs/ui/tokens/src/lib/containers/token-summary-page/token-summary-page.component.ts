@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject, combineLatest } from 'rxjs';
 import {
   TransactionSummaryModel,
   SmartContractModel
@@ -21,10 +21,12 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   transactions: TokenTransactionResponse[] = [];
   destroyed$ = new ReplaySubject<any>();
   hash = '';
+  filterAddress: string;
   transactions$: Observable<TokenTransactionResponse[]>;
   detailLoaded$: Observable<boolean>;
   selectedDetail$: Observable<TokenDetail>;
   tokenDetail: TokenDetail;
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -33,16 +35,32 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.route.paramMap
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe((paramMap: any) => {
-        if (!!paramMap.params.address) {
-          this.hash = paramMap.params.address;
-          console.log(this.hash);
+    console.log(this.route.snapshot);
+    combineLatest(
+      this.route.paramMap,
+      this.route.queryParamMap
+    )
+    .pipe(takeUntil(this.destroyed$))
+    .subscribe(([paramMap, queryParamMap]) => {
+      console.log(paramMap);
+      console.log(queryParamMap);
+      if (paramMap.has("address")) {
+        this.hash = paramMap.get("address");
+                
+        this.tokensFacade.loadDetail(this.hash);
+
+        if(queryParamMap.has("a")) {
+          this.tokensFacade.loadAll(this.hash, queryParamMap.get("a"));
+          this.filterAddress = queryParamMap.get("a");
+        } 
+        else {
           this.tokensFacade.loadRecent(this.hash);
-          this.tokensFacade.loadDetail(this.hash);
+          // This appears to be necessary when we change clear filter on the page
+          this.filterAddress = undefined;
         }
-      });
+      }
+    })
+
     this.loadTokenDetails();
   }
 

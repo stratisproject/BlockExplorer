@@ -17,7 +17,7 @@ class TokensService extends BaseService {
     super(http);
   }
 
-  TokenDetailResponse(tokenAddress: string): Observable<StrictHttpResponse<TokenDetail> {
+  TokenDetailResponse(tokenAddress: string): Observable<StrictHttpResponse<TokenDetail>> {
     let __params = this.newParams();
     let __headers = new HttpHeaders();
     let __body: any = null;
@@ -62,6 +62,8 @@ class TokensService extends BaseService {
     let __body: any = null;
 
     if (params.from != null) __params = __params.set('from', params.from.toString());
+    if (params.filterAddress != null) __params = __params.set('filterAddress', params.filterAddress);
+
     let req = new HttpRequest<any>(
       'GET',
       this.rootUrl + `/api/v1/tokens/${params.tokenAddress}/transactions`,
@@ -138,6 +140,7 @@ module TokensService {
    */
   export interface TransactionsForTokenParams {
     tokenAddress: string;
+    filterAddress?: string;
     from?: number;
   }
 }

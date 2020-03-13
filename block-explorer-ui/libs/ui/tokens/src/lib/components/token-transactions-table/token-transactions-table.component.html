@@ -23,7 +23,8 @@
       <td class="text-center">{{age(transaction)}}</td>
       <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
         <a *ngIf="transaction.fromAddress" [ngbTooltip]="transaction.fromAddress"
-          [routerLink]="['/addresses', transaction.fromAddress]">{{transaction.fromAddress || 'Unspecified'}}</a>
+          [routerLink]="['/tokens', tokenAddress]"
+          [queryParams]="{ a: transaction.fromAddress}">{{transaction.fromAddress || 'Unspecified'}}</a>
         <span *ngIf="!transaction.fromAddress"></span>
       </td>
       <td class="justify-content-center align-items-center d-none d-md-flex">
@@ -33,8 +34,9 @@
         </span>
       </td>
       <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
-        <a *ngIf=" transaction.toAddress" [ngbTooltip]="fromAddress"
-          [routerLink]="['/addresses', transaction.toAddress]">{{ transaction.toAddress || 'Unspecified'}}</a>
+        <a *ngIf=" transaction.toAddress" [ngbTooltip]="transaction.toAddress"
+          [routerLink]="['/tokens', tokenAddress]"
+          [queryParams]="{ a: transaction.toAddress}">{{ transaction.toAddress || 'Unspecified'}}</a>
         <span *ngIf="!transaction.toAddress"></span>
       </td>
       <td class="text-right">

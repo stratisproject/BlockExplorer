@@ -17,17 +17,31 @@ namespace AzureIndexer.Api.Infrastructure
             return query;
         }
 
-        public static TableQuery<AddressTokenTransactionEntry> PaginatedTokenTransactions(string tokenAddress, int fromBlock, int take = 50)
+        public static TableQuery<AddressTokenTransactionEntry> PaginatedTokenTransactions(string tokenAddress, int fromBlock, string filterAddress = null, int take = 50)
         {
             var query = new TableQuery<AddressTokenTransactionEntry>();
 
             var partitionQuery = TableQuery.GenerateFilterCondition(nameof(AddressTokenTransactionEntry.PartitionKey), QueryComparisons.Equal, tokenAddress);
-            var fromBlockQuery = TableQuery.GenerateFilterConditionForLong(nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.GreaterThanOrEqual, fromBlock);
-            var toBlockQuery = TableQuery.GenerateFilterConditionForLong(
-                nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.LessThan, fromBlock + take);
-            var rangeQuery = TableQuery.CombineFilters(fromBlockQuery, TableOperators.And, toBlockQuery);
+            //var fromBlockQuery = TableQuery.GenerateFilterConditionForLong(nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.GreaterThanOrEqual, fromBlock);
+            //var toBlockQuery = TableQuery.GenerateFilterConditionForLong(
+            //    nameof(AddressTokenTransactionEntry.BlockHeight), QueryComparisons.LessThan, fromBlock + take);
+            //var rangeQuery = TableQuery.CombineFilters(fromBlockQuery, TableOperators.And, toBlockQuery);
 
-            query = query.Where(TableQuery.CombineFilters(partitionQuery, TableOperators.And, rangeQuery));
+            if (!string.IsNullOrWhiteSpace(filterAddress))
+            {
+                var addressFromFilter = TableQuery.GenerateFilterCondition(nameof(AddressTokenTransactionEntry.AddressFrom), QueryComparisons.Equal, filterAddress);
+                var addressToFilter = TableQuery.GenerateFilterCondition(nameof(AddressTokenTransactionEntry.AddressTo), QueryComparisons.Equal, filterAddress);
+
+                var addressCondition = TableQuery.CombineFilters(addressFromFilter, TableOperators.Or, addressToFilter);
+
+                query = query.Where(TableQuery.CombineFilters(partitionQuery, TableOperators.And, addressCondition));
+            }
+            else
+            {
+                query = query.Where(partitionQuery);
+            }
+
+            query = query.Take(take);
 
             // We don't need to query all the columns.
             query = query.Select(new[]

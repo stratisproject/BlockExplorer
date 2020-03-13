@@ -57,12 +57,12 @@ namespace AzureIndexer.Api.Infrastructure
         /// <param name="from"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public async Task<List<AddressTokenTransactionEntry>> GetTransactionsForTokenAsync(string tokenAddress, int fromBlock = 0)
+        public async Task<List<AddressTokenTransactionEntry>> GetTransactionsForTokenAsync(string tokenAddress, string filterAddress = null, int fromBlock = 0)
         {
             var table = this.Configuration.GetTokenTransactionTable();
 
             // We can implement something similar to pagination that works nicer with table storage by adding block height range queries instead of entity count based queries.
-            var query = TokenQueries.PaginatedTokenTransactions(tokenAddress, fromBlock);
+            var query = TokenQueries.PaginatedTokenTransactions(tokenAddress, fromBlock, filterAddress, 1000);
 
             try
             {

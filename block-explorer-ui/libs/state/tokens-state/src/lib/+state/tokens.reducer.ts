@@ -20,8 +20,8 @@ export interface TokensPartialState {
 
 export const initialState: TokensState = {
   list : [ ],
-  loaded : false,  
-  detailLoaded: false
+  loaded : true,  
+  detailLoaded: true
 };
 
 export function tokensReducer(
@@ -50,6 +50,14 @@ export function tokensReducer(
       state = {
         ...state,
         detailLoaded: true
+      }
+      break;
+    }
+
+    case TokensActionTypes.LoadTokens: {
+      state = {
+        ...state,
+        loaded: false
       }
       break;
     }

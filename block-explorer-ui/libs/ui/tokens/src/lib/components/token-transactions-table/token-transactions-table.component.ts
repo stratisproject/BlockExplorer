@@ -11,6 +11,7 @@ export class TokenTransactionsTableComponent implements OnInit {
   @Input() transactions: TokenTransactionResponse[] = [];
   @Input() title = 'Token Transactions';
   @Input() symbol = ' ';
+  @Input() tokenAddress: string;
   @Output() selected = new EventEmitter<string>();
   
   constructor() { }

@@ -14,10 +14,15 @@
                   [token]="tokenDetail"
 
                 ></blockexplorer-token-summary>
+
+                <div class="list-group-item my-4-x" *ngIf="filterAddress">
+                  Filtered by token holder <strong>{{ filterAddress }}</strong>
+                  <a [routerLink]="['/tokens', hash]" [queryParams]="{ }"><i class="material-icons md-12" ngbTooltip="Clear address filter">close</i></a>
+                </div>
                
                 <div class="list-group-item mb-4">
                   <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>                  
-                  <blockexplorer-token-transactions-table [transactions]="transactions" *ngIf="transactionsLoaded$ | async">
+                  <blockexplorer-token-transactions-table [transactions]="transactions" [tokenAddress]="hash" *ngIf="transactionsLoaded$ | async">
                   </blockexplorer-token-transactions-table>
                 </div>
 

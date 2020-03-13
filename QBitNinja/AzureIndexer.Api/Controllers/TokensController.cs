@@ -61,9 +61,9 @@ namespace AzureIndexer.Api.Controllers
         // Get all the transactions for a particular token address
         [HttpGet]
         [Route("{tokenAddress}/transactions")]
-        public async Task<IEnumerable<TokenTransactionResponse>> TransactionsForToken([FromRoute] string tokenAddress, int? from = 0)
+        public async Task<IEnumerable<TokenTransactionResponse>> TransactionsForToken([FromRoute] string tokenAddress, [FromQuery] string filterAddress = null, int? from = 0)
         {
-            var results = await this.tokenSearchService.GetTransactionsForTokenAsync(tokenAddress, from ?? 0);
+            var results = await this.tokenSearchService.GetTransactionsForTokenAsync(tokenAddress, filterAddress, from ?? 0);
 
             return MapViewModel(results);
         }

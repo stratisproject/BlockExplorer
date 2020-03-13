@@ -17,8 +17,8 @@ export class TokensFacade {
   
   constructor(private store: Store<TokensPartialState>) { }
  
-  loadAll() {
-    this.store.dispatch(new LoadTokens());
+  loadAll(tokenAddress: string, filterAddress?: string) {
+    this.store.dispatch(new LoadTokens(tokenAddress, filterAddress));
   }
 
   loadRecent(tokenAddress: string) {

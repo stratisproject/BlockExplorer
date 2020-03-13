@@ -31,6 +31,7 @@ export class TokenDetailLoadError implements Action {
 
 export class LoadTokens implements Action {
  readonly type = TokensActionTypes.LoadTokens;
+ constructor(public tokenAddress: string, public filterAddress?: string) {}
 }
 
 export class TokensLoadError implements Action {
