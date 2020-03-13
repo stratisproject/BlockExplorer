@@ -16,6 +16,9 @@
     </tr>
   </thead>
   <tbody>
+    <tr *ngIf="!transactions || !transactions.length">
+      <td colspan="6">There are no transactions to display.</td>
+    </tr>
     <tr *ngFor="let transaction of transactions">
       <td class="text-truncate" style="max-width:80px;">
         <a [routerLink]="['/transactions', transaction.txId]">{{transaction.txId}}</a>
