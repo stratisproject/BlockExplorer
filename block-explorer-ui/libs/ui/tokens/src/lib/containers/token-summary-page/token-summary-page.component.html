@@ -25,7 +25,11 @@
                
                 <div class="list-group-item mb-4">
                   <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>                  
-                  <blockexplorer-token-transactions-table [transactions]="transactions" [tokenAddress]="hash" *ngIf="transactionsLoaded$ | async">
+                  <blockexplorer-token-transactions-table 
+                    [transactions]="transactions"
+                    [tokenAddress]="hash"
+                    [token]="tokenDetail"
+                    *ngIf="transactionsLoaded$ | async">
                   </blockexplorer-token-transactions-table>
                 </div>
 

@@ -43,7 +43,7 @@
         <span *ngIf="!transaction.toAddress"></span>
       </td>
       <td class="text-right">
-        <blockexplorer-balance [balance]="transaction.amount || 0" [symbol]="symbol"></blockexplorer-balance>
+        <blockexplorer-balance [balance]="transaction.amount || 0" [symbol]="symbol" [decimalPlaces]="token?.decimals || 0" [scaleDecimals]="token?.decimals || 0"></blockexplorer-balance>
       </td>
     </tr>
   </tbody>

@@ -11,7 +11,12 @@ export class BalanceComponent implements OnInit {
   _symbol: string;
 
   @Input() balance = 0;
+
+  // Show this many decimal places when formatting the value.
   @Input() decimalPlaces = 4;
+
+  // Scale the value by this many decimal places.
+  @Input() scaleDecimals = 8;
   
   @Input() 
   set symbol(value: string) {
@@ -25,7 +30,7 @@ export class BalanceComponent implements OnInit {
   }
 
   get value() {
-    return this.balance / Math.pow(10, 8);
+    return this.balance / Math.pow(10, this.scaleDecimals);
   }
 
   get symbol() {

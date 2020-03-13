@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { TokenTransactionResponse } from 'libs/state/tokens-state/src/lib/services/token-transaction-response';
 import * as moment from 'moment';
+import { TokenDetail } from 'libs/state/tokens-state/src/lib/services/token-detail';
 
 @Component({
   selector: 'blockexplorer-token-transactions-table',
@@ -12,6 +13,7 @@ export class TokenTransactionsTableComponent implements OnInit {
   @Input() title = 'Token Transactions';
   @Input() symbol = ' ';
   @Input() tokenAddress: string;
+  @Input() token: TokenDetail;
   @Output() selected = new EventEmitter<string>();
   
   constructor() { }
