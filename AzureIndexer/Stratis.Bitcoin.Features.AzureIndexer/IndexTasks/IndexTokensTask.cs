@@ -59,11 +59,6 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                 if (!tokenDetails.Any())
                     continue;
 
-                // Hang on, there's actually three addresses involved here:
-                // The sender of the tokens
-                // The recipient of the tokens
-                // The token contract address
-
                 foreach (var tokenDetail in tokenDetails)
                 {
                     var fromEntity = new AddressTokenTransactionEntry
@@ -74,26 +69,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.IndexTasks
                         AddressTo = tokenDetail.To,
                         Amount = tokenDetail.Amount,
                         TokenAddress = tokenDetail.TokenAddress,
-                        TokenSymbol = tokenDetail.TokenSymbol
+                        TokenSymbol = tokenDetail.TokenSymbol,
+                        Time = block.Block.Header.Time
                     };
 
                     bulk.Add(fromEntity.PartitionKey, fromEntity);
-
-                    // Add this entity so we can also perform the reverse lookup on the recipient's address
-                    // This causes duplicate keys due to the same block height: txid combo when sending to ones own address
-                    // Consider adding another table instead
-                    //var toEntity = new AddressTokenTransactionEntry
-                    //{
-                    //    PartitionKey = tokenDetail.To,
-                    //    RowKey = AddressTokenTransactionEntry.CreateRowKey(blockHeight, txHash),
-                    //    BlockHeight = blockHeight,
-                    //    AddressTo = tokenDetail.From,
-                    //    Amount = tokenDetail.Amount,
-                    //    TokenAddress = tokenDetail.TokenAddress,
-                    //    TokenSymbol = tokenDetail.TokenSymbol
-                    //};
-
-                    //bulk.Add(toEntity.PartitionKey, toEntity);
                 }
             }
         }
