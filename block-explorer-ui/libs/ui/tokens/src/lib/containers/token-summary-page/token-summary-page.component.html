@@ -16,7 +16,7 @@
                 ></blockexplorer-token-summary>
 
                 <div class="list-group-item my-4-x" *ngIf="filterAddress">
-                  Filtered by token holder <strong>{{ filterAddress }}</strong>
+                  Filtered by token holder <strong>{{ filterAddress }}</strong> | Balance <blockexplorer-balance [balance]="(balance$ | async) || 0" [symbol]="tokenDetail?.symbol || ' '" [decimalPlaces]="tokenDetail?.decimals || 0" [scaleDecimals]="tokenDetail?.decimals || 0"></blockexplorer-balance>
                   <a [routerLink]="['/tokens', hash]" [queryParams]="{ }"><i class="material-icons md-12" ngbTooltip="Clear address filter">close</i></a>
                 </div>
                 <div class="list-group-item my-4-x" *ngIf="!filterAddress">

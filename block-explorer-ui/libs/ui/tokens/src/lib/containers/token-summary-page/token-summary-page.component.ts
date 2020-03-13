@@ -5,7 +5,7 @@ import {
   SmartContractModel
 } from '@blockexplorer/shared/models';
 import { ActivatedRoute } from '@angular/router';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map, filter } from 'rxjs/operators';
 import { Log } from '@blockexplorer/shared/utils';
 import { TokensFacade } from 'libs/state/tokens-state/src';
 import { TokenTransactionResponse } from 'libs/state/tokens-state/src/lib/services/token-transaction-response';
@@ -26,6 +26,7 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
   detailLoaded$: Observable<boolean>;
   selectedDetail$: Observable<TokenDetail>;
   tokenDetail: TokenDetail;
+  balance$: Observable<number>;
   
 
   constructor(
@@ -78,6 +79,23 @@ export class TokenSummaryPageComponent implements OnInit, OnDestroy {
         .subscribe(detail => {
           this.tokenDetail = detail;
         });
+
+    this.balance$ = this.transactions$.pipe(
+      takeUntil(this.destroyed$),
+      filter(() => !!this.filterAddress),
+      map(tokens => {
+        return tokens
+          .map(t => {
+            if(t.fromAddress == this.filterAddress)
+              return -t.amount;
+            if(t.toAddress == this.filterAddress)
+              return +t.amount;
+            return 0;
+          })
+          .reduce((t, acc) => {
+            return t + acc;
+          }, 0);
+      }))
   }
 
   ngOnDestroy(): void {
