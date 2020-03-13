@@ -23,7 +23,7 @@
       <td class="text-truncate" style="max-width:80px;">
         <a [routerLink]="['/transactions', transaction.txId]">{{transaction.txId}}</a>
       </td>
-      <td class="text-center">{{age(transaction)}}</td>
+      <td class="text-center"><span [ngbTooltip]="transaction.time">{{age(transaction)}}</span></td>
       <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
         <a *ngIf="transaction.fromAddress" [ngbTooltip]="transaction.fromAddress"
           [routerLink]="['/tokens', tokenAddress]"
