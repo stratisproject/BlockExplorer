@@ -1,23 +1,24 @@
-<h3>Token MEDI</h3>
+<h3>Token {{ token?.name }}</h3>
 <h4 class="">Summary</h4>
 <div class="list-group-item my-4-x">
   <table class="table table-striped">
     <tbody>
       <tr>
         <th><label>Symbol</label></th>
-        <td>MEDI</td>
+        <td>{{ token?.symbol }}</td>
       </tr>
       <tr>
         <th><label>Total Supply</label></th>
-        <td>50000000</td>
+        <td>{{ token?.supply }}</td>
       </tr>
       <tr>
         <th><label>Contract</label></th>
-        <td><a [routerLink]="['/address', address]">{{address}}</a></td>
+        <td *ngIf="address"><a  [routerLink]="['/address', address]">{{address}}</a></td>
+        <td *ngIf="!address"></td>
       </tr>
       <tr>
         <th><label>Decimals</label></th>
-        <td>8</td>
+        <td>{{ token?.decimals }}</td>
       </tr>
     </tbody>
   </table>

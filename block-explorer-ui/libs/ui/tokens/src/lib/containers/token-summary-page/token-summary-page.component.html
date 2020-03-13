@@ -7,13 +7,16 @@
           <ngb-tabset type="pills" id="v-pills-tabContent">
             <ngb-tab title="Overview">
               <ng-template ngbTabContent>
-                <blockexplorer-busy-indicator
-                  [hidden]="transactionsLoaded$ | async"
-                ></blockexplorer-busy-indicator>
-                                
-                <blockexplorer-token-summary ></blockexplorer-token-summary>
+                <blockexplorer-busy-indicator [hidden]="detailLoaded$ | async"></blockexplorer-busy-indicator>
+                <blockexplorer-token-summary
+                  *ngIf="detailLoaded$ | async"
+                  [address]="hash"
+                  [token]="tokenDetail"
+
+                ></blockexplorer-token-summary>
                
                 <div class="list-group-item mb-4">
+                  <blockexplorer-busy-indicator [hidden]="transactionsLoaded$ | async"></blockexplorer-busy-indicator>                  
                   <blockexplorer-token-transactions-table [transactions]="transactions" *ngIf="transactionsLoaded$ | async">
                   </blockexplorer-token-transactions-table>
                 </div>

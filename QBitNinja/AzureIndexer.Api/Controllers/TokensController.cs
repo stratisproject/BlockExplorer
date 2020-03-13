@@ -21,7 +21,7 @@ namespace AzureIndexer.Api.Controllers
 
         public Dictionary<string, TokenDetail> KnownTokens = new Dictionary<string, TokenDetail>
         {
-            {"CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS ", new TokenDetail
+            {"CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS", new TokenDetail
                 {
                     Name = "Mediconnect",
                     Symbol = "MEDI",

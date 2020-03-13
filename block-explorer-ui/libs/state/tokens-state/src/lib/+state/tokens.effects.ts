@@ -3,7 +3,7 @@ import { Effect, Actions } from '@ngrx/effects';
 import { DataPersistence } from '@nrwl/nx';
 
 import { TokensPartialState  } from './tokens.reducer';
-import { LoadTokens, TokensLoaded, TokensLoadError, TokensActionTypes, LoadRecentTokenTransactions } from './tokens.actions';
+import { LoadTokens, TokensLoaded, TokensLoadError, TokensActionTypes, LoadRecentTokenTransactions, LoadTokenDetail, TokenDetailLoaded, TokenDetailLoadError } from './tokens.actions';
 import { TokensService } from '../services/tokens.service';
 import { map } from 'rxjs/operators';
 
@@ -32,6 +32,18 @@ export class TokensEffects {
   onError: (action: LoadRecentTokenTransactions, error) => {
     console.error('Error', error);
     return new TokensLoadError(error);
+  }
+ });
+
+ @Effect() loadTokenDetail$ = this.dataPersistence.fetch(TokensActionTypes.LoadTokenDetail, {
+  run: (action: LoadTokenDetail, state: TokensPartialState) => {
+    return this.tokensService.TokenDetail(action.address).pipe(
+      map(tokenDetail => new TokenDetailLoaded(tokenDetail)
+    ))
+  },
+  onError: (action: LoadTokenDetail, error) => {
+    console.error('Error', error);
+    return new TokenDetailLoadError(error);
   }
  });
 
