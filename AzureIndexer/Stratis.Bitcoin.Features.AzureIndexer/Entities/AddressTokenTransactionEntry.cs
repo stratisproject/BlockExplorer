@@ -48,10 +48,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
             const int Int32MaxIntegers = 10;
 
             // TableStorage returns results sorted by partition key, then rowkey.
-            // We zero-pad the block height to ensure results are ordered when returned.
             // To ensure the results are returned in descending block height, we subtract the actual block height
             // from Int32.MaxValue
-            return $"{GetDescendingPrefix(blockHeight)}{blockHeight.ToString()}:{txId}";
+            return $"{int.MaxValue - blockHeight}:{txId}";
         }
 
         /// <summary>
