@@ -32,7 +32,7 @@ export class TokensEffects {
 
  @Effect() loadRecentTokens$ = this.dataPersistence.fetch(TokensActionTypes.LoadRecentTokenTransactions, {
   run: (action: LoadRecentTokenTransactions, state: TokensPartialState) => {
-    return this.tokensService.RecentTransactionsForToken(action.tokenAddress).pipe(
+    return this.tokensService.TransactionsForToken({ tokenAddress: action.tokenAddress }).pipe(
       map(transactions => new TokensLoaded(transactions)
     ))
   },
