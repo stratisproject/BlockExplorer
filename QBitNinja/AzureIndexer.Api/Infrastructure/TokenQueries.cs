@@ -51,7 +51,8 @@ namespace AzureIndexer.Api.Infrastructure
                 nameof(AddressTokenTransactionEntry.Amount),
                 nameof(AddressTokenTransactionEntry.BlockHeight),
                 nameof(AddressTokenTransactionEntry.AddressFrom),
-                nameof(AddressTokenTransactionEntry.AddressTo)
+                nameof(AddressTokenTransactionEntry.AddressTo),
+                nameof(AddressTokenTransactionEntry.Time)
             });
 
             return query;
