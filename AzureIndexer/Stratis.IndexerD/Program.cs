@@ -1,6 +1,4 @@
-﻿using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
-
-namespace Stratis.IndexerD
+﻿namespace Stratis.IndexerD
 {
     using System;
     using System.Linq;
@@ -10,7 +8,6 @@ namespace Stratis.IndexerD
     using Stratis.Bitcoin.Builder;
     using Stratis.Bitcoin.Configuration;
     using Stratis.Bitcoin.Features.Api;
-    using Stratis.Bitcoin.Features.AzureIndexer;
     using Stratis.Bitcoin.Features.BlockStore;
     using Stratis.Bitcoin.Features.Consensus;
     using Stratis.Bitcoin.Features.MemoryPool;
@@ -20,6 +17,7 @@ namespace Stratis.IndexerD
     using Stratis.Bitcoin.Features.SmartContracts.Wallet;
     using Stratis.Bitcoin.Networks;
     using Stratis.Bitcoin.Utilities;
+    using Stratis.Features.AzureIndexer.Helpers;
     using Stratis.Sidechains.Networks;
 
     public class Program
