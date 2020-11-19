@@ -58,7 +58,6 @@ namespace Stratis.IndexerD
                         .UseSmartContractWallet()
                         .UseApi()
                         .UseMempool()
-                        .UseAzureIndexer()
                         .UseAzureIndexerOnSideChain()
                         .Build();
                 }

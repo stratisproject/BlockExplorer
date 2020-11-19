@@ -39,6 +39,8 @@
                     .AddFeature<AzureIndexerFeature>()
                     .FeatureServices(services =>
                     {
+                        services.AddSingleton<AzureIndexerLoop>();
+                        services.AddSingleton(new AzureIndexerSettings(setup));
                         services.AddSingleton<LogDeserializer>();
                     });
             });
