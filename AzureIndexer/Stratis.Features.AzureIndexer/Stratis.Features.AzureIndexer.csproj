@@ -28,8 +28,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
-    <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="NStratis" Version="4.0.0.77" />
+    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="NStratis" Version="4.0.0.78" />
     <PackageReference Include="Stratis.Core" Version="1.0.2" />
     <PackageReference Include="Stratis.Core.Networks" Version="1.0.2" />
     <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.2" />

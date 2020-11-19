@@ -15,7 +15,6 @@
     using Stratis.Bitcoin.Features.SmartContracts;
     using Stratis.Bitcoin.Features.SmartContracts.PoA;
     using Stratis.Bitcoin.Features.SmartContracts.Wallet;
-    using Stratis.Bitcoin.Networks;
     using Stratis.Bitcoin.Utilities;
     using Stratis.Features.AzureIndexer.Helpers;
     using Stratis.Sidechains.Networks;
@@ -64,10 +63,11 @@
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    nodeSettings = new NodeSettings(networksSelector: Bitcoin.Networks.Networks.Strax, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
                     {
-                        MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+                        MinProtocolVersion = ProtocolVersion.PROVEN_HEADER_VERSION
                     };
+
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()
