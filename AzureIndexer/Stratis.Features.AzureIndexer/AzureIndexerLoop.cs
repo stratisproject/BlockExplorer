@@ -1,21 +1,21 @@
-﻿namespace Stratis.Features.AzureIndexer
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.WindowsAzure.Storage.Auth;
-    using NBitcoin;
-    using Stratis.Bitcoin;
-    using Stratis.Bitcoin.AsyncWork;
-    using Stratis.Bitcoin.Utilities;
-    using Stratis.Features.AzureIndexer.IndexTasks;
-    using Stratis.Features.AzureIndexer.Repositories;
-    using Stratis.Features.AzureIndexer.Tokens;
-    using Stratis.SmartContracts.Core.Receipts;
-    using Stratis.SmartContracts.Core.State;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Auth;
+using NBitcoin;
+using Stratis.Bitcoin;
+using Stratis.Bitcoin.AsyncWork;
+using Stratis.Bitcoin.Utilities;
+using Stratis.Features.AzureIndexer.IndexTasks;
+using Stratis.Features.AzureIndexer.Repositories;
+using Stratis.Features.AzureIndexer.Tokens;
+using Stratis.SmartContracts.Core.Receipts;
+using Stratis.SmartContracts.Core.State;
 
+namespace Stratis.Features.AzureIndexer
+{
     /// <summary>
     /// The AzureIndexerStoreLoop loads blocks from the block repository and indexes them in Azure.
     /// </summary>
@@ -38,7 +38,7 @@
 
         private readonly ILoggerFactory loggerFactory;
         private readonly IReceiptRepository receiptRepository;
-        private readonly IStateRepositoryRoot state;
+        private readonly IStateRepositoryRoot stateRepositoryRoot;
         private readonly LogDeserializer logDeserializer;
 
         /// <summary>The Azure Indexer settings.</summary>
@@ -79,14 +79,7 @@
         /// <summary>Gets the highest block that has been indexed.</summary>
         internal ChainedHeader StoreTip { get; private set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AzureIndexerLoop"/> class.
-        /// Constructs the AzureIndexerLoop.
-        /// </summary>
-        /// <param name="fullNode">The full node that will be indexed.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="state"></param>
-        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, IReceiptRepository receiptRepository, IStateRepositoryRoot state, LogDeserializer logDeserializer)
+        public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory, LogDeserializer logDeserializer = null, IReceiptRepository receiptRepository = null, IStateRepositoryRoot stateRepositoryRoot = null)
         {
             this.asyncProvider = fullNode.AsyncProvider;
             this.FullNode = fullNode;
@@ -96,7 +89,7 @@
             this.indexerSettings = fullNode.NodeService<AzureIndexerSettings>();
             this.loggerFactory = loggerFactory;
             this.receiptRepository = receiptRepository;
-            this.state = state;
+            this.stateRepositoryRoot = stateRepositoryRoot;
             this.logDeserializer = logDeserializer;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
         }
@@ -335,7 +328,7 @@
                             task = new IndexBalanceTask(this.IndexerConfig, this.IndexerConfig.CreateIndexerClient().GetAllWalletRules(), this.loggerFactory);
                             break;
                         case IndexerCheckpoints.TokenTransactions:
-                            task = new IndexTokensTask(this.IndexerConfig, this.loggerFactory, this.receiptRepository, this.state, this.logDeserializer);
+                            task = new IndexTokensTask(this.IndexerConfig, this.loggerFactory, this.receiptRepository, this.stateRepositoryRoot, this.logDeserializer);
                             break;
                     }
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Stratis Bitcoin Features Azure Indexer</Description>
+    <Description>Stratis Azure Indexer</Description>
     <AssemblyTitle>Stratis.Features.AzureIndexer</AssemblyTitle>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Stratis.Features.AzureIndexer</AssemblyName>
@@ -14,9 +14,11 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute> 
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <Version>1.0.2-alpha</Version>
+    <Version>1.0.2</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <RootNamespace>Stratis.Features.AzureIndexer</RootNamespace>
+    <Authors>Stratis Group Ltd.</Authors>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.12.2" />
@@ -35,6 +37,7 @@
     <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.2" />
     <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.2" />
     <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.2.1" />
+    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.2.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 

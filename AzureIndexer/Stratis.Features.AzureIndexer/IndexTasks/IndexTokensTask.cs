@@ -1,14 +1,14 @@
-﻿namespace Stratis.Features.AzureIndexer.IndexTasks
-{
-    using System.Linq;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.WindowsAzure.Storage.Table;
-    using NBitcoin;
-    using Stratis.Features.AzureIndexer.Entities;
-    using Stratis.Features.AzureIndexer.Tokens;
-    using Stratis.SmartContracts.Core.Receipts;
-    using Stratis.SmartContracts.Core.State;
+﻿using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Table;
+using NBitcoin;
+using Stratis.Features.AzureIndexer.Entities;
+using Stratis.Features.AzureIndexer.Tokens;
+using Stratis.SmartContracts.Core.Receipts;
+using Stratis.SmartContracts.Core.State;
 
+namespace Stratis.Features.AzureIndexer.IndexTasks
+{
     public class IndexTokensTask : IndexTableEntitiesTaskBase<AddressTokenTransactionEntry>
     {
         private readonly IReceiptRepository receiptRepository;

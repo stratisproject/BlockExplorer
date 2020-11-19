@@ -88,7 +88,7 @@
         {
             this.AsyncProvider = asyncProvider;
             this.loggerFactory = loggerFactory;
-            this.Network = Networks.Stratis.Mainnet();
+            this.Network = Networks.Strax.Mainnet();
         }
 
         public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)

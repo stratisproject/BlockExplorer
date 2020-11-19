@@ -23,6 +23,22 @@
                     {
                         services.AddSingleton<AzureIndexerLoop>();
                         services.AddSingleton(new AzureIndexerSettings(setup));
+                    });
+            });
+
+            return fullNodeBuilder;
+        }
+
+        public static IFullNodeBuilder UseAzureIndexerOnSideChain(this IFullNodeBuilder fullNodeBuilder, Action<AzureIndexerSettings> setup = null)
+        {
+            LoggingConfiguration.RegisterFeatureNamespace<AzureIndexerFeature>("azindex");
+
+            fullNodeBuilder.ConfigureFeature(features =>
+            {
+                features
+                    .AddFeature<AzureIndexerFeature>()
+                    .FeatureServices(services =>
+                    {
                         services.AddSingleton<LogDeserializer>();
                     });
             });

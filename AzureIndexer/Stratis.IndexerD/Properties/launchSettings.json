@@ -1,7 +1,8 @@
 {
-    "profiles": {
-        "Stratis.IndexerD": {
-            "commandName": "Project"
-        }
+  "profiles": {
+    "Stratis.IndexerD": {
+      "commandName": "Project",
+      "commandLineArgs": "-datadir=c:\\stratis\\Main -port=40001 -apiport=40002"
     }
+  }
 }

@@ -27,6 +27,7 @@
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
     <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.2.1" />
     <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />
+    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.2.1" />
     <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.2.1" />	
   </ItemGroup>
 

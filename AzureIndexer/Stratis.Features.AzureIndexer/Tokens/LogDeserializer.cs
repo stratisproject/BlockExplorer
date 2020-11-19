@@ -1,15 +1,15 @@
-﻿namespace Stratis.Features.AzureIndexer.Tokens
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Dynamic;
-    using System.Reflection;
-    using NBitcoin;
-    using Nethereum.RLP;
-    using Stratis.SmartContracts;
-    using Stratis.SmartContracts.CLR;
-    using Stratis.SmartContracts.CLR.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Reflection;
+using NBitcoin;
+using Nethereum.RLP;
+using Stratis.SmartContracts;
+using Stratis.SmartContracts.CLR;
+using Stratis.SmartContracts.CLR.Serialization;
 
+namespace Stratis.Features.AzureIndexer.Tokens
+{
     public struct TransferLog
     {
         [Index]
