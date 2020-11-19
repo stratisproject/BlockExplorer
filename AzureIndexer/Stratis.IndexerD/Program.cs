@@ -15,6 +15,7 @@ using Stratis.Bitcoin.Features.SmartContracts.PoA;
 using Stratis.Bitcoin.Features.SmartContracts.Wallet;
 using Stratis.Bitcoin.Utilities;
 using Stratis.Features.AzureIndexer.Helpers;
+using Stratis.Features.SQLiteWalletRepository;
 using Stratis.Sidechains.Networks;
 
 namespace Stratis.IndexerD
@@ -59,6 +60,7 @@ namespace Stratis.IndexerD
                         .UseApi()
                         .UseMempool()
                         .UseAzureIndexerOnSideChain()
+                        .AddSQLiteWalletRepository()
                         .Build();
                 }
                 else
@@ -76,6 +78,7 @@ namespace Stratis.IndexerD
                         .UseApi()
                         .AddRPC()
                         .UseAzureIndexer()
+                        .AddSQLiteWalletRepository()
                         .Build();
                 }
 

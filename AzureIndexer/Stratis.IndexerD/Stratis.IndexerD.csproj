@@ -24,6 +24,7 @@
     <PackageReference Include="NStratis" Version="4.0.0.78" />
     <PackageReference Include="Stratis.Core.Networks" Version="1.0.2" />
     <PackageReference Include="Stratis.Features.Api" Version="1.0.2" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.2" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
     <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.2.1" />
     <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />

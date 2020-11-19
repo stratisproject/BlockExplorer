@@ -36,6 +36,8 @@
     <PackageReference Include="Stratis.Core.Networks" Version="1.0.2" />
     <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.2" />
     <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.2" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.2" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.2" />
     <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.2.1" />
     <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.2.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
