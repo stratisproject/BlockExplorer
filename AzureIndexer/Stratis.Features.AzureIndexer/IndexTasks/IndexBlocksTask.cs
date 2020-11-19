@@ -86,8 +86,8 @@
             Block block = first.Block;
             var hash = first.BlockId.ToString();
 
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start();
+            // Stopwatch watch = new Stopwatch();
+            // watch.Start();
             while (true)
             {
                 CloudBlobContainer container = this.Configuration.GetBlocksContainer();
@@ -108,19 +108,19 @@
 
                 try
                 {
-                    blob.UploadFromByteArrayAsync(blockBytes, 0, blockBytes.Length,
-                            new AccessCondition()
-                            {
-                                // TODO Review that param.
-                                IfNotModifiedSinceTime = DateTimeOffset.MinValue
-                            },
-                            new BlobRequestOptions() { MaximumExecutionTime = this.Timeout, ServerTimeout = this.Timeout },
-                            new OperationContext())
+                    blob.UploadFromByteArrayAsync(blockBytes, 0, blockBytes.Length, new AccessCondition()
+                    {
+                        // TODO Review that param.
+                        IfNotModifiedSinceTime = DateTimeOffset.MinValue
+                    },
+                    new BlobRequestOptions() { MaximumExecutionTime = this.Timeout, ServerTimeout = this.Timeout },
+                    new OperationContext())
                         .GetAwaiter()
                         .GetResult();
-                    //watch.Stop();
 
-                    //IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
+                    // watch.Stop();
+                    // IndexerTrace.BlockUploaded(watch.Elapsed, blockBytes.Length);
+
                     this.indexedBlocks++;
 
                     this.logger.LogDebug("Completed Indexing blocks from {0} to {1}", from, to);
@@ -135,11 +135,11 @@
                         IndexerTrace.ErrorWhileImportingBlockToAzure(uint256.Parse(hash), ex);
                     }
 
-                    //watch.Stop();
+                    // watch.Stop();
                     // IndexerTrace.BlockAlreadyUploaded();
                     this.indexedBlocks++;
 
-                    this.logger.LogError(ex, "Storage exception occurred: {0}", ex.ToString());
+                    this.logger.LogDebug(ex, "Storage exception occurred: {0}", ex.ToString());
                     break;
                 }
                 catch (Exception ex)
