@@ -21,7 +21,7 @@
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.12.2" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.8.0" />
     <PackageReference Include="Microsoft.Data.OData" Version="5.8.4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
@@ -32,14 +32,14 @@
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
     <PackageReference Include="NLog" Version="4.7.5" />
     <PackageReference Include="NStratis" Version="4.0.0.78" />
-    <PackageReference Include="Stratis.Core" Version="1.0.2" />
-    <PackageReference Include="Stratis.Core.Networks" Version="1.0.2" />
-    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.2" />
-    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.2" />
-    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.2" />
-    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.2" />
-    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.2.1" />
-    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.2.1" />
+    <PackageReference Include="Stratis.Core" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.3.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 
