@@ -1,27 +1,25 @@
-﻿using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using NBitcoin.Protocol;
+using Stratis.Bitcoin;
+using Stratis.Bitcoin.Builder;
+using Stratis.Bitcoin.Configuration;
+using Stratis.Bitcoin.Features.Api;
+using Stratis.Bitcoin.Features.BlockStore;
+using Stratis.Bitcoin.Features.Consensus;
+using Stratis.Bitcoin.Features.MemoryPool;
+using Stratis.Bitcoin.Features.RPC;
+using Stratis.Bitcoin.Features.SmartContracts;
+using Stratis.Bitcoin.Features.SmartContracts.PoA;
+using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+using Stratis.Bitcoin.Utilities;
+using Stratis.Features.AzureIndexer.Helpers;
+using Stratis.Features.SQLiteWalletRepository;
+using Stratis.Sidechains.Networks;
 
 namespace Stratis.IndexerD
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using NBitcoin.Protocol;
-    using Stratis.Bitcoin;
-    using Stratis.Bitcoin.Builder;
-    using Stratis.Bitcoin.Configuration;
-    using Stratis.Bitcoin.Features.Api;
-    using Stratis.Bitcoin.Features.AzureIndexer;
-    using Stratis.Bitcoin.Features.BlockStore;
-    using Stratis.Bitcoin.Features.Consensus;
-    using Stratis.Bitcoin.Features.MemoryPool;
-    using Stratis.Bitcoin.Features.RPC;
-    using Stratis.Bitcoin.Features.SmartContracts;
-    using Stratis.Bitcoin.Features.SmartContracts.PoA;
-    using Stratis.Bitcoin.Features.SmartContracts.Wallet;
-    using Stratis.Bitcoin.Networks;
-    using Stratis.Bitcoin.Utilities;
-    using Stratis.Sidechains.Networks;
-
     public class Program
     {
         public static void Main(string[] args)
@@ -61,15 +59,17 @@ namespace Stratis.IndexerD
                         .UseSmartContractWallet()
                         .UseApi()
                         .UseMempool()
-                        .UseAzureIndexer()
+                        .UseAzureIndexerOnSideChain()
+                        .AddSQLiteWalletRepository()
                         .Build();
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    nodeSettings = new NodeSettings(networksSelector: Bitcoin.Networks.Networks.Strax, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
                     {
-                        MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+                        MinProtocolVersion = ProtocolVersion.PROVEN_HEADER_VERSION
                     };
+
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()
@@ -78,6 +78,7 @@ namespace Stratis.IndexerD
                         .UseApi()
                         .AddRPC()
                         .UseAzureIndexer()
+                        .AddSQLiteWalletRepository()
                         .Build();
                 }
 

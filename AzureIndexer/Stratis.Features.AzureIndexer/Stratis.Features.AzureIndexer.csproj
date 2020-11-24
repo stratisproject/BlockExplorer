@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Stratis Azure Indexer</Description>
+    <AssemblyTitle>Stratis.Features.AzureIndexer</AssemblyTitle>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Stratis.Features.AzureIndexer</AssemblyName>
+    <PackageId>Stratis.Features.AzureIndexer</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute> 
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <Version>1.0.2</Version>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <RootNamespace>Stratis.Features.AzureIndexer</RootNamespace>
+    <Authors>Stratis Group Ltd.</Authors>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.13.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.8.0" />
+    <PackageReference Include="Microsoft.Data.OData" Version="5.8.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.3" />
+    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="NStratis" Version="4.0.0.78" />
+    <PackageReference Include="Stratis.Core" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.3.1" />
+    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.3.1" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <DefineConstants>$(DefineConstants);NOASSEMBLYCONTEXT</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1705;IDE0008;</NoWarn>
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+</Project>
