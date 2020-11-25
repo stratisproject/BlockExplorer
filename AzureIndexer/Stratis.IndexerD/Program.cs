@@ -13,8 +13,10 @@ using Stratis.Bitcoin.Features.RPC;
 using Stratis.Bitcoin.Features.SmartContracts;
 using Stratis.Bitcoin.Features.SmartContracts.PoA;
 using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+using Stratis.Bitcoin.Networks;
 using Stratis.Bitcoin.Utilities;
 using Stratis.Features.AzureIndexer.Helpers;
+using Stratis.Features.Collateral;
 using Stratis.Features.SQLiteWalletRepository;
 using Stratis.Sidechains.Networks;
 
@@ -30,6 +32,7 @@ namespace Stratis.IndexerD
         public static async Task MainAsync(string[] args)
         {
             var isSideChain = false;
+
             try
             {
                 NodeSettings nodeSettings;
@@ -56,6 +59,7 @@ namespace Stratis.IndexerD
                         })
                         .UseSmartContractPoAConsensus()
                         .UseSmartContractPoAMining()
+                        .CheckForPoAMembersCollateral(false) // This is a non-mining node so we will only check the commitment height data and not do the full set of collateral checks.
                         .UseSmartContractWallet()
                         .UseApi()
                         .UseMempool()
@@ -65,7 +69,7 @@ namespace Stratis.IndexerD
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Bitcoin.Networks.Networks.Strax, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    nodeSettings = new NodeSettings(networksSelector: Networks.Strax, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
                     {
                         MinProtocolVersion = ProtocolVersion.PROVEN_HEADER_VERSION
                     };
