@@ -17,6 +17,7 @@ using Stratis.Bitcoin.Networks;
 using Stratis.Bitcoin.Utilities;
 using Stratis.Features.AzureIndexer.Helpers;
 using Stratis.Features.Collateral;
+using Stratis.Features.Collateral.CounterChain;
 using Stratis.Features.SQLiteWalletRepository;
 using Stratis.Sidechains.Networks;
 
@@ -51,20 +52,25 @@ namespace Stratis.IndexerD
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()
-                        .AddRPC()
+                        .UseMempool()
                         .AddSmartContracts(options =>
                         {
                             options.UseReflectionExecutor();
                             options.UsePoAWhitelistedContracts();
                         })
-                        .UseSmartContractPoAConsensus()
-                        .UseSmartContractPoAMining()
-                        .CheckForPoAMembersCollateral(false) // This is a non-mining node so we will only check the commitment height data and not do the full set of collateral checks.
+                        .AddPoAFeature()
+                        .UsePoAConsensus()
+                        .CheckCollateralCommitment()
+
+                        // This needs to be set so that we can check the magic bytes during the Strat to Strax changeover.
+                        // Perhaps we can introduce a block height check rather?
+                        .SetCounterChainNetwork(StraxNetwork.MainChainNetworks[nodeSettings.Network.NetworkType]())
+
                         .UseSmartContractWallet()
-                        .UseApi()
-                        .UseMempool()
-                        .UseAzureIndexerOnSideChain()
                         .AddSQLiteWalletRepository()
+                        .UseApi()
+                        .AddRPC()
+                        .UseAzureIndexerOnSideChain()
                         .Build();
                 }
                 else
