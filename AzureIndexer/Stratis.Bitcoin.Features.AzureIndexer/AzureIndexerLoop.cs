@@ -1,4 +1,6 @@
-﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+﻿using Stratis.Bitcoin.Configuration.Settings;
+using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Bitcoin.P2P;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -26,6 +28,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
         /// <summary>Factory for creating background async loop tasks.</summary>
         private readonly IAsyncProvider asyncProvider;
+
+        /// <summary>Peer address manager.</summary>
+        private readonly IPeerAddressManager peerAddressManager;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -81,7 +86,11 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// <param name="loggerFactory">The logger factory.</param>
         public AzureIndexerLoop(FullNode fullNode, ILoggerFactory loggerFactory)
         {
+            var connectionManagerSettings = new ConnectionManagerSettings(fullNode.Settings);
+            var selfEndpointTracker = new SelfEndpointTracker(loggerFactory, connectionManagerSettings);
+
             this.asyncProvider = fullNode.AsyncProvider;
+            this.peerAddressManager = new PeerAddressManager(DateTimeProvider.Default, fullNode.DataFolder, loggerFactory, selfEndpointTracker);
             this.FullNode = fullNode;
             this.chainIndexer = fullNode.ChainIndexer;
             this.nodeLifetime = fullNode.NodeLifetime;
@@ -92,16 +101,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         }
 
         /// <summary>
-        /// Derives an IndexerConfiguration object from the proviced AzureIndexerSettings object and network.
+        /// Derives an IndexerConfiguration object from the provided AzureIndexerSettings object and network.
         /// </summary>
         /// <param name="indexerSettings">The AzureIndexerSettings object to use.</param>
         /// <param name="network">The network to use.</param>
         /// <param name="loggerFactory">logger factory</param>
         /// <param name="asyncProvider">current chain</param>
+        /// <param name="peerAddressManager">Peer address manager.</param>
         /// <returns>An IndexerConfiguration object derived from the AzureIndexerSettings object and network.</returns>
-        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public static IndexerConfiguration IndexerConfigFromSettings(AzureIndexerSettings indexerSettings, Network network, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, IPeerAddressManager peerAddressManager)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration(loggerFactory, asyncProvider)
+            IndexerConfiguration indexerConfig = new IndexerConfiguration(loggerFactory, asyncProvider, peerAddressManager)
             {
                 StorageNamespace = indexerSettings.StorageNamespace,
                 Network = network,
@@ -118,7 +128,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
         /// </summary>
         public void Initialize()
         {
-            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory, this.asyncProvider);
+            this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory, this.asyncProvider, this.peerAddressManager);
 
             AzureIndexer indexer = this.IndexerConfig.CreateIndexer();
             IndexerClient indexerClient = this.IndexerConfig.CreateIndexerClient();

@@ -1,4 +1,6 @@
-﻿namespace Stratis.Bitcoin.Features.AzureIndexer
+﻿using Stratis.Bitcoin.P2P;
+
+namespace Stratis.Bitcoin.Features.AzureIndexer
 {
     using System;
     using System.Collections.Generic;
@@ -35,6 +37,8 @@
         public bool IsSidechain { get; set; }
 
         public IAsyncProvider AsyncProvider { get; }
+
+        public IPeerAddressManager PeerAddressManager { get; }
 
         public Network Network { get; set; }
 
@@ -82,16 +86,18 @@
             set => this.blobClient = value;
         }
 
-        public IndexerConfiguration(ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public IndexerConfiguration(ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, IPeerAddressManager peerAddressManager)
         {
             this.AsyncProvider = asyncProvider;
+            this.PeerAddressManager = peerAddressManager;
             this.loggerFactory = loggerFactory;
-            this.Network = Networks.Networks.Stratis.Mainnet();
+            this.Network = Networks.Networks.Strax.Mainnet();
         }
 
-        public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public IndexerConfiguration(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, IPeerAddressManager peerAddressManager)
         {
             this.AsyncProvider = asyncProvider;
+            this.PeerAddressManager = peerAddressManager;
             this.loggerFactory = loggerFactory;
 
             var account = GetValue(config, "Azure.AccountName", true);
@@ -136,7 +142,7 @@
                 throw new IndexerConfigurationErrorsException("Node setting is not configured");
             }
 
-            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, this.loggerFactory, new PayloadProvider().DiscoverPayloads(), null, null, null, this.AsyncProvider);
+            NetworkPeerFactory networkPeerFactory = new NetworkPeerFactory(this.Network, DateTimeProvider.Default, this.loggerFactory, new PayloadProvider().DiscoverPayloads(), null, null, null, this.AsyncProvider, this.PeerAddressManager);
             return (NetworkPeer)networkPeerFactory.CreateConnectedNetworkPeerAsync(this.Node, ProtocolVersion.PROTOCOL_VERSION, isRelay: isRelay).Result;
         }
 

@@ -4,7 +4,7 @@
     <Description>Stratis Bitcoin Features Azure Indexer</Description>
     <AssemblyTitle>Stratis.Bitcoin.Features.AzureIndexer</AssemblyTitle>
     <!--<TargetFrameworks>netstandard2.0</TargetFrameworks>-->
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Stratis.Bitcoin.Features.AzureIndexer</AssemblyName>
     <PackageId>Stratis.Bitcoin.Features.AzureIndexer</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -22,23 +22,23 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="1.19.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="2.10.0" />
     <PackageReference Include="Microsoft.Data.OData" Version="5.8.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Filter" Version="1.1.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.1" />
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
-    <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <PackageReference Include="NStratis" Version="4.0.0.77" />
-    <PackageReference Include="Stratis.Bitcoin" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Features.BlockStore" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Consensus" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Miner" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Features.PoA" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Features.Wallet" Version="3.0.5" />
-    <PackageReference Include="Stratis.Bitcoin.Networks" Version="3.0.5" />
-    <PackageReference Include="Stratis.FodyNlogAdapter" Version="3.0.4.1" />
-    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.2" />
+    <PackageReference Include="NLog" Version="4.7.7" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.0" />
+    <PackageReference Include="NStratis" Version="4.0.0.79" />
+    <PackageReference Include="Stratis.Core" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Features.Miner" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Features.PoA" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.6.3" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 

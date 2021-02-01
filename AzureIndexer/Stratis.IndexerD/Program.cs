@@ -56,8 +56,8 @@ namespace Stratis.IndexerD
                             options.UseReflectionExecutor();
                             options.UsePoAWhitelistedContracts();
                         })
-                        .UseSmartContractPoAConsensus()
-                        .UseSmartContractPoAMining()
+                        .AddPoAFeature()
+                        .UsePoAConsensus()
                         .UseSmartContractWallet()
                         .UseApi()
                         .UseMempool()
@@ -66,7 +66,7 @@ namespace Stratis.IndexerD
                 }
                 else
                 {
-                    nodeSettings = new NodeSettings(networksSelector: Networks.Stratis, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+                    nodeSettings = new NodeSettings(networksSelector: Networks.Strax, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
                     {
                         MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
                     };

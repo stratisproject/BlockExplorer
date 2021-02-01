@@ -1,5 +1,9 @@
 ﻿using Stratis.Bitcoin.AsyncWork;
+using Stratis.Bitcoin.Configuration;
+using Stratis.Bitcoin.Configuration.Settings;
 using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Bitcoin.P2P;
+using Stratis.Bitcoin.Utilities;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 {
@@ -20,10 +24,13 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
         public AzureIndexer Indexer => this._Importer;
 
-        public static IndexerConfiguration CreateConfiguration(ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public static IndexerConfiguration CreateConfiguration(ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, NodeSettings nodeSettings)
         {
+            var connectionManagerSettings = new ConnectionManagerSettings(nodeSettings);
+            var selfEndpointTracker = new SelfEndpointTracker(loggerFactory, connectionManagerSettings);
+
             ConfigurationBuilder confBuilder = new ConfigurationBuilder();
-            IndexerConfiguration config = new IndexerConfiguration(confBuilder.Build(), loggerFactory, asyncProvider);
+            IndexerConfiguration config = new IndexerConfiguration(confBuilder.Build(), loggerFactory, asyncProvider, new PeerAddressManager(DateTimeProvider.Default, new DataFolder("C:\\Temp"), loggerFactory, selfEndpointTracker));
             return config;
         }
 
@@ -33,7 +40,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         {
             TestUtils.EnsureNew(folder);
 
-            var config = AzureIndexerLoop.IndexerConfigFromSettings( new AzureIndexerSettings() { StorageNamespace = folder }, KnownNetworks.TestNet, new LoggerFactory(), this.Indexer.Configuration.AsyncProvider);
+            var config = AzureIndexerLoop.IndexerConfigFromSettings( new AzureIndexerSettings() { StorageNamespace = folder }, KnownNetworks.TestNet, new LoggerFactory(), this.Indexer.Configuration.AsyncProvider, this.Indexer.Configuration.PeerAddressManager);
 
             config.EnsureSetup();
 

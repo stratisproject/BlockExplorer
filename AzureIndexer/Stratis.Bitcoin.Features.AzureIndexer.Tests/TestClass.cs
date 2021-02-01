@@ -113,9 +113,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void DoesNotCrashExtractingAddressFromBigTransaction()
         {
-            var tx = Transaction.Parse(File.ReadAllText("../../../Data/BigTransaction.txt"), RawFormat.BlockExplorer, KnownNetworks.StratisMain);
+            var tx = Transaction.Parse(File.ReadAllText("../../../Data/BigTransaction.txt"), RawFormat.BlockExplorer, KnownNetworks.StraxMain);
             var txId = tx.GetHash();
-            var result = OrderedBalanceChange.ExtractScriptBalances(txId, tx, null, null, 0, KnownNetworks.StratisMain);
+            var result = OrderedBalanceChange.ExtractScriptBalances(txId, tx, null, null, 0, KnownNetworks.StraxMain);
             foreach (var e in result)
             {
                 var entity = e.ToEntity();
@@ -290,7 +290,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 //Colored coin Payment
                 //GoldGuy emits gold to Nico
-                var txBuilder = new TransactionBuilder(KnownNetworks.StratisMain);
+                var txBuilder = new TransactionBuilder(KnownNetworks.StraxMain);
 
                 var issuanceCoinsTransaction
                     = new Transaction()
@@ -327,7 +327,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.NotNull(entry.ColoredTransaction);
                 Assert.Equal(Money.Parse("1.0"), entry.Amount);
 
-                txBuilder = new TransactionBuilder(KnownNetworks.StratisMain);
+                txBuilder = new TransactionBuilder(KnownNetworks.StraxMain);
                 txBuilder.StandardTransactionPolicy.MinRelayTxFee = new FeeRate(Money.Satoshis(1000));
                 var tx = txBuilder
                     .AddKeys(goldGuy)
@@ -350,7 +350,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var coloredCoins = ColoredCoin.Find(tx, ctx).ToArray();
                 var nicoGold = coloredCoins[0];
 
-                txBuilder = new TransactionBuilder(KnownNetworks.StratisMain);
+                txBuilder = new TransactionBuilder(KnownNetworks.StraxMain);
                 txBuilder.StandardTransactionPolicy.MinRelayTxFee = new FeeRate(Money.Satoshis(1000));
                 //GoldGuy sends 20 gold to alice against 0.6 BTC. Nico sends 10 gold to alice + 0.02 BTC.
                 tx = txBuilder
@@ -484,8 +484,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
         [Fact]
         public void DoNotCrashOnEmptyScript()
         {
-            var tx = Transaction.Parse("01000000014cee27ba570d2cca50bb9b3f7374c7eb24ec16ffec0a077c84c1cc23b0161804010000008b48304502200f1100f78596c8d46fb2f39c570ce6945956a3dd33c48fbdbe53af1c383182ed022100a85b528ea21ee7f39b2ec1568ac19f26f4dd4fb9d3dbf70587986de3c2c90fa801410426e4d0890ad5272b2b9a10ca3f518f7e025932caa62f13467e444df89ed25f24f4fc5075cad32f468c8f7f913e30057449d65623726e7102f5eaa326d486ebf7ffffffff020010000000000000006020e908000000001976a914947236437233a71cb033a53932008dbfe346388e88ac00000000", RawFormat.BlockExplorer, KnownNetworks.StratisRegTest);
-            OrderedBalanceChange.ExtractScriptBalances(null, tx, null, null, 0, Networks.Networks.Stratis.Testnet());
+            var tx = Transaction.Parse("01000000014cee27ba570d2cca50bb9b3f7374c7eb24ec16ffec0a077c84c1cc23b0161804010000008b48304502200f1100f78596c8d46fb2f39c570ce6945956a3dd33c48fbdbe53af1c383182ed022100a85b528ea21ee7f39b2ec1568ac19f26f4dd4fb9d3dbf70587986de3c2c90fa801410426e4d0890ad5272b2b9a10ca3f518f7e025932caa62f13467e444df89ed25f24f4fc5075cad32f468c8f7f913e30057449d65623726e7102f5eaa326d486ebf7ffffffff020010000000000000006020e908000000001976a914947236437233a71cb033a53932008dbfe346388e88ac00000000", RawFormat.BlockExplorer, KnownNetworks.StraxRegTest);
+            OrderedBalanceChange.ExtractScriptBalances(null, tx, null, null, 0, Networks.Networks.Strax.Testnet());
         }
 
         [Fact]
@@ -543,7 +543,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
                 //Merge alice2 into Alice with a tx involving alice1
                 tx
-                   = new TransactionBuilder(KnownNetworks.StratisMain)
+                   = new TransactionBuilder(KnownNetworks.StraxMain)
                        .AddKeys(alice1)
                        .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey)) //Alice1 10
                        .Send(alice2, "2.0")
@@ -586,7 +586,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     }
                 };
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey))
@@ -688,7 +688,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.Equal(2, rules.Length);
                 /////////////////////////////////////////////
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .AddKeys(alice1)
                         .AddCoins(new Coin(tx.GetHash(), 0, tx.Outputs[0].Value, tx.Outputs[0].ScriptPubKey))
                         .Send(alice2, "2.0")
@@ -735,7 +735,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     }
                 };
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(prevTx.GetHash(), 0, prevTx.Outputs[0].Value, prevTx.Outputs[0].ScriptPubKey))
@@ -775,7 +775,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 tester.Client.AddWalletRule("Alice", new ScriptRule(alice1.PubKey.ScriptPubKey.Hash, alice1.PubKey.ScriptPubKey));
                 tester.Client.AddWalletRule("Alice", new ScriptRule(alice2.PubKey.ScriptPubKey.Hash, null));
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .ContinueToBuild(newtx)
                         .AddKeys(alice1, alice2)
                         .AddCoins(new Coin(prevTx.GetHash(), 0, prevTx.Outputs[0].Value, prevTx.Outputs[0].ScriptPubKey))
@@ -802,7 +802,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.False(aliceBalance[0].ReceivedCoins[1] is ScriptCoin);
                 Assert.False(aliceBalance[0].ReceivedCoins[2] is ScriptCoin);
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .AddKeys(alice1, alice2)
                         .AddCoins(aliceBalance[0].ReceivedCoins[0])
                         .Send(satoshi, "0.0001")
@@ -959,7 +959,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(sheet.All[0].Amount == Money.Parse("20.0"));
 
                 var tx = chainBuilder.EmitMoney(bob, "10.0", false);
-                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StratisMain));
+                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StraxMain));
                 tester.Indexer.IndexOrderedBalance(tx);
 
                 sheet = tester.Client.GetOrderedBalance(bob).AsBalanceSheet(chainBuilder.Chain);
@@ -1113,7 +1113,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
 
             using (var tester = this.CreateTester())
             {
-                var tx = Transaction.Parse("010000000127d57276f1026a95b4af3b03b6aba859a001861682342af19825e8a2408ae008010000008c493046022100cd92b992d4bde3b44471677081c5ece6735d6936480ff74659ac1824d8a1958e022100b08839f167532aea10acecc9d5f7044ddd9793ef2989d090127a6e626dc7c9ce014104cac6999d6c3feaba7cdd6c62bce174339190435cffd15af7cb70c33b82027deba06e6d5441eb401c0f8f92d4ffe6038d283d2b2dd59c4384b66b7b8f038a7cf5ffffffff0200093d0000000000434104636d69f81d685f6f58054e17ac34d16db869bba8b3562aabc38c35b065158d360f087ef7bd8b0bcbd1be9a846a8ed339bf0131cdb354074244b0a9736beeb2b9ac40420f0000000000fdba0f76a9144838a081d73cf134e8ff9cfd4015406c73beceb388acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac00000000", RawFormat.BlockExplorer, KnownNetworks.StratisRegTest);
+                var tx = Transaction.Parse("010000000127d57276f1026a95b4af3b03b6aba859a001861682342af19825e8a2408ae008010000008c493046022100cd92b992d4bde3b44471677081c5ece6735d6936480ff74659ac1824d8a1958e022100b08839f167532aea10acecc9d5f7044ddd9793ef2989d090127a6e626dc7c9ce014104cac6999d6c3feaba7cdd6c62bce174339190435cffd15af7cb70c33b82027deba06e6d5441eb401c0f8f92d4ffe6038d283d2b2dd59c4384b66b7b8f038a7cf5ffffffff0200093d0000000000434104636d69f81d685f6f58054e17ac34d16db869bba8b3562aabc38c35b065158d360f087ef7bd8b0bcbd1be9a846a8ed339bf0131cdb354074244b0a9736beeb2b9ac40420f0000000000fdba0f76a9144838a081d73cf134e8ff9cfd4015406c73beceb388acacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacac00000000", RawFormat.BlockExplorer, KnownNetworks.StraxRegTest);
                 tx.Outputs[1].ScriptPubKey = new Script(string.Join(' ', Enumerable.Repeat("OP_NOP", BalanceId.MaxScriptSize)));
                 tester.Indexer.IndexOrderedBalance(tx);
                 var result = tester.Client.GetOrderedBalance(tx.Outputs[1].ScriptPubKey).ToArray()[0];
@@ -1191,7 +1191,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 }
 
                 tx.Outputs.Add(new TxOut(Money.Coins(0.1m), alice));
-                tx.Sign(KnownNetworks.StratisMain, bob, false);
+                tx.Sign(KnownNetworks.StraxMain, bob, false);
                 chainBuilder.Emit(tx);
                 chainBuilder.SubmitBlock();
                 chainBuilder.SyncIndexer();
@@ -1249,7 +1249,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 ScriptSig = bob.ScriptPubKey
             });
             tx.Outputs.Add(new TxOut(Money.Coins(0.1m), alice));
-            tx.Sign(KnownNetworks.StratisMain, bob, false);
+            tx.Sign(KnownNetworks.StraxMain, bob, false);
             chainBuilder.Emit(tx);
             chainBuilder.SubmitBlock();
             chainBuilder.SyncIndexer();
@@ -1285,7 +1285,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var aliceBalance = tester.Client.GetOrderedBalance(alice.PubKey.WitHash).ToArray();
                 Assert.True(aliceBalance.Length == 1);
 
-                var tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                var tx = new TransactionBuilder(KnownNetworks.StraxMain)
                     .AddCoins(aliceBalance[0].ReceivedCoins)
                     .AddKeys(alice)
                     .Send(bob.PubKey.WitHash, "5.0")
@@ -1331,8 +1331,8 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var aliceBalance = tester.Client.GetOrderedBalance(alice.PubKey.ScriptPubKey.WitHash).ToArray();
                 Assert.True(aliceBalance.Length == 1);
 
-                var tx = new TransactionBuilder(KnownNetworks.StratisMain)
-                    .AddCoins(ScriptCoin.Create(KnownNetworks.StratisMain, (Coin)aliceBalance[0].ReceivedCoins[0], alice.PubKey.ScriptPubKey))
+                var tx = new TransactionBuilder(KnownNetworks.StraxMain)
+                    .AddCoins(ScriptCoin.Create(KnownNetworks.StraxMain, (Coin)aliceBalance[0].ReceivedCoins[0], alice.PubKey.ScriptPubKey))
                     .AddKeys(alice)
                     .Send(bob.PubKey.ScriptPubKey.WitHash, "5.0")
                     .SetChange(alice.PubKey.ScriptPubKey.WitHash)
@@ -1384,7 +1384,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 Assert.True(bobBalance[1].Amount == Money.Parse("50.0"));
 
                 var aliceBalance = tester.Client.GetOrderedBalance(alice).ToArray();
-                var tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                var tx = new TransactionBuilder(KnownNetworks.StraxMain)
                     .AddCoins(bobBalance[0].ReceivedCoins)
                     .AddKeys(bob)
                     .Send(alice, "5.0")
@@ -1431,31 +1431,31 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                 var satoshiBalance = tester.Client.GetOrderedBalance(satoshi).ToArray();
                 Assert.True(satoshiBalance[0].Amount == Money.Parse("1.0"));
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                         .AddCoins(satoshiBalance[0].ReceivedCoins)
                         .AddKeys(satoshi)
                         .Send(alice, "0.2")
                         .SetChange(satoshi)
                         .BuildTransaction(true);
 
-                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StratisMain));
+                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StraxMain));
                 tester.Indexer.IndexOrderedBalance(tx);
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                        .AddCoins(satoshiBalance[0].ReceivedCoins)
                        .AddKeys(satoshi)
                        .Send(alice, "0.3")
                        .SetChange(satoshi)
                        .BuildTransaction(true);
 
-                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StratisMain));
+                tester.Indexer.Index(new TransactionEntry.Entity(null, tx, null, KnownNetworks.StraxMain));
                 tester.Indexer.IndexOrderedBalance(tx);
 
                 satoshiBalance = tester.Client.GetOrderedBalance(satoshi).ToArray();
                 Assert.True(satoshiBalance[0].Amount == -Money.Parse("0.3"));
                 Assert.True(satoshiBalance[1].Amount == -Money.Parse("0.2"));
 
-                tx = new TransactionBuilder(KnownNetworks.StratisMain)
+                tx = new TransactionBuilder(KnownNetworks.StraxMain)
                        .AddCoins(satoshiBalance[0].ReceivedCoins)
                        .AddKeys(satoshi)
                        .Send(alice, "0.1")
@@ -1566,17 +1566,17 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
             var testcase = JsonConvert.DeserializeObject<TestCase[]>(File.ReadAllText("../../../Data/openasset-known-tx.json"))
                 .First(t => t.test == test);
 
-            NoSqlTransactionRepository repository = new NoSqlTransactionRepository(KnownNetworks.StratisRegTest);
+            NoSqlTransactionRepository repository = new NoSqlTransactionRepository(KnownNetworks.StraxRegTest);
 
             foreach (var tx in testcase.txs)
             {
-                var txObj = Transaction.Parse(tx, RawFormat.Satoshi, KnownNetworks.StratisRegTest);
+                var txObj = Transaction.Parse(tx, RawFormat.Satoshi, KnownNetworks.StraxRegTest);
                 this.Transactions.Add(txObj);
                 repository.Put(txObj.GetHash(), txObj);
             }
 
             this.TestedTxId = uint256.Parse(testcase.testedtx);
-            this.Repository = new NoSqlColoredTransactionRepository(KnownNetworks.StratisRegTest, repository, new InMemoryNoSqlRepository(KnownNetworks.StratisRegTest));
+            this.Repository = new NoSqlColoredTransactionRepository(KnownNetworks.StraxRegTest, repository, new InMemoryNoSqlRepository(KnownNetworks.StraxRegTest));
         }
 
         public IColoredTransactionRepository Repository
@@ -1606,7 +1606,7 @@ namespace Stratis.Bitcoin.Features.AzureIndexer.Tests
                     WebClient client = new WebClient();
                     var result = client.DownloadString("http://btc.blockr.io/api/v1/tx/raw/" + ex.TxId);
                     var json = JObject.Parse(result);
-                    var tx = Transaction.Parse(json["data"]["tx"]["hex"].ToString(), RawFormat.Satoshi, KnownNetworks.StratisRegTest);
+                    var tx = Transaction.Parse(json["data"]["tx"]["hex"].ToString(), RawFormat.Satoshi, KnownNetworks.StraxRegTest);
 
                     builder.AppendLine("\"" + json["data"]["tx"]["hex"].ToString() + "\",\r\n");
                     this.Repository.Transactions.Put(tx.GetHash(), tx);

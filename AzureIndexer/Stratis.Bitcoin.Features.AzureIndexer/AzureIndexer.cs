@@ -1,4 +1,5 @@
 ﻿using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Bitcoin.P2P;
 
 namespace Stratis.Bitcoin.Features.AzureIndexer
 {
@@ -30,9 +31,9 @@ namespace Stratis.Bitcoin.Features.AzureIndexer
 
     public class AzureIndexer
     {
-        public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public static AzureIndexer CreateIndexer(IConfiguration config, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, IPeerAddressManager peerAddressManager)
         {
-            IndexerConfiguration indexerConfig = new IndexerConfiguration(config, loggerFactory, asyncProvider);
+            IndexerConfiguration indexerConfig = new IndexerConfiguration(config, loggerFactory, asyncProvider, peerAddressManager);
             return indexerConfig.CreateIndexer();
         }
 
