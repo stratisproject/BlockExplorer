@@ -75,7 +75,7 @@
             };
 
             int stopAtHeight = cachedSummary.Locator == null ? -1 : cachedLocator?.Height ?? -1;
-            int lookback = (int)(this.expiration.Ticks / this.network.Consensus.PowTargetSpacing.Ticks);
+            int lookback = (int)(this.expiration.Ticks / this.network.Consensus.PowTargetTimespan.Ticks);
             if (at == null)
             {
                 stopAtHeight = stopAtHeight - lookback;

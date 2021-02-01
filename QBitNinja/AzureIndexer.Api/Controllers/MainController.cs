@@ -616,7 +616,7 @@ namespace AzureIndexer.Api.Controllers
             };
 
             int stopAtHeight = cachedSummary.Locator == null ? -1 : cachedLocator.Height;
-            int lookback = (int)(this.Expiration.Ticks / this.Network.Consensus.PowTargetSpacing.Ticks);
+            int lookback = (int)(this.Expiration.Ticks / this.Network.Consensus.PowTargetTimespan.Ticks);
             if (at == null)
             {
                 stopAtHeight = stopAtHeight - lookback;
@@ -958,7 +958,7 @@ namespace AzureIndexer.Api.Controllers
             resp.Last144 = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis().Take(144).ToArray());
             resp.Last2016 = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis().Take(2016).ToArray());
             var difficultyAdjustmentInterval = (long)this.Network.Consensus.PowTargetTimespan.TotalSeconds /
-                                               (long)this.Network.Consensus.PowTargetSpacing.TotalSeconds;
+                                               (long)this.Network.Consensus.PowTargetTimespan.TotalSeconds;
 
             resp.SincePeriodStart = this.GetVersionStats(this.Chain.Tip.EnumerateToGenesis()
                                                              .TakeWhile(s => this.Chain.Tip == s || s.Height % difficultyAdjustmentInterval != difficultyAdjustmentInterval - 1).ToArray());

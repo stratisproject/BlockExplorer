@@ -9,12 +9,12 @@ using CommonServiceLocator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Protocols;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.Crypto;
 using Stratis.Bitcoin.AsyncWork;
 using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Bitcoin.P2P;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
 namespace AzureIndexer.Api.Infrastructure
@@ -166,10 +166,10 @@ namespace AzureIndexer.Api.Infrastructure
 
     public class QBitNinjaConfiguration
     {
-        public QBitNinjaConfiguration(IConfiguration configuration, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
+        public QBitNinjaConfiguration(IConfiguration configuration, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider, IPeerAddressManager peerAddressManager)
         {
             this.CoinbaseMaturity = 100;
-            this.Indexer = new IndexerConfiguration(configuration, loggerFactory, asyncProvider);
+            this.Indexer = new IndexerConfiguration(configuration, loggerFactory, asyncProvider, peerAddressManager);
             this.LocalChain = configuration["LocalChain"];
             this.ServiceBus = configuration["ServiceBus"];
         }
