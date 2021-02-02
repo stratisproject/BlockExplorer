@@ -117,12 +117,13 @@ namespace AzureIndexer.Api
 
             builder.Register(ctx =>
             {
+                var nodeSettings = NodeSettings.Default(network);
                 var loggerFactory = ctx.Resolve<ILoggerFactory>();
                 var dateTimeProvider = ctx.Resolve<IDateTimeProvider>();
-                var connectionManagerSettings = new ConnectionManagerSettings(NodeSettings.Default(network));
+                var connectionManagerSettings = new ConnectionManagerSettings(nodeSettings);
                 var selfEndpointTracker = new SelfEndpointTracker(loggerFactory, connectionManagerSettings);
 
-                var peerAddressManager = new PeerAddressManager(dateTimeProvider, new DataFolder("D:\\Home\\site\\wwwroot\\data\\temp"), loggerFactory, selfEndpointTracker);
+                var peerAddressManager = new PeerAddressManager(dateTimeProvider, nodeSettings.DataFolder, loggerFactory, selfEndpointTracker);
 
                 return peerAddressManager;
             }).As<IPeerAddressManager>().SingleInstance();
@@ -137,7 +138,9 @@ namespace AzureIndexer.Api
 
                 return signals;
             }).As<ISignals>().SingleInstance();
-            builder.RegisterType<ChainRepository>().As<IChainRepository>().WithParameter("folder", this.Configuration["LocalChain"]).SingleInstance();
+            builder.RegisterInstance(network).As<Network>();
+            builder.RegisterType<ChainStore>().As<IChainStore>();
+            builder.RegisterType<ChainRepository>().As<IChainRepository>().SingleInstance();
             builder.RegisterType<TransactionSearchService>().As<ITransactionSearchService>();
             builder.RegisterType<NodeLifetime>().As<INodeLifetime>();
             builder.RegisterType<BalanceSearchService>().As<IBalanceSearchService>();
