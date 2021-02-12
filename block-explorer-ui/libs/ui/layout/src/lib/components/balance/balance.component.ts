@@ -25,7 +25,7 @@ export class BalanceComponent implements OnInit {
   }
 
   get whole() {
-    return this.value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,').split('.')[0];
+    return this.value.toString().replace(/\d(?=(\d{3})+\.)/g, '$&,').split('.')[0];
   }
 
   get decimal() {
