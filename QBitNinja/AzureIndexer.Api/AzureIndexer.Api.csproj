@@ -26,14 +26,15 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Stratis.Core" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Miner" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.PoA" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Core.Networks" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Core" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Miner" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.PoA" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.7" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
+    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.6.4" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.5.3" />
@@ -47,11 +48,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Stratis.Sidechains.Networks">
-      <HintPath>..\..\AzureIndexer\StratisLibs\Stratis.Sidechains.Networks.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

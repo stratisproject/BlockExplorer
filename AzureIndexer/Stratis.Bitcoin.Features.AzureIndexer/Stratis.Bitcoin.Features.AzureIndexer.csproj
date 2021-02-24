@@ -31,14 +31,14 @@
     <PackageReference Include="NLog" Version="4.7.7" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.7.0" />
     <PackageReference Include="NStratis" Version="4.0.0.79" />
-    <PackageReference Include="Stratis.Core" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Miner" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.PoA" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.Core.Networks" Version="1.0.6.3" />
-    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.Core" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Miner" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.PoA" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.7" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.7" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 

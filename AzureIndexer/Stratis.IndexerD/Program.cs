@@ -1,4 +1,8 @@
 ﻿using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+using Stratis.Bitcoin.Features.SmartContracts.Wallet;
+using Stratis.Features.Collateral;
+using Stratis.Features.Collateral.CounterChain;
+using Stratis.Features.SQLiteWalletRepository;
 
 namespace Stratis.IndexerD
 {
@@ -10,14 +14,12 @@ namespace Stratis.IndexerD
     using Stratis.Bitcoin.Builder;
     using Stratis.Bitcoin.Configuration;
     using Stratis.Bitcoin.Features.Api;
-    using Stratis.Bitcoin.Features.AzureIndexer;
     using Stratis.Bitcoin.Features.BlockStore;
     using Stratis.Bitcoin.Features.Consensus;
     using Stratis.Bitcoin.Features.MemoryPool;
     using Stratis.Bitcoin.Features.RPC;
     using Stratis.Bitcoin.Features.SmartContracts;
     using Stratis.Bitcoin.Features.SmartContracts.PoA;
-    using Stratis.Bitcoin.Features.SmartContracts.Wallet;
     using Stratis.Bitcoin.Networks;
     using Stratis.Bitcoin.Utilities;
     using Stratis.Sidechains.Networks;
@@ -47,6 +49,7 @@ namespace Stratis.IndexerD
                     {
                         MinProtocolVersion = ProtocolVersion.CIRRUS_MIN_SUPPORTED_VERSION
                     };
+
                     node = new FullNodeBuilder()
                         .UseNodeSettings(nodeSettings)
                         .UseBlockStore()
@@ -58,7 +61,10 @@ namespace Stratis.IndexerD
                         })
                         .AddPoAFeature()
                         .UsePoAConsensus()
+                        .CheckCollateralCommitment()
+                        .SetCounterChainNetwork(StraxNetwork.MainChainNetworks[nodeSettings.Network.NetworkType]())
                         .UseSmartContractWallet()
+                        .AddSQLiteWalletRepository()
                         .UseApi()
                         .UseMempool()
                         .UseAzureIndexer()
