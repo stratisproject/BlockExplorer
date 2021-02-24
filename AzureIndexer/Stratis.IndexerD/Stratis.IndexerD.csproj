@@ -5,7 +5,7 @@
     <AssemblyName>Stratis.IndexerD</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>Stratis.IndexerD</PackageId>
-    <RuntimeFrameworkVersion>5.0.2</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>3.1.9</RuntimeFrameworkVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
