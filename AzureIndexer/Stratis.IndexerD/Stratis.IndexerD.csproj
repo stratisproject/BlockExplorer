@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.1" />
     <PackageReference Include="NLog" Version="4.7.7" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.7.0" />
-    <PackageReference Include="NStratis" Version="4.0.0.79" />
+    <PackageReference Include="NStratis" Version="4.0.0.80" />
     <PackageReference Include="Stratis.Core" Version="1.0.7" />
     <PackageReference Include="Stratis.Features.Api" Version="1.0.7" />
     <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.7" />
