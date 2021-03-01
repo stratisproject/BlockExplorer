@@ -6,8 +6,7 @@ using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.Models.Tokens;
 using Microsoft.AspNetCore.Mvc;
 using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Controllers
 {

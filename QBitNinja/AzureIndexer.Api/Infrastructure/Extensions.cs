@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using AzureIndexer.Api.Models;
 using CommonServiceLocator;
 using Microsoft.AspNetCore.Http;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Features.AzureIndexer.Entities;
 using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer.Entities;
 
 namespace AzureIndexer.Api.Infrastructure
 {

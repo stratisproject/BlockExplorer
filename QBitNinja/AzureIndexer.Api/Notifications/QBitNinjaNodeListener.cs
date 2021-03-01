@@ -14,16 +14,16 @@ using NBitcoin;
 using Stratis.Bitcoin;
 using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.Consensus;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Features.AzureIndexer.Entities;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
-using Stratis.Bitcoin.Features.AzureIndexer.Tokens;
 using Stratis.Bitcoin.Interfaces;
 using Stratis.Bitcoin.P2P.Peer;
 using Stratis.Bitcoin.P2P.Protocol;
 using Stratis.Bitcoin.P2P.Protocol.Behaviors;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer.Entities;
+using Stratis.Features.AzureIndexer.IndexTasks;
+using Stratis.Features.AzureIndexer.Repositories;
+using Stratis.Features.AzureIndexer.Tokens;
 using Stratis.SmartContracts.CLR.Serialization;
 using Stratis.SmartContracts.Core.Receipts;
 using Stratis.SmartContracts.Core.State;
@@ -102,7 +102,7 @@ namespace AzureIndexer.Api.Notifications
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
-        private Stratis.Bitcoin.Features.AzureIndexer.WalletRuleEntryCollection _Wallets;
+        private Stratis.Features.AzureIndexer.WalletRuleEntryCollection _Wallets;
         ReaderWriterLock _WalletsSlimLock = new ReaderWriterLock();
 
         object _LockBalance = new object();
@@ -142,9 +142,9 @@ namespace AzureIndexer.Api.Notifications
             this.logDeserializer = logDeserializer;
         }
 
-        private Stratis.Bitcoin.Features.AzureIndexer.AzureIndexer _Indexer;
+        private Stratis.Features.AzureIndexer.AzureIndexer _Indexer;
 
-        public Stratis.Bitcoin.Features.AzureIndexer.AzureIndexer Indexer
+        public Stratis.Features.AzureIndexer.AzureIndexer Indexer
         {
             get
             {

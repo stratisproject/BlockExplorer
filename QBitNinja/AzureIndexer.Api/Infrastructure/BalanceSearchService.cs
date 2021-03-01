@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api.Infrastructure
+﻿using Stratis.Features.AzureIndexer;
+
+namespace AzureIndexer.Api.Infrastructure
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +10,6 @@
     using System.Threading;
     using Models;
     using NBitcoin;
-    using Stratis.Bitcoin.Features.AzureIndexer;
 
     public class BalanceSearchService : IBalanceSearchService
     {
@@ -75,7 +76,7 @@
             };
 
             int stopAtHeight = cachedSummary.Locator == null ? -1 : cachedLocator?.Height ?? -1;
-            int lookback = (int)(this.expiration.Ticks / this.network.Consensus.PowTargetSpacing.Ticks);
+            int lookback = (int)(this.expiration.Ticks / this.network.Consensus.PowTargetTimespan.Ticks); // PowTargetSpacing
             if (at == null)
             {
                 stopAtHeight = stopAtHeight - lookback;

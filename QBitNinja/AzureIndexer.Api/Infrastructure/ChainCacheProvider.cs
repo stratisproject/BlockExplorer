@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stratis.Bitcoin.Base;
-using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 using Stratis.Bitcoin.Utilities;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -15,7 +15,6 @@ namespace AzureIndexer.Api.Infrastructure
     using System.IO;
     using System.Threading;
     using NBitcoin;
-    using Stratis.Bitcoin.Features.AzureIndexer;
 
     public class ChainCacheProvider
     {

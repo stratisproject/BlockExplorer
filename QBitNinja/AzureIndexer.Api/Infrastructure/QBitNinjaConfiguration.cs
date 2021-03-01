@@ -5,17 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AzureIndexer.Api.Models;
 using AzureIndexer.Api.Notifications;
-using CommonServiceLocator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Protocols;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
 using NBitcoin.Crypto;
 using Stratis.Bitcoin.AsyncWork;
-using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {

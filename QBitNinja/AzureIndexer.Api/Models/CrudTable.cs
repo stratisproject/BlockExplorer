@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
+using Stratis.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer.Helpers;
 using Stratis.Bitcoin.Utilities.JsonConverters;
 using Scope = AzureIndexer.Api.Infrastructure.Scope;
 

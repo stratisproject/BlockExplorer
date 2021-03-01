@@ -4,7 +4,7 @@ using AzureIndexer.Api.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NBitcoin;
 using NBitcoin.DataEncoders;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.ModelBinders
 {

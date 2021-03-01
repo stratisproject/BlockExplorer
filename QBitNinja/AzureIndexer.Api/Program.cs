@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api
+﻿using Microsoft.Extensions.Logging;
+
+namespace AzureIndexer.Api
 {
     using System;
     using System.IO;
