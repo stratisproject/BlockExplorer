@@ -68,7 +68,6 @@ namespace Stratis.IndexerD
                         .UseAzureIndexerOnSideChain()
                         .UseApi()
                         .UseMempool()
-                        .UseAzureIndexer()
                         .Build();
                 }
                 else
