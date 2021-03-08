@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer", "Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj", "{0530E335-AC7A-408C-A93B-5F762B29E5F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Features.AzureIndexer", "Stratis.Features.AzureIndexer\Stratis.Features.AzureIndexer.csproj", "{0530E335-AC7A-408C-A93B-5F762B29E5F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.IndexerD", "Stratis.IndexerD\Stratis.IndexerD.csproj", "{8E1DCC85-5E80-43AD-8A78-2F9DF8F2B995}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer.Tests", "Stratis.Bitcoin.Features.AzureIndexer.Tests\Stratis.Bitcoin.Features.AzureIndexer.Tests.csproj", "{6132B8ED-8F2F-4F38-831C-68446ECA56AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Features.AzureIndexer.Tests", "Stratis.Features.AzureIndexer.Tests\Stratis.Features.AzureIndexer.Tests.csproj", "{6132B8ED-8F2F-4F38-831C-68446ECA56AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

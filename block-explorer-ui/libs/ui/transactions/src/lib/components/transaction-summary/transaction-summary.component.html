@@ -1,0 +1,35 @@
+<h3>Transaction</h3>
+<div class="alert alert-secondary">
+  <b>Transaction Hash</b> {{hash}}
+</div>
+<h4 class="">Summary</h4>
+<div class="list-group-item my-4-x">
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Height</label></th>
+        <td><a [routerLink]="['/blocks', height]">{{height}}</a></td>
+      </tr>
+      <tr>
+        <th><label>Amount</label></th>
+        <td>
+          <blockexplorer-balance [balance]="amount"></blockexplorer-balance>
+        </td>
+      </tr>
+      <tr>
+        <th><label>Fees</label></th>
+        <td>
+          <blockexplorer-balance [balance]="fees"></blockexplorer-balance>
+        </td>
+      </tr>
+      <tr>
+        <th><label>Date</label></th>
+        <td>{{time}}</td>
+      </tr>
+      <tr>
+        <th><label>Type</label></th>
+        <td><span class="badge badge-purple">{{type}}</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

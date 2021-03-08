@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9FC402ED-963F-4EC0-A5C0-38139473804E}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,19 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9FC402
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Tests", "QBitNinja.Tests\QBitNinja.Tests.csproj", "{5CB38069-834E-4586-B101-036BDBCA7B92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureIndexer.Api", "AzureIndexer.Api\AzureIndexer.Api.csproj", "{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Client", "QBitNinja.Client\QBitNinja.Client.csproj", "{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Client.Tests", "QBitNinja.Client.Tests\QBitNinja.Client.Tests.csproj", "{068A0D44-F058-4086-9EB5-9FF75B89EA74}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja.Listener.Console", "QBitNinja.Listener.Console\QBitNinja.Listener.Console.csproj", "{9A05CF5C-3BF7-4898-8268-53089008B64C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QBitNinja.Client.NETCore", "QBitNinja.Client.NETCore\QBitNinja.Client.NETCore.csproj", "{30AEC09B-8D39-417F-85C3-A33F8AFB2193}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Bitcoin.Features.AzureIndexer", "..\AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer\Stratis.Bitcoin.Features.AzureIndexer.csproj", "{BA1C60EA-42C7-4B63-8DC0-6155C0603700}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBitNinja", "QBitNinja\QBitNinja.csproj", "{DE989093-1B6D-48E6-BB13-93A799F9CF49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stratis.Features.AzureIndexer", "..\AzureIndexer\Stratis.Features.AzureIndexer\Stratis.Features.AzureIndexer.csproj", "{E867139A-BB95-4784-AED3-D743AE9D20F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,70 +22,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.QA|Any CPU.ActiveCfg = QA|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.QA|Any CPU.Build.0 = QA|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.QA-Testnet|Any CPU.ActiveCfg = QA-Testnet|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.QA-Testnet|Any CPU.Build.0 = QA-Testnet|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5CB38069-834E-4586-B101-036BDBCA7B92}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.QA|Any CPU.ActiveCfg = QA|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.QA|Any CPU.Build.0 = QA|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.QA-Testnet|Any CPU.ActiveCfg = QA-Testnet|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.QA-Testnet|Any CPU.Build.0 = QA-Testnet|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C796B6B-86B5-4C57-ADAA-12CF1FECDA71}.Release|Any CPU.Build.0 = Release|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.QA|Any CPU.ActiveCfg = QA|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.QA|Any CPU.Build.0 = QA|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.QA-Testnet|Any CPU.ActiveCfg = QA-Testnet|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.QA-Testnet|Any CPU.Build.0 = QA-Testnet|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{068A0D44-F058-4086-9EB5-9FF75B89EA74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.QA|Any CPU.ActiveCfg = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.QA|Any CPU.Build.0 = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.QA-Testnet|Any CPU.ActiveCfg = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.QA-Testnet|Any CPU.Build.0 = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28BA4865-0990-4B5A-947E-143C700B1CB4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.QA|Any CPU.ActiveCfg = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.QA|Any CPU.Build.0 = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.QA-Testnet|Any CPU.ActiveCfg = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.QA-Testnet|Any CPU.Build.0 = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A05CF5C-3BF7-4898-8268-53089008B64C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.QA|Any CPU.ActiveCfg = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.QA|Any CPU.Build.0 = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30AEC09B-8D39-417F-85C3-A33F8AFB2193}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA|Any CPU.Build.0 = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA1C60EA-42C7-4B63-8DC0-6155C0603700}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.QA-Testnet|Any CPU.Build.0 = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE989093-1B6D-48E6-BB13-93A799F9CF49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.QA|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.QA|Any CPU.Build.0 = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88BBFD62-5762-443B-A8CC-4B9B6B5C2C1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.QA|Any CPU.ActiveCfg = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.QA|Any CPU.Build.0 = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.QA-Testnet|Any CPU.ActiveCfg = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.QA-Testnet|Any CPU.Build.0 = Debug|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E867139A-BB95-4784-AED3-D743AE9D20F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

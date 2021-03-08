@@ -170,7 +170,7 @@ namespace QBitNinja
             var scriptSig = FindScriptSig(address);
             if (scriptSig == null)
                 return null;
-            var result = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
+            var result = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(this.Network, scriptSig);
             return result == null ? null : new WhatIsScript(result.RedeemScript, Network);
         }
 
@@ -179,7 +179,7 @@ namespace QBitNinja
             var scriptSig = FindScriptSig(address);
             if (scriptSig == null)
                 return null;
-            var result = PayToPubkeyHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
+            var result = PayToPubkeyHashTemplate.Instance.ExtractScriptSigParameters(this.Network, scriptSig);
             return result == null ? null : new WhatIsPublicKey(result.PublicKey, Network);
         }
 

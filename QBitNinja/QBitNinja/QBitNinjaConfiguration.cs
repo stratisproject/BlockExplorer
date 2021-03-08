@@ -12,7 +12,9 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
 namespace QBitNinja
 {
@@ -199,7 +201,7 @@ namespace QBitNinja
 		{
 			var conf = new QBitNinjaConfiguration
 			{
-				Indexer = IndexerConfiguration.FromConfiguration(new ConfigurationManagerConfiguration()),
+				Indexer = new IndexerConfiguration(new ConfigurationManagerConfiguration(), new LoggerFactory()), // TODO: Check if this is correct
 				LocalChain = ConfigurationManager.AppSettings["LocalChain"],
 				ServiceBus = ConfigurationManager.AppSettings["ServiceBus"]
 			};
@@ -309,7 +311,7 @@ namespace QBitNinja
 
 		///////
 
-		public int CoinbaseMaturity
+		public long CoinbaseMaturity
 		{
 			get;
 			set;

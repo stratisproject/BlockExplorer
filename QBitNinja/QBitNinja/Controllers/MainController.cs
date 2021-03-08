@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
 
 namespace QBitNinja.Controllers
 {
@@ -50,11 +51,12 @@ namespace QBitNinja.Controllers
 			switch(this.Request.Content.Headers.ContentType.MediaType)
 			{
 				case "application/json":
-					tx = NBitcoin.Transaction.Parse(JsonConvert.DeserializeObject<string>(await Request.Content.ReadAsStringAsync()));
+					tx = NBitcoin.Transaction.Parse(JsonConvert.DeserializeObject<string>(await Request.Content.ReadAsStringAsync()), RawFormat.BlockExplorer);
 					break;
 				case "application/octet-stream":
 					{
-						tx = new Transaction(await Request.Content.ReadAsByteArrayAsync());
+                        // TODO: Fix this transaction
+                        // tx = new Transaction(await Request.Content.ReadAsByteArrayAsync());
 						break;
 					}
 				default:
@@ -92,7 +94,7 @@ namespace QBitNinja.Controllers
 				Success = true,
 				Error = new BroadcastError()
 				{
-					ErrorCode = NBitcoin.Protocol.RejectCode.INVALID,
+					ErrorCode = RejectCode.INVALID,
 					Reason = "Unknown"
 				}
 			};
@@ -638,12 +640,12 @@ namespace QBitNinja.Controllers
 			return ToBalanceLocator(AtBlock(feature));
 		}
 
-		private ConfirmedBalanceLocator ToBalanceLocator(ChainedBlock atBlock)
+		private ConfirmedBalanceLocator ToBalanceLocator(ChainedHeader atBlock)
 		{
 			return new ConfirmedBalanceLocator(atBlock.Height, atBlock.HashBlock);
 		}
 
-		private ChainedBlock AtBlock(BlockFeature at)
+		private ChainedHeader AtBlock(BlockFeature at)
 		{
 			var atBlock = Chain.Tip;
 			if(at != null)
@@ -656,12 +658,12 @@ namespace QBitNinja.Controllers
 			return atBlock;
 		}
 
-		private bool IsMature(int height, ChainedBlock tip)
+		private bool IsMature(int height, ChainedHeader tip)
 		{
 			return tip.Height - height >= Configuration.CoinbaseMaturity;
 		}
 
-		private bool IsMature(OrderedBalanceChange c, ChainedBlock tip)
+		private bool IsMature(OrderedBalanceChange c, ChainedHeader tip)
 		{
 			return !c.IsCoinbase || (c.BlockId != null && IsMature(c.Height, tip));
 		}
@@ -864,8 +866,11 @@ namespace QBitNinja.Controllers
 			VersionStatsResponse resp = new VersionStatsResponse();
 			resp.Last144 = GetVersionStats(Chain.Tip.EnumerateToGenesis().Take(144).ToArray());
 			resp.Last2016 = GetVersionStats(Chain.Tip.EnumerateToGenesis().Take(2016).ToArray());
-			resp.SincePeriodStart = GetVersionStats(Chain.Tip.EnumerateToGenesis()
-															 .TakeWhile(s => Chain.Tip == s || s.Height % Network.Consensus.DifficultyAdjustmentInterval != Network.Consensus.DifficultyAdjustmentInterval - 1).ToArray());
+		    var difficultyAdjustmentInterval = (long)Network.Consensus.PowTargetTimespan.TotalSeconds /
+		                                       (long)Network.Consensus.PowTargetSpacing.TotalSeconds;
+
+            resp.SincePeriodStart = GetVersionStats(Chain.Tip.EnumerateToGenesis()
+															 .TakeWhile(s => Chain.Tip == s || s.Height % difficultyAdjustmentInterval != difficultyAdjustmentInterval - 1).ToArray());
 			return resp;
 		}
 
@@ -891,7 +896,7 @@ namespace QBitNinja.Controllers
 			return result;
 		}
 
-		private VersionStats GetVersionStats(ChainedBlock[] chainedBlock)
+		private VersionStats GetVersionStats(ChainedHeader[] chainedBlock)
 		{
 			VersionStats stats = new VersionStats();
 			stats.Stats =
@@ -978,7 +983,7 @@ namespace QBitNinja.Controllers
 			var extendedInfo = Configuration.GetCacheTable<ExtendedBlockInformation>().ReadOne(id);
 			if(extendedInfo != null)
 				return extendedInfo;
-			ChainedBlock chainedBlock = blockFeature.GetChainedBlock(Chain);
+		    ChainedHeader chainedBlock = blockFeature.GetChainedBlock(Chain);
 			if(chainedBlock == null)
 				return null;
 			if(block.Transactions.Count == 0)

@@ -1,0 +1,25 @@
+<h3>Token {{ token?.name }}</h3>
+<h4 class="">Summary</h4>
+<div class="list-group-item my-4-x">
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <th><label>Symbol</label></th>
+        <td>{{ token?.symbol }}</td>
+      </tr>
+      <tr>
+        <th><label>Total Supply</label></th>
+        <td>{{ token?.supply }}</td>
+      </tr>
+      <tr>
+        <th><label>Contract</label></th>
+        <td *ngIf="address"><a  [routerLink]="['/addresses', address]">{{address}}</a></td>
+        <td *ngIf="!address"></td>
+      </tr>
+      <tr>
+        <th><label>Decimals</label></th>
+        <td>{{ token?.decimals }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

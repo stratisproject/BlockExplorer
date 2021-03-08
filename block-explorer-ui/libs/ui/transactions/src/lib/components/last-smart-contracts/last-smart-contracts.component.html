@@ -1,0 +1,27 @@
+<div class="list-group-item my-4 m20top">
+  <h5 class="mb-4 mt-2">Last {{records}} smart contract transactions</h5>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Height</th>
+        <th>Contract Hash</th>
+        <th class="text-center d-none d-md-table-cell">Amount</th>
+        <th class="text-center d-none d-sm-table-cell">Confirmations</th>
+        <th class="d-none d-sm-table-cell">Tx Hash</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tx of smartContracts">
+        <td><a [routerLink]="['/blocks', tx.height]">{{tx.height}}</a></td>
+        <td class="d-inline-block text-truncate" style="max-width: 120px;">{{tx.smartContract?.hash}}</td>
+        <td class="text-center d-none d-md-table-cell"><blockexplorer-balance [balance]="!!tx.amount?.satoshi || 0"></blockexplorer-balance></td>
+        <td class="text-center d-none d-sm-table-cell">{{tx.confirmations}}</td>
+        <td class="d-sm-inline-block text-truncate d-none d-sm-table-cell" style="max-width: 100px;"><a [routerLink]="['/transactions', tx.hash]">{{tx.hash}}</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="text-center">
+    <a class="btn btn-outline-primary load-more" *ngIf="!loading" (click)="getNext10()">Fetch next 10 smart contracts</a>
+    <span [hidden]="!loading"><i>Loading next 10 smart contracts...</i></span>
+  </div>
+</div>

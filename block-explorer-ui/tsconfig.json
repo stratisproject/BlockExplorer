@@ -1,0 +1,55 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@blockexplorer/state/transactions-state": [
+        "libs/state/transactions-state/src/index.ts"
+      ],
+      "@blockexplorer/state/global-state": [
+        "libs/state/global-state/src/index.ts"
+      ],
+      "@blockexplorer/ui/layout": [
+        "libs/ui/layout/src/index.ts"
+      ],
+      "@blockexplorer/ui/transactions": [
+        "libs/ui/transactions/src/index.ts"
+      ],
+      "@blockexplorer/ui/smart-contracts": [
+        "libs/ui/smart-contracts/src/index.ts"
+      ],
+      "@blockexplorer/state/smart-contracts-state": [
+        "libs/state/smart-contracts-state/src/index.ts"
+      ],
+      "@blockexplorer/shared/utils": [
+        "libs/shared/utils/src/index.ts"
+      ],
+      "@blockexplorer/shared/models": [
+        "libs/shared/models/src/index.ts"
+      ],
+      "@blockexplorer/state/tokens-state": [
+        "libs/state/tokens-state/src/index.ts"
+      ],
+      "@blockexplorer/ui/tokens": [
+        "libs/ui/tokens/src/index.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

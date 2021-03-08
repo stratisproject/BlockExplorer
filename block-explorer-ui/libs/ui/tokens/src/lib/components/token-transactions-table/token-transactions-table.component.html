@@ -1,0 +1,56 @@
+<!-- <div class="row mt-4">
+  <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages" [hidden]="transactions.length === 0"
+    [currentPage]="currentPage" (last)="last()" (first)="first()" (next)="next()" (previous)="previous()">
+  </blockexplorer-pager>
+</div> -->
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="text-left">Transaction Hash</th>
+      <th class="text-center">Age</th>
+      <th class="text-center">From</th>
+      <th class="text-center d-none d-md-table-cell"></th>
+      <th class="text-center d-none d-sm-table-cell">To</th>
+      <th class="text-center d-none d-sm-table-cell">Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngIf="!transactions || !transactions.length">
+      <td colspan="6">There are no transactions to display.</td>
+    </tr>
+    <tr *ngFor="let transaction of transactions">
+      <td class="text-truncate" style="max-width:80px;">
+        <a [routerLink]="['/transactions', transaction.txId]">{{transaction.txId}}</a>
+      </td>
+      <td class="text-center"><span [ngbTooltip]="transaction.time">{{age(transaction)}}</span></td>
+      <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
+        <a *ngIf="transaction.fromAddress" [ngbTooltip]="transaction.fromAddress"
+          [routerLink]="['/tokens', tokenAddress]"
+          [queryParams]="{ a: transaction.fromAddress}">{{transaction.fromAddress || 'Unspecified'}}</a>
+        <span *ngIf="!transaction.fromAddress"></span>
+      </td>
+      <td class="justify-content-center align-items-center d-none d-md-flex">
+        <span class="arrowTx_small rounded"
+          [ngClass]="{'bg-success': transaction.fromAddress, 'bg-danger': !transaction.fromAddress}">
+          <i class="material-icons md-12">arrow_forward</i>
+        </span>
+      </td>
+      <td class="text-truncate d-none d-sm-table-cell" style="max-width:80px;">
+        <a *ngIf=" transaction.toAddress" [ngbTooltip]="transaction.toAddress"
+          [routerLink]="['/tokens', tokenAddress]"
+          [queryParams]="{ a: transaction.toAddress}">{{ transaction.toAddress || 'Unspecified'}}</a>
+        <span *ngIf="!transaction.toAddress"></span>
+      </td>
+      <td class="text-right">
+        <blockexplorer-balance [balance]="transaction.amount || 0" [symbol]="symbol" [decimalPlaces]="token?.decimals || 0" [scaleDecimals]="token?.decimals || 0"></blockexplorer-balance>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- <div class="row mt-4">
+  <blockexplorer-pager *ngIf="showPaging" class="col-12" [totalPages]="totalPages" [hidden]="transactions.length === 0"
+    [currentPage]="currentPage" (last)="last()" (first)="first()" (next)="next()" (previous)="previous()">
+  </blockexplorer-pager>
+</div> -->

@@ -1,0 +1,24 @@
+<section class="col-lg-10 col-md-10 col-12 mx-auto">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <!-- overview -->
+        <div class="col-12 mt-4">
+          <ngb-tabset type="pills" id="v-pills-tabContent" class="single">
+            <ngb-tab title="Overview">
+              <ng-template ngbTabContent>
+                <blockexplorer-busy-indicator [hidden]="blockLoaded$ | async"></blockexplorer-busy-indicator>
+                <blockexplorer-block-summary *ngIf="blockLoaded$ | async" [block]="block$ | async">
+                </blockexplorer-block-summary>
+                <blockexplorer-transactions-list *ngIf="blockLoaded$ | async" [showCount]="true"
+                  [showTransactionHeader]="true" [showPaging]="false" title="Transactions"
+                  [transactions]="transactions">
+                </blockexplorer-transactions-list>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

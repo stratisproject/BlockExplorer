@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="data\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
+    <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.1.1" />
+    <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+    <PackageReference Include="Stratis.Core" Version="1.0.7" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.7.1" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Consensus" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Miner" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.PoA" Version="1.0.7" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
+    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.6.4" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="2.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.7" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.5.3" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.5.3" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.5.3" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.5.3" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.0.2" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\AzureIndexer\Stratis.Features.AzureIndexer\Stratis.Features.AzureIndexer.csproj" />
+  </ItemGroup>
+</Project>

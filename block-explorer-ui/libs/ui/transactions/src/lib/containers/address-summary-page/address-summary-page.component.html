@@ -1,0 +1,37 @@
+<section class="col-lg-10 col-md-10 col-12 mx-auto">
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <!-- overview -->
+        <div class="col-12 mt-4">
+          <ngb-tabset type="pills" id="v-pills-tabContent">
+            <ngb-tab title="Overview">
+              <ng-template ngbTabContent>
+                <blockexplorer-busy-indicator [hidden]="addressSummaryLoaded$ | async"></blockexplorer-busy-indicator>
+                <blockexplorer-address-summary *ngIf="addressSummaryLoaded$ | async" [hash]="addressHash"
+                  [address]="address$ | async"></blockexplorer-address-summary>
+
+                <h4 _ngcontent-c6="" class="">
+                  Transactions<span> ({{transactions.length}})</span>
+                </h4>
+                <div class="list-group-item mb-4">
+                  <blockexplorer-transactions-table [transactions]="transactions" *ngIf="addressDetailsLoaded$ | async">
+                  </blockexplorer-transactions-table>
+                </div>
+
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Transactions">
+              <ng-template ngbTabContent>
+                <div class="list-group-item my-4">
+                  <blockexplorer-transactions-list [transactions]="transactions"></blockexplorer-transactions-list>
+                </div>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
