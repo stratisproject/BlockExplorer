@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Threading;
+using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using AzureIndexer.Api.Controllers;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.IoC;
@@ -13,9 +15,11 @@ using Stratis.Bitcoin.AsyncWork;
 using Stratis.Bitcoin.Base;
 using Stratis.Bitcoin.Configuration;
 using Stratis.Bitcoin.Configuration.Settings;
+using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.EventBus;
 using Stratis.Bitcoin.Networks;
 using Stratis.Bitcoin.P2P;
+using Stratis.Bitcoin.P2P.Peer;
 using Stratis.Bitcoin.Signals;
 using Stratis.Bitcoin.Utilities;
 using Stratis.Features.AzureIndexer;
@@ -91,7 +95,6 @@ namespace AzureIndexer.Api
                 {
                     var loggerFactory = ctx.Resolve<ILoggerFactory>();
                     var asyncProvider = ctx.Resolve<IAsyncProvider>();
-                    var peerAddressManager = ctx.Resolve<IPeerAddressManager>();
                     var config = new QBitNinjaConfiguration(this.Configuration, loggerFactory, asyncProvider);
                     config.Indexer.EnsureSetup();
                     return config;
@@ -144,6 +147,10 @@ namespace AzureIndexer.Api
             builder.RegisterType<MainController>().AsSelf();
             builder.RegisterType<ChainCacheProvider>().AsSelf();
             builder.RegisterType<WhatIsIt>().AsSelf();
+
+            builder.RegisterInstance(new ServiceBusClient(this.Configuration["ServiceBus"])).AsSelf();
+            builder.RegisterInstance(new ServiceBusAdministrationClient(this.Configuration["ServiceBus"])).AsSelf();
+
             builder.RegisterInstance(new Stats()).AsSelf();
             this.ApplicationContainer = builder.Build();
 

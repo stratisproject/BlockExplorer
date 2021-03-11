@@ -14,6 +14,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.1.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.1.1" />
@@ -41,7 +42,6 @@
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.Security" Version="4.5.3" />
-    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.0.2" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
 

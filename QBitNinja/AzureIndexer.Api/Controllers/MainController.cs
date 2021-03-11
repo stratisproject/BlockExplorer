@@ -40,77 +40,6 @@ namespace AzureIndexer.Api.Controllers
 
         public QBitNinjaConfiguration Configuration { get; set; }
 
-        [HttpPost]
-        [Route("transactions")]
-        public async Task<BroadcastResponse> Broadcast()
-        {
-            Transaction tx = null;
-            switch (this.Request.ContentType)
-            {
-                case "application/json":
-                    using (StreamReader stream = new StreamReader(this.Request.Body))
-                    {
-                        string body = stream.ReadToEnd();
-                        tx = NBitcoin.Transaction.Parse(JsonConvert.DeserializeObject<string>(body), RawFormat.BlockExplorer);
-                    }
-
-                    break;
-                case "application/octet-stream":
-                    {
-                        // TODO: Fix this transaction
-                        // tx = new Transaction(await Request.Content.ReadAsByteArrayAsync());
-                        break;
-                    }
-
-                default:
-                    throw new HttpResponseException("UnsupportedMediaType", HttpStatusCode.UnsupportedMediaType);
-            }
-
-            await this.Configuration
-                .Topics
-                .BroadcastedTransactions
-                .AddAsync(new BroadcastedTransaction(tx));
-
-            var hash = tx.GetHash();
-            for (int i = 0; i < 10; i++)
-            {
-                var indexed = await this.Configuration.Indexer.CreateIndexerClient().GetTransactionAsync(hash);
-                if (indexed != null)
-                {
-                    return new BroadcastResponse()
-                    {
-                        Success = true
-                    };
-                }
-
-                var reject = await this.Configuration.GetRejectTable().ReadOneAsync(hash.ToString());
-                if (reject != null)
-                {
-                    return new BroadcastResponse()
-                    {
-                        Success = false,
-                        Error = new BroadcastError()
-                        {
-                            ErrorCode = reject.Code,
-                            Reason = reject.Reason
-                        }
-                    };
-                }
-
-                await Task.Delay(100 * i);
-            }
-
-            return new BroadcastResponse()
-            {
-                Success = true,
-                Error = new BroadcastError()
-                {
-                    ErrorCode = RejectCode.INVALID,
-                    Reason = "Unknown"
-                }
-            };
-        }
-
         [HttpGet]
         [Route("transactions/{txId}")]
         [Route("tx/{txId}")]
@@ -137,29 +66,6 @@ namespace AzureIndexer.Api.Controllers
             }
 
             return wallet;
-        }
-
-        [HttpPost]
-        [Route("subscriptions")]
-        public async Task<Subscription> AddSubscription(Subscription subscription)
-        {
-            if (subscription.Id == null)
-            {
-                subscription.Id = Encoders.Hex.EncodeData(RandomUtils.GetBytes(32));
-            }
-
-            if (!await (this.Configuration
-            .GetSubscriptionsTable()
-            .CreateAsync(subscription.Id, subscription, false)))
-            {
-                throw this.Error(409, "notification already exist");
-            }
-
-            await this.Configuration
-                .Topics
-                .SubscriptionChanges
-                .AddAsync(new SubscriptionChange(subscription, true));
-            return subscription;
         }
 
         private void AssertValidUrlPart(string str, string fieldName)
@@ -224,7 +130,6 @@ namespace AzureIndexer.Api.Controllers
                 throw this.Error(409, "This address already exist in the wallet");
             }
 
-            var unused = this.Configuration.Topics.AddedAddresses.AddAsync(new[] { address });
             return address;
         }
 
@@ -247,48 +152,6 @@ namespace AzureIndexer.Api.Controllers
             }
 
             return true;
-        }
-
-        [HttpPost]
-        [Route("wallets/{walletName}/keysets")]
-        public HDKeySet CreateKeyset(string walletName, [FromBody]HDKeySet keyset)
-        {
-            this.AssertValidUrlPart(keyset.Name, "Keyset name");
-            if (keyset.ExtPubKeys == null || keyset.ExtPubKeys.Length == 0)
-            {
-                throw this.Error(400, "ExtPubKeys not specified");
-            }
-
-            if (keyset.ExtPubKeys.Length < keyset.SignatureCount)
-            {
-                throw this.Error(400, "SignatureCount should not be higher than the number of HD Keys");
-            }
-
-            if (keyset.Path != null && keyset.Path.ToString().Contains("'"))
-            {
-                throw this.Error(400, "The keypath should not contains hardened children");
-            }
-
-            var repo = this.Configuration.CreateWalletRepository();
-
-            KeySetData keysetData = new KeySetData
-            {
-                KeySet = keyset,
-                State = new HDKeyState()
-            };
-            if (!repo.AddKeySet(walletName, keysetData))
-            {
-                throw this.Error(409, "Keyset already exists");
-            }
-
-            var newAddresses = repo.Scan(walletName, keysetData, 0, 20);
-
-            foreach (var addresses in newAddresses.Partition(20))
-            {
-                var unused = this.Configuration.Topics.AddedAddresses.AddAsync(addresses.ToArray());
-            }
-
-            return keyset;
         }
 
         [HttpGet]

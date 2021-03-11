@@ -1,13 +1,22 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Auth;
 using NBitcoin;
+using NBitcoin.DataEncoders;
 using Stratis.Bitcoin;
 using Stratis.Bitcoin.AsyncWork;
+using Stratis.Bitcoin.P2P.Protocol.Payloads;
 using Stratis.Bitcoin.Utilities;
+using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer.Entities;
 using Stratis.Features.AzureIndexer.IndexTasks;
 using Stratis.Features.AzureIndexer.Repositories;
 using Stratis.Features.AzureIndexer.Tokens;
@@ -40,6 +49,8 @@ namespace Stratis.Features.AzureIndexer
         private readonly IReceiptRepository receiptRepository;
         private readonly IStateRepositoryRoot stateRepositoryRoot;
         private readonly LogDeserializer logDeserializer;
+        private ServiceBusClient serviceBusClient;
+        private ServiceBusAdministrationClient serviceBusAdministrationClient;
 
         /// <summary>The Azure Indexer settings.</summary>
         private readonly AzureIndexerSettings indexerSettings;
@@ -49,6 +60,9 @@ namespace Stratis.Features.AzureIndexer
 
         /// <summary>Another async loop we need to wait upon before we can shut down this feature.</summary>
         private IAsyncLoop asyncLoopChain;
+
+        /// <summary>Another async loop we need to wait upon before we can shut down this feature.</summary>
+        private IAsyncLoop asyncLoopBroadcastTransactions;
 
         /// <summary>Gets the full node that owns the block repository that we want to index.</summary>
         public FullNode FullNode { get; }
@@ -75,6 +89,8 @@ namespace Stratis.Features.AzureIndexer
         public bool InitialBlockDownloadState { get; set; }
 
         public Dictionary<string, int> StatsDictionary { get; set; } = new Dictionary<string, int>();
+
+        private readonly ConcurrentDictionary<uint256, Transaction> broadcasting = new ConcurrentDictionary<uint256, Transaction>();
 
         /// <summary>Gets the highest block that has been indexed.</summary>
         internal ChainedHeader StoreTip { get; private set; }
@@ -113,6 +129,7 @@ namespace Stratis.Features.AzureIndexer
                 StorageCredentials = indexerSettings.AzureEmulatorUsed ? null : new StorageCredentials(indexerSettings.AzureAccountName, indexerSettings.AzureKey),
                 IsSidechain = indexerSettings.IsSidechain
             };
+
             return indexerConfig;
         }
 
@@ -122,6 +139,9 @@ namespace Stratis.Features.AzureIndexer
         public void Initialize()
         {
             this.IndexerConfig = IndexerConfigFromSettings(this.indexerSettings, this.FullNode.Network, this.loggerFactory, this.asyncProvider);
+
+            this.serviceBusClient = new ServiceBusClient(indexerSettings.ServiceBusConnectionString);
+            this.serviceBusAdministrationClient = new ServiceBusAdministrationClient(indexerSettings.ServiceBusConnectionString);
 
             AzureIndexer indexer = this.IndexerConfig.CreateIndexer();
             IndexerClient indexerClient = this.IndexerConfig.CreateIndexerClient();
@@ -157,6 +177,8 @@ namespace Stratis.Features.AzureIndexer
             this.logger.LogTrace("AsyncLoop disposed");
 
             this.asyncLoopChain.Dispose();
+
+            this.asyncLoopBroadcastTransactions.Dispose();
         }
 
         /// <summary>
@@ -229,6 +251,25 @@ namespace Stratis.Features.AzureIndexer
                 this.nodeLifetime.ApplicationStopping,
                 repeatEvery: TimeSpans.RunOnce,
                 startAfter: TimeSpans.Minute);
+
+            if (!string.IsNullOrEmpty(this.indexerSettings.ServiceBusConnectionString))
+            {
+                this.EnsureTopicExists().GetAwaiter().GetResult();
+                this.EnsureSubscriptionExists().GetAwaiter().GetResult();
+
+                var receiver = this.serviceBusClient.CreateReceiver(nameof(BroadcastedTransaction), this.GetMac());
+                var sender = this.serviceBusClient.CreateSender(nameof(BroadcastedTransaction));
+
+                this.asyncLoopBroadcastTransactions = this.asyncProvider.CreateAndRunAsyncLoop(
+                    $"{this.StoreName}.HandleBroadcastTransactions",
+                    async token =>
+                    {
+                        await this.HandleBroadcastTransactions(receiver, sender, this.nodeLifetime.ApplicationStopping);
+                    },
+                    this.nodeLifetime.ApplicationStopping,
+                    repeatEvery: TimeSpans.RunOnce,
+                    startAfter: TimeSpans.FiveSeconds);
+            }
         }
 
         /// <summary>
@@ -281,6 +322,71 @@ namespace Stratis.Features.AzureIndexer
                     IndexerTrace.ErrorWhileImportingBlockToAzure(this.StoreTip.HashBlock, ex);
                     await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Performs broadcast trnasaction management
+        /// </summary>
+        /// <param name="cancellationToken">The token used for cancellation.</param>
+        /// <returns>A task for asynchronous completion.</returns>
+        private async Task HandleBroadcastTransactions(ServiceBusReceiver receiver, ServiceBusSender sender, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var message = await receiver.ReceiveMessageAsync(cancellationToken: cancellationToken);
+
+                if (message != null)
+                {
+                    // var tx = message.Body.ToObjectFromJson<BroadcastedTransaction>();
+
+                    var txText = message.Body.ToString();
+                    var tx = Serializer.ToObject<BroadcastedTransaction>(txText, this.FullNode.Network);
+
+                    uint256 hash = null;
+
+                    try
+                    {
+                        hash = tx.Transaction.GetHash();
+                        TransactionEntry indexedTx = await this.AzureIndexerClient.GetTransactionAsync(hash);
+
+                        if (this.broadcasting.Count > 1000)
+                        {
+                            this.broadcasting.Clear();
+                        }
+
+                        this.broadcasting.TryAdd(hash, tx.Transaction);
+                        if (indexedTx == null || !indexedTx.BlockIds.Any(id => this.chainIndexer.GetHeader(id) != null))
+                        {
+                            Task unused = this.SendMessageAsync(new InvPayload(tx.Transaction));
+                        }
+
+                        TimeSpan[] reschedule =
+                        {
+                            TimeSpan.FromMinutes(5),
+                            TimeSpan.FromMinutes(10),
+                            TimeSpan.FromHours(1),
+                            TimeSpan.FromHours(6),
+                            TimeSpan.FromHours(24),
+                        };
+
+                        if (tx.Tried <= reschedule.Length - 1)
+                        {
+                            var serviceBusMessage = new ServiceBusMessage(message.Body);
+                            await sender.ScheduleMessageAsync(serviceBusMessage,
+                                DateTimeOffset.UtcNow.Add(reschedule[tx.Tried]), cancellationToken);
+                            tx.Tried++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(ex, "Error for new broadcasted transaction {Hash}", hash);
+                    }
+
+                    await receiver.CompleteMessageAsync(message, cancellationToken);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ContinueWith(t => { }).ConfigureAwait(false);
             }
         }
 
@@ -395,6 +501,61 @@ namespace Stratis.Features.AzureIndexer
             Guard.NotNull(chainedHeader, nameof(chainedHeader));
 
             this.StoreTip = chainedHeader;
+        }
+
+        private async Task EnsureSubscriptionExists()
+        {
+            try
+            {
+                await this.serviceBusAdministrationClient.GetSubscriptionAsync(nameof(BroadcastedTransaction), this.GetMac());
+            }
+            catch (ServiceBusException ex)
+            {
+                if (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
+                {
+                    await this.serviceBusAdministrationClient.CreateSubscriptionAsync(nameof(BroadcastedTransaction), this.GetMac());
+                }
+            }
+        }
+
+        private async Task EnsureTopicExists()
+        {
+            try
+            {
+                await this.serviceBusAdministrationClient.GetTopicAsync(nameof(BroadcastedTransaction));
+            }
+            catch (ServiceBusException ex)
+            {
+                if (ex.Reason == ServiceBusFailureReason.MessagingEntityNotFound)
+                {
+                    await this.serviceBusAdministrationClient.CreateTopicAsync(nameof(BroadcastedTransaction));
+                }
+            }
+        }
+
+        private async Task SendMessageAsync(Payload payload)
+        {
+            int[] delays = { 50, 100, 200, 300, 1000, 2000, 3000, 6000, 12000 };
+            int i = 0;
+
+            var peers = this.FullNode.ConnectionManager.ConnectedPeers;
+
+            while (peers.Count() < 2)
+            {
+                i++;
+                i = Math.Min(i, delays.Length - 1);
+                await Task.Delay(delays[i]).ConfigureAwait(false);
+            }
+
+            await peers.First().SendMessageAsync(payload).ConfigureAwait(false);
+        }
+
+        private string GetMac()
+        {
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            PhysicalAddress address = nics[0].GetPhysicalAddress();
+            byte[] bytes = address.GetAddressBytes();
+            return Encoders.Hex.EncodeData(bytes);
         }
     }
 }

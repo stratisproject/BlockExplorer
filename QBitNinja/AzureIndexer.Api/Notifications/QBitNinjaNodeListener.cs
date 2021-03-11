@@ -2,29 +2,23 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using AzureIndexer.Api.Infrastructure;
 using AzureIndexer.Api.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
 using NBitcoin;
-using Stratis.Bitcoin;
+using Stratis.Bitcoin.AsyncWork;
 using Stratis.Bitcoin.Connection;
 using Stratis.Bitcoin.Consensus;
 using Stratis.Bitcoin.Interfaces;
 using Stratis.Bitcoin.P2P.Peer;
-using Stratis.Bitcoin.P2P.Protocol;
 using Stratis.Bitcoin.P2P.Protocol.Behaviors;
 using Stratis.Bitcoin.P2P.Protocol.Payloads;
 using Stratis.Features.AzureIndexer;
 using Stratis.Features.AzureIndexer.Entities;
-using Stratis.Features.AzureIndexer.IndexTasks;
-using Stratis.Features.AzureIndexer.Repositories;
 using Stratis.Features.AzureIndexer.Tokens;
-using Stratis.SmartContracts.CLR.Serialization;
 using Stratis.SmartContracts.Core.Receipts;
 using Stratis.SmartContracts.Core.State;
 using ReaderWriterLock = NBitcoin.ReaderWriterLock;
@@ -55,7 +49,7 @@ namespace AzureIndexer.Api.Notifications
                 if (node.State == NetworkPeerState.HandShaked)
                 {
                     ListenerTrace.Info("Node handshaked");
-                    AttachedPeer.MessageReceived.Register(_Listener.node_MessageReceived);
+                    // AttachedPeer.MessageReceived.Register(_Listener.node_MessageReceived);
                     // AttachedPeer.Disconnected += AttachedNode_Disconnected; TODO: check if still needed
                     // ListenerTrace.Info("Connection count : " + nNodesGroup.GetNodeGroup(node).ConnectedNodes.Count); TODO: fix count
                 }
@@ -81,7 +75,6 @@ namespace AzureIndexer.Api.Notifications
             protected override void DetachCore()
             {
                 AttachedPeer.StateChanged.Unregister(AttachedNode_StateChanged);
-                AttachedPeer.MessageReceived.Unregister(_Listener.node_MessageReceived);
             }
 
             public override object Clone()
@@ -99,6 +92,8 @@ namespace AzureIndexer.Api.Notifications
         private readonly IReceiptRepository receiptRepository;
         private readonly IStateRepositoryRoot state;
         private readonly LogDeserializer logDeserializer;
+        private readonly ServiceBusClient serviceBusClient;
+        private readonly IAsyncProvider asyncProvider;
         SubscriptionCollection _Subscriptions = null;
         ReaderWriterLock _SubscriptionSlimLock = new ReaderWriterLock();
 
@@ -129,7 +124,9 @@ namespace AzureIndexer.Api.Notifications
             ILoggerFactory loggerFactory,
             IReceiptRepository receiptRepository,
             IStateRepositoryRoot state,
-            LogDeserializer logDeserializer)
+            LogDeserializer logDeserializer,
+            ServiceBusClient serviceBusClient,
+            IAsyncProvider asyncProvider)
         {
             _Configuration = configuration;
             this.initialBlockDownloadState = initialBlockDownloadState;
@@ -140,6 +137,8 @@ namespace AzureIndexer.Api.Notifications
             this.receiptRepository = receiptRepository;
             this.state = state;
             this.logDeserializer = logDeserializer;
+            this.serviceBusClient = serviceBusClient;
+            this.asyncProvider = asyncProvider;
         }
 
         private Stratis.Features.AzureIndexer.AzureIndexer _Indexer;
@@ -174,24 +173,8 @@ namespace AzureIndexer.Api.Notifications
             _Disposables.Add(_IndexerScheduler = new CustomThreadPoolTaskScheduler(50, 100, "Indexing Threads"));
             _Indexer.TaskScheduler = _IndexerScheduler;
 
-            // _Group = new NodesGroup(Configuration.Indexer.Network); TODO: check if this is correct
-            _Group = new NetworkPeerCollection();
-
-            // TODO: Check if needed
-            // _Disposables.Add(_Group);
-            // _Group.AllowSameGroup = true;
-            // _Group.MaximumNodeConnection = 2;
-
-            //addrman.Add(new NetworkAddress(Utils.ParseIpEndpoint(_Configuration.Indexer.Node, Configuration.Indexer.Network.DefaultPort)),
-            //            IPAddress.Parse("127.0.0.1"));
+            _Group = this.connectionManager.ConnectedPeers;
             this.connectionManager.AddNodeAddress(Utils.ParseIpEndpoint(_Configuration.Indexer.Node, Configuration.Indexer.Network.DefaultPort));
-
-            // TODO: Check if needed
-            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new ConnectionManagerBehavior(this.connectionManager, this.loggerFactory));
-            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new ConsensusManagerBehavior(_Chain, this.initialBlockDownloadState, this.consensusManager, this.peerBanning, this.loggerFactory));
-            // _Group.NodeConnectionParameters.TemplateBehaviors.Add(new Behavior(this, this.loggerFactory));
-
-
 
             ListenerTrace.Info("Fetching wallet rules...");
             _Wallets = _Configuration.Indexer.CreateIndexerClient().GetAllWalletRules();
@@ -206,14 +189,18 @@ namespace AzureIndexer.Api.Notifications
 
             ListenerTrace.Info("Fetching transactions to broadcast...");
 
-            _Disposables.Add(
-                Configuration
-                .Topics
-                .BroadcastedTransactions
-                .CreateConsumer("listener", true)
-                .EnsureSubscriptionExists()
-                .OnMessage((tx, ctl) =>
+            var receiver =
+                serviceBusClient.CreateReceiver(nameof(BroadcastedTransaction), nameof(BroadcastedTransaction));
+
+            var sender =
+                serviceBusClient.CreateSender(nameof(BroadcastedTransaction));
+
+            var asyncLoop = this.asyncProvider.CreateAndRunAsyncLoop(nameof(QBitNinjaNodeListener), async token =>
                 {
+                    var message = await receiver.ReceiveMessageAsync(cancellationToken: token);
+
+                    var tx = message.Body.ToObjectFromJson<BroadcastedTransaction>();
+
                     uint256 hash = null;
                     IndexerClient repo = Configuration.Indexer.CreateIndexerClient();
                     CrudTable<RejectPayload> rejects = Configuration.GetRejectTable();
@@ -240,7 +227,7 @@ namespace AzureIndexer.Api.Notifications
                             Task unused = SendMessageAsync(new InvPayload(tx.Transaction));
                         }
 
-                        TimeSpan[] reschedule = new[]
+                        TimeSpan[] reschedule =
                         {
                             TimeSpan.FromMinutes(5),
                             TimeSpan.FromMinutes(10),
@@ -248,9 +235,11 @@ namespace AzureIndexer.Api.Notifications
                             TimeSpan.FromHours(6),
                             TimeSpan.FromHours(24),
                         };
+
                         if (tx.Tried <= reschedule.Length - 1)
                         {
-                            ctl.RescheduleIn(reschedule[tx.Tried]);
+                            var serviceBusMessage = new ServiceBusMessage(message.Body);
+                            await sender.ScheduleMessageAsync(serviceBusMessage, DateTimeOffset.UtcNow.Add(reschedule[tx.Tried]));
                             tx.Tried++;
                         }
                     }
@@ -263,92 +252,22 @@ namespace AzureIndexer.Api.Notifications
                             throw;
                         }
                     }
-                }));
+
+                    await receiver.CompleteMessageAsync(message, token);
+                },
+                default);
+
+            _Disposables.Add(asyncLoop);
             ListenerTrace.Info("Transactions to broadcast fetched");
-
-            _Disposables.Add(_Configuration
-                .Topics
-                .SubscriptionChanges
-                .EnsureSubscriptionExists()
-                .AddUnhandledExceptionHandler(ExceptionOnMessagePump)
-                .OnMessage(c =>
-                {
-                    using (_SubscriptionSlimLock.LockWrite())
-                    {
-                        if (c.Added)
-                        {
-                            _Subscriptions.Add(c.Subscription);
-                        }
-                        else
-                        {
-                            _Subscriptions.Remove(c.Subscription.Id);
-                        }
-                    }
-                }));
-
-            _Disposables.Add(_Configuration
-                .Topics
-                .SendNotifications
-                .AddUnhandledExceptionHandler(ExceptionOnMessagePump)
-                .OnMessageAsync((n, act) =>
-                {
-                    return SendAsync(n, act).ContinueWith(t =>
-                    {
-                        if (!_Disposed)
-                        {
-                            if (t.Exception != null)
-                            {
-                                LastException = t.Exception;
-                            }
-                        }
-                    });
-                }, new OnMessageOptions
-                {
-                    MaxConcurrentCalls = 1000,
-                    AutoComplete = true,
-                    AutoRenewTimeout = TimeSpan.Zero
-                }));
-
-            _Disposables.Add(Configuration
-               .Topics
-               .AddedAddresses
-               .CreateConsumer("updater", true)
-               .EnsureSubscriptionExists()
-               .AddUnhandledExceptionHandler(ExceptionOnMessagePump)
-               .OnMessage(evt =>
-               {
-                   if (evt == null)
-                   {
-                       return;
-                   }
-
-                   ListenerTrace.Info("New wallet rule");
-                   using (_WalletsSlimLock.LockWrite())
-                   {
-                       foreach (WalletAddress address in evt)
-                       {
-                           _Wallets.Add(address.CreateWalletRuleEntry());
-                       }
-                   }
-               }));
         }
 
-        void ExceptionOnMessagePump(Exception ex)
-        {
-            if (!_Disposed)
-            {
-                ListenerTrace.Error("Error on azure message pumped", ex);
-                LastException = ex;
-            }
-        }
-
-        NetworkPeerCollection _Group;
+        IReadOnlyNetworkPeerCollection _Group;
 
         private async Task SendMessageAsync(Payload payload)
         {
             int[] delays = new int[] { 50, 100, 200, 300, 1000, 2000, 3000, 6000, 12000 };
             int i = 0;
-            while (_Group.Count != 2)
+            while (_Group.Count() < 2)
             {
                 i++;
                 i = Math.Min(i, delays.Length - 1);
@@ -356,57 +275,6 @@ namespace AzureIndexer.Api.Notifications
             }
 
             await _Group.First().SendMessageAsync(payload).ConfigureAwait(false);
-        }
-
-        private async Task SendAsync(Notify notify, MessageControl act)
-        {
-            Notification n = notify.Notification;
-            HttpClient http = new HttpClient();
-            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, n.Subscription.Url);
-            n.Tried++;
-            StringContent content = new StringContent(n.ToString(), Encoding.UTF8, "application/json");
-            message.Content = content;
-            CancellationTokenSource tcs = new CancellationTokenSource();
-            tcs.CancelAfter(10000);
-
-            Subscription subscription = await Configuration.GetSubscriptionsTable().ReadOneAsync(n.Subscription.Id).ConfigureAwait(false);
-            if (subscription == null)
-            {
-                return;
-            }
-
-            bool failed = false;
-            try
-            {
-                HttpResponseMessage response = await http.SendAsync(message, tcs.Token).ConfigureAwait(false);
-                failed = !response.IsSuccessStatusCode;
-            }
-            catch
-            {
-                failed = true;
-            }
-
-            TimeSpan[] tries = new[]
-            {
-                TimeSpan.FromSeconds(0.0),
-                TimeSpan.FromMinutes(1.0),
-                TimeSpan.FromMinutes(5.0),
-                TimeSpan.FromMinutes(30.0),
-                TimeSpan.FromMinutes(60.0),
-                TimeSpan.FromHours(7.0),
-                TimeSpan.FromHours(14.0),
-                TimeSpan.FromHours(24.0),
-                TimeSpan.FromHours(24.0),
-                TimeSpan.FromHours(24.0),
-                TimeSpan.FromHours(24.0),
-                TimeSpan.FromHours(24.0)
-            };
-
-            if (!notify.SendAndForget && failed && (n.Tried - 1) <= tries.Length - 1)
-            {
-                TimeSpan wait = tries[n.Tried - 1];
-                act.RescheduleIn(wait);
-            }
         }
 
         void TryLock(object obj, Action act)
@@ -424,338 +292,13 @@ namespace AzureIndexer.Api.Notifications
             }
         }
 
-
         private ChainIndexer _Chain;
 
-        public ChainIndexer Chain
-        {
-            get
-            {
-                return _Chain;
-            }
-        }
-
-        public int WalletAddressCount
-        {
-            get
-            {
-                using (_WalletsSlimLock.LockRead())
-                {
-                    return _Wallets.Count;
-                }
-            }
-        }
+        public ChainIndexer Chain => _Chain;
 
         ConcurrentDictionary<uint256, Transaction> _Broadcasting = new ConcurrentDictionary<uint256, Transaction>();
-        ConcurrentDictionary<uint256, uint256> _KnownInvs = new ConcurrentDictionary<uint256, uint256>();
 
         uint256 _LastChainTip;
-
-        Task node_MessageReceived(INetworkPeer node, IncomingMessage message)
-        {
-            if (_KnownInvs.Count == 1000)
-            {
-                _KnownInvs.Clear();
-            }
-
-            if (message.Message.Payload is InvPayload)
-            {
-                InvPayload inv = (InvPayload)message.Message.Payload;
-                foreach (InventoryVector inventory in inv.Inventory)
-                {
-                    Transaction tx;
-                    if (_Broadcasting.TryRemove(inventory.Hash, out tx))
-                    {
-                        ListenerTrace.Info("Broadcasted reached mempool " + inventory);
-                    }
-                }
-
-                GetDataPayload getdata = new GetDataPayload(inv.Inventory.Where(i => i.Type == InventoryType.MSG_TX && _KnownInvs.TryAdd(i.Hash, i.Hash)).ToArray());
-                foreach (InventoryVector data in getdata.Inventory)
-                {
-                    data.Type = node.AddSupportedOptions(InventoryType.MSG_TX);
-                }
-
-                if (getdata.Inventory.Count > 0)
-                {
-                    node.SendMessageAsync(getdata);
-                }
-            }
-
-            if (message.Message.Payload is TxPayload)
-            {
-                Transaction tx = ((TxPayload)message.Message.Payload).Obj;
-                ListenerTrace.Verbose("Received Transaction " + tx.GetHash());
-                _Indexer.IndexAsync(new TransactionEntry.Entity(tx.GetHash(), tx, null, _Configuration.Indexer.Network))
-                        .ContinueWith(HandleException);
-                _Indexer.IndexOrderedBalanceAsync(tx)
-                    .ContinueWith(HandleException);
-                Async(() =>
-                {
-                    uint256 txId = tx.GetHash();
-                    List<OrderedBalanceChange> balances;
-                    using (_WalletsSlimLock.LockRead())
-                    {
-                        balances =
-                            OrderedBalanceChange
-                            .ExtractWalletBalances(txId, tx, null, null, int.MaxValue, _Wallets, _Configuration.Indexer.Network)
-                            .AsEnumerable()
-                            .ToList();
-                    }
-                    UpdateHDState(balances);
-
-                    _Indexer.IndexAsync(balances)
-                        .ContinueWith(HandleException);
-
-
-                    Task notify = null;
-                    using (_SubscriptionSlimLock.LockRead())
-                    {
-                        QBitNinjaQueue<Notify> topic = Configuration.Topics.SendNotifications;
-
-                        notify = Task.WhenAll(_Subscriptions
-                            .GetNewTransactions()
-                            .Select(t => topic.AddAsync(new Notify()
-                            {
-                                SendAndForget = true,
-                                Notification = new Notification()
-                                {
-                                    Subscription = t,
-                                    Data = new NewTransactionNotificationData()
-                                    {
-                                        TransactionId = txId
-                                    }
-                                }
-                            })).ToArray());
-                    }
-                    notify.Wait();
-                });
-                Task unused = Configuration.Topics.NewTransactions.AddAsync(tx)
-                                .ContinueWith(HandleException);
-            }
-
-            if (message.Message.Payload is BlockPayload)
-            {
-                Block block = ((BlockPayload)message.Message.Payload).Obj;
-                uint256 blockId = block.GetHash();
-
-                List<OrderedBalanceChange> balances = null;
-                using (_WalletsSlimLock.LockRead())
-                {
-                    balances = block.Transactions.SelectMany(tx => OrderedBalanceChange.ExtractWalletBalances(null, tx, null, null, 0, _Wallets, _Configuration.Indexer.Network)).ToList();
-                }
-
-                UpdateHDState(balances);
-            }
-
-            if (message.Message.Payload is HeadersPayload)
-            {
-                if (_Chain.Tip.HashBlock != _LastChainTip)
-                {
-                    BlockHeader header = _Chain.Tip.Header;
-                    _LastChainTip = _Chain.Tip.HashBlock;
-
-                    Configuration.Indexer.CreateIndexer().IndexChain(_Chain);
-
-                    Async(() =>
-                    {
-                        CancellationTokenSource cancel = new CancellationTokenSource(TimeSpan.FromMinutes(30));
-                        CacheBlocksRepository repo = new CacheBlocksRepository(new FullNodeBlocksRepository(new FullNode())); // TODO: check if correct
-                        TryLock(_LockBlocks, () =>
-                        {
-                            new IndexBlocksTask(Configuration.Indexer, this.loggerFactory)
-                            {
-                                EnsureIsSetup = false,
-                            }.Index(
-                                new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Blocks), repo, _Chain, null, this.loggerFactory) // TODO: check lastProcessed
-                            {
-                                CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                        });
-                        TryLock(_LockTransactions, () =>
-                        {
-                            new IndexTransactionsTask(Configuration.Indexer, this.loggerFactory)
-                            {
-                                EnsureIsSetup = false
-                            }
-                            .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Transactions), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
-                            {
-                                CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                        });
-                        TryLock(_LockWallets, () =>
-                        {
-                            using (_WalletsSlimLock.LockRead())
-                            {
-                                new IndexBalanceTask(Configuration.Indexer, _Wallets, loggerFactory)
-                                {
-                                    EnsureIsSetup = false
-                                }
-                                .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Wallets), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
-                                {
-                                    CancellationToken = cancel.Token
-                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                            }
-                        });
-                        TryLock(_LockBalance, () =>
-                        {
-                            new IndexBalanceTask(Configuration.Indexer, null, loggerFactory)
-                            {
-                                EnsureIsSetup = false
-                            }.Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Balances), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
-                            {
-                                CancellationToken = cancel.Token
-                            }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                        });
-                        TryLock(_LockSubscriptions, () =>
-                        {
-                            using (_SubscriptionSlimLock.LockRead())
-                            {
-                                new IndexNotificationsTask(Configuration, _Subscriptions, loggerFactory)
-                                {
-                                    EnsureIsSetup = false,
-                                }
-                                .Index(new BlockFetcher(_Indexer.GetCheckpointRepository().GetCheckpoint("subscriptions"), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
-                                {
-                                    CancellationToken = cancel.Token
-                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                            }
-                        });
-                        TryLock(_LockTokenTransactions, () =>
-                        {
-                            new IndexTokensTask(Configuration.Indexer, this.loggerFactory, this.receiptRepository, this.state, this.logDeserializer)
-                                {
-                                    EnsureIsSetup = false
-                                }
-                                .Index(new BlockFetcher(_Indexer.GetCheckpoint(IndexerCheckpoints.Transactions), repo, _Chain, null, loggerFactory) // TODO: check lastProcessed
-                                {
-                                    CancellationToken = cancel.Token
-                                }, _Indexer.TaskScheduler, _Configuration.Indexer.Network);
-                        });
-                        cancel.Dispose();
-                        Task<bool> unused = _Configuration.Topics.NewBlocks.AddAsync(header);
-                    });
-                }
-            }
-
-            if (message.Message.Payload is GetDataPayload)
-            {
-                GetDataPayload getData = (GetDataPayload)message.Message.Payload;
-                foreach (InventoryVector data in getData.Inventory)
-                {
-                    Transaction tx = null;
-                    if (data.Type == InventoryType.MSG_TX && _Broadcasting.TryGetValue(data.Hash, out tx))
-                    {
-                        TxPayload payload = new TxPayload(tx);
-                        node.SendMessageAsync(payload);
-                        ListenerTrace.Info("Broadcasted " + data.Hash);
-                    }
-                }
-            }
-
-            if (message.Message.Payload is RejectPayload)
-            {
-                RejectPayload reject = (RejectPayload)message.Message.Payload;
-                uint256 txId = reject.Hash;
-                if (txId != null)
-                {
-                    ListenerTrace.Info("Broadcasted transaction rejected (" + reject.Code + ") " + txId);
-                    if (reject.Code != RejectCode.DUPLICATE)
-                    {
-                        Configuration.GetRejectTable().Create(txId.ToString(), reject);
-                    }
-
-                    Transaction tx;
-                    _Broadcasting.TryRemove(txId, out tx);
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private void UpdateHDState(List<OrderedBalanceChange> balances)
-        {
-            foreach (OrderedBalanceChange balance in balances)
-            {
-                UpdateHDState(balance);
-            }
-        }
-
-        private void UpdateHDState(OrderedBalanceChange entry)
-        {
-            WalletRepository repo = Configuration.CreateWalletRepository();
-            IDisposable walletLock = null;
-            try
-            {
-                foreach (WalletAddress matchedAddress in entry.MatchedRules.Select(m => WalletAddress.TryParse(m.Rule.CustomData)).Where(m => m != null))
-                {
-                    if (matchedAddress.HDKeySet == null)
-                    {
-                        return;
-                    }
-
-                    KeySetData keySet = repo.GetKeySetData(matchedAddress.WalletName, matchedAddress.HDKeySet.Name);
-                    if (keySet == null)
-                    {
-                        return;
-                    }
-
-                    var keyIndex = (int)matchedAddress.HDKey.Path.Indexes.Last();
-                    if (keyIndex < keySet.State.NextUnused)
-                    {
-                        return;
-                    }
-
-                    walletLock = walletLock ?? _WalletsSlimLock.LockWrite();
-                    foreach (WalletAddress address in repo.Scan(matchedAddress.WalletName, keySet, keyIndex + 1, 20))
-                    {
-                        ListenerTrace.Info("New wallet rule");
-                        WalletRuleEntry walletEntry = address.CreateWalletRuleEntry();
-                        _Wallets.Add(walletEntry);
-                    }
-                }
-            }
-            finally
-            {
-                if (walletLock != null)
-                {
-                    walletLock.Dispose();
-                }
-            }
-        }
-
-        Task Async(Action act)
-        {
-            Task t = new Task(() =>
-            {
-                try
-                {
-                    act();
-                }
-                catch (Exception ex)
-                {
-                    if (!_Disposed)
-                    {
-                        ListenerTrace.Error("Error during task.", ex);
-                        LastException = ex;
-                    }
-                }
-            });
-            t.Start(TaskScheduler.Default);
-            return t;
-        }
-
-        void HandleException(Task t)
-        {
-            if (t.IsFaulted)
-            {
-                if (!_Disposed)
-                {
-                    ListenerTrace.Error("Error during asynchronous task", t.Exception);
-                    LastException = t.Exception;
-                }
-            }
-        }
 
         public Exception LastException
         {

@@ -51,10 +51,6 @@ namespace AzureIndexer.Api.Notifications
 
         protected override void IndexCore(string partitionName, IEnumerable<Notify> items)
         {
-            _Conf
-                .Topics
-                .SendNotifications
-                .AddAsync(items.First()).Wait();
         }
 
         protected override int PartitionSize

@@ -43,6 +43,9 @@
         /// <summary>The callback used to modify settings on startup.</summary>
         private Action<AzureIndexerSettings> callback = null;
 
+        /// <summary>Gets or sets service bus connection strings.</summary>
+        public string ServiceBusConnectionString { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureIndexerSettings"/> class.
         /// </summary>
@@ -93,6 +96,7 @@
             this.To = int.Parse(config.GetOrDefault<string>("indexto", int.MaxValue.ToString()));
             this.CheckpointsetName = config.GetOrDefault<string>("chkptset", "default");
             this.StorageNamespace = config.GetOrDefault<string>("indexprefix", "");
+            this.ServiceBusConnectionString = config.GetOrDefault<string>("azuresb", "");
         }
 
         /// <summary>
