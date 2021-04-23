@@ -21,16 +21,17 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="NLog" Version="4.7.5" />
-    <PackageReference Include="NStratis" Version="4.0.0.78" />
-    <PackageReference Include="Stratis.Core.Networks" Version="1.0.3.1" />
-    <PackageReference Include="Stratis.Features.Api" Version="1.0.3.1" />
-    <PackageReference Include="Stratis.Features.Collateral" Version="4.0.0.1" />
-    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.3.1" />
+    <PackageReference Include="NStratis" Version="4.0.0.80" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Api" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.Collateral" Version="4.0.0.2" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.7" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.3" />
-    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.3.1" />
-    <PackageReference Include="Stratis.SmartContracts" Version="1.2.1" />
-    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.3.1" />
-    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.3.1" />	
+    <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.SmartContracts.CLR" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.SmartContracts.Core" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.SmartContracts.Networks" Version="1.0.6.3" />
+    <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="1.0.6.3" />	
   </ItemGroup>
 
   <ItemGroup>
