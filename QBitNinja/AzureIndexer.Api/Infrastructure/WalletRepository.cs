@@ -8,8 +8,8 @@ using AzureIndexer.Api.Models;
 using NBitcoin;
 using NBitcoin.Crypto;
 using NBitcoin.DataEncoders;
-using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {

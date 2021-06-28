@@ -1,5 +1,5 @@
 ﻿using AzureIndexer.Api.Models;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {

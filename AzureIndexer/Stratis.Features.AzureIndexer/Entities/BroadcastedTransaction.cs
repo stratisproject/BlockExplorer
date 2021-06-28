@@ -1,6 +1,6 @@
 ﻿using NBitcoin;
 
-namespace AzureIndexer.Api.Notifications
+namespace Stratis.Features.AzureIndexer.Entities
 {
     public class BroadcastedTransaction
     {

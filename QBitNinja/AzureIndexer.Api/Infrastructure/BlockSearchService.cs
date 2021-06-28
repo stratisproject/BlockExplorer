@@ -1,4 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Stratis.Features.AzureIndexer;
 
 #pragma warning disable 618
 namespace AzureIndexer.Api.Infrastructure
@@ -9,7 +9,6 @@ namespace AzureIndexer.Api.Infrastructure
     using AutoMapper;
     using Models;
     using NBitcoin;
-    using Stratis.Bitcoin.Features.AzureIndexer;
 
     public class BlockSearchService : IBlockSearchService
     {

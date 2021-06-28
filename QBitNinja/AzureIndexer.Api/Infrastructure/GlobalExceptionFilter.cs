@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Threading.Tasks;
 using AzureIndexer.Api.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.WindowsAzure.Storage;

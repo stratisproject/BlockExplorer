@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.ModelBinders
 {

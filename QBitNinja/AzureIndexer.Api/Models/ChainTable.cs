@@ -5,9 +5,9 @@ using System.Text;
 using AzureIndexer.Api.Infrastructure;
 using Microsoft.WindowsAzure.Storage.Table;
 using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer;
-using Stratis.Bitcoin.Features.AzureIndexer.Helpers;
 using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer.Helpers;
 using Scope = AzureIndexer.Api.Infrastructure.Scope;
 
 namespace AzureIndexer.Api.Models

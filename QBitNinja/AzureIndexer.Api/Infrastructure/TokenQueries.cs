@@ -1,5 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {

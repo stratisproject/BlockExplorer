@@ -5,7 +5,7 @@ using AzureIndexer.Api.Infrastructure;
 using NBitcoin;
 using NBitcoin.OpenAsset;
 using Newtonsoft.Json;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 
 #if !CLIENT
 

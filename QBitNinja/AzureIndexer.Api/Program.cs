@@ -1,4 +1,6 @@
-﻿namespace AzureIndexer.Api
+﻿using Microsoft.Extensions.Logging;
+
+namespace AzureIndexer.Api
 {
     using System;
     using System.IO;
@@ -48,10 +50,6 @@
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseKestrel(o =>
-                {
-                    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30);
-                })
                 .ConfigureServices(services => services.AddAutofac())
                 .UseIISIntegration()
                 .UseSerilog()

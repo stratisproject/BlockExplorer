@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {
@@ -8,7 +9,6 @@ namespace AzureIndexer.Api.Infrastructure
     using Microsoft.Extensions.Hosting;
     using NBitcoin;
     using Serilog;
-    using Stratis.Bitcoin.Features.AzureIndexer;
 
     public class Stats
     {

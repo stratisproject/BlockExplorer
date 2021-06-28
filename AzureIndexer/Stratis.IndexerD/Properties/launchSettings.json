@@ -2,7 +2,7 @@
   "profiles": {
     "Stratis.IndexerD": {
       "commandName": "Project",
-      "commandLineArgs": "-datadir=c:\\Stratis\\CirrusDelete -apiport=40001 -port=40002 -sidechain -iprangefiltering=false -azureacc=cirrusmainindexernew -azemu=0 -azurekey=PC6qxtGjtq2+eUxFmnLY8W0vgyKNQWRXPaa5NYYzaMfgEEuprTQD1BiczuURzWlt5dpBsVftC7EycSHng0yuoQ== indexprefix="
+      "commandLineArgs": "-datadir=c:\\Stratis\\CirrusDelete -apiport=40001 -port=40002 -sidechain -iprangefiltering=false -azureacc=yourstorageaccountname -azemu=0 -azurekey=yourstorageaccountsecret -azuresb=yourservicebusconnectionstring"
     }
   }
 }

@@ -1,11 +1,11 @@
 ﻿using AzureIndexer.Api.Models;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.Infrastructure
 {
     using System;
     using NBitcoin;
     using NBitcoin.DataEncoders;
-    using Stratis.Bitcoin.Features.AzureIndexer;
 
     public static class StringExtensions
     {

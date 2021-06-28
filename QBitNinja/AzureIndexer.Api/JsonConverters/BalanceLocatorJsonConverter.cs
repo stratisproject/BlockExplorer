@@ -1,8 +1,8 @@
 ﻿#if !CLIENT
 using System;
 using Newtonsoft.Json;
-using Stratis.Bitcoin.Features.AzureIndexer;
 using Stratis.Bitcoin.Utilities.JsonConverters;
+using Stratis.Features.AzureIndexer;
 
 namespace AzureIndexer.Api.JsonConverters
 {

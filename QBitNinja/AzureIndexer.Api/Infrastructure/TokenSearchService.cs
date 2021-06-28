@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureIndexer.Api.Models.Response;
 using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer;
+using Stratis.Features.AzureIndexer;
 using Stratis.SmartContracts;
 
 namespace AzureIndexer.Api.Infrastructure

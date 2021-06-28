@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NBitcoin;
-using Stratis.Bitcoin.Features.AzureIndexer.IndexTasks;
-using Stratis.Bitcoin.Features.AzureIndexer.Repositories;
+using Stratis.Features.AzureIndexer.Repositories;
 
 namespace AzureIndexer.Api.Infrastructure
 {
