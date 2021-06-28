@@ -21,6 +21,7 @@
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.1.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.8.0" />
     <PackageReference Include="Microsoft.Data.OData" Version="5.8.4" />

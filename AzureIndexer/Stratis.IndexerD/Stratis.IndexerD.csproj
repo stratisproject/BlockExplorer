@@ -26,11 +26,12 @@
     <PackageReference Include="Stratis.Features.Api" Version="1.0.7" />
     <PackageReference Include="Stratis.Features.Collateral" Version="4.0.0.4" />
     <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.7.1" />
     <PackageReference Include="Stratis.Patricia" Version="1.0.7" />
+    <PackageReference Include="Stratis.Features.PoA" Version="1.0.7" />
     <PackageReference Include="Stratis.Sidechains.Networks" Version="1.0.6.4" />
-    <PackageReference Include="Stratis.SmartContracts.CLR" Version="2.0.1" />
+    <PackageReference Include="Stratis.SmartContracts" Version="2.0.0" />
     <PackageReference Include="Stratis.SmartContracts.Core" Version="2.0.1" />
-    <PackageReference Include="Stratis.SmartContracts.Networks" Version="2.0.1" />
     <PackageReference Include="Stratis.SmartContracts.RuntimeObserver" Version="2.0.0" />	
   </ItemGroup>
 

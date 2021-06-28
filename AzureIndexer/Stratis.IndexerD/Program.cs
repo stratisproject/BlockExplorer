@@ -61,17 +61,13 @@ namespace Stratis.IndexerD
                         })
                         .AddPoAFeature()
                         .UsePoAConsensus()
-                        .CheckCollateralCommitment() // This is a non-mining node so we will only check the commitment height data and not do the full set of collateral checks.
-
-                        // This needs to be set so that we can check the magic bytes during the Strat to Strax changeover.
-                        // Perhaps we can introduce a block height check rather?
+                        .CheckCollateralCommitment()
                         .SetCounterChainNetwork(StraxNetwork.MainChainNetworks[nodeSettings.Network.NetworkType]())
-
                         .UseSmartContractWallet()
+                        .AddSQLiteWalletRepository()
+                        .UseAzureIndexerOnSideChain()
                         .UseApi()
                         .UseMempool()
-                        .UseAzureIndexerOnSideChain()
-                        .AddSQLiteWalletRepository()
                         .Build();
                 }
                 else
