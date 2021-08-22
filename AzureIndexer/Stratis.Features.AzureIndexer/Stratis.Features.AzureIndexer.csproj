@@ -31,13 +31,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
     <PackageReference Include="NLog" Version="4.7.9" />
-    <PackageReference Include="NStratis" Version="4.0.0.80" />
-    <PackageReference Include="Stratis.Core" Version="1.0.7" />
-    <PackageReference Include="Stratis.Core.Networks" Version="1.0.7" />
-    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.7" />
-    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.7.1" />
-    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.7" />
-    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.7" />
+    <PackageReference Include="NStratis" Version="4.0.0.82" />
+    <PackageReference Include="Stratis.Core" Version="1.0.9.3" />
+    <PackageReference Include="Stratis.Core.Networks" Version="1.0.9.3" />
+    <PackageReference Include="Stratis.Features.BlockStore" Version="1.0.9.3" />
+    <PackageReference Include="Stratis.Features.SmartContracts" Version="1.0.9.3" />
+    <PackageReference Include="Stratis.Features.SQLiteWalletRepository" Version="1.0.9.3" />
+    <PackageReference Include="Stratis.Features.Wallet" Version="1.0.9.3" />
     <PackageReference Include="Stratis.SmartContracts.CLR" Version="2.0.1" />
     <PackageReference Include="Stratis.SmartContracts.Core" Version="2.0.1" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
