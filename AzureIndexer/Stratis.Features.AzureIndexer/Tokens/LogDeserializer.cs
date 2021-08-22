@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Reflection;
-using NBitcoin;
-using Nethereum.RLP;
-using Stratis.SmartContracts;
-using Stratis.SmartContracts.CLR;
-using Stratis.SmartContracts.CLR.Serialization;
-
-namespace Stratis.Features.AzureIndexer.Tokens
+﻿namespace Stratis.Features.AzureIndexer.Tokens
 {
+    using NBitcoin;
+    using Nethereum.RLP;
+    using Stratis.SmartContracts;
+    using Stratis.SmartContracts.CLR;
+    using Stratis.SmartContracts.CLR.Serialization;
+    using System;
+    using System.Collections.Generic;
+    using System.Dynamic;
+    using System.Reflection;
+
     public struct TransferLog
     {
         [Index]
@@ -24,6 +24,7 @@ namespace Stratis.Features.AzureIndexer.Tokens
     public class LogDeserializer
     {
         private readonly IContractPrimitiveSerializer primitiveSerializer;
+
         public Network Network { get; }
 
         public LogDeserializer(IContractPrimitiveSerializer primitiveSerializer, Network network)
@@ -41,7 +42,7 @@ namespace Stratis.Features.AzureIndexer.Tokens
         /// <returns>An <see cref="ExpandoObject"/> containing the fields of the Type and its deserialized values.</returns>
         public dynamic DeserializeLogData(byte[] bytes, Type type)
         {
-            RLPCollection collection = (RLPCollection)RLP.Decode(bytes)[0];
+            RLPCollection collection = (RLPCollection)RLP.Decode(bytes);
 
             var instance = new ExpandoObject() as IDictionary<string, object>;
 
