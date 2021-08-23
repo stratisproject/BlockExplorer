@@ -1,8 +1,5 @@
 ﻿namespace Stratis.Features.AzureIndexer.Entities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using CSharpFunctionalExtensions;
     using Microsoft.WindowsAzure.Storage.Table;
     using NBitcoin;
@@ -12,10 +9,13 @@
     using Stratis.SmartContracts.CLR.Compilation;
     using Stratis.SmartContracts.CLR.Decompilation;
     using Stratis.SmartContracts.CLR.Serialization;
-    using Stratis.SmartContracts.Core;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public partial class TransactionEntry
     {
+
         public ColoredTransaction ColoredTransaction { get; set; }
 
         public DateTimeOffset? MempoolDate { get; set; }
@@ -325,7 +325,9 @@
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {
                     if (!transactionOutput.ScriptPubKey.IsSmartContractCreate())
+                    {
                         continue;
+                    }
 
                     Result<ContractTxData> contractTxDataResult = smartContractSerializer.Deserialize(transactionOutput.ScriptPubKey.ToBytes());
                     if (contractTxDataResult.IsSuccess)

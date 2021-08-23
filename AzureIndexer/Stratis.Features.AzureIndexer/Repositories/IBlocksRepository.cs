@@ -1,10 +1,11 @@
 ﻿namespace Stratis.Features.AzureIndexer.Repositories
 {
-    using System.Collections.Generic;
-    using System.Threading;
     using NBitcoin;
     using Stratis.Bitcoin;
     using Stratis.Bitcoin.Features.BlockStore;
+    using Stratis.Bitcoin.Features.BlockStore.Repositories;
+    using System.Collections.Generic;
+    using System.Threading;
 
     public interface IBlocksRepository
     {
@@ -16,12 +17,12 @@
     public class FullNodeBlocksRepository : IBlocksRepository
     {
         private readonly FullNode node;
-        private readonly BlockRepository repo;
+        private readonly LevelDbBlockRepository repo;
 
         public FullNodeBlocksRepository(FullNode node)
         {
             this.node = node;
-            this.repo = node.NodeService<IBlockRepository>() as BlockRepository;
+            this.repo = node.NodeService<IBlockRepository>() as LevelDbBlockRepository;
         }
 
         public Block GetStoreTip()
