@@ -324,7 +324,7 @@
 
                 foreach (TxOut transactionOutput in transaction.Outputs)
                 {
-                    if (!Stratis.SmartContracts.Core.SmartContractScript.IsSmartContractCreate(transactionOutput.ScriptPubKey))
+                    if (!transactionOutput.ScriptPubKey.IsSmartContractCreate())
                     {
                         continue;
                     }
