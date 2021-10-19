@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using Refit;
 using stratfaucet.request;
@@ -14,43 +10,35 @@ namespace stratfaucet.Lib
 {
     public class WalletUtils : IWalletUtils
     {
-        private IConfiguration _config;
-
-        private String apiUrl;
-
-        private string password;
-
-        private string accountName;
-
-        private string walletName;
-
-        private IStratisWalletAPI stratApi;
+      private readonly string _password;
+        private readonly string _accountName;
+        private readonly string _walletName;
+        private readonly int _coinType;
+        private readonly IStratisWalletAPI _stratApi;
 
         private decimal coinDivisor = 100000000M;
         public WalletUtils(IConfiguration config)
         {
-            _config = config;
-            apiUrl = (_config["Faucet:FullNodeApiUrl"] != null ? _config["Faucet:FullNodeApiUrl"] : "http://127.0.0.1:37220");
-            password = _config["Faucet:FullNodePassword"];
-            accountName = _config["Faucet:FullNodeAccountName"];
-            walletName = _config["Faucet:FullNodeWalletName"];
+            var apiUrl = config["Faucet:FullNodeApiUrl"] ?? "http://127.0.0.1:37220";
+            _password = config["Faucet:FullNodePassword"];
+            _accountName = config["Faucet:FullNodeAccountName"];
+            _walletName = config["Faucet:FullNodeWalletName"];
+            _coinType = int.Parse(config["Faucet:FullNodeCoinType"]);
 
-            stratApi = RestService.For<IStratisWalletAPI>(apiUrl,
-            new RefitSettings
-            {
-            }
-          );
+            _stratApi = RestService.For<IStratisWalletAPI>(apiUrl, new RefitSettings());
         }
         public async Task<Balance> GetBalance()
         {
             try
             {
-                var bal = await stratApi.GetBalance(walletName);
-                var address = await stratApi.GetUnusedAddress(walletName, accountName, 0);
+                var bal = await _stratApi.GetBalance(_walletName);
+                var address = await _stratApi.GetUnusedAddress(_walletName, _accountName, 0);
                 return new Balance
                 {
                     balance = (bal.BalancesList.First().AmountConfirmed / coinDivisor),
-                    returnAddress = address.Substring(address.IndexOf("\"") + 1, address.LastIndexOf("\"") -1)
+                    returnAddress = address.Substring(
+                      address.IndexOf("\"", StringComparison.OrdinalIgnoreCase) + 1,
+                      address.LastIndexOf("\"", StringComparison.OrdinalIgnoreCase) - 1)
                 };
             }
             catch (Exception e)
@@ -66,24 +54,29 @@ namespace stratfaucet.Lib
         {
             var amount = (await GetBalance()).balance / 100;
 
-            BuildTransaction buildTransaction = new BuildTransaction{
-                WalletName = walletName,
-                AccountName = accountName,
-                CoinType = 105,
-                Password = password,
+            var buildTransaction = new BuildTransaction
+            {
+                WalletName = _walletName,
+                AccountName = _accountName,
+                CoinType = _coinType,
+                Password = _password,
                 DestinationAddress = recipient.address,
-                Amount = amount.ToString(),
+                Amount = amount.ToString(CultureInfo.InvariantCulture),
                 FeeType = "low",
                 AllowUnconfirmed = true
             };
-            var transaction = await stratApi.BuildTransaction(buildTransaction);
+            var transaction = await _stratApi.BuildTransaction(buildTransaction);
 
-            SendTransaction sendTransaction = new SendTransaction{
+            var sendTransaction = new SendTransaction
+            {
                 Hex = transaction.Hex
             };
 
-          var resp =  await stratApi.SendTransaction(sendTransaction);
-          return new Transaction{
+          var resp =  await _stratApi.SendTransaction(sendTransaction);
+          Console.Write(resp);
+
+          return new Transaction
+          {
               confirmation = transaction.TransactionId
           };
         }
@@ -91,6 +84,5 @@ namespace stratfaucet.Lib
         {
             return true;
         }
-
     }
 }
