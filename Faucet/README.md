@@ -1,6 +1,6 @@
 # stratfaucet
 
-This is a basic faucet for Stratis Platform test tokens (TSTRAT). It is written in dotnet core/typescript/Angular. It uses Refit against the stratisX `Stratis.StratisD` and is bundled with Docker containers.
+This is a basic faucet for Stratis Platform test tokens (TSTRAX). It is written in dotnet core/typescript/Angular. It uses Refit against the stratisX `Stratis.StratisD` and is bundled with Docker containers.
 
 ## Runing the faucet with Docker
 
@@ -11,7 +11,8 @@ This is a basic faucet for Stratis Platform test tokens (TSTRAT). It is written 
     "FullNodeApiurl": "http://0.0.0.0:37220",
     "FullNodePassword": "<password>",
     "FullNodeAccountName": "account 0",
-    "FullNodeWalletName": "<walletname>"
+    "FullNodeWalletName": "<walletname>",
+    "FullNodeCoinType": "105105"
   }
 ```
 

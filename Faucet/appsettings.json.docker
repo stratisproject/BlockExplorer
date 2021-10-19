@@ -16,6 +16,7 @@
     "FullNodeApiurl": "http://0.0.0.0:37220",
     "FullNodePassword": "<password>",
     "FullNodeAccountName": "account 0",
-    "FullNodeWalletName": "<wallet>"
+    "FullNodeWalletName": "<wallet>",
+    "FullNodeCoinType": "105105"
   }
 }
